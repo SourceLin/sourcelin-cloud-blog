@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.sourcelin</groupId>
         <artifactId>sourcelin-modules</artifactId>
-        <version>3.6.8</version>
+        <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 	

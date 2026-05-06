@@ -6,13 +6,13 @@
 
     <groupId>com.sourcelin</groupId>
     <artifactId>sourcelin-cloud-blog</artifactId>
-    <version>3.6.8</version>
+    <version>1.0.0</version>
 
     <name>sourcelin-cloud-blog</name>
     <description>SourceLin cloud blog microservices</description>
 
     <properties>
-        <sourcelin.version>3.6.8</sourcelin.version>
+        <sourcelin.version>1.0.0</sourcelin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
