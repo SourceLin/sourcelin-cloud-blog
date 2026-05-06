@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.sourcelin</groupId>
+        <artifactId>sourcelin-cloud-blog</artifactId>
+        <version>3.6.8</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <modules>
+        <module>sourcelin-common-log</module>
+        <module>sourcelin-common-core</module>
+        <module>sourcelin-common-webmvc</module>
+        <module>sourcelin-common-redis</module>
+        <module>sourcelin-common-seata</module>
+        <module>sourcelin-common-swagger</module>
+        <module>sourcelin-common-sensitive</module>
+        <module>sourcelin-common-security</module>
+        <module>sourcelin-common-datascope</module>
+        <module>sourcelin-common-datasource</module>
+    </modules>
+
+    <artifactId>sourcelin-common</artifactId>
+    <packaging>pom</packaging>
+
+    <description>
+        sourcelin-common通用模块
+    </description>
+
+</project>

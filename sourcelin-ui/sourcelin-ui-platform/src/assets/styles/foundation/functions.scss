@@ -1,0 +1,27 @@
+/**
+ * Foundation：SCSS 颜色与数值辅助函数（供全局样式与 mixin 使用）。
+ */
+
+@use 'sass:math';
+@use 'sass:color';
+
+/** 按亮度增量调整颜色 */
+@function adjust-color($color, $amount) {
+  @return color.adjust($color, $lightness: $amount);
+}
+
+/** 两色按权重混合 */
+@function mix-colors($color1, $color2, $weight) {
+  @return color.mix($color1, $color2, $weight);
+}
+
+/** 安全除法（避免原生 `/` 被解析为 CSS） */
+@function divide($dividend, $divisor) {
+  @return math.div($dividend, $divisor);
+}
+
+/** 将小数转为百分比 calc 表达式 */
+@function percentage-calc($value) {
+  @return calc(#{$value} * 100%);
+}
+

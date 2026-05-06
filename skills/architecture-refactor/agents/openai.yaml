@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sourcelin 架构重构"
+  short_description: "跨端目录整理、组件拆分、模块边界、规则和文档同步重构"
+  default_prompt: "执行 Sourcelin 架构重构、页面拆分、后台模块化、后端分层或规则体系治理时使用本技能。"

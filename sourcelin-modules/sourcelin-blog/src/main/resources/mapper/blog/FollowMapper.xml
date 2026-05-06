@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.FollowMapper">
+    
+    <resultMap type="Follow" id="FollowResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="followUserId"    column="follow_user_id"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <resultMap type="Follow" id="FollowResultVO">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="followUserId"    column="follow_user_id"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="createTime"    column="create_time"    />
+        <association property="targetUser" javaType="com.sourcelin.blog.api.domain.User">
+            <result property="id" column="target_user_id"/>
+            <result property="nickname" column="target_nickname"/>
+            <result property="avatar" column="target_avatar"/>
+            <result property="introduction" column="target_introduction"/>
+        </association>
+    </resultMap>
+
+    <resultMap type="Follow" id="FansResultVO">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="source_user_id"    />
+        <result property="followUserId"    column="follow_user_id"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="createTime"    column="create_time"    />
+        <association property="user" javaType="com.sourcelin.blog.api.domain.User">
+            <result property="id" column="user_id"/>
+            <result property="nickname" column="nickname"/>
+            <result property="avatar" column="avatar"/>
+            <result property="introduction" column="introduction"/>
+        </association>
+    </resultMap>
+
+    <sql id="selectFollowVo">
+        select id, user_id, follow_user_id, deleted, create_time from b_follow
+    </sql>
+
+    <select id="selectFollowList" parameterType="Follow" resultMap="FollowResult">
+        <include refid="selectFollowVo"/>
+        <where>
+            <if test="userId != null"> and user_id = #{userId}</if>
+            <if test="followUserId != null"> and follow_user_id = #{followUserId}</if>
+            <if test="deleted != null"> and deleted = #{deleted}</if>
+        </where>
+    </select>
+    
+    <select id="selectFollowById" parameterType="Long" resultMap="FollowResult">
+        <include refid="selectFollowVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectFollowListWithTargetUser" parameterType="Follow" resultMap="FollowResultVO">
+        SELECT f.id, f.user_id, f.follow_user_id, f.deleted, f.create_time,
+               u.id as target_user_id, u.nickname as target_nickname, u.avatar as target_avatar, u.introduction as target_introduction
+        FROM b_follow f
+        LEFT JOIN b_user u ON f.follow_user_id = u.id and u.del_flag = '0'
+        WHERE f.deleted = 0
+        <if test="userId != null">AND f.user_id = #{userId}</if>
+        <if test="params != null and params.relationState == 'active'">AND u.id IS NOT NULL</if>
+        <if test="params != null and params.relationState == 'inactive'">AND u.id IS NULL</if>
+    </select>
+
+    <select id="selectFansListWithUser" parameterType="Follow" resultMap="FansResultVO">
+        SELECT f.id, f.user_id as source_user_id, f.follow_user_id, f.deleted, f.create_time,
+               u.id as user_id, u.nickname, u.avatar, u.introduction
+        FROM b_follow f
+        LEFT JOIN b_user u ON f.user_id = u.id and u.del_flag = '0'
+        WHERE f.deleted = 0
+        <if test="targetUserId != null">AND f.follow_user_id = #{targetUserId}</if>
+        <if test="params != null and params.relationState == 'active'">AND u.id IS NOT NULL</if>
+        <if test="params != null and params.relationState == 'inactive'">AND u.id IS NULL</if>
+    </select>
+
+    <select id="selectFollowByUserAndTarget" resultMap="FollowResult">
+        <include refid="selectFollowVo"/>
+        where user_id = #{userId} and follow_user_id = #{followUserId} and deleted = 0
+    </select>
+
+    <select id="countFollowByUserId" resultType="int">
+        select count(1) from b_follow where deleted = 0 and user_id = #{userId}
+    </select>
+
+    <select id="countFansByTargetUserId" resultType="int">
+        select count(1) from b_follow where deleted = 0 and follow_user_id = #{targetUserId}
+    </select>
+        
+    <insert id="insertFollow" parameterType="Follow" useGeneratedKeys="true" keyProperty="id">
+        insert into b_follow
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="followUserId != null">follow_user_id,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="followUserId != null">#{followUserId},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFollow" parameterType="Follow">
+        update b_follow
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="followUserId != null">follow_user_id = #{followUserId},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFollowById" parameterType="Long">
+        update b_follow set deleted = 1 where id = #{id}
+    </delete>
+
+    <delete id="deleteFollowByIds" parameterType="String">
+        update b_follow set deleted = 1 where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

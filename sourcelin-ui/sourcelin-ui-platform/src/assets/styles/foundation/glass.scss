@@ -1,0 +1,957 @@
+@import './responsive';
+
+/**
+ * Foundation：玻璃态表面体系（`.sourcelin-glass*`、面板 token、卡片/弹窗/输入/按钮），
+ * 以及暗色覆盖、无 backdrop 降级与移动端简化滤镜。
+ */
+
+/* —— 标准 / 轻量 / 强化玻璃块（含 hover 抬起） —— */
+
+.sourcelin-glass {
+  position: relative;
+  border-radius: var(--glass-radius, 20px);
+  background: var(--glass-surface);
+  background-image: var(--glass-noise);
+  background-blend-mode: soft-light;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  outline: 1px solid var(--glass-border);
+  border: none;
+  box-shadow:
+    inset 0 1px 0 var(--glass-inner-glow),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 12px 36px var(--glass-shadow),
+    0 3px 10px rgba(0, 0, 0, 0.1);
+  overflow: clip;
+  contain: paint;
+  will-change: transform, backdrop-filter;
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease,
+    background 0.3s ease;
+}
+
+.sourcelin-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.52) 0%,
+    rgba(255, 255, 255, 0.22) 22%,
+    transparent 48%
+  );
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 1;
+}
+
+.sourcelin-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.24),
+    inset 0 -3px 14px rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sourcelin-glass:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 1px 0 var(--glass-inner-glow),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 20px 56px var(--glass-shadow),
+    0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.sourcelin-glass-lite {
+  position: relative;
+  border-radius: var(--glass-radius, 16px);
+  background: var(--glass-surface-lite);
+  background-image: var(--glass-noise);
+  background-blend-mode: soft-light;
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) - 4px)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) - 4px)) saturate(var(--glass-saturate));
+  outline: 1px solid var(--glass-border);
+  border: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    0 8px 22px var(--glass-shadow);
+  overflow: clip;
+  contain: paint;
+  transition: all 0.25s ease;
+}
+
+.sourcelin-glass-lite:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.46),
+    0 12px 28px var(--glass-shadow);
+}
+
+/* —— 面板族：默认 / 柔和 / 强调 / 内凹 / 芯片 / 前奏区 —— */
+
+.sourcelin-panel,
+.sourcelin-panel-soft,
+.sourcelin-panel-strong,
+.sourcelin-panel-inset,
+.sourcelin-panel-modal-field,
+.sourcelin-chip-surface,
+.sourcelin-prelude-surface {
+  position: relative;
+  overflow: clip;
+  isolation: isolate;
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base),
+    border-color var(--transition-base),
+    background var(--transition-base);
+}
+
+.sourcelin-panel,
+.sourcelin-panel-soft,
+.sourcelin-panel-strong {
+  border-radius: calc(var(--glass-radius, 20px) + 2px);
+}
+
+/* 底色略透时略增 blur，层次更「玻璃」而不是「白盒蒙层」 */
+.sourcelin-panel {
+  position: relative;
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
+  border: 1px solid var(--border-panel-default);
+  background: var(--surface-panel-default);
+  box-shadow:
+    var(--highlight-panel-default),
+    var(--shadow-panel-default),
+    var(--shadow-panel-glow);
+}
+
+.sourcelin-panel-soft {
+  backdrop-filter: blur(calc(var(--glass-blur) + 4px)) saturate(var(--glass-saturate));
+  border: 1px solid var(--border-panel-subtle);
+  background: var(--surface-panel-soft);
+  box-shadow:
+    var(--highlight-panel-soft),
+    var(--shadow-panel-soft);
+}
+
+.sourcelin-panel-strong {
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--border-panel-strong);
+  background: var(--surface-panel-strong);
+  box-shadow:
+    var(--highlight-panel-strong),
+    var(--shadow-panel-default),
+    var(--shadow-panel-glow-strong);
+}
+
+.sourcelin-panel-inset {
+  border-radius: calc(var(--glass-radius, 20px) - 4px);
+  border: 1px solid var(--border-panel-subtle);
+  background: var(--surface-panel-inset);
+  box-shadow:
+    var(--highlight-panel-soft),
+    var(--shadow-panel-inline);
+  backdrop-filter: blur(calc(var(--glass-blur) - 2px)) saturate(calc(var(--glass-saturate) - 8%));
+}
+
+/* solid 模态内嵌区块（--surface-modal-field） */
+.sourcelin-panel-modal-field {
+  border-radius: calc(var(--glass-radius, 20px) - 4px);
+  border: 1px solid color-mix(in srgb, var(--border-color) 78%, var(--glass-border));
+  background: var(--surface-modal-field);
+  box-shadow: var(--shadow-panel-inline);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* 与 .sourcelin-panel* 组合：悬停微抬起与强调阴影 */
+.sourcelin-panel-hoverable:hover {
+  transform: scale(1.012);
+  border-color: var(--border-interactive-hover);
+  background: var(--surface-panel-default);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--surface-white-25) 88%, transparent),
+    var(--highlight-panel-default),
+    var(--shadow-panel-hover),
+    var(--shadow-panel-glow);
+}
+
+.sourcelin-chip-surface {
+  border-radius: 999px;
+  border: 1px solid var(--border-panel-chip);
+  background: var(--surface-panel-chip-quiet);
+  box-shadow: var(--highlight-panel-chip);
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(calc(var(--glass-saturate) - 10%));
+}
+
+.sourcelin-chip-surface--accent {
+  border-color: var(--border-panel-badge-accent);
+  background: var(--surface-panel-chip-accent);
+  box-shadow:
+    var(--highlight-panel-chip),
+    0 10px 24px color-mix(in srgb, var(--primary-color) 14%, transparent);
+}
+
+/* glass-page + FeatureCard/NCard 内 hero 眉题：提高优先级，避免叠层或内容区样式盖住 chip 底框 */
+.glass-page .article-card-prelude-label.sourcelin-chip-surface {
+  position: relative;
+  z-index: 1;
+  overflow: clip;
+  isolation: isolate;
+  border-radius: 999px;
+  border: 1px solid var(--border-panel-chip);
+  background: var(--surface-panel-chip);
+  box-shadow: var(--highlight-panel-chip);
+  backdrop-filter: blur(calc(var(--glass-blur) - 2px));
+}
+
+.glass-page .article-card-prelude-label.sourcelin-chip-surface.sourcelin-chip-surface--accent {
+  border-color: var(--border-panel-badge-accent);
+  background: var(--surface-panel-chip-accent);
+}
+
+.sourcelin-prelude-surface {
+  border-radius: calc(var(--glass-radius, 20px) + 4px);
+  border: 1px solid var(--border-panel-prelude);
+  background: var(--surface-panel-prelude);
+  box-shadow:
+    var(--highlight-panel-soft),
+    var(--shadow-panel-subtle);
+  backdrop-filter: blur(var(--glass-blur));
+}
+
+/* —— 强化玻璃、磨砂变体 —— */
+
+.sourcelin-glass-strong {
+  position: relative;
+  border-radius: var(--glass-radius, 24px);
+  background: var(--glass-surface-strong);
+  background-image: var(--glass-noise);
+  background-blend-mode: soft-light;
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 6px)) saturate(calc(var(--glass-saturate) + 20%));
+  backdrop-filter: blur(calc(var(--glass-blur) + 6px)) saturate(calc(var(--glass-saturate) + 20%));
+  outline: 1px solid var(--glass-border-strong);
+  border: none;
+  box-shadow:
+    inset 0 2px 0 var(--glass-inner-glow),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1),
+    0 18px 56px var(--glass-shadow),
+    0 6px 18px rgba(0, 0, 0, 0.14);
+  overflow: clip;
+  contain: paint;
+}
+
+.sourcelin-frosted {
+  position: relative;
+  border-radius: var(--glass-radius, 20px);
+  background: var(--glass-surface);
+  background-image: var(--glass-noise);
+  background-blend-mode: soft-light;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  outline: 1px solid var(--glass-border);
+  border: none;
+  box-shadow:
+    inset 0 1px 0 var(--glass-inner-glow),
+    0 8px 32px var(--glass-shadow);
+  overflow: clip;
+  transition: all 0.3s ease;
+}
+
+.sourcelin-frosted::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent 35%);
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+.sourcelin-frosted:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 var(--glass-inner-glow),
+    0 12px 40px var(--glass-shadow);
+}
+
+/* —— 内容卡片（带顶部光泽与 hover 顶栏渐变条） —— */
+
+.sourcelin-card {
+  position: relative;
+  padding: 24px;
+  border-radius: var(--glass-radius, 20px);
+  background: var(--glass-surface-lite);
+  background-image: var(--glass-noise);
+  background-blend-mode: soft-light;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--card-shadow);
+  overflow: clip;
+  contain: paint;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sourcelin-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  border-radius: var(--glass-radius, 20px) var(--glass-radius, 20px) 0 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.sourcelin-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--primary-color),
+    var(--secondary-color),
+    var(--accent-color)
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+}
+
+.sourcelin-card:hover {
+  transform: translateY(-6px);
+  background: var(--glass-surface-strong);
+  background-image: var(--glass-noise);
+  background-blend-mode: soft-light;
+  box-shadow:
+    0 16px 48px var(--glass-shadow),
+    0 6px 20px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* —— 弹窗主体与全屏遮罩（毛玻璃背景 + 居中容器） —— */
+
+.sourcelin-modal {
+  position: relative;
+  border-radius: var(--glass-radius, 20px);
+  background: var(--glass-surface-strong);
+  background-image: var(--glass-noise);
+  background-blend-mode: soft-light;
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 4px)) saturate(calc(var(--glass-saturate) + 10%));
+  backdrop-filter: blur(calc(var(--glass-blur) + 4px)) saturate(calc(var(--glass-saturate) + 10%));
+  border: 1px solid var(--glass-border-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+    0 24px 80px rgba(0, 0, 0, 0.25),
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: clip;
+  contain: paint;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.sourcelin-modal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 46%;
+  border-radius: var(--glass-radius, 20px) var(--glass-radius, 20px) 0 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.35) 20%,
+    rgba(255, 255, 255, 0.15) 40%,
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.sourcelin-modal::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 12px rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sourcelin-modal:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+    0 28px 90px rgba(0, 0, 0, 0.3),
+    0 10px 36px rgba(0, 0, 0, 0.18),
+    0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.sourcelin-modal-mask {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--modal-overlay-scrim);
+  -webkit-backdrop-filter: var(--modal-overlay-backdrop-filter);
+  backdrop-filter: var(--modal-overlay-backdrop-filter);
+  z-index: 2000;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sourcelin-card:hover::after {
+  opacity: 1;
+}
+
+/* —— 兼容用表单控件（非 Naive 场景下的玻璃输入 / 按钮） —— */
+
+.sourcelin-input {
+  border-radius: calc(var(--glass-radius, 20px) / 2);
+  background: var(--input-background);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) / 2)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) / 2)) saturate(var(--glass-saturate));
+  border: 1px solid var(--input-border);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+  padding: 12px 16px;
+  color: var(--input-text);
+  font-size: 14px;
+}
+
+.sourcelin-input:hover {
+  border-color: var(--input-border-hover);
+  background: var(--input-background-focus);
+}
+
+.sourcelin-input:focus {
+  background: var(--input-background-focus);
+  border-color: var(--input-border-focus);
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 0 0 3px rgba(var(--primary-color-rgb), 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.sourcelin-button {
+  position: relative;
+  border-radius: calc(var(--glass-radius, 20px) / 2);
+  background: rgba(99, 102, 241, 0.15);
+  background: color-mix(in srgb, var(--primary-color) 15%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+  backdrop-filter: blur(10px) saturate(150%);
+  border: 1px solid rgba(var(--primary-color-rgb), 0.3);
+  color: var(--primary-color);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 4px 12px rgba(var(--primary-color-rgb), 0.15);
+  overflow: hidden;
+  transition: all 0.25s ease;
+  padding: 12px 24px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.sourcelin-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), transparent 50%);
+  pointer-events: none;
+}
+
+.sourcelin-button:hover {
+  background: color-mix(in srgb, var(--primary-color) 25%, transparent);
+  border-color: rgba(var(--primary-color-rgb), 0.5);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 8px 20px rgba(var(--primary-color-rgb), 0.25);
+}
+
+.sourcelin-button:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.sourcelin-button-primary {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: var(--text-color-light);
+  border: none;
+}
+
+.sourcelin-button-primary:hover {
+  background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+  box-shadow: 0 8px 25px rgba(var(--primary-color-rgb), 0.3);
+}
+
+/* 全铺玻璃蒙层（类名历史遗留双 sourcelin 前缀，勿随意改名以免破坏引用） */
+.sourcelin-sourcelin-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--glass-surface-lite);
+  background-image: var(--glass-noise);
+  background-blend-mode: soft-light;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+/* —— 暗色主题：压低高光、加深阴影与遮罩 —— */
+
+html[data-theme='dark'] .sourcelin-glass,
+html[data-theme='dark'] .sourcelin-frosted {
+  background: var(--glass-surface);
+  background-image: var(--glass-noise);
+  background-blend-mode: soft-light;
+}
+
+html[data-theme='dark'] .sourcelin-modal {
+  background: var(--glass-surface-strong);
+  background-image: var(--glass-noise);
+  background-blend-mode: soft-light;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 24px 80px rgba(0, 0, 0, 0.5),
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+html[data-theme='dark'] .sourcelin-modal::before {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.05) 30%,
+    transparent 50%
+  );
+}
+
+html[data-theme='dark'] .sourcelin-modal::after {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 -2px 12px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme='dark'] .sourcelin-glass::before,
+html[data-theme='dark'] .sourcelin-frosted::before,
+html[data-theme='dark'] .sourcelin-card::before {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.05) 30%,
+    transparent 50%
+  );
+}
+
+html[data-theme='dark'] .sourcelin-glass::after,
+html[data-theme='dark'] .sourcelin-card::after {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 -2px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* 不支持 backdrop-filter 的浏览器：退回纯色玻璃底 */
+@supports not (backdrop-filter: blur(1px)) {
+  .sourcelin-glass,
+  .sourcelin-glass-lite,
+  .sourcelin-glass-strong,
+  .sourcelin-frosted,
+  .sourcelin-card {
+    background: var(--fallback-glass-bg) !important;
+  }
+
+  html[data-theme='dark'] .sourcelin-glass,
+  html[data-theme='dark'] .sourcelin-glass-lite,
+  html[data-theme='dark'] .sourcelin-glass-strong,
+  html[data-theme='dark'] .sourcelin-frosted,
+  html[data-theme='dark'] .sourcelin-card {
+    background: var(--fallback-glass-bg) !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass-blur: 0px;
+    --glass-drop-blur: 0px;
+    --glass-ice-blur: 0px;
+    --glass-frost-blur: 0px;
+    --glass-gem-blur: 0px;
+    --glass-nested-blur: 0px;
+    --glass-nested-deep-blur: 0px;
+    --surface-panel-soft: var(--fallback-glass-bg);
+    --surface-panel-default: var(--fallback-glass-bg);
+    --surface-panel-strong: var(--fallback-glass-bg);
+    --surface-panel-inset: var(--fallback-glass-bg-lite);
+    --surface-content-card: var(--fallback-glass-bg);
+    --surface-content-card-featured: var(--fallback-glass-bg);
+    --content-card-backdrop-filter: none;
+    --content-card-backdrop-filter-hover: none;
+    --modal-overlay-backdrop-filter: none;
+    --modal-overlay-scrim: var(--overlay-medium);
+  }
+
+  .sourcelin-glass,
+  .sourcelin-glass-lite,
+  .sourcelin-glass-strong,
+  .sourcelin-glass-drop,
+  .sourcelin-glass-ice,
+  .sourcelin-glass-frost,
+  .sourcelin-glass-gem,
+  .sourcelin-frosted,
+  .sourcelin-card,
+  .sourcelin-panel,
+  .sourcelin-panel-soft,
+  .sourcelin-panel-strong,
+  .sourcelin-panel-inset,
+  .sourcelin-chip-surface,
+  .sourcelin-prelude-surface,
+  .sourcelin-modal,
+  .sourcelin-modal-mask {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* 窄屏：去掉 SVG 液态滤镜 url，仅保留 blur（省电、减兼容问题） */
+@include sourcelin-down(md) {
+  .sourcelin-glass,
+  .sourcelin-glass-lite,
+  .sourcelin-glass-strong {
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  }
+}
+
+/* 工具类：按需关闭或强制使用液态 SVG 滤镜 */
+.sourcelin-no-liquid {
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) !important;
+}
+
+.sourcelin-force-liquid {
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) !important;
+}
+
+/* 折射光晕装饰（伪元素，置于内容背后） */
+.sourcelin-refraction {
+  position: relative;
+}
+
+.sourcelin-refraction::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(
+    ellipse at 30% 20%,
+    var(--glass-refraction) 0%,
+    transparent 50%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ========== 液态玻璃光学体系：4 种光学变体 ========== */
+
+/* —— 1. 冰晶玻璃 (Ice Crystal) —— */
+/* 隐喻：厚重冰块，锐利顶部高光条，安定厚重。适合阅读容器。 */
+.sourcelin-glass-ice {
+  position: relative;
+  border-radius: var(--glass-radius, 18px);
+  background: var(--glass-ice-surface);
+  background-image: var(--glass-ice-refraction), var(--glass-ice-grain);
+  background-blend-mode: normal, overlay;
+  background-size: auto, 256px 256px;
+  background-repeat: no-repeat, repeat;
+  -webkit-backdrop-filter: blur(var(--glass-ice-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-ice-blur)) saturate(var(--glass-saturate));
+  outline: 1px solid var(--glass-ice-border);
+  border: none;
+  box-shadow: var(--glass-ice-highlight), var(--glass-ice-shadow);
+  overflow: clip;
+  contain: paint;
+  will-change: transform, backdrop-filter;
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease,
+    background 0.3s ease;
+}
+
+.sourcelin-glass-ice:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--glass-ice-highlight),
+    var(--highlight-panel-strong),
+    var(--shadow-panel-hover),
+    0 0 56px color-mix(in srgb, var(--primary-color) 8%, transparent);
+}
+
+/* —— 2. 水滴玻璃 (Water Drop) —— */
+/* 隐喻：悬浮水珠，折射环境光形成内部光斑。标准液态玻璃。 */
+.sourcelin-glass-drop {
+  position: relative;
+  border-radius: var(--glass-radius, 20px);
+  background: var(--glass-drop-surface);
+  background-image: var(--glass-drop-refraction), var(--glass-drop-grain);
+  background-blend-mode: normal, overlay;
+  background-size: auto, 256px 256px;
+  background-repeat: no-repeat, repeat;
+  -webkit-backdrop-filter: blur(var(--glass-drop-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-drop-blur)) saturate(var(--glass-saturate));
+  outline: 1px solid var(--glass-drop-border);
+  border: none;
+  box-shadow: var(--glass-drop-highlight), var(--glass-drop-shadow);
+  overflow: clip;
+  contain: paint;
+  will-change: transform, backdrop-filter;
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease,
+    background 0.3s ease;
+}
+
+.sourcelin-glass-drop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    var(--glass-drop-refraction),
+    radial-gradient(
+      ellipse at var(--refraction-x, 50%) var(--refraction-y, 50%),
+      color-mix(in srgb, var(--companion-color) 6%, transparent),
+      transparent 42%
+    );
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 1;
+  transition: background 0.15s ease-out;
+}
+
+.sourcelin-glass-drop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.24),
+    inset 0 -3px 14px rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sourcelin-glass-drop:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--glass-drop-glow-hover);
+}
+
+/* .sourcelin-glass 即水滴玻璃 */
+.sourcelin-glass {
+  position: relative;
+  border-radius: var(--glass-radius, 20px);
+  background: var(--glass-drop-surface);
+  background-image: var(--glass-drop-refraction), var(--glass-drop-grain);
+  background-blend-mode: normal, soft-light;
+  background-size: auto, 256px 256px;
+  background-repeat: no-repeat, repeat;
+  -webkit-backdrop-filter: blur(var(--glass-drop-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-drop-blur)) saturate(var(--glass-saturate));
+  outline: 1px solid var(--glass-drop-border);
+  border: none;
+  box-shadow:
+    inset 0 1px 0 var(--glass-inner-glow),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 12px 36px var(--glass-shadow),
+    0 3px 10px rgba(0, 0, 0, 0.1);
+  overflow: clip;
+  contain: paint;
+  will-change: transform, backdrop-filter;
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease,
+    background 0.3s ease;
+}
+
+.sourcelin-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    var(--glass-drop-refraction),
+    radial-gradient(
+      ellipse at var(--refraction-x, 50%) var(--refraction-y, 50%),
+      color-mix(in srgb, var(--companion-color) 6%, transparent),
+      transparent 42%
+    );
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 1;
+  transition: background 0.15s ease-out;
+}
+
+.sourcelin-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.24),
+    inset 0 -3px 14px rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sourcelin-glass:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--glass-drop-glow-hover);
+}
+
+/* —— 3. 雾面玻璃 (Frosted Panel) —— */
+/* 隐喻：磨砂镜面，散射光线，垂直侧光带。适合侧边栏。 */
+.sourcelin-glass-frost {
+  position: relative;
+  border-radius: var(--glass-radius, 18px);
+  background: var(--glass-frost-surface);
+  background-image: var(--glass-frost-refraction), var(--glass-frost-grain);
+  background-blend-mode: normal, overlay;
+  background-size: auto, 256px 256px;
+  background-repeat: no-repeat, repeat;
+  -webkit-backdrop-filter: blur(var(--glass-frost-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-frost-blur)) saturate(var(--glass-saturate));
+  outline: 1px solid var(--glass-frost-border);
+  border: none;
+  box-shadow: var(--glass-frost-highlight), var(--glass-frost-shadow);
+  overflow: clip;
+  contain: paint;
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease;
+}
+
+.sourcelin-glass-frost:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glass-frost-highlight),
+    var(--highlight-panel-soft),
+    var(--shadow-panel-default);
+}
+
+/* —— 4. 宝石玻璃 (Gem Crystal) —— */
+/* 隐喻：切割宝石，棱镜分光。全站最华丽，仅用于签名时刻。 */
+.sourcelin-glass-gem {
+  position: relative;
+  border-radius: var(--glass-radius, 18px);
+  background: var(--glass-gem-surface);
+  background-image: var(--glass-gem-refraction), var(--glass-gem-grain);
+  background-blend-mode: normal, overlay;
+  background-size: auto, 256px 256px;
+  background-repeat: no-repeat, repeat;
+  -webkit-backdrop-filter: blur(var(--glass-gem-blur)) saturate(calc(var(--glass-saturate) * 1.15));
+  backdrop-filter: blur(var(--glass-gem-blur)) saturate(calc(var(--glass-saturate) * 1.15));
+  outline: 1px solid var(--glass-gem-border);
+  border: none;
+  box-shadow: var(--glass-gem-highlight), var(--glass-gem-shadow);
+  overflow: clip;
+  contain: paint;
+  will-change: transform, backdrop-filter;
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease;
+}
+
+/* Gem 变体：conic-gradient 色散边框（伪元素实现 0.5px 极细彩虹边框） */
+.sourcelin-glass-gem::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 0.5px;
+  background: var(--glass-gem-chromatic-border);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Gem 变体：双高光条（顶部 + 左侧） */
+.sourcelin-glass-gem::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: var(--glass-gem-highlight);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sourcelin-glass-gem:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--glass-gem-highlight),
+    var(--highlight-panel-strong),
+    var(--shadow-panel-hover),
+    var(--glass-gem-chromatic-fallback);
+}
+
+/* Fallback：不支持 conic-gradient 的浏览器使用 box-shadow */
+@supports not (background: conic-gradient(#fff, #000)) {
+  .sourcelin-glass-gem {
+    box-shadow: var(--glass-gem-highlight), var(--glass-gem-shadow), var(--glass-gem-chromatic-fallback);
+  }
+
+  .sourcelin-glass-gem::before {
+    display: none;
+  }
+}
+
+/* —— 嵌套容器 blur 降值 —— */
+/* 用于已在 blur 容器内的子元素，避免多重 blur 叠加 */
+.sourcelin-glass-nested {
+  -webkit-backdrop-filter: blur(var(--glass-nested-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-nested-blur)) saturate(var(--glass-saturate));
+}
+
+.sourcelin-glass-nested-deep {
+  -webkit-backdrop-filter: blur(var(--glass-nested-deep-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-nested-deep-blur)) saturate(var(--glass-saturate));
+}
+
+/* 窄屏适配：光学变体去掉 SVG 液态滤镜 */
+@include sourcelin-down(md) {
+  .sourcelin-glass-ice,
+  .sourcelin-glass-frost,
+  .sourcelin-glass-gem {
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  }
+
+  .sourcelin-glass-nested,
+  .sourcelin-glass-nested-deep {
+    -webkit-backdrop-filter: blur(var(--glass-nested-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-nested-blur)) saturate(var(--glass-saturate));
+  }
+}

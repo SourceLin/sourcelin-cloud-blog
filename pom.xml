@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.sourcelin</groupId>
+    <artifactId>sourcelin-cloud-blog</artifactId>
+    <version>3.6.8</version>
+
+    <name>sourcelin-cloud-blog</name>
+    <description>SourceLin cloud blog microservices</description>
+
+    <properties>
+        <sourcelin.version>3.6.8</sourcelin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <spring-boot.version>2.7.18</spring-boot.version>
+        <spring-cloud.version>2021.0.9</spring-cloud.version>
+        <spring-cloud-alibaba.version>2021.0.6.1</spring-cloud-alibaba.version>
+        <spring-boot-admin.version>2.7.16</spring-boot-admin.version>
+        <springdoc.version>1.6.9</springdoc.version>
+        <tobato.version>1.27.2</tobato.version>
+        <kaptcha.version>2.3.3</kaptcha.version>
+        <pagehelper.boot.version>2.0.0</pagehelper.boot.version>
+        <druid.version>1.2.27</druid.version>
+        <dynamic-ds.version>4.3.1</dynamic-ds.version>
+        <commons.io.version>2.21.0</commons.io.version>
+        <velocity.version>2.3</velocity.version>
+        <fastjson.version>2.0.61</fastjson.version>
+        <jjwt.version>0.9.1</jjwt.version>
+        <minio.version>8.2.2</minio.version>
+        <poi.version>4.1.2</poi.version>
+        <transmittable-thread-local.version>2.14.4</transmittable-thread-local.version>
+        <!-- Hutool 5.8+ 模块化：DFA（WordTree 等）在 hutool-dfa，需在业务模块显式依赖 -->
+        <hutool.version>5.8.34</hutool.version>
+        <sa-token.version>1.38.0</sa-token.version>
+        <tomcat.version>9.0.112</tomcat.version>
+        <logback.version>1.2.13</logback.version>
+        <spring-framework.version>5.3.39</spring-framework.version>
+    </properties>
+
+    <!-- Dependency version management -->
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- Override Spring Framework BOM version -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>${spring-framework.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Spring Cloud BOM -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Spring Cloud Alibaba BOM -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Spring Boot BOM -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Override Logback dependency versions -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+
+            <!-- Override embedded Tomcat versions -->
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>${tomcat.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-el</artifactId>
+                <version>${tomcat.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-websocket</artifactId>
+                <version>${tomcat.version}</version>
+            </dependency>
+
+            <!-- FastDFS client dependency -->
+            <dependency>
+                <groupId>com.github.tobato</groupId>
+                <artifactId>fastdfs-client</artifactId>
+                <version>${tobato.version}</version>
+            </dependency>
+
+            <!-- Springdoc webmvc -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+
+            <!-- Springdoc webflux (gateway) -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-webflux-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+
+            <!-- Captcha -->
+            <dependency>
+                <groupId>pro.fessional</groupId>
+                <artifactId>kaptcha</artifactId>
+                <version>${kaptcha.version}</version>
+            </dependency>
+
+            <!-- PageHelper starter -->
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper.boot.version}</version>
+            </dependency>
+
+            <!-- Commons IO -->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
+            </dependency>
+
+            <!-- Excel processing -->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+
+            <!-- Template engine -->
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity-engine-core</artifactId>
+                <version>${velocity.version}</version>
+            </dependency>
+
+            <!-- JSON parser -->
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+
+            <!-- JWT -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+
+            <!-- Transmittable Thread Local -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>transmittable-thread-local</artifactId>
+                <version>${transmittable-thread-local.version}</version>
+            </dependency>
+
+            <!-- Common core module -->
+            <dependency>
+                <groupId>com.sourcelin</groupId>
+                <artifactId>sourcelin-common-core</artifactId>
+                <version>${sourcelin.version}</version>
+            </dependency>
+
+            <!-- Common webmvc module -->
+            <dependency>
+                <groupId>com.sourcelin</groupId>
+                <artifactId>sourcelin-common-webmvc</artifactId>
+                <version>${sourcelin.version}</version>
+            </dependency>
+
+            <!-- Common swagger module -->
+            <dependency>
+                <groupId>com.sourcelin</groupId>
+                <artifactId>sourcelin-common-swagger</artifactId>
+                <version>${sourcelin.version}</version>
+            </dependency>
+
+            <!-- Common security module -->
+            <dependency>
+                <groupId>com.sourcelin</groupId>
+                <artifactId>sourcelin-common-security</artifactId>
+                <version>${sourcelin.version}</version>
+            </dependency>
+
+            <!-- Common sensitive module -->
+            <dependency>
+                <groupId>com.sourcelin</groupId>
+                <artifactId>sourcelin-common-sensitive</artifactId>
+                <version>${sourcelin.version}</version>
+            </dependency>
+
+            <!-- Common data scope module -->
+            <dependency>
+                <groupId>com.sourcelin</groupId>
+                <artifactId>sourcelin-common-datascope</artifactId>
+                <version>${sourcelin.version}</version>
+            </dependency>
+
+            <!-- Common data source module -->
+            <dependency>
+                <groupId>com.sourcelin</groupId>
+                <artifactId>sourcelin-common-datasource</artifactId>
+                <version>${sourcelin.version}</version>
+            </dependency>
+
+            <!-- Common seata module -->
+            <dependency>
+                <groupId>com.sourcelin</groupId>
+                <artifactId>sourcelin-common-seata</artifactId>
+                <version>${sourcelin.version}</version>
+            </dependency>
+
+            <!-- Common log module -->
+            <dependency>
+                <groupId>com.sourcelin</groupId>
+                <artifactId>sourcelin-common-log</artifactId>
+                <version>${sourcelin.version}</version>
+            </dependency>
+
+            <!-- Common redis module -->
+            <dependency>
+                <groupId>com.sourcelin</groupId>
+                <artifactId>sourcelin-common-redis</artifactId>
+                <version>${sourcelin.version}</version>
+            </dependency>
+
+            <!-- System API module -->
+            <dependency>
+                <groupId>com.sourcelin</groupId>
+                <artifactId>sourcelin-api-system</artifactId>
+                <version>${sourcelin.version}</version>
+            </dependency>
+
+            <!-- File API module -->
+            <dependency>
+                <groupId>com.sourcelin</groupId>
+                <artifactId>sourcelin-api-file</artifactId>
+                <version>${sourcelin.version}</version>
+            </dependency>
+
+            <!-- Blog API module -->
+            <dependency>
+                <groupId>com.sourcelin</groupId>
+                <artifactId>sourcelin-api-blog</artifactId>
+                <version>${sourcelin.version}</version>
+            </dependency>
+
+            <!-- Hutool BOM -->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-bom</artifactId>
+                <version>${hutool.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Sa-Token -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-spring-boot-starter</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-reactor-spring-boot-starter</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-redis-jackson</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <modules>
+        <module>sourcelin-auth</module>
+        <module>sourcelin-gateway</module>
+        <module>sourcelin-visual</module>
+        <module>sourcelin-modules</module>
+        <module>sourcelin-api</module>
+        <module>sourcelin-common</module>
+    </modules>
+    <packaging>pom</packaging>
+
+    <dependencies>
+        <!-- Spring Cloud bootstrap starter -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>public</id>
+            <name>aliyun nexus</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>public</id>
+            <name>aliyun nexus</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+</project>

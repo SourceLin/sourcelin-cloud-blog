@@ -1,0 +1,98 @@
+// Element Plus 变量覆盖（必须在最前面）
+@use "./element-plus-vars";
+
+$border: 1px solid var(--el-border-color-light);
+
+/* el-dialog */
+.el-dialog {
+  .el-dialog__header {
+    padding: 15px 20px;
+    margin: 0;
+    border-bottom: $border;
+  }
+
+  .el-dialog__body {
+    padding: 20px;
+  }
+
+  .el-dialog__footer {
+    padding: 15px;
+    border-top: $border;
+  }
+}
+
+/* el-drawer */
+.el-drawer {
+  .el-drawer__header {
+    padding: 15px 20px;
+    margin: 0;
+    color: inherit;
+    border-bottom: $border;
+  }
+
+  .el-drawer__body {
+    padding: 20px;
+  }
+
+  .el-drawer__footer {
+    padding: 15px;
+    border-top: $border;
+  }
+}
+
+// 抽屉和对话框底部按钮区域
+.dialog-footer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+html.dark {
+  .el-tabs--border-card {
+    background: var(--el-bg-color-overlay);
+    border-color: var(--el-border-color);
+
+    > .el-tabs__header {
+      background: var(--el-fill-color-light);
+      border-bottom-color: var(--el-border-color);
+    }
+
+    > .el-tabs__header .el-tabs__item {
+      color: var(--el-text-color-secondary);
+      border-color: transparent;
+    }
+
+    > .el-tabs__header .el-tabs__item:hover {
+      color: var(--el-text-color-primary);
+    }
+
+    > .el-tabs__header .el-tabs__item.is-active {
+      color: var(--el-color-primary);
+      background: var(--el-bg-color-overlay);
+      border-color: var(--el-border-color);
+      border-bottom-color: var(--el-bg-color-overlay);
+    }
+  }
+
+  .el-tabs--card {
+    > .el-tabs__header {
+      border-bottom-color: var(--el-border-color);
+    }
+
+    > .el-tabs__header .el-tabs__nav {
+      background: var(--el-fill-color-light);
+      border-color: var(--el-border-color);
+    }
+
+    > .el-tabs__header .el-tabs__item {
+      color: var(--el-text-color-secondary);
+      border-left-color: var(--el-border-color);
+    }
+
+    > .el-tabs__header .el-tabs__item.is-active {
+      color: var(--el-color-primary);
+      background: var(--el-bg-color-overlay);
+      border-bottom-color: var(--el-bg-color-overlay);
+    }
+  }
+}

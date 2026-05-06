@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.WebNavbarMapper">
+    
+    <resultMap type="WebNavbar" id="WebNavbarResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="summary"    column="summary"    />
+        <result property="icon"    column="icon"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="orderNum"    column="order_num"    />
+        <result property="path"    column="path"    />
+        <result property="component"    column="component"    />
+        <result property="isFrame"    column="is_frame"    />
+        <result property="type"    column="type"    />
+        <result property="visible"    column="visible"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectWebNavbarVo">
+        select id, name, summary, icon, parent_id, order_num, path, component, is_frame, type, visible, create_by, create_time, update_by, update_time, remark from b_web_navbar
+    </sql>
+
+    <select id="selectWebNavbarList" parameterType="WebNavbar" resultMap="WebNavbarResult">
+        <include refid="selectWebNavbarVo"/>
+        <where>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="visible != null  and visible != ''"> and visible = #{visible}</if>
+        </where>
+    </select>
+
+    <select id="selectWebNavbarById" parameterType="Long" resultMap="WebNavbarResult">
+        <include refid="selectWebNavbarVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertWebNavbar" parameterType="WebNavbar" useGeneratedKeys="true" keyProperty="id">
+        insert into b_web_navbar
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="summary != null">summary,</if>
+            <if test="icon != null">icon,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="orderNum != null">order_num,</if>
+            <if test="path != null">path,</if>
+            <if test="component != null">component,</if>
+            <if test="isFrame != null">is_frame,</if>
+            <if test="type != null">type,</if>
+            <if test="visible != null">visible,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="summary != null">#{summary},</if>
+            <if test="icon != null">#{icon},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+            <if test="path != null">#{path},</if>
+            <if test="component != null">#{component},</if>
+            <if test="isFrame != null">#{isFrame},</if>
+            <if test="type != null">#{type},</if>
+            <if test="visible != null">#{visible},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWebNavbar" parameterType="WebNavbar">
+        update b_web_navbar
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="summary != null">summary = #{summary},</if>
+            <if test="icon != null">icon = #{icon},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="path != null">path = #{path},</if>
+            <if test="component != null">component = #{component},</if>
+            <if test="isFrame != null">is_frame = #{isFrame},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="visible != null">visible = #{visible},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWebNavbarById" parameterType="Long">
+        delete from b_web_navbar where id = #{id}
+    </delete>
+
+    <delete id="deleteWebNavbarByIds" parameterType="String">
+        delete from b_web_navbar where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

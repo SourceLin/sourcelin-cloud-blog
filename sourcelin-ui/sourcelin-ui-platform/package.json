@@ -1,0 +1,49 @@
+{
+  "name": "sourcelin-ui-platform-v3",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "typecheck": "vue-tsc -b",
+    "lint": "npm run style:guard",
+    "layering:guard": "node scripts/layering-guard.mjs",
+    "preview": "vite preview",
+    "test:architecture": "node --experimental-strip-types scripts/architecture-refactor.test.mjs && node scripts/layering-guard.mjs",
+    "test:layering-guard": "node --test scripts/layering-guard.test.mjs",
+    "test:style-guard": "node --test scripts/style-guard.test.mjs",
+    "style:guard": "node scripts/style-guard.mjs"
+  },
+  "dependencies": {
+    "@vicons/ionicons5": "^0.13.0",
+    "@vueup/vue-quill": "^1.2.0",
+    "@vueuse/core": "^14.2.1",
+    "@zxzinn/vue-waterfall": "^0.2.1",
+    "axios": "^1.7.9",
+    "echarts": "^6.0.0",
+    "fuse.js": "^7.1.0",
+    "highlight.js": "^11.11.1",
+    "js-cookie": "^3.0.5",
+    "jsencrypt": "^3.5.4",
+    "lodash-es": "^4.17.23",
+    "naive-ui": "^2.44.1",
+    "nprogress": "^0.2.0",
+    "pinia": "^3.0.4",
+    "sass": "^1.98.0",
+    "screenfull": "^6.0.2",
+    "unplugin-auto-import": "^21.0.0",
+    "unplugin-vue-components": "^31.0.0",
+    "vue": "^3.5.30",
+    "vue-echarts": "^8.0.1",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.0",
+    "@vitejs/plugin-vue": "^6.0.5",
+    "@vue/tsconfig": "^0.9.0",
+    "typescript": "~5.9.3",
+    "vite": "^8.0.1",
+    "vue-tsc": "^3.2.5"
+  }
+}

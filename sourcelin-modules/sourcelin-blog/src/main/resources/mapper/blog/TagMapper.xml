@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.TagMapper">
+    
+    <resultMap type="Tag" id="TagResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="summary"    column="summary"    />
+        <result property="icon"    column="icon"    />
+        <result property="orderNum"    column="order_num"    />
+        <result property="clickCount"    column="click_count"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectTagVo">
+        select id, name, summary, icon, order_num, click_count, create_time, update_by, update_time from b_tag
+    </sql>
+
+    <select id="selectTagList" parameterType="Tag" resultMap="TagResult">
+        <include refid="selectTagVo"/>
+        <where>  
+            <if test="keywords != null and keywords != ''"> and (name like concat('%', #{keywords}, '%') or summary like concat('%', #{keywords}, '%'))</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="summary != null  and summary != ''"> and summary = #{summary}</if>
+        </where>
+    </select>
+
+    <select id="selectTagAll" resultMap="TagResult">
+        <include refid="selectTagVo"/>
+    </select>
+    
+    <select id="selectTagById" parameterType="Long" resultMap="TagResult">
+        <include refid="selectTagVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTag" parameterType="Tag" useGeneratedKeys="true" keyProperty="id">
+        insert into b_tag
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="summary != null">summary,</if>
+            <if test="icon != null">icon,</if>
+            <if test="orderNum != null">order_num,</if>
+            <if test="clickCount != null">click_count,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="summary != null">#{summary},</if>
+            <if test="icon != null">#{icon},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+            <if test="clickCount != null">#{clickCount},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTag" parameterType="Tag">
+        update b_tag
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="summary != null">summary = #{summary},</if>
+            <if test="icon != null">icon = #{icon},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="clickCount != null">click_count = #{clickCount},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTagById" parameterType="Long">
+        delete from b_tag where id = #{id}
+    </delete>
+
+    <delete id="deleteTagByIds" parameterType="String">
+        delete from b_tag where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByArticleIds">
+        DELETE FROM b_article_tag WHERE article_id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="saveArticleTags">
+        insert into  b_article_tag(article_id,tag_id) values
+        <foreach collection="tagIds" item="tagId" index="index" separator=",">
+            ( #{articleId},#{tagId})
+        </foreach>
+    </insert>
+</mapper>

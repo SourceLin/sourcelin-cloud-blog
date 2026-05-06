@@ -1,0 +1,128 @@
+/**
+ * 项目主题变量
+ * 
+ * 结构：
+ * 1. SCSS 变量 - 布局尺寸（供 JS 导出和组件使用）
+ * 2. CSS 变量 - 侧边栏/菜单主题色
+ * 3. 主题模式 - 深蓝侧边栏、暗黑模式
+ * 4. 无障碍模式
+ */
+
+// ============================================
+// 1. SCSS 变量 - 布局尺寸
+// ============================================
+
+$sidebar-width: 210px;
+$sidebar-width-collapsed: 54px;
+$navbar-height: 50px;
+$tags-view-height: 34px;
+
+// ============================================
+// 2. CSS 变量 - 默认主题（浅色 + 白色侧边栏）
+// ============================================
+
+:root {
+  // Design Tokens - 基础品牌色与语义色
+  --primary-color: #4b55fa;
+  --primary-hover: #3b45ea;
+  --primary-active: #2b35da;
+  --primary-light: rgba(75, 85, 250, 0.1);
+  --title-color: #2d3b8d;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-placeholder: #999999;
+  --bg-page: #f1f4fd;
+  --bg-white: #ffffff;
+  --border-color: #e4eafd;
+  --success-color: #37b874;
+  --warning-color: #faad14;
+  --error-color: #fa4c6e;
+  --info-color: #1890ff;
+  --sidebar-classic-bg: #1a1f2e;
+  --sidebar-classic-text: #c3ccdd;
+  --sidebar-classic-active-text: #ffffff;
+  --sidebar-classic-parent-active-text: #9fb3ff;
+
+  // 菜单
+  --menu-background: var(--el-bg-color-overlay);
+  --menu-text: var(--el-text-color-regular);
+  --menu-active-text: var(--el-menu-active-color);
+  --menu-hover: color-mix(in srgb, var(--el-color-primary) 10%, var(--el-fill-color-light));
+  --menu-active-parent-bg: var(--el-color-primary-light-9);
+  --menu-active-parent-text: var(--el-color-primary);
+  --menu-active-parent-bg-emphasis: color-mix(in srgb, var(--el-color-primary) 14%, transparent);
+  --menu-top-active-bg: color-mix(in srgb, var(--el-text-color-primary) 10%, transparent);
+
+  // 侧边栏 Logo
+  --sidebar-logo-background: var(--menu-background);
+  --sidebar-logo-text-color: var(--el-text-color-primary);
+  --toolbar-hover-bg: color-mix(in srgb, var(--el-text-color-primary) 6%, transparent);
+}
+
+// SCSS 变量映射（供组件使用）
+$menu-background: var(--menu-background);
+$menu-text: var(--menu-text);
+$menu-active-text: var(--menu-active-text);
+$menu-hover: var(--menu-hover);
+$sidebar-logo-background: var(--sidebar-logo-background);
+$sidebar-logo-text-color: var(--sidebar-logo-text-color);
+
+// ============================================
+// 3. 主题模式
+// ============================================
+
+// 浅色主题 - 深蓝色侧边栏
+html.sidebar-color-classic {
+  --menu-background: var(--sidebar-classic-bg);
+  --menu-text: var(--sidebar-classic-text);
+  --menu-active-text: var(--sidebar-classic-active-text);
+  --menu-hover: color-mix(in srgb, var(--el-color-white) 10%, transparent);
+  --menu-active-parent-bg: color-mix(
+    in srgb,
+    var(--sidebar-classic-parent-active-text) 14%,
+    transparent
+  );
+  --menu-active-parent-text: var(--sidebar-classic-parent-active-text);
+  --menu-active-parent-bg-emphasis: color-mix(
+    in srgb,
+    var(--sidebar-classic-parent-active-text) 20%,
+    transparent
+  );
+  --menu-top-active-bg: color-mix(in srgb, var(--el-color-white) 12%, transparent);
+  --sidebar-logo-background: color-mix(in srgb, var(--sidebar-classic-bg) 88%, black);
+  --sidebar-logo-text-color: var(--sidebar-classic-active-text);
+  --toolbar-hover-bg: color-mix(in srgb, var(--el-color-white) 10%, transparent);
+}
+
+// 暗黑主题
+html.dark {
+  --menu-background: var(--el-bg-color-page);
+  --menu-text: var(--el-color-white);
+  --menu-active-text: var(--el-menu-active-color);
+  --menu-hover: color-mix(in srgb, var(--el-color-primary) 12%, transparent);
+  --menu-active-parent-bg: color-mix(in srgb, var(--el-color-primary-light-3) 14%, transparent);
+  --menu-active-parent-text: var(--el-color-primary-light-3);
+  --menu-active-parent-bg-emphasis: color-mix(
+    in srgb,
+    var(--el-color-primary-light-3) 18%,
+    transparent
+  );
+  --menu-top-active-bg: color-mix(in srgb, var(--el-color-white) 12%, transparent);
+  --sidebar-logo-background: color-mix(
+    in srgb,
+    var(--menu-background) 88%,
+    var(--el-bg-color-page)
+  );
+  --sidebar-logo-text-color: var(--el-color-white);
+  --toolbar-hover-bg: color-mix(in srgb, var(--el-color-white) 10%, transparent);
+
+  // 暗色 + 经典蓝：Logo 背景与侧边栏背景一致
+  &.sidebar-color-classic {
+    --sidebar-logo-background: var(--menu-background);
+  }
+
+  // Element Plus 表格选中行背景色
+  .el-table {
+    --el-table-current-row-bg-color: var(--el-fill-color-light);
+  }
+}

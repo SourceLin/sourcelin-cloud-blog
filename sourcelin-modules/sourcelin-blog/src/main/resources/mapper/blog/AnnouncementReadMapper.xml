@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.AnnouncementReadMapper">
+
+    <insert id="insertIgnoreRead">
+        insert ignore into announcement_read (announcement_id, user_id, read_time)
+        values (#{announcementId}, #{userId}, now())
+    </insert>
+
+    <insert id="insertReadAllVisible">
+        insert ignore into announcement_read (announcement_id, user_id, read_time)
+        select a.id, #{userId}, now()
+        from announcement a
+        where a.deleted = 0
+          and a.publish_status = '1'
+          and a.publish_time is not null
+          and a.publish_time &lt;= now()
+          and (a.expire_time is null or a.expire_time &gt; now())
+          and (
+            a.scope_type = 'all'
+            or (
+              a.scope_type = 'assign'
+              and a.scope_payload is not null
+              and json_contains(a.scope_payload, cast(#{userId} as json), '$')
+            )
+          )
+    </insert>
+</mapper>

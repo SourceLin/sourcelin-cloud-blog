@@ -1,0 +1,45 @@
+/**
+ * Foundation：响应式断点变量与媒体查询 mixin。
+ * 业务组件和页面通过 `@import '@/shared/styles/responsive'` 间接使用。
+ */
+
+$breakpoint-xl: 1280px;
+$breakpoint-lg: 1080px;
+$breakpoint-md: 768px;
+$breakpoint-sm: 640px;
+
+/** 按名称解析断点像素值（xl / lg / md / sm） */
+@function sourcelin-breakpoint($name) {
+  @if $name == xl {
+    @return $breakpoint-xl;
+  } @else if $name == lg {
+    @return $breakpoint-lg;
+  } @else if $name == md {
+    @return $breakpoint-md;
+  } @else if $name == sm {
+    @return $breakpoint-sm;
+  }
+
+  @error "未知断点名「#{$name}」，仅支持 xl、lg、md、sm。";
+}
+
+/** 最大宽度：小于等于该断点 */
+@mixin sourcelin-down($name) {
+  @media (max-width: sourcelin-breakpoint($name)) {
+    @content;
+  }
+}
+
+/** 最小宽度：大于等于该断点 */
+@mixin sourcelin-up($name) {
+  @media (min-width: sourcelin-breakpoint($name)) {
+    @content;
+  }
+}
+
+/** 介于两断点之间（含边界） */
+@mixin sourcelin-between($min-name, $max-name) {
+  @media (min-width: sourcelin-breakpoint($min-name)) and (max-width: sourcelin-breakpoint($max-name)) {
+    @content;
+  }
+}

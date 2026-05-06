@@ -1,0 +1,15 @@
+export const ResultCode = {
+  SUCCESS: 0,
+  BAD_REQUEST: 40000,
+  VALIDATION_ERROR: 40001,
+  UNAUTHORIZED: 40100,
+  FORBIDDEN: 40300,
+  NOT_FOUND: 40400,
+  CONFLICT: 40900,
+  BUSINESS_ERROR: 42200,
+  TOO_MANY_REQUESTS: 42900,
+  SYSTEM_ERROR: 50000,
+  REMOTE_SERVICE_ERROR: 50001
+} as const
+
+export type ResultCodeValue = (typeof ResultCode)[keyof typeof ResultCode]

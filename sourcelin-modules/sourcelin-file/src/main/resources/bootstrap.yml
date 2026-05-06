@@ -1,0 +1,123 @@
+# Tomcat
+server:
+  port: 9300
+
+# Spring
+spring:
+  application:
+    # 应用名称
+    name: sourcelin-file
+  profiles:
+    # 环境配置
+    active: dev
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  redis:
+    host: ${FILE_REDIS_HOST:${REDIS_HOST:localhost}}
+    port: ${FILE_REDIS_PORT:${REDIS_PORT:6379}}
+    password: ${FILE_REDIS_PASSWORD:${REDIS_PASSWORD:}}
+  datasource:
+    druid:
+      dynamic:
+        datasource:
+          master:
+            driver-class-name: com.mysql.cj.jdbc.Driver
+            url: ${FILE_DB_URL:${DB_URL:jdbc:mysql://127.0.0.1:3306/sourcelin-cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8}}
+            username: ${FILE_DB_USERNAME:${DB_USERNAME:root}}
+            password: ${FILE_DB_PASSWORD:${DB_PASSWORD:}}
+        # 连接池与动态路由的基础参数（用于兜底；若 Nacos 配置解析成功将被其覆盖/合并）
+        druid:
+          initial-size: 5
+          min-idle: 5
+          maxActive: 20
+          maxWait: 60000
+          connectTimeout: 30000
+          socketTimeout: 60000
+          timeBetweenEvictionRunsMillis: 60000
+          minEvictableIdleTimeMillis: 300000
+          validationQuery: SELECT 1 FROM DUAL
+          testWhileIdle: true
+          testOnBorrow: false
+          testOnReturn: false
+          poolPreparedStatements: true
+          maxPoolPreparedStatementPerConnectionSize: 20
+          filters: stat,slf4j
+          connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+    # dynamic-datasource 默认配置兜底（确保 primary 数据源可用）
+    dynamic:
+      primary: master
+      datasource:
+        master:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: ${FILE_DB_URL:${DB_URL:jdbc:mysql://127.0.0.1:3306/sourcelin-cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8}}
+          username: ${FILE_DB_USERNAME:${DB_USERNAME:root}}
+          password: ${FILE_DB_PASSWORD:${DB_PASSWORD:}}
+      druid:
+        initial-size: 5
+        min-idle: 5
+        maxActive: 20
+        maxWait: 60000
+        connectTimeout: 30000
+        socketTimeout: 60000
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: SELECT 1 FROM DUAL
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        maxPoolPreparedStatementPerConnectionSize: 20
+        filters: stat,slf4j
+        connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+  cloud:
+    nacos:
+      discovery:
+        # 分组
+        group: ${NACOS_GROUP:BLOG_GROUP}
+        # 服务注册地址
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+      config:
+        # 分组
+        group: ${NACOS_GROUP:BLOG_GROUP}
+        # 配置中心地址
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+        # 配置文件格式
+        file-extension: yml
+        # 共享配置
+        shared-configs:
+          - data-id: application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+            group: ${spring.cloud.nacos.config.group}
+
+# mybatis兜底配置（Nacos 配置解析异常时也能保证 mapper XML 可加载）
+mybatis:
+  type-aliases-package: com.sourcelin.file.domain
+  mapper-locations: classpath:mapper/**/*.xml
+
+# 本地文件上传
+file:
+  domain: ${FILE_DOMAIN:http://127.0.0.1:9300}
+  path: ${FILE_UPLOAD_PATH:D:/sourcelin/uploadPath}
+  prefix: ${FILE_PREFIX:/statics}
+
+# FastDFS配置
+fdfs:
+  domain: ${FDFS_DOMAIN:http://127.0.0.1}
+  soTimeout: ${FDFS_SO_TIMEOUT:3000}
+  connectTimeout: ${FDFS_CONNECT_TIMEOUT:2000}
+  trackerList: ${FDFS_TRACKER_LIST:127.0.0.1:22122}
+
+# Minio配置
+minio:
+  url: ${MINIO_URL:http://127.0.0.1:9000}
+  accessKey: ${MINIO_ACCESS_KEY:}
+  secretKey: ${MINIO_SECRET_KEY:}
+  bucketName: ${MINIO_BUCKET_NAME:sourcelin}
+
+# 防盗链配置
+referer:
+  # 防盗链开关
+  enabled: ${REFERER_ENABLED:false}
+  # 允许的域名列表
+  allowed-domains: ${REFERER_ALLOWED_DOMAINS:localhost,127.0.0.1}

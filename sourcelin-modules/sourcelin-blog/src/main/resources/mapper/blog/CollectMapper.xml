@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.CollectMapper">
+    
+    <resultMap type="Collect" id="CollectResult">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="targetType" column="target_type"/>
+        <result property="targetId" column="target_id"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <resultMap type="Collect" id="CollectResultVO">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="targetType" column="target_type"/>
+        <result property="targetId" column="collect_target_id"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createTime" column="create_time"/>
+        <association property="article" javaType="com.sourcelin.blog.domain.Article">
+            <result property="id" column="article_id"/>
+            <result property="title" column="title"/>
+            <result property="avatar" column="avatar"/>
+            <result property="summary" column="summary"/>
+            <result property="viewCount" column="view_count"/>
+            <result property="likeCount" column="like_count"/>
+            <result property="createTime" column="article_create_time"/>
+        </association>
+        <association property="say" javaType="com.sourcelin.blog.domain.Say">
+            <result property="id" column="say_id"/>
+            <result property="content" column="say_content"/>
+            <result property="images" column="say_images"/>
+            <result property="imageFileIds" column="say_image_file_ids"/>
+            <result property="likeCount" column="say_like_count"/>
+            <result property="collectCount" column="say_collect_count"/>
+            <result property="commentCount" column="say_comment_count"/>
+            <result property="status" column="say_status"/>
+            <result property="createTime" column="say_create_time"/>
+        </association>
+        <association property="treehole" javaType="com.sourcelin.blog.domain.Treehole">
+            <result property="id" column="treehole_id"/>
+            <result property="content" column="treehole_content"/>
+            <result property="likeCount" column="treehole_like_count"/>
+            <result property="collectCount" column="treehole_collect_count"/>
+            <result property="commentCount" column="treehole_comment_count"/>
+            <result property="status" column="treehole_status"/>
+            <result property="createTime" column="treehole_create_time"/>
+        </association>
+        <association property="user" javaType="com.sourcelin.blog.api.domain.User">
+            <result property="id" column="user_id"/>
+            <result property="nickname" column="user_nickname"/>
+            <result property="avatar" column="user_avatar"/>
+        </association>
+    </resultMap>
+
+    <sql id="selectCollectVo">
+        select id, user_id, target_type, target_id, deleted, create_time, update_time from b_collect
+    </sql>
+
+    <select id="selectCollectList" parameterType="Collect" resultMap="CollectResult">
+        <include refid="selectCollectVo"/>
+        <where>
+            <if test="userId != null">and user_id = #{userId}</if>
+            <if test="targetType != null and targetType != ''">and target_type = #{targetType}</if>
+            <if test="targetId != null">and target_id = #{targetId}</if>
+            <if test="deleted != null">and deleted = #{deleted}</if>
+            <if test="params != null and params.targetIds != null and params.targetIds.size > 0">
+                and target_id in
+                <foreach item="id" collection="params.targetIds" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    
+    <select id="selectCollectListWithArticle" parameterType="Collect" resultMap="CollectResultVO">
+        SELECT c.id, c.user_id, c.target_type, c.target_id as collect_target_id, c.deleted, c.create_time,
+               u.nickname as user_nickname, u.avatar as user_avatar,
+               a.id as article_id,
+               a.title, a.avatar, a.summary, a.view_count, a.like_count, a.create_time as article_create_time,
+               s.id as say_id, s.content as say_content, s.images as say_images, s.image_file_ids as say_image_file_ids,
+               s.like_count as say_like_count, s.collect_count as say_collect_count, s.comment_count as say_comment_count,
+               s.status as say_status, s.create_time as say_create_time,
+               t.id as treehole_id, t.content as treehole_content, t.like_count as treehole_like_count,
+               t.collect_count as treehole_collect_count, t.comment_count as treehole_comment_count,
+               t.status as treehole_status, t.create_time as treehole_create_time
+        FROM b_collect c
+        LEFT JOIN b_user u ON c.user_id = u.id AND u.del_flag = '0'
+        LEFT JOIN b_article a ON c.target_type = 'article' AND c.target_id = a.id AND a.deleted = 0
+        LEFT JOIN b_say s ON c.target_type = 'say' AND c.target_id = s.id AND s.deleted = 0
+        LEFT JOIN b_treehole t ON c.target_type = 'treehole' AND c.target_id = t.id AND t.deleted = 0
+        WHERE c.deleted = 0
+        <if test="userId != null">AND c.user_id = #{userId}</if>
+        <if test="targetType != null and targetType != ''">AND c.target_type = #{targetType}</if>
+        <if test="params != null and params.relationState == 'active'">
+            AND (
+                (c.target_type = 'article' AND a.id IS NOT NULL)
+                OR (c.target_type = 'say' AND s.id IS NOT NULL)
+                OR (c.target_type = 'treehole' AND t.id IS NOT NULL)
+            )
+        </if>
+        <if test="params != null and params.relationState == 'inactive'">
+            AND (
+                (c.target_type = 'article' AND a.id IS NULL)
+                OR (c.target_type = 'say' AND s.id IS NULL)
+                OR (c.target_type = 'treehole' AND t.id IS NULL)
+            )
+        </if>
+    </select>
+
+    <select id="selectCollectByUserAndTarget" resultMap="CollectResult">
+        <include refid="selectCollectVo"/>
+        where user_id = #{userId} and target_type = #{targetType} and target_id = #{targetId} and deleted = 0
+    </select>
+
+    <select id="countCollectByUserId" resultType="int">
+        select count(1) from b_collect where deleted = 0 and user_id = #{userId}
+    </select>
+
+    <select id="countActiveCollectRecords" resultType="long">
+        select count(1) from b_collect where deleted = 0
+    </select>
+
+    <select id="countTodayActiveCollectUsers" resultType="long">
+        select count(distinct user_id)
+        from b_collect
+        where deleted = 0
+          and date(create_time) = curdate()
+    </select>
+    
+    <select id="selectCollectById" parameterType="Long" resultMap="CollectResult">
+        <include refid="selectCollectVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCollect" parameterType="Collect" useGeneratedKeys="true" keyProperty="id">
+        insert into b_collect
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="targetType != null and targetType != ''">target_type,</if>
+            <if test="targetId != null">target_id,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="targetType != null and targetType != ''">#{targetType},</if>
+            <if test="targetId != null">#{targetId},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCollect" parameterType="Collect">
+        update b_collect
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="targetType != null and targetType != ''">target_type = #{targetType},</if>
+            <if test="targetId != null">target_id = #{targetId},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCollectById" parameterType="Long">
+        update b_collect set deleted = 1 where id = #{id}
+    </delete>
+
+    <delete id="deleteCollectByIds" parameterType="String">
+        update b_collect set deleted = 1 where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

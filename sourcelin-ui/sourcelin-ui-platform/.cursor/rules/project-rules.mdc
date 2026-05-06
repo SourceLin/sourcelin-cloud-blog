@@ -1,0 +1,37 @@
+---
+description: Use when working in Sourcelin UI Platform. Formal rules live in rules/, formal skills live in skills/, and architecture changes must keep docs and entrypoints in sync.
+alwaysApply: true
+---
+
+# Cursor 统一规则入口
+
+请以下列规则源为准：
+
+- `rules/frontend-platform.md`
+- `rules/design-system-layering.md`
+- `rules/ui-design-system-core.md`
+- `rules/ui-vue-components.md`
+- `rules/ui-page-boundaries.md`
+- `rules/ui-scss-tokens.md`
+- `rules/documentation-sync.md`
+
+请以下列技能源为准：
+
+- `skills/README.md`
+- `skills/sourcelin-ui-refactor/SKILL.md`
+- `skills/sourcelin-ui-refactor/reference.md`
+
+请以下列架构说明为准：
+
+- `README.md`
+- `AGENTS.md`
+- `docs/frontend-architecture.md`
+- `docs/style-asset-ledger.md`
+
+执行要求：
+
+- 改规则，只改 `rules/`
+- 改技能，只改 `skills/`
+- 架构边界、路由协议、请求约定和样式资产变更后，同步检查文档与轻量入口
+- 首屏加载统一走 `SSkeleton` 与共享 skeleton 组件；增量加载保持轻 spinner / quiet loading
+- 不在 `.cursor/` 中重复维护整套规则或技能正文

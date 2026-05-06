@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.SayMapper">
+    
+    <resultMap type="Say" id="SayResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="userNickname" column="user_nickname" />
+        <result property="content"    column="content"    />
+        <result property="images"    column="images"    />
+        <result property="imageFileIds" column="image_file_ids"    />
+        <result property="likeCount"    column="like_count"    />
+        <result property="commentCount"    column="comment_count"    />
+        <result property="collectCount"    column="collect_count"    />
+        <result property="status"    column="status"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <association property="user" javaType="com.sourcelin.blog.api.domain.User">
+            <result property="id" column="ref_user_id" />
+            <result property="nickname" column="user_nickname" />
+            <result property="avatar" column="user_avatar" />
+        </association>
+    </resultMap>
+
+    <sql id="selectSayVo">
+        select s.id, s.user_id, s.content, s.images, s.image_file_ids, s.like_count, s.comment_count, s.collect_count, s.status, s.deleted,
+               s.create_by, s.create_time, s.update_by, s.update_time,
+               u.id as ref_user_id, u.nickname as user_nickname, u.avatar as user_avatar
+        from b_say s
+                 left join b_user u on s.user_id = u.id
+    </sql>
+
+    <select id="selectSayList" parameterType="Say" resultMap="SayResult">
+        <include refid="selectSayVo"/>
+        <where>
+            <if test="params == null or params.includeDeleted == null or params.includeDeleted != true">
+                and s.deleted = 0
+            </if>
+        <if test="keywords != null and keywords != ''"> and (s.content like concat('%', #{keywords}, '%') or u.nickname like concat('%', #{keywords}, '%'))</if>
+        <if test="userId != null"> and s.user_id = #{userId}</if>
+        <if test="userNickname != null and userNickname != ''"> and u.nickname like concat('%', #{userNickname}, '%')</if>
+        <if test="content != null  and content != ''"> and s.content like concat('%', #{content}, '%')</if>
+        <if test="status != null "> and s.status = #{status}</if>
+        <if test="params.beginTime != null and params.beginTime != ''"><!-- 更新时间范围查询 -->
+            and s.update_time &gt;= #{params.beginTime}
+        </if>
+        <if test="params.endTime != null and params.endTime != ''"><!-- 更新时间范围查询 -->
+            and s.update_time &lt;= #{params.endTime}
+        </if>
+        </where>
+        order by s.create_time desc
+    </select>
+
+    <select id="selectSayById" parameterType="Long" resultMap="SayResult">
+        <include refid="selectSayVo"/>
+        where s.id = #{id}
+    </select>
+
+    <insert id="insertSay" parameterType="Say" useGeneratedKeys="true" keyProperty="id">
+        insert into b_say (user_id, content, images, image_file_ids, like_count, comment_count, collect_count, status, deleted, create_by, create_time, update_by, update_time)
+        values (#{userId}, #{content}, #{images}, #{imageFileIds}, #{likeCount}, #{commentCount}, ifnull(#{collectCount}, 0), #{status}, #{deleted}, #{createBy}, sysdate(), #{updateBy}, sysdate())
+    </insert>
+
+    <update id="updateSay" parameterType="Say">
+        update b_say
+        set user_id = #{userId},
+            content = #{content},
+            images = #{images},
+            image_file_ids = #{imageFileIds},
+            like_count = #{likeCount},
+            comment_count = #{commentCount},
+            collect_count = ifnull(#{collectCount}, collect_count),
+            status = #{status},
+            update_by = #{updateBy},
+            update_time = sysdate()
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSayById" parameterType="Long">
+        update b_say
+        set deleted = 1,
+            update_time = sysdate()
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteSayByIds" parameterType="String">
+        update b_say
+        set deleted = 1,
+            update_time = sysdate()
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="updateLikeCount" parameterType="Long">
+        update b_say set like_count = like_count + 1 where id = #{id} and deleted = 0
+    </update>
+
+    <update id="updateLikeCountDecrease" parameterType="Long">
+        update b_say
+        set like_count = if(ifnull(like_count, 0) &gt; 0, like_count - 1, 0)
+        where id = #{id} and deleted = 0
+    </update>
+
+    <update id="updateCommentCount" parameterType="Long">
+        update b_say set comment_count = comment_count + 1 where id = #{id}
+    </update>
+
+    <update id="updateCommentCountDecrease" parameterType="Long">
+        update b_say
+        set comment_count = if(ifnull(comment_count, 0) &gt; 0, comment_count - 1, 0)
+        where id = #{id}
+    </update>
+
+    <update id="updateCollectCountIncrease" parameterType="Long">
+        update b_say
+        set collect_count = ifnull(collect_count, 0) + 1
+        where id = #{id} and deleted = 0
+    </update>
+
+    <update id="updateCollectCountDecrease" parameterType="Long">
+        update b_say
+        set collect_count = if(ifnull(collect_count, 0) &gt; 0, collect_count - 1, 0)
+        where id = #{id} and deleted = 0
+    </update>
+
+</mapper>

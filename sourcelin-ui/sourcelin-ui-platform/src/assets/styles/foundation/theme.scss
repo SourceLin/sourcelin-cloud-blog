@@ -1,0 +1,266 @@
+/**
+ * Foundation：亮色/暗色主题切换时的过渡、面板文字色，以及主题切换动效（日月、星空、全屏渐变）。
+ * 与 `html[data-theme]` 配合；部分装饰渐变保留固定 rgba 以保证动效辨识度。
+ */
+
+/* 主题切换全局过渡时长 */
+:root {
+  --theme-transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --theme-transition-fast: all 0.3s ease;
+  --theme-transition-slow: all 0.8s ease;
+}
+
+body,
+#app {
+  transition: var(--theme-transition);
+}
+
+/* 卡片与玻璃面板：随主题过渡 */
+.card,
+.article-item,
+.modern-card,
+.sourcelin-card,
+.sourcelin-modal,
+.sourcelin-glass,
+.sourcelin-glass-lite,
+.sourcelin-panel,
+.sourcelin-panel-soft,
+.sourcelin-panel-strong,
+.sourcelin-panel-inset,
+.sourcelin-panel-modal-field,
+.sourcelin-chip-surface,
+.sourcelin-prelude-surface,
+.glass-card {
+  transition: var(--theme-transition);
+}
+
+/* 弹窗与面板内文字色（明暗主题统一走语义 token） */
+html[data-theme='light'] .sourcelin-modal {
+  color: var(--text-color);
+}
+
+html[data-theme='dark'] .sourcelin-modal {
+  color: var(--text-color);
+}
+
+html[data-theme='light'] .sourcelin-panel,
+html[data-theme='light'] .sourcelin-panel-soft,
+html[data-theme='light'] .sourcelin-panel-strong,
+html[data-theme='light'] .sourcelin-panel-inset,
+html[data-theme='light'] .sourcelin-panel-modal-field,
+html[data-theme='light'] .sourcelin-chip-surface,
+html[data-theme='light'] .sourcelin-prelude-surface,
+html[data-theme='light'] .glass-card,
+html[data-theme='light'] .header-stats .stat-item {
+  color: var(--text-color);
+}
+
+html[data-theme='dark'] .sourcelin-panel,
+html[data-theme='dark'] .sourcelin-panel-soft,
+html[data-theme='dark'] .sourcelin-panel-strong,
+html[data-theme='dark'] .sourcelin-panel-inset,
+html[data-theme='dark'] .sourcelin-panel-modal-field,
+html[data-theme='dark'] .sourcelin-chip-surface,
+html[data-theme='dark'] .sourcelin-prelude-surface,
+html[data-theme='dark'] .glass-card,
+html[data-theme='dark'] .header-stats .stat-item {
+  color: var(--text-color);
+}
+
+/* 按钮与表单控件：较快过渡 */
+button,
+.btn,
+.sourcelin-button {
+  transition: var(--theme-transition-fast);
+}
+
+input,
+textarea,
+.sourcelin-input {
+  transition: var(--theme-transition-fast);
+}
+
+/* 原生输入框：背景与占位符随 token */
+input,
+textarea {
+  color: var(--text-color) !important;
+  background: var(--input-background) !important;
+
+  &::placeholder {
+    color: var(--input-placeholder) !important;
+  }
+
+  &:focus {
+    color: var(--text-color) !important;
+    background: var(--input-background-focus) !important;
+  }
+}
+
+/* —— 以下：主题切换全屏动效（可选 UI，pointer-events: none） —— */
+
+.theme-switch-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.theme-switch-animation.active {
+  opacity: 1;
+}
+
+.sun-moon-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+}
+
+.sun,
+.moon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sun {
+  background: var(--theme-transition-sun-gradient);
+  box-shadow: var(--theme-transition-sun-shadow);
+  opacity: 1;
+}
+
+.moon {
+  background: var(--theme-transition-moon-gradient);
+  box-shadow: var(--theme-transition-moon-shadow);
+  opacity: 0;
+}
+
+.theme-switch-animation.dark .sun {
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(180deg) scale(0.8);
+}
+
+.theme-switch-animation.dark .moon {
+  opacity: 1;
+  transform: translate(-50%, -50%) rotate(0deg) scale(1);
+}
+
+.theme-switch-animation.light .sun {
+  opacity: 1;
+  transform: translate(-50%, -50%) rotate(0deg) scale(1);
+}
+
+.theme-switch-animation.light .moon {
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(-180deg) scale(0.8);
+}
+
+.star-field {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+              radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+              radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+              radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
+              radial-gradient(2px 2px at 160px 30px, #ddd, transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: sparkle 3s linear infinite;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.theme-switch-animation.dark .star-field {
+  opacity: 0.8;
+}
+
+@keyframes sparkle {
+  from { transform: translateY(0px); }
+  to { transform: translateY(-100px); }
+}
+
+.theme-switch-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0;
+  transition: all 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+  background-size: 400% 400%;
+}
+
+.theme-switch-bg.active {
+  opacity: 1;
+}
+
+.theme-switch-bg.light {
+  background: var(--theme-transition-sky-bg-light);
+}
+
+.theme-switch-bg.dark {
+  background: var(--theme-transition-sky-bg-dark);
+}
+
+.theme-switch-bg.active.light {
+  animation: lightBgShift 1.6s ease-in-out;
+}
+
+.theme-switch-bg.active.dark {
+  animation: darkBgShift 1.6s ease-in-out;
+}
+
+@keyframes lightBgShift {
+  0% {
+    background: var(--theme-transition-sky-bg-dark);
+    opacity: 1;
+  }
+  50% {
+    background: linear-gradient(135deg,
+      rgba(80, 95, 120, 0.7) 0%,
+      rgba(138, 155, 184, 0.54) 32%,
+      rgba(214, 223, 238, 0.42) 68%,
+      rgba(255, 255, 255, 0.28) 100%);
+    opacity: 0.85;
+  }
+  100% {
+    background: var(--theme-transition-sky-bg-light);
+    opacity: 0.9;
+  }
+}
+
+@keyframes darkBgShift {
+  0% {
+    background: var(--theme-transition-sky-bg-light);
+    opacity: 1;
+  }
+  50% {
+    background: linear-gradient(135deg,
+      rgba(95, 109, 133, 0.56) 0%,
+      rgba(54, 67, 92, 0.54) 34%,
+      rgba(22, 31, 48, 0.62) 72%,
+      rgba(8, 13, 24, 0.82) 100%);
+    opacity: 0.85;
+  }
+  100% {
+    background: var(--theme-transition-sky-bg-dark);
+    opacity: 0.9;
+  }
+}

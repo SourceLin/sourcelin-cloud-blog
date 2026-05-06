@@ -1,0 +1,181 @@
+@use "sass:math";
+
+#app {
+  background: transparent;
+}
+
+body {
+  word-break: break-word;
+  height: 100%;
+  background: var(--surface-page);
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--link-hover);
+}
+
+.sourcelin-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sourcelin-center-absolute {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.sourcelin-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sourcelin-container {
+  display: flex;
+  justify-content: center;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+.sourcelin-page-shell {
+  width: min(var(--content-max-width), calc(100% - (var(--page-shell-padding) * 2)));
+  margin: 0 auto;
+}
+
+.sourcelin-reading-shell {
+  width: min(var(--content-max-width-readable), 100%);
+}
+
+:where(h1, h2, h3, h4, h5, h6) {
+  color: var(--title-color);
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.02em;
+}
+
+:where(h1) {
+  font-size: var(--page-title-size);
+}
+
+:where(h2) {
+  font-size: var(--section-title-size);
+}
+
+:where(h3) {
+  font-size: var(--card-title-size);
+}
+
+:where(p, li, blockquote) {
+  color: var(--text-reading);
+  line-height: var(--reading-line-height);
+}
+
+:where(small, time, figcaption) {
+  color: var(--text-reading-soft);
+  line-height: var(--line-height-copy);
+}
+
+.sourcelin-pointer {
+  cursor: pointer;
+}
+
+.card {
+  background: var(--surface-panel-default);
+  border: 1px solid var(--border-panel-default);
+  border-radius: var(--glass-radius, 20px);
+  box-shadow:
+    var(--highlight-panel-default),
+    var(--shadow-panel-default),
+    var(--shadow-panel-glow);
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    var(--highlight-panel-default),
+    var(--shadow-panel-hover),
+    var(--shadow-panel-glow-strong);
+}
+
+.sourcelin-shadow {
+  box-shadow: var(--shadow-medium);
+  transition: all var(--transition-base);
+  border-radius: var(--border-radius-lg);
+}
+
+.sourcelin-shadow:hover {
+  box-shadow: var(--shadow-large);
+  transform: translateY(-2px);
+}
+
+.sourcelin-underline {
+  background: linear-gradient(to right, var(--primary-color), var(--secondary-color)) no-repeat right bottom;
+  background-size: 0px 2px;
+  transition: background-size var(--transition-base);
+}
+
+.sourcelin-underline:hover {
+  background-size: 100% 2px;
+  background-position: left bottom;
+}
+
+.sourcelin-tag {
+  display: inline-block;
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  margin-right: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-color-light);
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-base);
+}
+
+.sourcelin-tag:hover {
+  border-radius: 0;
+  background-color: var(--text-color-dark);
+}
+
+.sourcelin-bg-image {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  z-index: -1;
+  object-fit: cover;
+}
+
+.sourcelin-bg-image-error {
+  background: var(--body-gradient);
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  z-index: -1;
+}
+
+@import './tokens/base';
+@import './tokens/semantic';
+@import './tokens/component';
+@import './foundation/glass';
+@import './foundation/theme';
+@import './foundation/form-controls';
+@import './foundation/animations';
+@import './foundation/a11y';
+@import './naive/override';
+@import './foundation/page-shell';
+@import './responsive-enhancements';
+
+// Reset inherited transparent text fill for regular copy.
+// Intentional gradient text styles still win because :where() has zero specificity.
+:where(body, body *) {
+  -webkit-text-fill-color: currentColor;
+}
+

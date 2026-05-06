@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.LikeRecordMapper">
+
+    <resultMap id="LikeRecordResult" type="LikeRecord">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="targetType" column="target_type"/>
+        <result property="targetId" column="target_id"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectLikeRecordVo">
+        select id, user_id, target_type, target_id, deleted, create_time, update_time
+        from b_like_record
+    </sql>
+
+    <select id="selectLikeByUserAndTarget" resultMap="LikeRecordResult">
+        <include refid="selectLikeRecordVo"/>
+        where user_id = #{userId}
+          and target_type = #{targetType}
+          and target_id = #{targetId}
+          and deleted = 0
+    </select>
+
+    <select id="selectLikeRecordById" resultMap="LikeRecordResult">
+        <include refid="selectLikeRecordVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectAnyLikeByUserAndTarget" resultMap="LikeRecordResult">
+        <include refid="selectLikeRecordVo"/>
+        where user_id = #{userId}
+          and target_type = #{targetType}
+          and target_id = #{targetId}
+    </select>
+
+    <select id="countActiveLikeByTarget" resultType="int">
+        select count(1)
+        from b_like_record
+        where target_type = #{targetType}
+          and target_id = #{targetId}
+          and deleted = 0
+    </select>
+
+    <select id="selectActiveLikeCountsByTargetIds" resultType="com.sourcelin.blog.dto.interaction.InteractionTargetCountDTO">
+        select target_id as targetId, count(1) as count
+        from b_like_record
+        where target_type = #{targetType}
+          and deleted = 0
+          and target_id in
+          <foreach item="id" collection="targetIds" open="(" separator="," close=")">
+              #{id}
+          </foreach>
+        group by target_id
+    </select>
+
+    <select id="selectActiveTargetIdsByUserAndType" resultType="long">
+        select target_id
+        from b_like_record
+        where user_id = #{userId}
+          and target_type = #{targetType}
+          and deleted = 0
+          and target_id in
+          <foreach item="id" collection="targetIds" open="(" separator="," close=")">
+              #{id}
+          </foreach>
+    </select>
+
+    <insert id="insertLikeRecord" parameterType="LikeRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into b_like_record
+        (user_id, target_type, target_id, deleted, create_time, update_time)
+        values
+        (#{userId}, #{targetType}, #{targetId}, #{deleted}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="updateLikeRecord" parameterType="LikeRecord">
+        update b_like_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteLikeRecordByIds">
+        delete from b_like_record
+        where id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectLikeRecordList" parameterType="LikeRecord" resultMap="LikeRecordResult">
+        <include refid="selectLikeRecordVo"/>
+        <where>
+            <if test="userId != null">and user_id = #{userId}</if>
+            <if test="targetType != null and targetType != ''">and target_type = #{targetType}</if>
+            <if test="targetId != null">and target_id = #{targetId}</if>
+            <if test="deleted != null">and deleted = #{deleted}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="countActiveLikeRecords" resultType="long">
+        select count(1) from b_like_record where deleted = 0
+    </select>
+
+    <select id="countTodayActiveLikeUsers" resultType="long">
+        select count(distinct user_id)
+        from b_like_record
+        where deleted = 0
+          and date(create_time) = curdate()
+    </select>
+</mapper>

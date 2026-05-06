@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.UserMapper">
+    
+    <resultMap type="User" id="UserResult">
+        <result property="id"    column="id"    />
+        <result property="username"    column="username"    />
+        <result property="nickname"    column="nickname"    />
+        <result property="userType"    column="user_type"    />
+        <result property="email"    column="email"    />
+        <result property="phone"    column="phone"    />
+        <result property="password"    column="password"    />
+        <result property="sex"    column="sex"    />
+        <result property="avatar"    column="avatar"    />
+        <result property="avatarFileId"    column="avatar_file_id"    />
+        <result property="birthday"    column="birthday"    />
+        <result property="introduction"    column="introduction"    />
+        <result property="praise"    column="praise"    />
+        <result property="follow"    column="follow"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="loginIp"    column="login_ip"    />
+        <result property="loginDate"    column="login_date"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="userStatus"    column="user_status"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectUserVo">
+        select id, username, nickname, user_type, email, phone, password, sex, avatar, avatar_file_id, birthday, introduction, praise, follow, del_flag, login_ip, login_date, create_by, create_time, update_by, update_time, user_status, remark from b_user
+    </sql>
+
+    <select id="selectUserList" parameterType="User" resultMap="UserResult">
+        <include refid="selectUserVo"/>
+        <where>  
+            <if test="username != null  and username != ''"> and username like concat('%', #{username}, '%')</if>
+            <if test="nickname != null  and nickname != ''"> and nickname like concat('%', #{nickname}, '%')</if>
+            <if test="userType != null "> and user_type = #{userType}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="sex != null "> and sex = #{sex}</if>
+            <if test="follow != null "> and follow = #{follow}</if>
+            <if test="userStatus != null "> and user_status = #{userStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectUserById" parameterType="Long" resultMap="UserResult">
+        <include refid="selectUserVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertUser" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+        insert into b_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="username != null">username,</if>
+            <if test="nickname != null">nickname,</if>
+            <if test="userType != null">user_type,</if>
+            <if test="email != null">email,</if>
+            <if test="phone != null">phone,</if>
+            <if test="password != null">password,</if>
+            <if test="sex != null">sex,</if>
+            <if test="avatar != null">avatar,</if>
+            <if test="avatarFileId != null">avatar_file_id,</if>
+            <if test="birthday != null">birthday,</if>
+            <if test="introduction != null">introduction,</if>
+            <if test="praise != null">praise,</if>
+            <if test="follow != null">follow,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="loginIp != null">login_ip,</if>
+            <if test="loginDate != null">login_date,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="userStatus != null">user_status,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="username != null">#{username},</if>
+            <if test="nickname != null">#{nickname},</if>
+            <if test="userType != null">#{userType},</if>
+            <if test="email != null">#{email},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="password != null">#{password},</if>
+            <if test="sex != null">#{sex},</if>
+            <if test="avatar != null">#{avatar},</if>
+            <if test="avatarFileId != null">#{avatarFileId},</if>
+            <if test="birthday != null">#{birthday},</if>
+            <if test="introduction != null">#{introduction},</if>
+            <if test="praise != null">#{praise},</if>
+            <if test="follow != null">#{follow},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="loginIp != null">#{loginIp},</if>
+            <if test="loginDate != null">#{loginDate},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="userStatus != null">#{userStatus},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateUser" parameterType="User">
+        update b_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="username != null">username = #{username},</if>
+            <if test="nickname != null">nickname = #{nickname},</if>
+            <if test="userType != null">user_type = #{userType},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="avatarFileId != null">avatar_file_id = #{avatarFileId},</if>
+            <if test="birthday != null">birthday = #{birthday},</if>
+            <if test="introduction != null">introduction = #{introduction},</if>
+            <if test="praise != null">praise = #{praise},</if>
+            <if test="follow != null">follow = #{follow},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="loginIp != null">login_ip = #{loginIp},</if>
+            <if test="loginDate != null">login_date = #{loginDate},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="userStatus != null">user_status = #{userStatus},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteUserById" parameterType="Long">
+        update b_user set del_flag = '2' where id = #{id}
+    </delete>
+
+
+    <delete id="deleteUserByIds" parameterType="Long">
+        update b_user set del_flag = '2' where id in
+        <foreach collection="array" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+
+    <select id="selectUserByUsername" parameterType="String" resultMap="UserResult">
+        <include refid="selectUserVo"/>
+        where username = #{username} and del_flag = '0'
+        order by id desc
+        limit 1
+    </select>
+
+    <select id="selectUserByEmail" parameterType="String" resultMap="UserResult">
+        <include refid="selectUserVo"/>
+        where email = #{email} and del_flag = '0'
+        order by id desc
+        limit 1
+    </select>
+</mapper>

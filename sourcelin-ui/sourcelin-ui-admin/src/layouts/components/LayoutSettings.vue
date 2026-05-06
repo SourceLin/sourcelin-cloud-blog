@@ -1,0 +1,539 @@
+<template>
+  <el-drawer
+    v-model="drawerVisible"
+    size="380"
+    :title="t('settings.project')"
+    :before-close="handleCloseDrawer"
+    class="settings-drawer"
+  >
+    <div class="settings-content">
+      <section class="config-section">
+        <el-divider>{{ t("settings.theme") }}</el-divider>
+
+        <div class="flex-center">
+          <el-switch
+            v-model="isDark"
+            :active-icon="Moon"
+            :inactive-icon="Sunny"
+            class="theme-switch"
+            @change="handleThemeChange"
+          />
+        </div>
+      </section>
+
+      <!-- 界面设置 -->
+      <section class="config-section">
+        <el-divider>{{ t("settings.interface") }}</el-divider>
+
+        <div
+          v-if="settingsStore.systemPolicy.allowCustomThemeColor"
+          class="config-item flex-x-between"
+        >
+          <span class="text-xs">{{ t("settings.themeColor") }}</span>
+          <el-color-picker
+            v-model="selectedThemeColor"
+            :predefine="colorPresets"
+            popper-class="theme-picker-dropdown"
+          />
+        </div>
+
+        <div class="config-item flex-x-between">
+          <span class="text-xs">{{ t("settings.showTagsView") }}</span>
+          <el-switch v-model="settingsStore.showTagsView" />
+        </div>
+
+        <div class="config-item flex-x-between">
+          <span class="text-xs">{{ t("settings.showAppLogo") }}</span>
+          <el-switch v-model="settingsStore.showAppLogo" />
+        </div>
+
+        <div class="config-item flex-x-between">
+          <span class="text-xs">{{ t("settings.pageSwitchingAnimation") }}</span>
+          <el-select v-model="settingsStore.pageSwitchingAnimation" style="width: 150px">
+            <el-option
+              v-for="(item, key) in pageSwitchingAnimationOptions"
+              :key
+              :label="t(`settings.${item.value}`)"
+              :value="item.value"
+            />
+          </el-select>
+        </div>
+
+        <div
+          v-if="!isDark && settingsStore.systemPolicy.allowUserSidebarAppearanceSwitch"
+          class="config-item flex-x-between"
+        >
+          <span class="text-xs">{{ t("settings.sidebarColorScheme") }}</span>
+          <el-radio-group v-model="sidebarColor" @change="changeSidebarColor">
+            <el-radio :value="SidebarColor.CLASSIC_BLUE">
+              {{ t("settings.classicBlue") }}
+            </el-radio>
+            <el-radio :value="SidebarColor.MINIMAL_WHITE">
+              {{ t("settings.minimalWhite") }}
+            </el-radio>
+          </el-radio-group>
+        </div>
+      </section>
+
+      <!-- 布局设置 -->
+      <section v-if="settingsStore.systemPolicy.allowUserLayoutSwitch" class="config-section">
+        <el-divider>{{ t("settings.navigation") }}</el-divider>
+
+        <!-- 整合的布局选择 -->
+        <div class="layout-select">
+          <div class="layout-grid">
+            <el-tooltip
+              v-for="item in layoutOptions"
+              :key="item.value"
+              :content="item.label"
+              placement="bottom"
+            >
+              <div
+                role="button"
+                tabindex="0"
+                :class="[
+                  'layout-item',
+                  item.className,
+                  {
+                    'is-active': settingsStore.layout === item.value,
+                  },
+                ]"
+                @click="handleLayoutChange(item.value)"
+                @keydown.enter.space="handleLayoutChange(item.value)"
+              >
+                <!-- 布局预览图标 -->
+                <div class="layout-preview">
+                  <div v-if="item.value !== LayoutMode.LEFT" class="layout-header"></div>
+                  <div v-if="item.value !== LayoutMode.TOP" class="layout-sidebar"></div>
+                  <div class="layout-main"></div>
+                </div>
+                <!-- 布局名称 -->
+                <div class="layout-name">{{ item.label }}</div>
+                <!-- 选中状态指示器 -->
+                <div v-if="settingsStore.layout === item.value" class="layout-check">
+                  <el-icon><Check /></el-icon>
+                </div>
+              </div>
+            </el-tooltip>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 操作按钮区域 - 固定到底部 -->
+    <template #footer>
+      <div class="action-buttons">
+        <el-tooltip content="复制配置将导出当前有效设置 JSON" placement="top">
+          <el-button
+            type="primary"
+            size="default"
+            :icon="copyIcon"
+            :loading="copyLoading"
+            @click="handleCopySettings"
+          >
+            {{ copyLoading ? "复制中..." : t("settings.copyConfig") }}
+          </el-button>
+        </el-tooltip>
+        <el-tooltip content="重置将恢复所有设置为默认值" placement="top">
+          <el-button
+            type="warning"
+            size="default"
+            :icon="resetIcon"
+            :loading="resetLoading"
+            @click="handleResetSettings"
+          >
+            {{ resetLoading ? "重置中..." : t("settings.resetConfig") }}
+          </el-button>
+        </el-tooltip>
+      </div>
+    </template>
+  </el-drawer>
+</template>
+
+<script setup lang="ts">
+import { Check, DocumentCopy, Moon, RefreshLeft, Sunny } from "@element-plus/icons-vue";
+
+const { t } = useI18n();
+import { LayoutMode, PageSwitchingAnimationOptions, SidebarColor, ThemeMode } from "@/enums";
+import { useSettingsStore } from "@/store";
+import { resolveThemeColor } from "@/utils/theme";
+
+// 页面切换动画选项
+const pageSwitchingAnimationOptions: Record<string, OptionItem> = PageSwitchingAnimationOptions;
+
+// 按钮图标
+const copyIcon = markRaw(DocumentCopy);
+const resetIcon = markRaw(RefreshLeft);
+
+// 加载状态
+const copyLoading = ref(false);
+const resetLoading = ref(false);
+
+// 布局选项配置
+interface LayoutOption {
+  value: LayoutMode;
+  label: string;
+  className: string;
+}
+
+const layoutOptions: LayoutOption[] = [
+  { value: LayoutMode.LEFT, label: t("settings.leftLayout"), className: "left" },
+  { value: LayoutMode.TOP, label: t("settings.topLayout"), className: "top" },
+  { value: LayoutMode.MIX, label: t("settings.mixLayout"), className: "mix" },
+];
+
+const settingsStore = useSettingsStore();
+const colorPresets = computed(() => settingsStore.themeColorPresets);
+const isDark = computed({
+  get: () => settingsStore.resolvedTheme === ThemeMode.DARK,
+  set: (value: boolean) => {
+    settingsStore.theme = value ? ThemeMode.DARK : ThemeMode.LIGHT;
+  },
+});
+
+const sidebarColor = computed({
+  get: () => settingsStore.sidebarColorScheme,
+  set: (value) => {
+    settingsStore.sidebarColorScheme = value;
+  },
+});
+
+const selectedThemeColor = computed({
+  get: () => resolveThemeColor(settingsStore.themeColor),
+  set: (value) => {
+    settingsStore.themeColor = value;
+  },
+});
+
+const drawerVisible = computed({
+  get: () => settingsStore.settingsVisible,
+  set: (value) => (settingsStore.settingsVisible = value),
+});
+
+/**
+ * 处理主题切换
+ *
+ * @param dark 是否启用暗黑模式
+ */
+const handleThemeChange = (dark: string | number | boolean) => {
+  settingsStore.theme = dark ? ThemeMode.DARK : ThemeMode.LIGHT;
+};
+
+/**
+ * 更改侧边栏颜色
+ *
+ * @param val 颜色方案名称
+ */
+const changeSidebarColor = (val: string | number | boolean | undefined) => {
+  settingsStore.sidebarColorScheme = val as SidebarColor;
+};
+
+/**
+ * 切换布局
+ *
+ * @param layout - 布局模式
+ */
+const handleLayoutChange = (layout: LayoutMode) => {
+  if (settingsStore.layout === layout) return;
+
+  settingsStore.layout = layout;
+};
+
+/**
+ * 复制当前配置
+ */
+const handleCopySettings = async () => {
+  try {
+    copyLoading.value = true;
+
+    // 生成配置代码
+    const configCode = generateSettingsCode();
+
+    // 复制到剪贴板
+    await navigator.clipboard.writeText(configCode);
+
+    // 显示成功消息
+    ElMessage.success({
+      message: t("settings.copySuccess"),
+      duration: 3000,
+    });
+  } catch {
+    ElMessage.error("复制配置失败");
+  } finally {
+    copyLoading.value = false;
+  }
+};
+
+/**
+ * 重置为默认配置
+ */
+const handleResetSettings = async () => {
+  resetLoading.value = true;
+
+  try {
+    settingsStore.resetSettings();
+
+    ElMessage.success(t("settings.resetSuccess"));
+  } catch {
+    ElMessage.error("重置配置失败");
+  } finally {
+    resetLoading.value = false;
+  }
+};
+
+/**
+ * 生成配置代码字符串
+ */
+const generateSettingsCode = (): string => {
+  return JSON.stringify(settingsStore.effectiveSettings, null, 2);
+};
+
+/**
+ * 关闭抽屉前的回调
+ */
+const handleCloseDrawer = () => {
+  settingsStore.settingsVisible = false;
+};
+</script>
+
+<style lang="scss" scoped>
+/* 设置抽屉样式 */
+.settings-drawer {
+  :deep(.el-drawer__body) {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+  }
+}
+
+/* 设置内容区域 */
+.settings-content {
+  /* let drawer body control height with flex and make this area scrollable */
+  flex: 1 1 auto;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* 底部操作区域样式 */
+.action-buttons {
+  display: flex;
+
+  & > .el-button {
+    flex: 1;
+    font-size: 14px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+  }
+}
+/* 主题切换器优化 */
+.theme-switch {
+  transform: scale(1.15);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.2);
+  }
+}
+
+.config-section {
+  margin-bottom: 24px;
+
+  .config-item {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--el-border-color-light);
+    transition: all 0.3s ease;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      padding-right: 8px;
+      padding-left: 8px;
+      margin: 0 -8px;
+      background-color: var(--el-fill-color-light);
+      border-radius: 6px;
+    }
+  }
+}
+
+/* 布局选择器样式优化 */
+.layout-select {
+  padding: 16px 8px;
+
+  .layout-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    justify-items: center;
+  }
+}
+
+.layout-item {
+  --preview-inset-x: 6px;
+  --preview-inset-top: 4px;
+  --preview-inset-bottom: 4px;
+  --preview-sidebar-width: 10px;
+  --preview-gap: 4px;
+  --preview-header-height: 10px;
+  position: relative;
+  width: 70px;
+  height: 80px;
+  overflow: hidden;
+  cursor: pointer;
+  background: linear-gradient(145deg, var(--el-bg-color) 0%, var(--el-bg-color-page) 100%);
+  border: 2px solid var(--el-border-color);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: linear-gradient(
+      145deg,
+      var(--el-bg-color) 0%,
+      var(--el-color-primary-light-9) 100%
+    );
+    border-color: var(--el-color-primary-light-3);
+    transform: translateY(-4px) scale(1.05);
+  }
+
+  &:active {
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  .layout-preview {
+    position: relative;
+    width: calc(100% - 12px);
+    height: 50px;
+    margin: 8px auto 4px;
+  }
+
+  .layout-header {
+    position: absolute;
+    top: var(--preview-inset-top);
+    right: var(--preview-inset-x);
+    left: var(--preview-inset-x);
+    height: var(--preview-header-height);
+    background: linear-gradient(
+      90deg,
+      var(--el-color-primary) 0%,
+      var(--el-color-primary-light-3) 100%
+    );
+    border-radius: 2px;
+  }
+
+  .layout-sidebar {
+    position: absolute;
+    left: var(--preview-inset-x);
+    width: var(--preview-sidebar-width);
+    background: linear-gradient(
+      180deg,
+      var(--el-color-primary-dark-2) 0%,
+      var(--el-color-primary) 100%
+    );
+    border-radius: 2px;
+  }
+
+  .layout-main {
+    position: absolute;
+    background: linear-gradient(135deg, var(--el-fill-color-light) 0%, var(--el-fill-color) 100%);
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 2px;
+  }
+
+  .layout-name {
+    position: absolute;
+    right: 0;
+    bottom: 6px;
+    left: 0;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--el-text-color-regular);
+    text-align: center;
+    transition: color 0.3s ease;
+  }
+
+  .layout-check {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    color: white;
+    background: var(--el-color-success);
+    border-radius: 50%;
+  }
+
+  // 左侧布局
+  &.left {
+    .layout-sidebar {
+      top: var(--preview-inset-top);
+      bottom: var(--preview-inset-bottom);
+    }
+    .layout-main {
+      top: var(--preview-inset-top);
+      right: var(--preview-inset-x);
+      bottom: var(--preview-inset-bottom);
+      left: calc(var(--preview-inset-x) + var(--preview-sidebar-width) + var(--preview-gap));
+    }
+  }
+
+  // 顶部布局
+  &.top {
+    .layout-main {
+      top: calc(var(--preview-inset-top) + var(--preview-header-height) + var(--preview-gap));
+      right: var(--preview-inset-x);
+      bottom: var(--preview-inset-bottom);
+      left: var(--preview-inset-x);
+    }
+  }
+
+  // 混合布局
+  &.mix {
+    .layout-sidebar {
+      top: calc(var(--preview-inset-top) + var(--preview-header-height) + var(--preview-gap));
+      bottom: var(--preview-inset-bottom);
+    }
+    .layout-main {
+      top: calc(var(--preview-inset-top) + var(--preview-header-height) + var(--preview-gap));
+      right: var(--preview-inset-x);
+      bottom: var(--preview-inset-bottom);
+      left: calc(var(--preview-inset-x) + var(--preview-sidebar-width) + var(--preview-gap));
+    }
+  }
+
+  &.is-active {
+    background: linear-gradient(
+      145deg,
+      var(--el-color-primary-light-9) 0%,
+      var(--el-color-primary-light-8) 100%
+    );
+    border-color: var(--el-color-primary);
+    transform: translateY(-2px) scale(1.08);
+
+    .layout-name {
+      font-weight: 600;
+      color: var(--el-color-primary);
+    }
+  }
+}
+
+:deep(.copy-config-dialog) {
+  .el-message-box__content {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+}
+</style>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.file.mapper.FileInfoMapper">
+
+    <resultMap id="FileInfoResult" type="com.sourcelin.file.domain.FileInfo">
+        <id property="fileId" column="file_id"/>
+        <result property="fileName" column="file_name"/>
+        <result property="originalName" column="original_name"/>
+        <result property="fileExt" column="file_ext"/>
+        <result property="contentType" column="content_type"/>
+        <result property="fileSize" column="file_size"/>
+        <result property="fileHash" column="file_hash"/>
+        <result property="storageType" column="storage_type"/>
+        <result property="bucketName" column="bucket_name"/>
+        <result property="storagePath" column="storage_path"/>
+        <result property="accessUrl" column="access_url"/>
+        <result property="accessScope" column="access_scope"/>
+        <result property="bizType" column="biz_type"/>
+        <result property="bizId" column="biz_id"/>
+        <result property="ownerType" column="owner_type"/>
+        <result property="ownerId" column="owner_id"/>
+        <result property="status" column="status"/>
+        <result property="refCount" column="ref_count"/>
+        <result property="expireTime" column="expire_time"/>
+        <result property="lastAccessTime" column="last_access_time"/>
+        <result property="deleteTime" column="delete_time"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <insert id="insertFileInfo" parameterType="com.sourcelin.file.domain.FileInfo" useGeneratedKeys="true" keyProperty="fileId">
+        insert into file_info (
+            file_name, original_name, file_ext, content_type, file_size, file_hash,
+            storage_type, bucket_name, storage_path, access_url, access_scope,
+            biz_type, biz_id, owner_type, owner_id, status, ref_count,
+            expire_time, last_access_time, delete_time, remark, create_by, create_time,
+            update_by, update_time
+        ) values (
+            #{fileName}, #{originalName}, #{fileExt}, #{contentType}, #{fileSize}, #{fileHash},
+            #{storageType}, #{bucketName}, #{storagePath}, #{accessUrl}, #{accessScope},
+            #{bizType}, #{bizId}, #{ownerType}, #{ownerId}, #{status}, #{refCount},
+            #{expireTime}, #{lastAccessTime}, #{deleteTime}, #{remark}, #{createBy}, #{createTime},
+            #{updateBy}, #{updateTime}
+        )
+    </insert>
+
+    <select id="selectFileInfoById" parameterType="Long" resultMap="FileInfoResult">
+        select file_id, file_name, original_name, file_ext, content_type, file_size, file_hash,
+               storage_type, bucket_name, storage_path, access_url, access_scope,
+               biz_type, biz_id, owner_type, owner_id, status, ref_count, expire_time,
+               last_access_time, delete_time, remark, create_by, create_time, update_by, update_time
+        from file_info
+        where file_id = #{fileId}
+    </select>
+
+    <update id="updateFileInfo" parameterType="com.sourcelin.file.domain.FileInfo">
+        update file_info
+        <set>
+            <if test="fileName != null">file_name = #{fileName},</if>
+            <if test="originalName != null">original_name = #{originalName},</if>
+            <if test="fileExt != null">file_ext = #{fileExt},</if>
+            <if test="contentType != null">content_type = #{contentType},</if>
+            <if test="fileSize != null">file_size = #{fileSize},</if>
+            <if test="fileHash != null">file_hash = #{fileHash},</if>
+            <if test="storageType != null">storage_type = #{storageType},</if>
+            <if test="bucketName != null">bucket_name = #{bucketName},</if>
+            <if test="storagePath != null">storage_path = #{storagePath},</if>
+            <if test="accessUrl != null">access_url = #{accessUrl},</if>
+            <if test="accessScope != null">access_scope = #{accessScope},</if>
+            <if test="bizType != null">biz_type = #{bizType},</if>
+            <if test="bizId != null">biz_id = #{bizId},</if>
+            <if test="ownerType != null">owner_type = #{ownerType},</if>
+            <if test="ownerId != null">owner_id = #{ownerId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="refCount != null">ref_count = #{refCount},</if>
+            <if test="expireTime != null">expire_time = #{expireTime},</if>
+            <if test="lastAccessTime != null">last_access_time = #{lastAccessTime},</if>
+            <if test="deleteTime != null">delete_time = #{deleteTime},</if>
+            remark = #{remark},
+            update_by = #{updateBy},
+            update_time = #{updateTime}
+        </set>
+        where file_id = #{fileId}
+    </update>
+</mapper>

@@ -1,0 +1,34 @@
+/**
+ * 业务相关枚举
+ *
+ * @description
+ * 包含菜单、用户、角色等业务实体的枚举定义
+ */
+
+/**
+ * 菜单类型枚举
+ */
+export enum MenuTypeEnum {
+  CATALOG = "M", // 目录
+  MENU = "C", // 菜单
+  BUTTON = "F", // 按钮
+}
+
+/**
+ * 菜单范围枚举
+ */
+export enum MenuScopeEnum {
+  PLATFORM = 1, // 平台菜单
+}
+
+/**
+ * 用户性别枚举
+ */
+export enum UserGender {
+  /** 未知 */
+  UNKNOWN = 0,
+  /** 男 */
+  MALE = 1,
+  /** 女 */
+  FEMALE = 2,
+}

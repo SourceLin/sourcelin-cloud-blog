@@ -1,0 +1,201 @@
+@import './mixins';
+@import './responsive';
+
+/**
+ * Foundation：页面外壳（`.glass-page`）、页头、统计块、玻璃卡片与空状态等布局/表面样式。
+ * 依赖 `mixins` 中的 `liquid-glass-effect` 与断点 mixin。
+ */
+
+/* 全页容器：最小高度、顶栏留白、底层 page-glow 装饰 */
+.glass-page {
+  min-height: calc(100vh - var(--header-height, 64px));
+  padding: calc(var(--header-height, 64px) + var(--spacing-xxxl, 32px)) var(--spacing-lg, 24px) var(--spacing-xl, 60px);
+  background: transparent;
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+}
+
+.glass-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--page-glow);
+  opacity: 0.82;
+  pointer-events: none;
+  z-index: 0;
+}
+
+html[data-theme='dark'] .glass-page {
+  background: color-mix(in srgb, var(--background-color-deep) 32%, transparent);
+}
+
+html[data-theme='dark'] .glass-page::before {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--background-color-deep) 26%, transparent) 0%,
+      color-mix(in srgb, var(--background-color-deep) 38%, transparent) 100%
+    ),
+    radial-gradient(circle at 50% -8%, color-mix(in srgb, var(--primary-color) 4%, transparent), transparent 48%),
+    var(--page-glow);
+  opacity: 0.82;
+}
+
+.glass-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* 页头：标题、副标题、可选横向布局与数据统计 */
+.page-header {
+  max-width: var(--content-max-width, 960px);
+  margin: 0 auto var(--spacing-xl, 40px);
+  text-align: center;
+  position: relative;
+}
+
+.page-header.flex-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg, 20px);
+  text-align: left;
+}
+
+.header-content {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md, 12px);
+  margin: 0 0 var(--spacing-sm, 8px);
+  font-size: var(--font-size-xxxl, 2.5rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-header.flex-header .page-title {
+  justify-content: flex-start;
+}
+
+.title-icon {
+  font-size: var(--font-size-xxl, 2rem);
+}
+
+.page-subtitle {
+  margin: 0;
+  font-size: var(--font-size-md, 1rem);
+  color: var(--text-color-muted);
+}
+
+.header-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md, 16px);
+  margin-top: var(--spacing-lg, 20px);
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+  padding: 0.8rem 1rem;
+  border-radius: calc(var(--border-radius-lg) + 2px);
+  border: 1px solid var(--border-panel-subtle);
+  background: var(--surface-panel-soft);
+  box-shadow:
+    var(--highlight-panel-soft),
+    var(--shadow-panel-subtle);
+}
+
+.stat-value {
+  font-size: var(--font-size-xl, 1.5rem);
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.stat-label {
+  font-size: var(--font-size-sm, 0.85rem);
+  color: var(--text-color-muted);
+}
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: var(--glass-stroke);
+}
+
+/* 页头装饰光斑（不参与点击） */
+.header-decoration {
+  position: absolute;
+  inset: -20px;
+  pointer-events: none;
+}
+
+.deco-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(var(--primary-color-rgb), 0.1), transparent);
+  filter: blur(40px);
+}
+
+/* 内容区玻璃卡片（轻量 panel 表面） */
+.glass-card {
+  position: relative;
+  padding: var(--spacing-lg, 24px);
+  @include liquid-glass-effect('lite', 100%, var(--glass-radius), false);
+  background: var(--surface-panel-default);
+  background-image: var(--glass-noise);
+  background-blend-mode: soft-light;
+  outline: 1px solid var(--border-panel-default);
+  box-shadow:
+    var(--highlight-panel-default),
+    var(--shadow-panel-default),
+    var(--shadow-panel-glow);
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44%;
+  background: linear-gradient(180deg, var(--surface-white-25), transparent 72%);
+  pointer-events: none;
+  border-radius: var(--glass-radius) var(--glass-radius) 0 0;
+}
+
+/* 小屏：收紧边距与页头排版 */
+@include sourcelin-down(md) {
+  .glass-page {
+    padding: var(--spacing-xxxl, 80px) var(--spacing-md, 16px) var(--spacing-xl, 40px);
+  }
+
+  .page-header.flex-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .page-title {
+    font-size: var(--font-size-xxl, 2rem);
+  }
+
+  .header-stats {
+    width: 100%;
+    justify-content: center;
+  }
+}

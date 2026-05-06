@@ -1,0 +1,475 @@
+/* Component token extension point */
+
+:root {
+  --surface-glass-card: var(--glass-surface-strong);
+  --surface-glass-card-muted: var(--glass-surface-lite);
+  --surface-glass-card-soft: color-mix(in srgb, var(--glass-surface-strong) 88%, var(--text-color-light));
+  --surface-glass-highlight-soft: linear-gradient(180deg, color-mix(in srgb, var(--text-color-light) 36%, transparent), transparent 58%);
+  --surface-glass-highlight-strong: linear-gradient(180deg, color-mix(in srgb, var(--text-color-light) 48%, transparent), transparent 56%);
+  --surface-panel-soft:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--glass-surface-lite) 82%, transparent),
+      color-mix(in srgb, var(--glass-surface-strong) 90%, transparent)
+    ),
+    radial-gradient(circle at 14% 0%, color-mix(in srgb, var(--accent-color) 4%, transparent), transparent 36%);
+  --surface-panel-default:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent-color) 6%, var(--glass-surface-strong)),
+      color-mix(in srgb, var(--glass-surface-lite) 90%, transparent)
+    ),
+    radial-gradient(circle at 16% 0%, color-mix(in srgb, var(--accent-color) 6%, transparent), transparent 38%);
+  --surface-panel-strong:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent-color) 8%, var(--glass-surface-strong)),
+      color-mix(in srgb, var(--glass-surface-lite) 88%, transparent)
+    ),
+    radial-gradient(circle at 14% 0%, color-mix(in srgb, var(--accent-color) 7%, transparent), transparent 36%);
+  --surface-panel-inset:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--glass-surface-strong) 58%, transparent),
+      color-mix(in srgb, var(--glass-surface-lite) 72%, transparent)
+    ),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent-color) 4%, transparent), transparent 44%);
+  --surface-panel-chip:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-white-10) 100%, transparent),
+      color-mix(in srgb, var(--glass-surface-lite) 92%, transparent)
+    );
+  --surface-panel-chip-accent:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent-color) 8%, var(--glass-surface-strong)),
+      color-mix(in srgb, var(--primary-color) 3%, transparent)
+    );
+  --surface-panel-chip-quiet:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-white-15) 84%, transparent),
+      color-mix(in srgb, var(--glass-surface-lite) 94%, transparent)
+    );
+  --surface-panel-tag:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent-color) 5%, var(--glass-surface-strong)),
+      color-mix(in srgb, var(--glass-surface-lite) 86%, transparent)
+    );
+  --surface-panel-prelude:
+    linear-gradient(120deg, color-mix(in srgb, var(--accent-color) 4%, transparent), transparent 58%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--glass-surface-lite) 76%, transparent),
+      color-mix(in srgb, var(--glass-surface-strong) 86%, transparent)
+    );
+  --surface-panel-specular-soft:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface-white-40) 42%, transparent) 0%, transparent 42%),
+    radial-gradient(ellipse at 86% 10%, color-mix(in srgb, var(--secondary-color) 7%, transparent), transparent 38%);
+  --surface-panel-specular-strong:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface-white-60) 46%, transparent) 0%, transparent 44%),
+    radial-gradient(ellipse at 82% 12%, color-mix(in srgb, var(--secondary-color) 9%, transparent), transparent 40%);
+  --surface-content-card:
+    var(--surface-panel-specular-soft),
+    var(--glass-frost-refraction),
+    var(--glass-frost-grain),
+    var(--glass-frost-surface);
+  --surface-content-card-featured:
+    var(--surface-panel-specular-strong),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--primary-color) 4%, var(--glass-frost-surface)),
+      color-mix(in srgb, var(--glass-frost-surface) 92%, transparent)
+    ),
+    var(--glass-frost-grain);
+  --border-content-card: var(--glass-frost-border);
+  --border-content-card-featured: color-mix(in srgb, var(--border-panel-strong) 78%, var(--glass-frost-border));
+  --highlight-content-card: var(--glass-frost-highlight);
+  --shadow-content-card: var(--glass-frost-shadow);
+  --shadow-content-card-hover:
+    var(--highlight-panel-soft),
+    var(--shadow-panel-default);
+  --content-card-backdrop-filter: blur(var(--glass-frost-blur)) saturate(var(--glass-saturate));
+  --content-card-backdrop-filter-hover: blur(var(--glass-frost-blur)) saturate(calc(var(--glass-saturate) + 4%));
+  --content-readable-scrim:
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      color-mix(in srgb, var(--glass-surface-strong) 18%, transparent) 100%
+    );
+  --text-shadow-glass: 0 1px 2px color-mix(in srgb, var(--text-color-light) 52%, transparent);
+  --border-panel-subtle: color-mix(in srgb, var(--glass-border) 82%, var(--border-light));
+  --border-panel-prelude: color-mix(in srgb, var(--glass-border) 88%, var(--border-color));
+  --border-panel-default: color-mix(in srgb, var(--glass-border-strong) 58%, var(--glass-border));
+  --border-panel-chip: color-mix(in srgb, var(--glass-border-strong) 82%, var(--glass-border));
+  --border-panel-strong: var(--glass-border-strong);
+  --border-panel-accent: color-mix(in srgb, var(--accent-color) 42%, transparent);
+  --border-panel-badge-accent: color-mix(in srgb, var(--accent-color) 28%, transparent);
+  --border-interactive-default: var(--border-panel-badge-accent);
+  --border-interactive-hover: var(--border-panel-accent);
+  --border-interactive-active: color-mix(in srgb, var(--primary-color) 46%, transparent);
+  --discover-filter-active-underline-height: 3px;
+  --discover-filter-active-underline: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--companion-color) 62%, var(--surface-white-20)),
+    color-mix(in srgb, var(--companion-color) 86%, var(--primary-color) 14%),
+    color-mix(in srgb, var(--companion-color) 74%, var(--secondary-color) 26%)
+  );
+  --discover-filter-active-underline-shadow:
+    0 0 10px color-mix(in srgb, var(--companion-color) 32%, transparent),
+    0 0 18px color-mix(in srgb, var(--companion-color) 16%, transparent);
+  --highlight-panel-soft: inset 0 1px 0 color-mix(in srgb, var(--surface-white-18) 82%, transparent);
+  --highlight-panel-default: inset 0 1px 0 color-mix(in srgb, var(--surface-white-20) 92%, transparent);
+  --highlight-panel-strong: inset 0 1px 0 color-mix(in srgb, var(--surface-white-25) 86%, transparent);
+  --highlight-panel-chip: inset 0 1px 0 color-mix(in srgb, var(--surface-white-18) 90%, transparent);
+  --shadow-panel-subtle: 0 4px 12px color-mix(in srgb, var(--background-color-deep) 8%, transparent);
+  --shadow-panel-soft: 0 12px 24px color-mix(in srgb, var(--background-color-deep) 8%, transparent);
+  --shadow-panel-default: 0 16px 32px color-mix(in srgb, var(--background-color-deep) 10%, transparent);
+  --shadow-panel-hover: 0 24px 40px color-mix(in srgb, var(--background-color-deep) 12%, transparent);
+  --shadow-panel-inline: 0 1px 0 color-mix(in srgb, var(--background-color-deep) 3%, transparent);
+  --shadow-panel-glow: 0 18px 36px color-mix(in srgb, var(--accent-color) 12%, transparent);
+  --shadow-panel-glow-strong: 0 24px 48px color-mix(in srgb, var(--accent-color) 16%, transparent);
+  --surface-black-05: color-mix(in srgb, var(--background-color-deep) 5%, transparent);
+  --surface-black-08: color-mix(in srgb, var(--background-color-deep) 8%, transparent);
+  --surface-black-10: color-mix(in srgb, var(--background-color-deep) 10%, transparent);
+  --surface-black-18: color-mix(in srgb, var(--background-color-deep) 18%, transparent);
+  --surface-black-20: color-mix(in srgb, var(--background-color-deep) 20%, transparent);
+  --surface-black-25: color-mix(in srgb, var(--background-color-deep) 25%, transparent);
+  --surface-black-30: color-mix(in srgb, var(--background-color-deep) 30%, transparent);
+  --surface-black-35: color-mix(in srgb, var(--background-color-deep) 35%, transparent);
+  --surface-black-39: color-mix(in srgb, var(--background-color-deep) 39%, transparent);
+  --surface-black-40: color-mix(in srgb, var(--background-color-deep) 40%, transparent);
+  --surface-black-44: color-mix(in srgb, var(--background-color-deep) 44%, transparent);
+  --surface-black-50: color-mix(in srgb, var(--background-color-deep) 50%, transparent);
+  --surface-black-60: color-mix(in srgb, var(--background-color-deep) 60%, transparent);
+  --surface-black-80: color-mix(in srgb, var(--background-color-deep) 80%, transparent);
+  --surface-white-05: color-mix(in srgb, var(--text-color-light) 5%, transparent);
+  --surface-white-08: color-mix(in srgb, var(--text-color-light) 8%, transparent);
+  --surface-white-10: color-mix(in srgb, var(--text-color-light) 10%, transparent);
+  --surface-white-12: color-mix(in srgb, var(--text-color-light) 12%, transparent);
+  --surface-white-15: color-mix(in srgb, var(--text-color-light) 15%, transparent);
+  --surface-white-18: color-mix(in srgb, var(--text-color-light) 18%, transparent);
+  --surface-white-20: color-mix(in srgb, var(--text-color-light) 20%, transparent);
+  --surface-white-25: color-mix(in srgb, var(--text-color-light) 25%, transparent);
+  --surface-white-30: color-mix(in srgb, var(--text-color-light) 30%, transparent);
+  --surface-white-40: color-mix(in srgb, var(--text-color-light) 40%, transparent);
+  --surface-white-60: color-mix(in srgb, var(--text-color-light) 60%, transparent);
+  --surface-white-70: color-mix(in srgb, var(--text-color-light) 70%, transparent);
+  --surface-white-80: color-mix(in srgb, var(--text-color-light) 80%, transparent);
+  --surface-white-90: color-mix(in srgb, var(--text-color-light) 90%, transparent);
+  --code-inline-bg: color-mix(in srgb, var(--background-color) 92%, var(--text-color-light));
+  --code-block-bg: color-mix(in srgb, var(--background-color-deep) 82%, var(--card-bg));
+  --code-block-text: color-mix(in srgb, var(--text-color-light) 88%, var(--accent-color));
+  --table-row-alt-bg: color-mix(in srgb, var(--background-color) 94%, var(--text-color-light));
+  --warning-color-dark: color-mix(in srgb, var(--warning-color) 72%, var(--background-color-deep));
+  --primary-color-strong: color-mix(in srgb, var(--primary-color) 78%, var(--background-color-deep));
+  --success-color-strong: color-mix(in srgb, var(--success-color) 72%, var(--background-color-deep));
+  --error-color-strong: color-mix(in srgb, var(--error-color) 78%, var(--background-color-deep));
+  --info-color-strong: color-mix(in srgb, var(--info-color) 78%, var(--background-color-deep));
+  --button-glow: var(--button-glow);
+  --button-glow-strong: var(--button-glow-strong);
+  --input-focus-ring: var(--input-focus-ring);
+  --pagination-shell: var(--pagination-shell);
+  --pagination-item: var(--pagination-item);
+  --pagination-item-active: var(--pagination-item-active);
+  --comment-thread-gap: clamp(0.9rem, 1.6vw, 1.2rem);
+  --comment-reply-indent: clamp(0.9rem, 2vw, 1.3rem);
+  --section-prelude-spacing: clamp(0.8rem, 1.6vw, 1.15rem);
+  --glass-panel-outline: 1px solid color-mix(in srgb, var(--glass-border) 82%, transparent);
+
+  --theme-transition-sky-overlay-dark: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--background-color-deep) 60%, transparent) 0%,
+    color-mix(in srgb, var(--background-color-deep) 30%, transparent) 30%,
+    color-mix(in srgb, var(--background-color-deep) 10%, transparent) 60%,
+    transparent 100%
+  );
+  --theme-transition-sky-overlay-light: linear-gradient(
+    180deg,
+    #FFE0B8 0%,
+    rgba(255, 214, 165, 0.68) 34%,
+    rgba(255, 243, 214, 0.18) 72%,
+    transparent 100%
+  );
+  --theme-transition-sky-bg-light: linear-gradient(180deg, #FFD6A5 0%, #FFE6C7 34%, #FFF3D6 66%, #FDF8EE 100%);
+  --theme-transition-sky-bg-dark:
+    radial-gradient(1px 1px at 20% 30%, var(--surface-white-90) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 70%, var(--surface-white-80) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 60% 20%, color-mix(in srgb, var(--text-color-light) 95%, transparent) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 60%, var(--surface-white-70) 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 50%, var(--surface-white-60) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 90% 40%, color-mix(in srgb, var(--text-color-light) 85%, transparent) 0%, transparent 100%),
+    radial-gradient(1px 1px at 35% 15%, color-mix(in srgb, var(--text-color-light) 75%, transparent) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 80%, color-mix(in srgb, var(--text-color-light) 65%, transparent) 0%, transparent 100%),
+    radial-gradient(ellipse at 30% 25%, color-mix(in srgb, var(--primary-color) 12%, transparent) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 35%, color-mix(in srgb, var(--secondary-color) 8%, transparent) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 75%, #183251 0%, transparent 50%),
+    linear-gradient(180deg, #060A14 0%, #0A1120 20%, #0E1830 52%, #182848 82%, #223B63 100%);
+  --theme-transition-sun-gradient: linear-gradient(135deg, #FFD76A 0%, #FFBF5F 58%, #FFA94D 100%);
+  --theme-transition-sun-shadow:
+    0 0 40px color-mix(in srgb, #FFD76A 78%, transparent),
+    0 0 80px color-mix(in srgb, #FFBF5F 44%, transparent),
+    0 0 120px color-mix(in srgb, #FFA94D 24%, transparent);
+  --theme-transition-moon-gradient: linear-gradient(135deg, #F4F7FF 0%, #D6E1F5 52%, #A9BAD9 100%);
+  --theme-transition-moon-shadow:
+    inset -4px -4px 10px color-mix(in srgb, #6E82A8 15%, transparent),
+    inset 3px 3px 5px color-mix(in srgb, #D9E7FF 90%, transparent),
+    0 0 50px color-mix(in srgb, #9CB5E8 66%, transparent),
+    0 0 100px color-mix(in srgb, #88A0D2 34%, transparent);
+  --theme-transition-moon-mask: #0B1324;
+  --theme-transition-moon-crater: color-mix(in srgb, #8FA3C2 30%, transparent);
+  --theme-transition-moon-crater-shadow: -15px 18px 0 3px color-mix(in srgb, #8FA3C2 25%, transparent);
+
+  --zombie-page-bg: #2c3e50;
+  --zombie-wrapper-bg: #20332f;
+  --zombie-skin: #1abc9c;
+  --zombie-skin-dark: #148f77;
+  --zombie-skin-deep: #07362c;
+  --zombie-shadow-deep: #1a252f;
+  --zombie-brain-shell: #2c3e50;
+  --zombie-brain-tissue: #e05887;
+  --zombie-gum: #e883a6;
+  --zombie-bone: #bfbfbf;
+  --zombie-bone-shadow: #6d8082;
+  --zombie-shirt-top: #593f35;
+  --zombie-shirt-bottom: #795548;
+  --zombie-eye: #ffffff;
+  --zombie-eye-accent: #ff9800;
+  --zombie-rock: #3e5871;
+  --zombie-tomb: #95a5a6;
+  --zombie-tomb-text: #3e4a4a;
+
+  /* ========== 4 种光学变体 Token ========== */
+
+  /* —— 1. 冰晶玻璃 (Ice Crystal) —— */
+  /* 隐喻：厚重冰块，锐利顶部高光条，安定厚重。适合阅读容器。 */
+  --glass-ice-surface: color-mix(in srgb, var(--glass-surface-strong) 94%, var(--text-color-light));
+  --glass-ice-border: color-mix(in srgb, var(--glass-border-strong) 88%, var(--border-light));
+  --glass-ice-highlight: inset 0 1px 0 color-mix(in srgb, var(--text-color-light) 56%, transparent);
+  --glass-ice-refraction:
+    linear-gradient(180deg, color-mix(in srgb, var(--text-color-light) 52%, transparent) 0%, transparent 18%),
+    radial-gradient(ellipse at 82% 8%, color-mix(in srgb, var(--companion-color) 4%, transparent), transparent 42%);
+  --glass-ice-grain:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.02) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(79, 70, 229, 0.015) 0%, transparent 45%);
+  --glass-ice-shadow:
+    var(--highlight-panel-strong),
+    var(--shadow-panel-default),
+    0 0 48px color-mix(in srgb, var(--primary-color) 6%, transparent);
+  --glass-ice-blur: calc(var(--glass-blur) + 2px);
+
+  /* —— 2. 水滴玻璃 (Water Drop) —— */
+  /* 隐喻：悬浮水珠，折射环境光形成内部光斑。标准液态玻璃。 */
+  --glass-drop-surface: var(--glass-surface);
+  --glass-drop-border: var(--glass-border);
+  --glass-drop-highlight: inset 0 1px 0 var(--glass-inner-glow);
+  --glass-drop-refraction:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.22) 22%, transparent 48%),
+    radial-gradient(circle at 78% 18%, color-mix(in srgb, var(--companion-color) 8%, transparent), transparent 38%);
+  --glass-drop-grain: var(--glass-noise);
+  --glass-drop-shadow:
+    inset 0 1px 0 var(--glass-inner-glow),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 12px 36px var(--glass-shadow),
+    0 3px 10px rgba(0, 0, 0, 0.1);
+  --glass-drop-glow-hover:
+    inset 0 1px 0 var(--glass-inner-glow),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 20px 56px var(--glass-shadow),
+    0 6px 16px rgba(0, 0, 0, 0.12),
+    0 0 32px color-mix(in srgb, var(--companion-color) 12%, transparent);
+  --glass-drop-blur: var(--glass-blur);
+
+  /* —— 3. 雾面玻璃 (Frosted Panel) —— */
+  /* 隐喻：磨砂镜面，散射光线，垂直侧光带。适合侧边栏。 */
+  --glass-frost-surface: color-mix(in srgb, var(--glass-surface) 88%, var(--glass-surface-lite));
+  --glass-frost-border: color-mix(in srgb, var(--glass-border) 78%, var(--border-light));
+  --glass-frost-highlight: inset 0 1px 0 color-mix(in srgb, var(--text-color-light) 28%, transparent);
+  --glass-frost-refraction:
+    linear-gradient(90deg, color-mix(in srgb, var(--surface-white-25) 42%, transparent) 0%, transparent 12%),
+    linear-gradient(180deg, color-mix(in srgb, var(--text-color-light) 18%, transparent) 0%, transparent 32%),
+    radial-gradient(ellipse at 50% 50%, color-mix(in srgb, var(--primary-color) 4%, transparent), transparent 58%);
+  --glass-frost-grain:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.025) 0%, transparent 45%),
+    radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(148, 163, 184, 0.015) 0%, transparent 55%);
+  --glass-frost-shadow:
+    var(--highlight-panel-soft),
+    var(--shadow-panel-soft);
+  --glass-frost-blur: calc(var(--glass-blur) - 4px);
+
+  /* —— 4. 宝石玻璃 (Gem Crystal) —— */
+  /* 隐喻：切割宝石，棱镜分光。全站最华丽，仅用于签名时刻。 */
+  --glass-gem-surface: var(--glass-surface-strong);
+  --glass-gem-border: color-mix(in srgb, var(--accent-color) 28%, var(--glass-border-strong));
+  --glass-gem-highlight:
+    inset 0 1px 0 color-mix(in srgb, var(--text-color-light) 62%, transparent),
+    inset 1px 0 0 color-mix(in srgb, var(--text-color-light) 28%, transparent);
+  --glass-gem-chromatic-border: conic-gradient(
+    from 180deg,
+    #4F46E5 0deg,
+    #818CF8 60deg,
+    var(--companion-color) 120deg,
+    #FBBF24 180deg,
+    #6366F1 240deg,
+    var(--aurora-color) 300deg,
+    #4F46E5 360deg
+  );
+  --glass-gem-chromatic-fallback:
+    0 0 0 1px color-mix(in srgb, var(--primary-color) 14%, transparent),
+    -2px -2px 12px color-mix(in srgb, var(--primary-color) 10%, transparent),
+    2px -2px 12px color-mix(in srgb, var(--companion-color) 8%, transparent),
+    -2px 2px 12px color-mix(in srgb, var(--accent-color) 8%, transparent),
+    2px 2px 12px color-mix(in srgb, var(--aurora-color) 6%, transparent);
+  --glass-gem-refraction:
+    radial-gradient(ellipse at 28% 14%, color-mix(in srgb, var(--text-color-light) 42%, transparent), transparent 32%),
+    radial-gradient(ellipse at 72% 86%, color-mix(in srgb, var(--primary-color) 12%, transparent), transparent 28%);
+  --glass-gem-grain:
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.015) 0%, transparent 40%),
+    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.01) 0%, transparent 35%);
+  --glass-gem-shadow:
+    var(--highlight-panel-strong),
+    var(--shadow-panel-default);
+  --glass-gem-blur: calc(var(--glass-blur) + 6px);
+
+  /* —— 嵌套容器 blur 降值 —— */
+  --glass-nested-blur: calc(var(--glass-blur) / 4);
+  --glass-nested-deep-blur: calc(var(--glass-blur) / 6);
+}
+
+html[data-theme='dark'] {
+  --surface-glass-card-soft: color-mix(in srgb, var(--glass-surface-strong) 88%, var(--background-color-deep));
+  --surface-panel-soft:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--background-color-deep) 10%, var(--glass-surface-lite)),
+      color-mix(in srgb, var(--background-color-deep) 18%, var(--glass-surface-strong))
+    ),
+    radial-gradient(circle at 14% 0%, color-mix(in srgb, var(--accent-color) 6%, transparent), transparent 36%);
+  --surface-panel-default:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--background-color-deep) 12%, var(--glass-surface-strong)),
+      color-mix(in srgb, var(--background-color-deep) 22%, var(--glass-surface-lite))
+    ),
+    radial-gradient(circle at 16% 0%, color-mix(in srgb, var(--accent-color) 7%, transparent), transparent 38%);
+  --surface-panel-strong:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--background-color-deep) 16%, var(--glass-surface-strong)),
+      color-mix(in srgb, var(--background-color-deep) 30%, var(--glass-surface-lite))
+    ),
+    radial-gradient(circle at 14% 0%, color-mix(in srgb, var(--accent-color) 8%, transparent), transparent 38%);
+  --surface-panel-inset:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--background-color-deep) 20%, var(--glass-surface-strong)),
+      color-mix(in srgb, var(--background-color-deep) 34%, var(--glass-surface-lite))
+    ),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent-color) 4%, transparent), transparent 46%);
+  --surface-panel-specular-soft:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface-white-18) 26%, transparent) 0%, transparent 40%),
+    radial-gradient(ellipse at 86% 10%, color-mix(in srgb, var(--secondary-color) 8%, transparent), transparent 38%);
+  --surface-panel-specular-strong:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface-white-25) 30%, transparent) 0%, transparent 44%),
+    radial-gradient(ellipse at 82% 12%, color-mix(in srgb, var(--secondary-color) 10%, transparent), transparent 40%);
+  --surface-content-card:
+    var(--surface-panel-specular-soft),
+    var(--glass-frost-refraction),
+    color-mix(in srgb, var(--glass-frost-surface) 92%, var(--background-color-deep));
+  --surface-content-card-featured:
+    var(--surface-panel-specular-strong),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--primary-color) 7%, var(--glass-frost-surface)),
+      color-mix(in srgb, var(--glass-frost-surface) 92%, var(--background-color-deep))
+    );
+  --border-content-card: var(--glass-frost-border);
+  --border-content-card-featured: color-mix(in srgb, var(--border-panel-strong) 76%, var(--glass-frost-border));
+  --content-readable-scrim:
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      color-mix(in srgb, var(--background-color-deep) 36%, transparent) 100%
+    );
+  --text-shadow-glass: 0 1px 4px color-mix(in srgb, var(--background-color-deep) 82%, transparent);
+  --border-panel-subtle: color-mix(in srgb, var(--glass-border) 68%, transparent);
+  --border-panel-prelude: color-mix(in srgb, var(--glass-border) 74%, transparent);
+  --border-panel-default: color-mix(in srgb, var(--glass-border-strong) 72%, transparent);
+  --border-panel-chip: color-mix(in srgb, var(--glass-border-strong) 78%, transparent);
+  --border-panel-strong: color-mix(in srgb, var(--glass-border-strong) 92%, transparent);
+  --discover-filter-active-underline: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--companion-color) 72%, var(--surface-white-25)),
+    color-mix(in srgb, var(--companion-color) 90%, var(--accent-color) 10%),
+    color-mix(in srgb, var(--companion-color) 80%, var(--primary-color) 20%)
+  );
+  --discover-filter-active-underline-shadow:
+    0 0 12px color-mix(in srgb, var(--companion-color) 40%, transparent),
+    0 0 24px color-mix(in srgb, var(--companion-color) 24%, transparent);
+  --highlight-panel-soft: inset 0 1px 0 color-mix(in srgb, var(--surface-white-18) 62%, transparent);
+  --highlight-panel-default: inset 0 1px 0 color-mix(in srgb, var(--surface-white-20) 70%, transparent);
+  --highlight-panel-strong: inset 0 1px 0 color-mix(in srgb, var(--surface-white-25) 74%, transparent);
+  --code-inline-bg: color-mix(in srgb, var(--glass-surface-strong) 92%, transparent);
+  --code-block-bg: color-mix(in srgb, var(--background-color-deep) 88%, var(--glass-surface-strong));
+  --code-block-text: color-mix(in srgb, var(--text-color-light) 92%, var(--info-color));
+  --table-row-alt-bg: color-mix(in srgb, var(--text-color-light) 5%, transparent);
+
+  /* ========== 暗色主题光学变体覆盖 ========== */
+
+  /* —— 冰晶玻璃（暗色） —— */
+  --glass-ice-surface: color-mix(in srgb, var(--glass-surface-strong) 92%, var(--background-color-deep));
+  --glass-ice-border: color-mix(in srgb, var(--glass-border-strong) 68%, transparent);
+  --glass-ice-highlight: inset 0 1px 0 color-mix(in srgb, var(--surface-white-18) 40%, transparent);
+  --glass-ice-refraction:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-white-18) 28%, transparent) 0%, transparent 14%),
+    radial-gradient(ellipse at 82% 8%, color-mix(in srgb, var(--aurora-color) 6%, transparent), transparent 38%);
+  --glass-ice-grain:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.015) 0%, transparent 40%);
+  --glass-ice-shadow:
+    var(--highlight-panel-strong),
+    var(--shadow-panel-default);
+
+  /* —— 水滴玻璃（暗色） —— */
+  --glass-drop-refraction:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.16) 22%, transparent 48%),
+    radial-gradient(circle at 78% 18%, color-mix(in srgb, var(--companion-color) 10%, transparent), transparent 38%);
+  --glass-drop-glow-hover:
+    inset 0 1px 0 var(--glass-inner-glow),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+    0 20px 56px var(--glass-shadow),
+    0 6px 16px rgba(0, 0, 0, 0.18),
+    0 0 32px color-mix(in srgb, var(--companion-color) 14%, transparent);
+
+  /* —— 雾面玻璃（暗色） —— */
+  --glass-frost-surface: color-mix(in srgb, var(--glass-surface) 84%, var(--background-color-deep));
+  --glass-frost-border: color-mix(in srgb, var(--glass-border) 52%, transparent);
+  --glass-frost-highlight: inset 0 1px 0 color-mix(in srgb, var(--surface-white-18) 18%, transparent);
+  --glass-frost-refraction:
+    linear-gradient(90deg, color-mix(in srgb, var(--surface-white-18) 14%, transparent) 0%, transparent 10%),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-white-08) 22%, transparent) 0%, transparent 28%),
+    radial-gradient(ellipse at 50% 50%, color-mix(in srgb, var(--primary-color) 3%, transparent), transparent 52%);
+  --glass-frost-grain:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.018) 0%, transparent 45%),
+    radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.012) 0%, transparent 50%);
+
+  /* —— 宝石玻璃（暗色） —— */
+  --glass-gem-border: color-mix(in srgb, var(--accent-color) 22%, var(--glass-border-strong));
+  --glass-gem-highlight:
+    inset 0 1px 0 color-mix(in srgb, var(--surface-white-25) 42%, transparent),
+    inset 1px 0 0 color-mix(in srgb, var(--surface-white-18) 18%, transparent);
+  --glass-gem-chromatic-fallback:
+    0 0 0 1px color-mix(in srgb, var(--primary-color) 18%, transparent),
+    -2px -2px 18px color-mix(in srgb, var(--primary-color) 14%, transparent),
+    2px -2px 18px color-mix(in srgb, var(--companion-color) 10%, transparent),
+    -2px 2px 18px color-mix(in srgb, var(--accent-color) 10%, transparent),
+    2px 2px 18px color-mix(in srgb, var(--aurora-color) 8%, transparent);
+  --glass-gem-grain:
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.012) 0%, transparent 40%),
+    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.008) 0%, transparent 35%);
+}
+

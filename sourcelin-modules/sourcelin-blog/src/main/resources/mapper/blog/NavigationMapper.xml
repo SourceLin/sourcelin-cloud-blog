@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.NavigationMapper">
+
+    <resultMap id="NavigationResult" type="Navigation">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="url" column="url"/>
+        <result property="description" column="description"/>
+        <result property="icon" column="icon"/>
+        <result property="cover" column="cover"/>
+        <result property="category" column="category"/>
+        <result property="source" column="source"/>
+        <result property="isRecommend" column="is_recommend"/>
+        <result property="status" column="status"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="clickCount" column="click_count"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectNavigationVo">
+        select id, name, url, description, icon, cover, category, source, is_recommend, status, order_num, click_count,
+               create_by, create_time, update_by, update_time, remark
+        from b_navigation
+    </sql>
+
+    <select id="selectNavigationById" parameterType="Long" resultMap="NavigationResult">
+        <include refid="selectNavigationVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectNavigationList" parameterType="Navigation" resultMap="NavigationResult">
+        <include refid="selectNavigationVo"/>
+        <where>
+            <if test="keywords != null and keywords != ''">
+                and (name like concat('%', #{keywords}, '%') or description like concat('%', #{keywords}, '%') or url like concat('%', #{keywords}, '%'))
+            </if>
+            <if test="name != null and name != ''">
+                and (name like concat('%', #{name}, '%') or description like concat('%', #{name}, '%'))
+            </if>
+            <if test="category != null and category != ''">and category = #{category}</if>
+            <if test="status != null">and status = #{status}</if>
+            <if test="isRecommend != null">and is_recommend = #{isRecommend}</if>
+        </where>
+        order by order_num asc, id desc
+    </select>
+
+    <insert id="insertNavigation" parameterType="Navigation" useGeneratedKeys="true" keyProperty="id">
+        insert into b_navigation
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            name,
+            url,
+            <if test="description != null">description,</if>
+            <if test="icon != null">icon,</if>
+            <if test="cover != null">cover,</if>
+            <if test="category != null">category,</if>
+            <if test="source != null">source,</if>
+            <if test="isRecommend != null">is_recommend,</if>
+            <if test="status != null">status,</if>
+            <if test="orderNum != null">order_num,</if>
+            <if test="clickCount != null">click_count,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{name},
+            #{url},
+            <if test="description != null">#{description},</if>
+            <if test="icon != null">#{icon},</if>
+            <if test="cover != null">#{cover},</if>
+            <if test="category != null">#{category},</if>
+            <if test="source != null">#{source},</if>
+            <if test="isRecommend != null">#{isRecommend},</if>
+            <if test="status != null">#{status},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+            <if test="clickCount != null">#{clickCount},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateNavigation" parameterType="Navigation">
+        update b_navigation
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="url != null and url != ''">url = #{url},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="icon != null">icon = #{icon},</if>
+            <if test="cover != null">cover = #{cover},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="source != null">source = #{source},</if>
+            <if test="isRecommend != null">is_recommend = #{isRecommend},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="clickCount != null">click_count = #{clickCount},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteNavigationById" parameterType="Long">
+        delete from b_navigation where id = #{id}
+    </delete>
+
+    <delete id="deleteNavigationByIds" parameterType="Long">
+        delete from b_navigation where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="updateClickCount" parameterType="Long">
+        update b_navigation
+        set click_count = ifnull(click_count, 0) + 1
+        where id = #{id}
+    </update>
+</mapper>

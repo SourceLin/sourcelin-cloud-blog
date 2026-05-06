@@ -1,0 +1,66 @@
+# Tomcat
+server:
+  port: 9204
+
+# Spring
+spring:
+  application:
+    # 应用名称
+    name: sourcelin-blog
+  profiles:
+    # 环境配置
+    active: dev
+  redis:
+    host: ${BLOG_REDIS_HOST:localhost}
+    port: ${BLOG_REDIS_PORT:6379}
+    password: ${BLOG_REDIS_PASSWORD:}
+  datasource:
+    # dynamic-datasource 默认配置兜底（确保 primary 数据源可用）
+    dynamic:
+      primary: master
+      datasource:
+        master:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: ${BLOG_DB_URL:jdbc:mysql://127.0.0.1:3306/sourcelin-cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8}
+          username: ${BLOG_DB_USERNAME:root}
+          password: ${BLOG_DB_PASSWORD:}
+      druid:
+        initial-size: 5
+        min-idle: 5
+        maxActive: 20
+        maxWait: 60000
+        connectTimeout: 30000
+        socketTimeout: 60000
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: SELECT 1 FROM DUAL
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        maxPoolPreparedStatementPerConnectionSize: 20
+        filters: stat,slf4j
+        connectionProperties: druid.stat.mergeSql\\=true;druid.stat.slowSqlMillis\\=5000
+  cloud:
+    nacos:
+      discovery:
+        # 分组
+        group: ${NACOS_GROUP:BLOG_GROUP}
+        # 服务注册地址
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+      config:
+        # 分组
+        group: ${NACOS_GROUP:BLOG_GROUP}
+        # 配置中心地址
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+        # 配置文件格式
+        file-extension: yml
+        # 共享配置
+        shared-configs:
+          - data-id: application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+            group: ${spring.cloud.nacos.config.group}
+
+# mybatis兜底配置（Nacos 配置解析异常时也能保证 mapper XML 可加载）
+mybatis:
+  type-aliases-package: com.sourcelin.blog
+  mapper-locations: classpath:mapper/**/*.xml

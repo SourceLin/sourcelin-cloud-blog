@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.WebConfigMapper">
+    
+    <resultMap type="WebConfig" id="WebConfigResult">
+        <result property="id"    column="id"    />
+        <result property="logo"    column="logo"    />
+        <result property="name"    column="name"    />
+        <result property="summary"    column="summary"    />
+        <result property="keyword"    column="keyword"    />
+        <result property="author"    column="author"    />
+        <result property="recordNum"    column="record_num"    />
+        <result property="webUrl"    column="web_url"    />
+        <result property="notice"    column="notice"    />
+        <result property="aliPay"    column="ali_pay"    />
+        <result property="weixinPay"    column="weixin_pay"    />
+        <result property="github"    column="github"    />
+        <result property="gitee"    column="gitee"    />
+        <result property="qqNumber"    column="qq_number"    />
+        <result property="qqGroup"    column="qq_group"    />
+        <result property="email"    column="email"    />
+        <result property="wechat"    column="wechat"    />
+        <result property="showList"    column="show_list"    />
+        <result property="loginTypeList"    column="login_type_list"    />
+        <result property="openComment"    column="open_comment"    />
+        <result property="openAdmiration"    column="open_admiration"    />
+        <result property="touristAvatar"    column="tourist_avatar"    />
+        <result property="authorInfo"    column="author_info"    />
+        <result property="authorAvatar"    column="author_avatar"    />
+        <result property="aboutMe"    column="about_me"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectWebConfigVo">
+        select id, logo, name, summary, keyword, author, record_num, web_url, notice, ali_pay, weixin_pay, github, gitee, qq_number, qq_group, email, wechat, show_list, login_type_list, open_comment, open_admiration, tourist_avatar, author_info, author_avatar, about_me, create_by, create_time, update_by, update_time, remark from b_web_config
+    </sql>
+
+    <select id="selectWebConfigList" parameterType="WebConfig" resultMap="WebConfigResult">
+        <include refid="selectWebConfigVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="author != null  and author != ''"> and author = #{author}</if>
+            <if test="openComment != null "> and open_comment = #{openComment}</if>
+            <if test="openAdmiration != null "> and open_admiration = #{openAdmiration}</if>
+        </where>
+    </select>
+    
+    <select id="selectWebConfigById" parameterType="Long" resultMap="WebConfigResult">
+        <include refid="selectWebConfigVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWebConfig" parameterType="WebConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into b_web_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="logo != null and logo != ''">logo,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="summary != null and summary != ''">summary,</if>
+            <if test="keyword != null and keyword != ''">keyword,</if>
+            <if test="author != null and author != ''">author,</if>
+            <if test="recordNum != null">record_num,</if>
+            <if test="webUrl != null">web_url,</if>
+            <if test="notice != null">notice,</if>
+            <if test="aliPay != null">ali_pay,</if>
+            <if test="weixinPay != null">weixin_pay,</if>
+            <if test="github != null">github,</if>
+            <if test="gitee != null">gitee,</if>
+            <if test="qqNumber != null">qq_number,</if>
+            <if test="qqGroup != null">qq_group,</if>
+            <if test="email != null">email,</if>
+            <if test="wechat != null">wechat,</if>
+            <if test="showList != null">show_list,</if>
+            <if test="loginTypeList != null">login_type_list,</if>
+            <if test="openComment != null">open_comment,</if>
+            <if test="openAdmiration != null">open_admiration,</if>
+            <if test="touristAvatar != null">tourist_avatar,</if>
+            <if test="authorInfo != null">author_info,</if>
+            <if test="authorAvatar != null">author_avatar,</if>
+            <if test="aboutMe != null">about_me,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="logo != null and logo != ''">#{logo},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="summary != null and summary != ''">#{summary},</if>
+            <if test="keyword != null and keyword != ''">#{keyword},</if>
+            <if test="author != null and author != ''">#{author},</if>
+            <if test="recordNum != null">#{recordNum},</if>
+            <if test="webUrl != null">#{webUrl},</if>
+            <if test="notice != null">#{notice},</if>
+            <if test="aliPay != null">#{aliPay},</if>
+            <if test="weixinPay != null">#{weixinPay},</if>
+            <if test="github != null">#{github},</if>
+            <if test="gitee != null">#{gitee},</if>
+            <if test="qqNumber != null">#{qqNumber},</if>
+            <if test="qqGroup != null">#{qqGroup},</if>
+            <if test="email != null">#{email},</if>
+            <if test="wechat != null">#{wechat},</if>
+            <if test="showList != null">#{showList},</if>
+            <if test="loginTypeList != null">#{loginTypeList},</if>
+            <if test="openComment != null">#{openComment},</if>
+            <if test="openAdmiration != null">#{openAdmiration},</if>
+            <if test="touristAvatar != null">#{touristAvatar},</if>
+            <if test="authorInfo != null">#{authorInfo},</if>
+            <if test="authorAvatar != null">#{authorAvatar},</if>
+            <if test="aboutMe != null">#{aboutMe},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWebConfig" parameterType="WebConfig">
+        update b_web_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="logo != null and logo != ''">logo = #{logo},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="summary != null and summary != ''">summary = #{summary},</if>
+            <if test="keyword != null and keyword != ''">keyword = #{keyword},</if>
+            <if test="author != null and author != ''">author = #{author},</if>
+            <if test="recordNum != null">record_num = #{recordNum},</if>
+            <if test="webUrl != null">web_url = #{webUrl},</if>
+            <if test="notice != null">notice = #{notice},</if>
+            <if test="aliPay != null">ali_pay = #{aliPay},</if>
+            <if test="weixinPay != null">weixin_pay = #{weixinPay},</if>
+            <if test="github != null">github = #{github},</if>
+            <if test="gitee != null">gitee = #{gitee},</if>
+            <if test="qqNumber != null">qq_number = #{qqNumber},</if>
+            <if test="qqGroup != null">qq_group = #{qqGroup},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="wechat != null">wechat = #{wechat},</if>
+            <if test="showList != null">show_list = #{showList},</if>
+            <if test="loginTypeList != null">login_type_list = #{loginTypeList},</if>
+            <if test="openComment != null">open_comment = #{openComment},</if>
+            <if test="openAdmiration != null">open_admiration = #{openAdmiration},</if>
+            <if test="touristAvatar != null">tourist_avatar = #{touristAvatar},</if>
+            <if test="authorInfo != null">author_info = #{authorInfo},</if>
+            <if test="authorAvatar != null">author_avatar = #{authorAvatar},</if>
+            <if test="aboutMe != null">about_me = #{aboutMe},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWebConfigById" parameterType="Long">
+        delete from b_web_config where id = #{id}
+    </delete>
+
+    <delete id="deleteWebConfigByIds" parameterType="String">
+        delete from b_web_config where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

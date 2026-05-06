@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.CommentMapper">
+    
+    <resultMap type="com.sourcelin.blog.vo.CommentVO" id="CommentResultVO">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="parentUserId"    column="parent_user_id"    />
+        <result property="articleId"    column="article_id"    />
+        <result property="parentCommentId"    column="parent_comment_id"    />
+        <result property="content"    column="content"    />
+        <result property="commentInfo"    column="comment_info"    />
+        <result property="floorCommentId"    column="floor_comment_id"    />
+        <result property="likeCount"    column="like_count"    />
+        <result property="status"    column="status"    />
+        <result property="moderationDecision" column="moderation_decision" />
+        <result property="source"    column="source"    />
+        <result property="browser"    column="browser"    />
+        <result property="browserVersion"    column="browser_version"    />
+        <result property="system"    column="system"    />
+        <result property="systemVersion"    column="system_version"    />
+        <result property="ipAddress"    column="ip_address"    />
+        <result property="ipSource"    column="ip_source"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectCommentVo">
+        select c.id, c.user_id, c.parent_user_id, c.article_id, c.parent_comment_id, c.content, c.comment_info, c.floor_comment_id, c.like_count, c.status,
+               c.source, c.browser, c.browser_version, c.system, c.system_version, c.ip_address, c.ip_source, c.create_time, c.update_by, c.update_time,
+               u.id as userId, u.nickname as nickname, u.avatar as avatar,
+               pu.id as parentUserId, pu.nickname as parentNickname,
+               m.decision as moderation_decision
+        from b_comment c
+                 left join b_user u ON c.user_id = u.id
+                 left join b_user pu ON c.parent_user_id = pu.id
+                 left join b_comment_moderation m ON m.comment_id = c.id
+    </sql>
+
+    <select id="selectCommentList" parameterType="com.sourcelin.blog.dto.CommentDTO" resultMap="CommentResultVO">
+        <include refid="selectCommentVo"/>
+        where c.deleted = 0
+        <if test="keywords != null and keywords != ''"> and (c.content like concat('%', #{keywords}, '%') or u.nickname like concat('%', #{keywords}, '%'))</if>
+        <if test="articleId != null"> and c.article_id = #{articleId}</if>
+        <if test="content != null  and content != ''"> and c.content like concat('%', #{content}, '%')</if>
+        <if test="source != null and source != ''"> and c.source = #{source}</if>
+        <if test="nickname != null and nickname != ''"> and u.nickname like concat('%', #{nickname}, '%')</if>
+        <if test="status != null"> and c.status = #{status}</if>
+        <if test="moderationDecision != null and moderationDecision != ''"> and m.decision = #{moderationDecision}</if>
+    </select>
+
+    <select id="selectFrontCommentList" parameterType="com.sourcelin.blog.dto.CommentDTO" resultMap="CommentResultVO">
+        <include refid="selectCommentVo"/>
+        where c.deleted = 0
+        <if test="articleId != null"> and c.article_id = #{articleId}</if>
+        <if test="content != null  and content != ''"> and c.content like concat('%', #{content}, '%')</if>
+        <if test="source != null and source != ''"> and c.source = #{source}</if>
+        <if test="nickname != null and nickname != ''"> and u.nickname like concat('%', #{nickname}, '%')</if>
+        <choose>
+            <when test="frontMergeOwn != null and frontMergeOwn == true">
+                <if test="viewerUserId != null">
+                    and (c.status = 1 or (c.user_id = #{viewerUserId} and c.status in (0, 2)))
+                </if>
+                <if test="viewerUserId == null">
+                    and c.status = 1
+                </if>
+            </when>
+            <otherwise>
+                <if test="status != null"> and c.status = #{status}</if>
+            </otherwise>
+        </choose>
+        order by c.create_time desc
+    </select>
+    
+    <select id="selectCommentById" parameterType="Long" resultMap="CommentResultVO">
+        <include refid="selectCommentVo"/>
+        where c.id = #{id}
+    </select>
+
+    <select id="countByArticleIdAndUserId" resultType="int">
+        select count(1) from b_comment c
+        where c.deleted = 0 and c.article_id = #{articleId} and c.user_id = #{userId}
+          and (c.source is null or c.source = 'article')
+    </select>
+
+    <select id="countByArticleId" resultType="int">
+        select count(1) from b_comment c
+        where c.deleted = 0 and c.article_id = #{articleId}
+          and (c.source is null or c.source = 'article')
+    </select>
+        
+    <insert id="insertComment" parameterType="Comment" useGeneratedKeys="true" keyProperty="id">
+        insert into b_comment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="parentUserId != null">parent_user_id,</if>
+            <if test="articleId != null">article_id,</if>
+            <if test="parentCommentId != null">parent_comment_id,</if>
+            <if test="content != null">content,</if>
+            <if test="commentInfo != null">comment_info,</if>
+            <if test="floorCommentId != null">floor_comment_id,</if>
+            <if test="likeCount != null">like_count,</if>
+            <if test="status != null">status,</if>
+            <if test="source != null">source,</if>
+            <if test="browser != null">browser,</if>
+            <if test="browserVersion != null">browser_version,</if>
+            <if test="system != null">system,</if>
+            <if test="systemVersion != null">system_version,</if>
+            <if test="ipAddress != null">ip_address,</if>
+            <if test="ipSource != null">ip_source,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="parentUserId != null">#{parentUserId},</if>
+            <if test="articleId != null">#{articleId},</if>
+            <if test="parentCommentId != null">#{parentCommentId},</if>
+            <if test="content != null">#{content},</if>
+            <if test="commentInfo != null">#{commentInfo},</if>
+            <if test="floorCommentId != null">#{floorCommentId},</if>
+            <if test="likeCount != null">#{likeCount},</if>
+            <if test="status != null">#{status},</if>
+            <if test="source != null">#{source},</if>
+            <if test="browser != null">#{browser},</if>
+            <if test="browserVersion != null">#{browserVersion},</if>
+            <if test="system != null">#{system},</if>
+            <if test="systemVersion != null">#{systemVersion},</if>
+            <if test="ipAddress != null">#{ipAddress},</if>
+            <if test="ipSource != null">#{ipSource},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateComment" parameterType="Comment">
+        update b_comment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="parentUserId != null">parent_user_id = #{parentUserId},</if>
+            <if test="articleId != null">article_id = #{articleId},</if>
+            <if test="parentCommentId != null">parent_comment_id = #{parentCommentId},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="commentInfo != null">comment_info = #{commentInfo},</if>
+            <if test="floorCommentId != null">floor_comment_id = #{floorCommentId},</if>
+            <if test="likeCount != null">like_count = #{likeCount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="source != null">source = #{source},</if>
+            <if test="browser != null">browser = #{browser},</if>
+            <if test="browserVersion != null">browser_version = #{browserVersion},</if>
+            <if test="system != null">system = #{system},</if>
+            <if test="systemVersion != null">system_version = #{systemVersion},</if>
+            <if test="ipAddress != null">ip_address = #{ipAddress},</if>
+            <if test="ipSource != null">ip_source = #{ipSource},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCommentById" parameterType="Long">
+        update b_comment set deleted = 1 where id = #{id}
+    </delete>
+
+    <delete id="deleteCommentByIds" parameterType="String">
+        update b_comment set deleted = 1 where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="updateLikeCount" parameterType="Long">
+        update b_comment
+        set like_count = ifnull(like_count, 0) + 1
+        where id = #{id}
+    </update>
+</mapper>

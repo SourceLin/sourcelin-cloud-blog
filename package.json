@@ -1,0 +1,19 @@
+{
+  "name": "sourcelin-cloud-blog",
+  "version": "1.0.0",
+  "description": "<p align=\"center\">\r \t<img alt=\"logo\" src=\"https://oscimg.oschina.net/oscnet/up-b99b286755aef70355a7084753f89cdb7c9.png\">\r </p>\r <h1 align=\"center\" style=\"margin: 30px 0 30px; font-weight: bold;\">Sourcelin Blog</h1>\r <h4 align=\"center\">面向个人写作与生活记录的现代博客平台，支持多端访问</h4>\r <p align=\"center\">\r \t<a href=\"https://gitee.com/sourcelin/sourcelin-cloud-blog\"><img src=\"https://gitee.com/sourcelin/sourcelin-cloud-blog/badge/star.svg?theme=dark\"></a>\r \t<img src=\"https://img.shields.io/badge/version-v3.6.8-brightgreen.svg\">\r \t<img src=\"https://img.shields.io/badge/java-1.8+-blue.svg\">\r \t<img src=\"https://img.shields.io/badge/springboot-2.7.18-blue.svg\">\r \t<img src=\"https://img.shields.io/badge/vue-3.x-green.svg\">\r \t<a href=\"https://gitee.com/sourcelin/sourcelin-cloud-blog/blob/master/LICENSE\"><img src=\"https://img.shields.io/github/license/sourcelin/sourcelin-cloud-blog\"></a>\r </p>",
+  "main": "test-api.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/my_lyq/sourcelin-cloud-blog.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

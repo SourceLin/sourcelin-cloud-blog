@@ -1,0 +1,65 @@
+/* Semantic token aliases */
+
+:root {
+  --bg-page: var(--background-color);
+  --body-bg: var(--body-gradient);
+  --surface-page: var(--body-gradient);
+  --card-bg: var(--card-background);
+  --card-border: var(--glass-border);
+  --surface-page-shell: color-mix(in srgb, var(--glass-surface-lite) 86%, transparent);
+  --surface-page-shell-strong: color-mix(in srgb, var(--glass-surface-strong) 90%, transparent);
+  --surface-page-content: var(--surface-page);
+  --surface-page-ambient: var(--page-content-ambient);
+  --surface-page-transition: var(--page-content-transition);
+  --surface-masthead-mist: var(--page-masthead-mist);
+
+  --text-primary: var(--text-color);
+  --text-secondary: var(--text-color-muted);
+  --text-placeholder: var(--input-placeholder);
+  --editor-placeholder-color: var(--text-color-muted);
+  --title-color: var(--text-color-dark);
+  --text-reading: color-mix(in srgb, var(--text-color) 95%, var(--background-color-deep));
+  --text-reading-soft: color-mix(in srgb, var(--text-color-muted) 92%, transparent);
+  --content-max-width-readable: min(100%, 54rem);
+  --page-title-size: clamp(2.6rem, 4vw, 4.2rem);
+  --section-title-size: clamp(1.35rem, 2vw, 1.8rem);
+  --card-title-size: clamp(1rem, 1.2vw, 1.18rem);
+  --section-kicker-size: 0.78rem;
+
+  --form-autofill-surface: var(--glass-surface-lite);
+
+  --surface-modal-solid: var(--text-color-light);
+  --surface-modal-field: color-mix(in srgb, var(--bg-page) 22%, var(--surface-modal-solid));
+
+  --modal-overlay-scrim: color-mix(in srgb, var(--background-color-deep) 48%, transparent);
+  --modal-overlay-backdrop-filter: blur(14px) saturate(135%);
+}
+
+html[data-theme='dark'] {
+  --bg-page: var(--background-color);
+  --body-bg: var(--body-gradient);
+  --surface-page: var(--body-gradient);
+  --card-bg: var(--card-background);
+  --card-border: var(--glass-border);
+  --surface-page-shell: color-mix(in srgb, var(--glass-surface) 88%, transparent);
+  --surface-page-shell-strong: color-mix(in srgb, var(--glass-surface-strong) 94%, transparent);
+  --surface-page-content: var(--surface-page);
+  --surface-page-ambient: var(--page-content-ambient);
+  --surface-page-transition: var(--page-content-transition);
+  --surface-masthead-mist: var(--page-masthead-mist);
+
+  --text-primary: var(--text-color);
+  --text-secondary: var(--text-color-muted);
+  --text-placeholder: var(--input-placeholder);
+  --editor-placeholder-color: var(--text-color-muted);
+  --title-color: var(--text-color-dark);
+  --text-reading: color-mix(in srgb, var(--text-color) 97%, transparent);
+  --text-reading-soft: color-mix(in srgb, var(--text-color-muted) 90%, transparent);
+  --content-max-width-readable: min(100%, 54rem);
+
+  --surface-modal-solid: var(--background-color);
+  --surface-modal-field: color-mix(in srgb, var(--background-color-deep) 40%, var(--surface-modal-solid));
+
+  --modal-overlay-scrim: color-mix(in srgb, var(--background-color-deep) 68%, transparent);
+  --modal-overlay-backdrop-filter: blur(16px) saturate(140%);
+}

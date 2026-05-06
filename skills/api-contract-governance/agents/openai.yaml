@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sourcelin API 契约治理"
+  short_description: "统一响应体、分页协议、错误码、前后端消费与 smoke 验证治理"
+  default_prompt: "治理 Sourcelin API 响应体、分页字段、错误码、前端消费或接口冒烟测试时使用本技能。"

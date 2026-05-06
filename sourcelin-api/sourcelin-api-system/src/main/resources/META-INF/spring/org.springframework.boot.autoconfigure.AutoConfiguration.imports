@@ -1,0 +1,4 @@
+com.sourcelin.system.api.factory.RemoteSysUserFallbackFactory
+com.sourcelin.system.api.factory.RemoteSysLogFallbackFactory
+com.sourcelin.system.api.factory.RemoteNoticeFallbackFactory
+com.sourcelin.system.api.factory.RemoteSysDictDataFallbackFactory

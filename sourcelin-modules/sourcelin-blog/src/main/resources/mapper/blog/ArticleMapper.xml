@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.ArticleMapper">
+    
+    <resultMap type="Article" id="ArticleResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="categoryId"    column="category_id"    />
+        <result property="title"    column="title"    />
+        <result property="avatar"    column="avatar"    />
+        <result property="avatarFileId"    column="avatar_file_id"    />
+        <result property="summary"    column="summary"    />
+        <result property="content"    column="content"    />
+        <result property="readAuth"    column="read_auth"    />
+        <result property="status"    column="status"    />
+        <result property="isComment"    column="is_comment"    />
+        <result property="isRecommend"    column="is_recommend"    />
+        <result property="isTop"    column="is_top"    />
+        <result property="isOriginal"    column="is_original"    />
+        <result property="originalUrl"    column="original_url"    />
+        <result property="viewCount"    column="view_count"    />
+        <result property="likeCount"    column="like_count"    />
+        <result property="collectCount"    column="collect_count"    />
+        <result property="commentCount"    column="comment_count"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <association property="user"    javaType="User"  resultMap="UserResult" />
+        <association property="category"    javaType="Category"  resultMap="CategoryResult" />
+        <collection  property="tags"   javaType="java.util.List"  resultMap="TagResult" />
+    </resultMap>
+
+    <resultMap type="User" id="UserResult">
+        <result property="id"    column="user_id"    />
+        <result property="nickname"    column="author"    />
+        <result property="avatar"    column="user_avatar"    />
+        <result property="introduction"    column="user_introduction"    />
+    </resultMap>
+
+    <resultMap type="Category" id="CategoryResult">
+        <result property="id"    column="category_id"    />
+        <result property="name"    column="category_name"    />
+        <result property="icon"    column="category_icon"    />
+    </resultMap>
+
+    <resultMap type="Tag" id="TagResult">
+        <result property="id"    column="tag_id"    />
+        <result property="name"    column="tag_name"    />
+        <result property="icon"    column="tag_icon"    />
+    </resultMap>
+
+    <resultMap type="com.sourcelin.blog.vo.ArticleVO" id="ArticleResultVO">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="categoryId"    column="category_id"    />
+        <result property="title"    column="title"    />
+        <result property="avatar"    column="avatar"    />
+        <result property="summary"    column="summary"    />
+        <result property="content"    column="content"    />
+        <result property="readAuth"    column="read_auth"    />
+        <result property="status"    column="status"    />
+        <result property="isComment"    column="is_comment"    />
+        <result property="isRecommend"    column="is_recommend"    />
+        <result property="isTop"    column="is_top"    />
+        <result property="isOriginal"    column="is_original"    />
+        <result property="originalUrl"    column="original_url"    />
+        <result property="viewCount"    column="view_count"    />
+        <result property="likeCount"    column="like_count"    />
+        <result property="collectCount"    column="collect_count"    />
+        <result property="commentCount"    column="comment_count"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectArticleVo">
+        select a.id, a.user_id, a.category_id, a.title, a.avatar, a.avatar_file_id, a.summary, a.content, a.read_auth, a.status, a.is_comment,
+               a.is_recommend, a.is_top, a.is_original, a.original_url, a.view_count, a.like_count, a.collect_count,
+               (select count(1) from b_comment bc where bc.deleted = 0 and bc.article_id = a.id and (bc.source is null or bc.source = 'article')) as comment_count, a.deleted,
+               a.create_time, a.update_by, a.update_time,
+               u.id as user_id,u.nickname as author,u.avatar as user_avatar,u.introduction as user_introduction,
+               c.id as category_id,c.name as category_name,c.icon as category_icon,
+               t.id as tag_id,t.name as tag_name,t.icon as tag_icon
+        from b_article a
+                 left join b_user u ON a.user_id = u.id
+                 left join b_category c ON a.category_id = c.id
+                 left join b_article_tag atg ON a.id = atg.article_id
+                 left join b_tag t ON atg.tag_id = t.id
+    </sql>
+
+    <select id="selectArticleList" parameterType="Article" resultMap="ArticleResult">
+        <include refid="selectArticleVo"/>
+        WHERE a.deleted = 0
+        <if test="userId != null"> and a.user_id = #{userId}</if>
+        <if test="categoryId != null"> and a.category_id = #{categoryId}</if>
+        <if test="title != null  and title != ''"> and title like concat('%', #{title}, '%')</if>
+        <if test="content != null  and content != ''"> and content like concat('%', #{content}, '%')</if>
+        <if test="readAuth != null "> and read_auth = #{readAuth}</if>
+        <if test="status != null "> and status = #{status}</if>
+        <if test="isComment != null "> and is_comment = #{isComment}</if>
+        <if test="isRecommend != null "> and is_recommend = #{isRecommend}</if>
+        <if test="isTop != null "> and is_top = #{isTop}</if>
+        <if test="isOriginal != null "> and is_original = #{isOriginal}</if>
+    </select>
+
+    <select id="selectArticleVoList" parameterType="Article" resultMap="ArticleResultVO">
+        SELECT a.*,
+        u.nickname AS author,
+        c.name AS categoryName,
+        (select count(1) from b_comment bc where bc.deleted = 0 and bc.article_id = a.id and (bc.source is null or bc.source = 'article')) as comment_count,
+        group_concat( t.id SEPARATOR ',' ) AS tagIds,
+        group_concat( t.name SEPARATOR ',' ) AS tagNames
+        FROM
+        b_article a
+        LEFT JOIN b_category c ON a.category_id = c.id
+        LEFT JOIN b_user u ON a.user_id = u.id
+        LEFT JOIN b_article_tag atg ON a.id = atg.article_id
+        LEFT JOIN b_tag t ON atg.tag_id = t.id
+        WHERE a.deleted = 0
+        <if test="userId != null"> and a.user_id = #{userId}</if>
+        <if test="categoryId != null"> and a.category_id = #{categoryId}</if>
+        <if test="tagId != null  and tagId != ''"> and a.id in (select atg.article_id from b_article_tag atg where atg.tag_id = #{tagId})</if>
+        <if test="title != null  and title != ''"> and title like concat('%', #{title}, '%')</if>
+        <if test="content != null  and content != ''"> and content like concat('%', #{content}, '%')</if>
+        <if test="readAuth != null "> and read_auth = #{readAuth}</if>
+        <if test="status != null "> and status = #{status}</if>
+        <if test="params != null and params.excludePublished != null and params.excludePublished"> and status != 2</if>
+        <if test="isComment != null "> and is_comment = #{isComment}</if>
+        <if test="isRecommend != null "> and is_recommend = #{isRecommend}</if>
+        <if test="isTop != null "> and is_top = #{isTop}</if>
+        <if test="isOriginal != null "> and is_original = #{isOriginal}</if>
+        GROUP BY
+        a.id
+        <if test="params != null and params.orderBy != null and params.orderBy != ''">
+            order by ${params.orderBy} desc
+        </if>
+    </select>
+
+    <select id="countArticleByUserId" resultType="int">
+        select count(1) from b_article where deleted = 0 and user_id = #{userId}
+    </select>
+    
+    <select id="selectArticleById" parameterType="Long" resultMap="ArticleResult">
+        <include refid="selectArticleVo"/>
+        where a.id = #{id}
+    </select>
+        
+    <insert id="insertArticle" parameterType="Article" useGeneratedKeys="true" keyProperty="id">
+        insert into b_article
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="avatar != null">avatar,</if>
+            <if test="avatarFileId != null">avatar_file_id,</if>
+            <if test="summary != null">summary,</if>
+            <if test="content != null">content,</if>
+            <if test="readAuth != null">read_auth,</if>
+            <if test="status != null">status,</if>
+            <if test="isComment != null">is_comment,</if>
+            <if test="isRecommend != null">is_recommend,</if>
+            <if test="isTop != null">is_top,</if>
+            <if test="isOriginal != null">is_original,</if>
+            <if test="originalUrl != null">original_url,</if>
+            <if test="viewCount != null">view_count,</if>
+            <if test="likeCount != null">like_count,</if>
+            <if test="collectCount != null">collect_count,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="avatar != null">#{avatar},</if>
+            <if test="avatarFileId != null">#{avatarFileId},</if>
+            <if test="summary != null">#{summary},</if>
+            <if test="content != null">#{content},</if>
+            <if test="readAuth != null">#{readAuth},</if>
+            <if test="status != null">#{status},</if>
+            <if test="isComment != null">#{isComment},</if>
+            <if test="isRecommend != null">#{isRecommend},</if>
+            <if test="isTop != null">#{isTop},</if>
+            <if test="isOriginal != null">#{isOriginal},</if>
+            <if test="originalUrl != null">#{originalUrl},</if>
+            <if test="viewCount != null">#{viewCount},</if>
+            <if test="likeCount != null">#{likeCount},</if>
+            <if test="collectCount != null">#{collectCount},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateArticle" parameterType="Article">
+        update b_article
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="avatarFileId != null">avatar_file_id = #{avatarFileId},</if>
+            <if test="summary != null">summary = #{summary},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="readAuth != null">read_auth = #{readAuth},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="isComment != null">is_comment = #{isComment},</if>
+            <if test="isRecommend != null">is_recommend = #{isRecommend},</if>
+            <if test="isTop != null">is_top = #{isTop},</if>
+            <if test="isOriginal != null">is_original = #{isOriginal},</if>
+            <if test="originalUrl != null">original_url = #{originalUrl},</if>
+            <if test="viewCount != null">view_count = #{viewCount},</if>
+            <if test="likeCount != null">like_count = #{likeCount},</if>
+            <if test="collectCount != null">collect_count = #{collectCount},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteArticleById" parameterType="Long">
+        update b_article set deleted = 1  where id = #{id}
+    </delete>
+
+    <delete id="deleteArticleByIds" parameterType="Long">
+        update b_article set deleted = 1 where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="updateLikeCount" parameterType="Long">
+        update b_article 
+        set like_count = ifnull(like_count, 0) + 1 
+        where id = #{id} and deleted = 0 and status = 2
+    </update>
+
+    <update id="updateLikeCountDecrease" parameterType="Long">
+        update b_article
+        set like_count = case when ifnull(like_count, 0) > 0 then like_count - 1 else 0 end
+        where id = #{id} and deleted = 0 and status = 2
+    </update>
+
+    <update id="updateViewCount" parameterType="Long">
+        update b_article 
+        set view_count = ifnull(view_count, 0) + 1 
+        where id = #{id}
+    </update>
+
+    <update id="updateCollectCountIncrease" parameterType="Long">
+        update b_article
+        set collect_count = ifnull(collect_count, 0) + 1
+        where id = #{id} and deleted = 0 and status = 2
+    </update>
+
+    <update id="updateCollectCountDecrease" parameterType="Long">
+        update b_article
+        set collect_count = case when ifnull(collect_count, 0) > 0 then collect_count - 1 else 0 end
+        where id = #{id} and deleted = 0 and status = 2
+    </update>
+
+</mapper>

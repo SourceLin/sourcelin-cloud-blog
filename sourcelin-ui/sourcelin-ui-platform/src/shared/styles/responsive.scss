@@ -1,0 +1,6 @@
+/**
+ * Shared：业务组件和页面的响应式样式入口。
+ *
+ * 业务层不得直接依赖 Foundation 路径；需要断点 mixin 时统一从本文件导入。
+ */
+@import '@/assets/styles/foundation/responsive';

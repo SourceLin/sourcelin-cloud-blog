@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sourcelin 后端开发"
+  short_description: "后端 Controller、Service、Mapper、DTO/VO、异常和公共能力开发"
+  default_prompt: "在 Sourcelin Cloud Blog 中新增或修改后端接口、业务服务、数据访问或公共能力时使用本技能。"

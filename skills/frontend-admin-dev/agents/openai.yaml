@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sourcelin 管理后台开发"
+  short_description: "Vue3 管理后台页面、API、表格分页、权限与模块化组件开发"
+  default_prompt: "在 sourcelin-ui-admin 中新增或修改后台页面、API、表格、分页、弹窗或权限交互时使用本技能。"

@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.AnnouncementMapper">
+
+    <resultMap type="Announcement" id="AnnouncementResult">
+        <result property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="scopeType" column="scope_type"/>
+        <result property="scopePayload" column="scope_payload"/>
+        <result property="publishStatus" column="publish_status"/>
+        <result property="publishTime" column="publish_time"/>
+        <result property="expireTime" column="expire_time"/>
+        <result property="deleted" column="deleted"/>
+        <result property="isRead" column="is_read"/>
+        <result property="createBy" column="created_by"/>
+        <result property="createTime" column="created_at"/>
+        <result property="updateBy" column="updated_by"/>
+        <result property="updateTime" column="updated_at"/>
+    </resultMap>
+
+    <sql id="frontVisibleWhere">
+        a.deleted = 0
+        and a.publish_status = '1'
+        and a.publish_time is not null
+        and a.publish_time &lt;= now()
+        and (a.expire_time is null or a.expire_time &gt; now())
+        and (
+            a.scope_type = 'all'
+            <if test="userId != null">
+                or (
+                    a.scope_type = 'assign'
+                    and a.scope_payload is not null
+                    and json_contains(a.scope_payload, cast(#{userId} as json), '$')
+                )
+                or (
+                    a.scope_type = 'role'
+                    and a.scope_payload is not null
+                    and exists (
+                        select 1
+                        from b_user bu
+                        where bu.id = #{userId}
+                          and bu.del_flag = '0'
+                          and json_contains(a.scope_payload, cast(bu.user_type as json), '$')
+                    )
+                )
+            </if>
+        )
+    </sql>
+
+    <select id="selectFrontAnnouncementList" resultMap="AnnouncementResult">
+        select a.id,
+               a.title,
+               cast(a.content as char) as content,
+               a.scope_type,
+               cast(a.scope_payload as char) as scope_payload,
+               a.publish_status,
+               a.publish_time,
+               a.expire_time,
+               a.deleted,
+               a.created_by,
+               a.created_at,
+               a.updated_by,
+               a.updated_at,
+               <choose>
+                   <when test="userId != null">
+                       case when ar.id is null then 0 else 1 end
+                   </when>
+                   <otherwise>
+                       0
+                   </otherwise>
+               </choose> as is_read
+        from announcement a
+        <if test="userId != null">
+            left join announcement_read ar on ar.announcement_id = a.id and ar.user_id = #{userId}
+        </if>
+        where
+        <include refid="frontVisibleWhere"/>
+        order by a.publish_time desc, a.id desc
+    </select>
+
+    <select id="selectFrontAnnouncementById" resultMap="AnnouncementResult">
+        select a.id,
+               a.title,
+               cast(a.content as char) as content,
+               a.scope_type,
+               cast(a.scope_payload as char) as scope_payload,
+               a.publish_status,
+               a.publish_time,
+               a.expire_time,
+               a.deleted,
+               a.created_by,
+               a.created_at,
+               a.updated_by,
+               a.updated_at,
+               <choose>
+                   <when test="userId != null">
+                       case when ar.id is null then 0 else 1 end
+                   </when>
+                   <otherwise>
+                       0
+                   </otherwise>
+               </choose> as is_read
+        from announcement a
+        <if test="userId != null">
+            left join announcement_read ar on ar.announcement_id = a.id and ar.user_id = #{userId}
+        </if>
+        where a.id = #{id}
+          and <include refid="frontVisibleWhere"/>
+        limit 1
+    </select>
+
+    <select id="countUnread" resultType="long">
+        select count(1)
+        from announcement a
+        where
+        <include refid="frontVisibleWhere"/>
+          and not exists (
+            select 1
+            from announcement_read ar
+            where ar.announcement_id = a.id
+              and ar.user_id = #{userId}
+        )
+    </select>
+
+    <select id="selectAnnouncementList" parameterType="Announcement" resultMap="AnnouncementResult">
+        select a.id,
+               a.title,
+               cast(a.content as char) as content,
+               a.scope_type,
+               cast(a.scope_payload as char) as scope_payload,
+               a.publish_status,
+               a.publish_time,
+               a.expire_time,
+               a.deleted,
+               a.created_by,
+               a.created_at,
+               a.updated_by,
+               a.updated_at,
+               0 as is_read
+        from announcement a
+        where a.deleted = 0
+        <if test="title != null and title != ''">
+            and a.title like concat('%', #{title}, '%')
+        </if>
+        <if test="scopeType != null and scopeType != ''">
+            and a.scope_type = #{scopeType}
+        </if>
+        <if test="publishStatus != null and publishStatus != ''">
+            and a.publish_status = #{publishStatus}
+        </if>
+        order by a.created_at desc, a.id desc
+    </select>
+
+    <select id="selectAnnouncementById" resultMap="AnnouncementResult">
+        select a.id,
+               a.title,
+               cast(a.content as char) as content,
+               a.scope_type,
+               cast(a.scope_payload as char) as scope_payload,
+               a.publish_status,
+               a.publish_time,
+               a.expire_time,
+               a.deleted,
+               a.created_by,
+               a.created_at,
+               a.updated_by,
+               a.updated_at,
+               0 as is_read
+        from announcement a
+        where a.id = #{id}
+          and a.deleted = 0
+        limit 1
+    </select>
+
+    <insert id="insertAnnouncement" parameterType="Announcement" useGeneratedKeys="true" keyProperty="id">
+        insert into announcement
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">title,</if>
+            <if test="content != null">content,</if>
+            <if test="scopeType != null and scopeType != ''">scope_type,</if>
+            <if test="scopePayload != null">scope_payload,</if>
+            <if test="publishStatus != null and publishStatus != ''">publish_status,</if>
+            <if test="publishTime != null">publish_time,</if>
+            <if test="expireTime != null">expire_time,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="createBy != null and createBy != ''">created_by,</if>
+            <if test="createTime != null">created_at,</if>
+            <if test="updateBy != null and updateBy != ''">updated_by,</if>
+            <if test="updateTime != null">updated_at,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="content != null">#{content},</if>
+            <if test="scopeType != null and scopeType != ''">#{scopeType},</if>
+            <if test="scopePayload != null">#{scopePayload},</if>
+            <if test="publishStatus != null and publishStatus != ''">#{publishStatus},</if>
+            <if test="publishTime != null">#{publishTime},</if>
+            <if test="expireTime != null">#{expireTime},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateAnnouncement" parameterType="Announcement">
+        update announcement
+        <trim prefix="set" suffixOverrides=",">
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="scopeType != null and scopeType != ''">scope_type = #{scopeType},</if>
+            <if test="scopePayload != null">scope_payload = #{scopePayload},</if>
+            <if test="publishStatus != null and publishStatus != ''">publish_status = #{publishStatus},</if>
+            <if test="publishTime != null">publish_time = #{publishTime},</if>
+            <if test="expireTime != null">expire_time = #{expireTime},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="updateBy != null and updateBy != ''">updated_by = #{updateBy},</if>
+            <if test="updateTime != null">updated_at = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteAnnouncementByIds">
+        update announcement
+        set deleted = 1,
+            updated_by = #{updateBy},
+            updated_at = now()
+        where id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

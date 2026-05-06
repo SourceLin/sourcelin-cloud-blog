@@ -1,0 +1,15 @@
+/**
+ * 仅屏幕阅读器可见，保留标题语义与文档大纲。
+ * 与 focus 可见的 skip-link 等场景配合时，可对 :focus 单独覆盖。
+ */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

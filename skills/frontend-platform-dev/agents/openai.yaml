@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sourcelin 博客前台开发"
+  short_description: "博客前台 Vue3 页面、组件、API、composable 与设计系统边界开发"
+  default_prompt: "在 sourcelin-ui-platform 中新增或修改前台页面、组件、API、状态或样式边界时使用本技能。"

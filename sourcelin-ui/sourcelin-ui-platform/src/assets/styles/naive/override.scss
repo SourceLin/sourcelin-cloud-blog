@@ -1,0 +1,318 @@
+/* Naive UI style override patch layer */
+
+/* SInput: Naive sets .n-input root background (--n-color); SInput sets .n-input-wrapper (--input-background).
+   Dual fills show a seam at border-radius. Must be global + !important so cascade wins over Naive’s later CSS. */
+.n-input.s-input {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.n-input.s-input.n-input--focus,
+.n-input.s-input.n-input--error-status.n-input--focus,
+.n-input.s-input.n-input--warning-status.n-input--focus {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.n-input.s-input.n-input--disabled {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.n-base-selection {
+  background: var(--input-background);
+  border: 1px solid var(--input-border);
+  box-shadow: var(--shadow-soft);
+  transition:
+    border-color var(--transition-base),
+    background var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.n-base-selection:hover {
+  border-color: var(--input-border-hover);
+  background: var(--input-background-focus);
+}
+
+.n-base-selection.n-base-selection--active,
+.n-base-selection.n-base-selection--focus {
+  border-color: var(--input-border-focus);
+  background: var(--input-background-focus);
+  box-shadow: var(--input-focus-ring), var(--shadow-medium);
+}
+
+.n-base-selection .n-base-selection-label,
+.n-base-selection .n-base-selection-input__content,
+.n-base-selection .n-base-selection-tags {
+  color: var(--input-text);
+}
+
+.n-base-selection .n-base-selection-placeholder {
+  color: var(--input-placeholder);
+}
+
+.n-base-selection-menu {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-panel-strong) 96%, transparent),
+      color-mix(in srgb, var(--surface-panel-soft) 92%, transparent)
+    );
+  border: 1px solid color-mix(in srgb, var(--border-panel-strong) 82%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--surface-white-25) 86%, transparent),
+    var(--shadow-panel-default),
+    0 18px 42px color-mix(in srgb, var(--companion-color) 8%, transparent);
+  -webkit-backdrop-filter: blur(32px) saturate(calc(var(--glass-saturate) + 8%));
+  backdrop-filter: blur(32px) saturate(calc(var(--glass-saturate) + 8%));
+}
+
+.n-base-selection-menu .n-base-selection-option,
+.n-base-selection-menu .n-base-selection-option__content {
+  color: var(--text-primary);
+}
+
+.n-base-selection-menu .n-base-selection-option--selected,
+.n-base-selection-menu .n-base-selection-option:hover {
+  background: color-mix(in srgb, var(--primary-color) 9%, var(--surface-panel-chip-accent));
+}
+
+.n-radio .n-radio__dot {
+  box-shadow: inset 0 0 0 1px var(--input-border);
+  background: var(--toolbar-button-surface);
+}
+
+.n-radio.n-radio--checked .n-radio__dot {
+  box-shadow: inset 0 0 0 1px var(--primary-color);
+}
+
+.n-radio .n-radio__label {
+  color: var(--text-primary);
+}
+
+.n-pagination .n-pagination-item,
+.n-pagination .n-pagination-prefix,
+.n-pagination .n-pagination-quick-jumper,
+.n-pagination .n-pagination-jumper,
+.n-pagination .n-pagination-item-ellipsis {
+  color: var(--text-primary);
+}
+
+.n-pagination .n-pagination-item,
+.n-pagination .n-pagination-item-ellipsis,
+.n-pagination .n-pagination-prefix + .n-select .n-base-selection,
+.n-pagination .n-pagination-quick-jumper input {
+  background: var(--pagination-item);
+  border-color: var(--glass-border);
+  box-shadow: var(--shadow-panel-inline);
+}
+
+.n-pagination .n-pagination-item:not(.n-pagination-item--disabled):hover,
+.n-pagination .n-pagination-item.n-pagination-item--active {
+  background: var(--pagination-item-active);
+  border-color: var(--border-interactive-hover);
+  box-shadow: var(--button-glow);
+}
+
+.n-pagination {
+  padding: 0.35rem;
+  border-radius: 999px;
+  background: var(--pagination-shell);
+  border: var(--glass-panel-outline);
+  box-shadow:
+    var(--highlight-panel-soft),
+    var(--shadow-panel-soft);
+  animation: structural-breathe 7.2s cubic-bezier(0.19, 1, 0.22, 1) infinite;
+}
+
+.n-form .n-form-item-label__text,
+.n-form .n-form-item-blank {
+  color: var(--text-primary);
+}
+
+.n-spin-container,
+.n-spin-body {
+  color: var(--text-primary);
+}
+
+/* Naive input/textarea: autofill inset matches wrapper (--input-background), not glass field rows */
+.n-input .n-input__input-el:-webkit-autofill,
+.n-input .n-input__textarea-el:-webkit-autofill,
+.n-input .n-input__input-el:-webkit-autofill:hover,
+.n-input .n-input__textarea-el:-webkit-autofill:hover,
+.n-input .n-input__input-el:autofill,
+.n-input .n-input__textarea-el:autofill {
+  -webkit-text-fill-color: var(--input-text);
+  caret-color: var(--input-text);
+  box-shadow: 0 0 0 1000px var(--s-input-autofill-background, var(--input-background)) inset;
+  transition: background-color 99999s ease-out 0s;
+}
+
+.n-input .n-input__input-el:-webkit-autofill:focus,
+.n-input .n-input__input-el:-webkit-autofill:active,
+.n-input .n-input__textarea-el:-webkit-autofill:focus,
+.n-input .n-input__textarea-el:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--input-text);
+  caret-color: var(--input-text);
+  box-shadow: 0 0 0 1000px var(--s-input-autofill-background-focus, var(--input-background-focus)) inset;
+  transition: background-color 99999s ease-out 0s;
+}
+
+.n-message {
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-surface-lite);
+  box-shadow:
+    inset 0 1px 0 var(--glass-inner-glow),
+    var(--shadow-medium);
+  backdrop-filter: blur(20px) saturate(165%);
+}
+
+.n-message .n-message__content {
+  color: var(--text-primary);
+}
+
+.n-message .n-message__close {
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--toolbar-button-surface);
+  box-shadow: var(--shadow-soft);
+  transition:
+    background var(--transition-base),
+    border-color var(--transition-base),
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.n-message .n-message__close:hover {
+  border-color: var(--border-interactive-hover);
+  background: var(--toolbar-button-surface-hover);
+  transform: scale(1.04);
+  box-shadow: var(--shadow-medium);
+}
+
+.n-message .n-message__close .n-base-icon {
+  color: var(--text-secondary);
+}
+
+.n-notification {
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-surface-lite);
+  box-shadow:
+    inset 0 1px 0 var(--glass-inner-glow),
+    var(--shadow-large);
+  backdrop-filter: blur(22px) saturate(170%);
+}
+
+.n-notification .n-notification-main__header {
+  color: var(--title-color);
+}
+
+.n-notification .n-notification-main__content {
+  color: var(--text-secondary);
+}
+
+.n-notification .n-notification-main__close {
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--toolbar-button-surface);
+  box-shadow: var(--shadow-soft);
+  transition:
+    background var(--transition-base),
+    border-color var(--transition-base),
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.n-notification .n-notification-main__close:hover {
+  border-color: var(--border-interactive-hover);
+  background: var(--toolbar-button-surface-hover);
+  transform: scale(1.04);
+  box-shadow: var(--shadow-medium);
+}
+
+.n-notification .n-notification-main__close .n-base-icon {
+  color: var(--text-secondary);
+}
+
+.n-upload-dragger {
+  width: 100%;
+  height: auto;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: var(--border-radius-lg);
+}
+
+.n-upload-trigger {
+  width: 100%;
+}
+
+.ql-editor.ql-blank::before {
+  color: var(--editor-placeholder-color) !important;
+  font-style: normal;
+}
+
+.ql-snow .ql-editor.ql-blank::before {
+  color: var(--editor-placeholder-color) !important;
+  font-style: normal;
+}
+
+html[data-theme='dark'] .ql-editor.ql-blank::before {
+  color: var(--editor-placeholder-color) !important;
+  font-style: normal;
+}
+
+html[data-theme='dark'] .ql-snow .ql-editor.ql-blank::before {
+  color: var(--editor-placeholder-color) !important;
+  font-style: normal;
+}
+
+/* ========== 下拉菜单 / Popover → 统一液态卡面 ========== */
+.n-dropdown-menu {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-panel-strong) 96%, transparent),
+      color-mix(in srgb, var(--surface-panel-soft) 92%, transparent)
+    ) !important;
+  border: 1px solid color-mix(in srgb, var(--border-panel-strong) 82%, transparent) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--surface-white-25) 86%, transparent),
+    var(--shadow-panel-default),
+    0 18px 42px color-mix(in srgb, var(--companion-color) 8%, transparent) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(calc(var(--glass-saturate) + 8%)) !important;
+  backdrop-filter: blur(32px) saturate(calc(var(--glass-saturate) + 8%)) !important;
+}
+
+.n-dropdown-option {
+  color: var(--text-primary) !important;
+}
+
+.n-dropdown-option:hover {
+  background: color-mix(in srgb, var(--primary-color) 9%, var(--surface-panel-chip-accent)) !important;
+}
+
+.n-popover-inner {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-panel-strong) 96%, transparent),
+      color-mix(in srgb, var(--surface-panel-soft) 92%, transparent)
+    ) !important;
+  border: 1px solid color-mix(in srgb, var(--border-panel-strong) 82%, transparent) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--surface-white-25) 86%, transparent),
+    var(--shadow-panel-default),
+    0 18px 42px color-mix(in srgb, var(--companion-color) 8%, transparent) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(calc(var(--glass-saturate) + 8%)) !important;
+  backdrop-filter: blur(32px) saturate(calc(var(--glass-saturate) + 8%)) !important;
+}
+
+/* NModal 遮罩（--modal-overlay-*） */
+.n-modal-mask {
+  background: var(--modal-overlay-scrim);
+  -webkit-backdrop-filter: var(--modal-overlay-backdrop-filter);
+  backdrop-filter: var(--modal-overlay-backdrop-filter);
+}

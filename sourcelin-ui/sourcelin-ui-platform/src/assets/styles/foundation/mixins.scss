@@ -1,0 +1,219 @@
+/**
+ * Foundation：设计系统用 SCSS mixin（color-mix 降级、液态玻璃背景、backdrop、阴影与悬浮抬起等）。
+ * 业务组件与页面禁止直接使用 `liquid-glass-effect`，应通过 UI 抽象层或工具类承接。
+ */
+
+@mixin color-mix-fallback($fallback, $color-mix) {
+  background: $fallback;
+  background: $color-mix;
+}
+
+@mixin color-mix-border-fallback($fallback, $color-mix) {
+  border-color: $fallback;
+  border-color: $color-mix;
+}
+
+@mixin color-mix-outline-fallback($fallback, $color-mix) {
+  outline-color: $fallback;
+  outline-color: $color-mix;
+}
+
+/* 液态玻璃背景：先写 fallback，再覆盖为 color-mix（旧浏览器仅看到纯色） */
+@mixin liquid-glass-background($opacity-multiplier: 100%, $fallback: rgba(255, 255, 255, 0.85)) {
+  background: $fallback;
+  background: color-mix(
+    in srgb,
+    var(--glass-highlight)
+    calc(var(--glass-opacity) * #{$opacity-multiplier}),
+    transparent
+  );
+}
+
+@mixin liquid-glass-background-dark($opacity-multiplier: 100%, $fallback: rgba(30, 30, 40, 0.9)) {
+  background: $fallback;
+  background: color-mix(
+    in srgb,
+    var(--glass-highlight)
+    calc(var(--glass-opacity) * #{$opacity-multiplier}),
+    rgba(0, 0, 0, 0.2)
+  );
+}
+
+/* 背景滤镜：SVG 滤镜 url + blur/saturate（与 App 内 SVG filter 定义 id 对应） */
+@mixin backdrop-filter-liquid($filter-id: 'liquid-glass', $blur: null, $saturate: null) {
+  $blur-value: var(--glass-blur);
+  $saturate-value: var(--glass-saturate);
+
+  @if $blur != null {
+    $blur-value: $blur;
+  }
+
+  @if $saturate != null {
+    $saturate-value: $saturate;
+  }
+
+  -webkit-backdrop-filter: url(##{$filter-id}) blur(#{$blur-value}) saturate(#{$saturate-value});
+  backdrop-filter: url(##{$filter-id}) blur(#{$blur-value}) saturate(#{$saturate-value});
+}
+
+@mixin backdrop-filter-frosted($blur: null, $saturate: null) {
+  $blur-value: var(--glass-blur);
+  $saturate-value: var(--glass-saturate);
+
+  @if $blur != null {
+    $blur-value: $blur;
+  }
+
+  @if $saturate != null {
+    $saturate-value: $saturate;
+  }
+
+  -webkit-backdrop-filter: blur(#{$blur-value}) saturate(#{$saturate-value});
+  backdrop-filter: blur(#{$blur-value}) saturate(#{$saturate-value});
+}
+
+/**
+ * 液态玻璃综合效果（圆角、噪声纹理、描边、阴影、可选高光伪元素）。
+ * $variant: default | lite | strong | frosted；$include-pseudo 控制顶部光泽层。
+ */
+@mixin liquid-glass-effect(
+  $variant: 'default',
+  $opacity-multiplier: 100%,
+  $border-radius: null,
+  $include-pseudo: false
+) {
+  $resolved-border-radius: var(--glass-radius, 20px);
+
+  @if $border-radius != null {
+    $resolved-border-radius: $border-radius;
+  }
+
+  position: relative;
+  border-radius: $resolved-border-radius;
+  border: none;
+  overflow: clip;
+  contain: paint;
+
+  @if $variant == 'lite' {
+    @include liquid-glass-background($opacity-multiplier * 0.8, rgba(255, 255, 255, 0.68));
+    background: var(--glass-surface-lite);
+  } @else if $variant == 'strong' {
+    @include liquid-glass-background($opacity-multiplier * 1.2, rgba(255, 255, 255, 0.9));
+    background: var(--glass-surface-strong);
+  } @else {
+    @include liquid-glass-background($opacity-multiplier);
+    background: var(--glass-surface);
+  }
+
+  background-image: var(--glass-noise);
+  background-blend-mode: soft-light;
+
+  @if $variant == 'lite' {
+    @include backdrop-filter-liquid('liquid-glass-lite', calc(var(--glass-blur) - 4px));
+  } @else if $variant == 'strong' {
+    @include backdrop-filter-liquid('liquid-glass-strong', calc(var(--glass-blur) + 6px), calc(var(--glass-saturate) + 20%));
+  } @else if $variant == 'frosted' {
+    @include backdrop-filter-frosted();
+  } @else {
+    @include backdrop-filter-liquid('liquid-glass');
+  }
+
+  outline: 1px solid var(--glass-border);
+
+  @if $variant == 'strong' {
+    outline: 1px solid var(--glass-border-strong);
+  }
+
+  @if $variant == 'strong' {
+    box-shadow:
+      inset 0 2px 0 var(--glass-inner-glow),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.08),
+      0 12px 48px var(--glass-shadow),
+      0 4px 16px rgba(0, 0, 0, 0.12);
+  } @else if $variant == 'lite' {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      0 4px 16px var(--glass-shadow);
+  } @else {
+    box-shadow:
+      inset 0 1px 0 var(--glass-inner-glow),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+      0 8px 32px var(--glass-shadow),
+      0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease,
+    background 0.3s ease;
+
+  @if $include-pseudo {
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.45) 0%,
+        rgba(255, 255, 255, 0.15) 20%,
+        transparent 40%
+      );
+      pointer-events: none;
+      mix-blend-mode: overlay;
+      z-index: 1;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 -2px 12px rgba(0, 0, 0, 0.08);
+      pointer-events: none;
+      z-index: 2;
+    }
+  }
+}
+
+/* 阴影档位：与 token 中 shadow 变量对应 */
+@mixin glass-shadow($level: 'medium') {
+  @if $level == 'soft' {
+    box-shadow: var(--shadow-soft);
+  } @else if $level == 'large' {
+    box-shadow: var(--shadow-large);
+  } @else if $level == 'card' {
+    box-shadow: var(--card-shadow);
+  } @else {
+    box-shadow: var(--shadow-medium);
+  }
+}
+
+@mixin hover-tension($scale: 1.015, $shadow-level: 'large') {
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+
+  &:hover {
+    transform: scale($scale);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--surface-white-25) 88%, transparent),
+      inset 0 -1px 0 color-mix(in srgb, var(--background-color-deep) 8%, transparent);
+    @include glass-shadow($shadow-level);
+  }
+}
+
+/* Tooltip 箭头：双边框色 color-mix 降级写法 */
+@mixin tooltip-arrow-horizontal($fallback, $color-mix) {
+  border-left-color: $fallback !important;
+  border-right-color: $fallback !important;
+  border-left-color: $color-mix !important;
+  border-right-color: $color-mix !important;
+}
+
+@mixin tooltip-arrow-vertical($fallback, $color-mix) {
+  border-top-color: $fallback !important;
+  border-bottom-color: $fallback !important;
+  border-top-color: $color-mix !important;
+  border-bottom-color: $color-mix !important;
+}

@@ -1,0 +1,2 @@
+com.sourcelin.common.log.service.AsyncLogService
+com.sourcelin.common.log.aspect.LogAspect

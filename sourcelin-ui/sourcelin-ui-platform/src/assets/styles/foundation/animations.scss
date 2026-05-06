@@ -1,0 +1,447 @@
+/**
+ * Foundation：通用 @keyframes 与 `.animate-*` 工具类（淡入淡出、位移动画、加载、光效等）。
+ * 业务层优先使用类名组合，避免在页面中重复定义关键帧。
+ */
+
+/* —— 显隐与位移动画 —— */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+/* —— 缩放、脉冲、旋转 —— */
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+/* —— 骨架闪动、光晕、渐变位移、涟漪 —— */
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(var(--primary-color-rgb), 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(var(--primary-color-rgb), 0.4);
+  }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes ambient-flow {
+  0%, 100% {
+    background-position: 0% 50%;
+    transform: scale(1);
+    opacity: 0.82;
+  }
+  50% {
+    background-position: 100% 52%;
+    transform: scale(1.025);
+    opacity: 1;
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  10%, 30% { transform: scale(1.05); }
+  20%, 40% { transform: scale(0.98); }
+}
+
+@keyframes cursorBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* —— 3D 翻入 —— */
+
+@keyframes flipInX {
+  from {
+    transform: perspective(400px) rotateX(90deg);
+    opacity: 0;
+  }
+  40% { transform: perspective(400px) rotateX(-10deg); }
+  70% { transform: perspective(400px) rotateX(10deg); }
+  to {
+    transform: perspective(400px) rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes flipInY {
+  from {
+    transform: perspective(400px) rotateY(90deg);
+    opacity: 0;
+  }
+  40% { transform: perspective(400px) rotateY(-10deg); }
+  70% { transform: perspective(400px) rotateY(10deg); }
+  to {
+    transform: perspective(400px) rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+/* —— 工具类：绑定时长与缓动 —— */
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+.animate-fadeOut {
+  animation: fadeOut 0.3s ease-out;
+}
+.animate-fadeInUp {
+  animation: fadeInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animate-fadeInDown {
+  animation: fadeInDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animate-fadeInLeft {
+  animation: fadeInLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animate-fadeInRight {
+  animation: fadeInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animate-scaleOut {
+  animation: scaleOut 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+.animate-spin-slow {
+  animation: spin 3s linear infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--primary-color-rgb), 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200px 100%;
+}
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-gradient {
+  animation: gradientShift 3s ease infinite;
+  background-size: 200% 200%;
+}
+
+.animate-heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.animate-flipInX {
+  animation: flipInX 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animate-flipInY {
+  animation: flipInY 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 延迟与持续时长 */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-700 { animation-delay: 0.7s; }
+.delay-1000 { animation-delay: 1s; }
+
+.duration-100 { animation-duration: 0.1s; }
+.duration-200 { animation-duration: 0.2s; }
+.duration-300 { animation-duration: 0.3s; }
+.duration-500 { animation-duration: 0.5s; }
+.duration-700 { animation-duration: 0.7s; }
+.duration-1000 { animation-duration: 1s; }
+
+/* 迭代与播放状态 */
+.animate-infinite {
+  animation-iteration-count: infinite;
+}
+.animate-paused {
+  animation-play-state: paused;
+}
+.animate-running {
+  animation-play-state: running;
+}
+
+/* ========== 液态玻璃光学体系升级：新动效 ========== */
+
+/* —— 1. 玻璃呼吸光效 (glass-breathe) —— */
+/* 用途：主卡片、SCard hoverable 的 box-shadow glow 缓动，模拟环境光变化 */
+/* 优化：使用 cubic-bezier(0.4, 0, 0.2, 1) 模拟生物呼吸节奏（吸气快、呼气慢） */
+@keyframes glass-breathe {
+  0%, 100% {
+    box-shadow:
+      var(--highlight-panel-default),
+      var(--shadow-panel-default),
+      0 0 24px color-mix(in srgb, var(--companion-color) 8%, transparent);
+  }
+  50% {
+    box-shadow:
+      var(--highlight-panel-default),
+      var(--shadow-panel-default),
+      0 0 36px color-mix(in srgb, var(--companion-color) 14%, transparent);
+  }
+}
+
+.sourcelin-glass-breathe {
+  animation: glass-breathe 6.8s cubic-bezier(0.19, 1, 0.22, 1) infinite;
+}
+
+@keyframes structural-breathe {
+  0%, 100% {
+    box-shadow:
+      var(--highlight-panel-soft),
+      var(--shadow-panel-soft),
+      0 0 24px color-mix(in srgb, var(--companion-color) 6%, transparent);
+  }
+  50% {
+    box-shadow:
+      var(--highlight-panel-default),
+      var(--shadow-panel-default),
+      0 0 34px color-mix(in srgb, var(--companion-color) 12%, transparent);
+  }
+}
+
+.sourcelin-ambient-flow {
+  animation: ambient-flow 16s cubic-bezier(0.19, 1, 0.22, 1) infinite;
+  background-size: 160% 160%;
+  transform-origin: center;
+}
+
+.sourcelin-structural-breathe {
+  animation: structural-breathe 6.8s cubic-bezier(0.19, 1, 0.22, 1) infinite;
+}
+
+.sourcelin-surface-tension {
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.sourcelin-surface-tension:hover {
+  transform: scale(1.015);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--surface-white-25) 88%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--background-color-deep) 8%, transparent),
+    var(--shadow-panel-hover);
+}
+
+/* —— 2. 折射漂移 (refraction-drift) —— */
+/* 用途：hero 区 ::before 高光层微幅位移，模拟光线缓慢移动 */
+@keyframes refraction-drift {
+  0%, 100% {
+    background-position: 0% 0%;
+    transform: translateX(0);
+  }
+  50% {
+    background-position: 4% 0%;
+    transform: translateX(8px);
+  }
+}
+
+.sourcelin-refraction-drift::before {
+  animation: refraction-drift 12s ease-in-out infinite;
+}
+
+/* —— 3. 光泽扫过 (shine-sweep) —— */
+/* 用途：Section 标题、SCard header 的 ::after 高光条从左到右扫过 */
+@keyframes shine-sweep {
+  0% {
+    left: -200%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: 200%;
+    opacity: 0;
+  }
+}
+
+.sourcelin-shine-sweep {
+  position: relative;
+  overflow: hidden;
+}
+
+.sourcelin-shine-sweep::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -200%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--text-color-light) 18%, transparent),
+    transparent
+  );
+  pointer-events: none;
+  z-index: 3;
+}
+
+.sourcelin-shine-sweep:hover::after {
+  animation: shine-sweep 0.8s ease-out;
+}
+
+/* —— 4. 视差遮罩入场 (staggered-mask-reveal) —— */
+/* 用途：页面组件入场时，使用「玻璃划过」效果替代传统 fade-in */
+@keyframes mask-reveal-sweep {
+  0% {
+    clip-path: inset(0 0 100% 0);
+    filter: blur(8px);
+    opacity: 0;
+  }
+  30% {
+    filter: blur(4px);
+    opacity: 0.6;
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+.sourcelin-reveal-staggered {
+  animation: mask-reveal-sweep 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  will-change: clip-path, filter, opacity;
+}
+
+/* 延迟链：多个元素依次入场 */
+.sourcelin-reveal-staggered:nth-child(1) { animation-delay: 0ms; }
+.sourcelin-reveal-staggered:nth-child(2) { animation-delay: 80ms; }
+.sourcelin-reveal-staggered:nth-child(3) { animation-delay: 160ms; }
+.sourcelin-reveal-staggered:nth-child(4) { animation-delay: 240ms; }
+.sourcelin-reveal-staggered:nth-child(5) { animation-delay: 320ms; }
+.sourcelin-reveal-staggered:nth-child(6) { animation-delay: 400ms; }
