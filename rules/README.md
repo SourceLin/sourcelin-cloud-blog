@@ -28,13 +28,21 @@
 - API 契约治理：读取 `api-contract.md` 和 `testing-and-validation.md`。
 - 架构重构：读取全部规则，按影响范围执行 Maven、npm 或 pnpm 验证。
 
-## 开源分支边界
-
-- MUST：开源分支可以提交项目文档，但不得提交市场分析和商业模式文档。
-- MUST：规则和技能不得引用开源分支不提交的本地维护脚本。
-- MUST NOT：提交 `scripts/**`。
-- MUST NOT：提交 `docs/MARKET_ANALYSIS.md` 或 `docs/BUSINESS_MODEL.md`。
-- CHECK：执行 `git ls-files scripts docs/MARKET_ANALYSIS.md docs/BUSINESS_MODEL.md` 必须无输出。
+## 开源分支边界
+
+- MUST：开源分支可以提交项目文档，但不得提交市场分析和商业模式文档。
+- MUST：规则和技能不得引用开源分支不提交的本地维护脚本。
+- MUST NOT：提交 `scripts/**`。
+- MUST NOT：提交 `docs/MARKET_ANALYSIS.md` 或 `docs/BUSINESS_MODEL.md`。
+- CHECK：执行 `git ls-files scripts docs/MARKET_ANALYSIS.md docs/BUSINESS_MODEL.md` 必须无输出。
+
+## 仓库发布模型
+
+- MUST：公开发布只通过 `origin/master` 进行。
+- MUST：内部开发默认在本地 `develop` 上进行，并同步到 `private/develop`。
+- MUST：私有备份或私有主线对齐只推送到 `private/master`。
+- MUST NOT：将 `develop`、`scripts/**`、过程文档或仅供内部使用的资料直接推送到公开仓库。
+- CHECK：执行 `git branch -vv`，必须满足本地 `master` 跟踪 `origin/master`，本地 `develop` 跟踪 `private/develop`。
 
 ## 维护规则
 
