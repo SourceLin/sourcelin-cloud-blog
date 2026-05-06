@@ -5,12 +5,13 @@
 <h4 align="center">面向个人写作与生活记录的现代博客平台，支持多端访问</h4>
 <p align="center">
 	<a href="https://gitee.com/my_lyq/sourcelin-cloud-blog"><img src="https://gitee.com/my_lyq/sourcelin-cloud-blog/badge/star.svg?theme=dark" alt="Gitee Stars"></a>
-	<img src="https://img.shields.io/badge/version-v3.6.8-brightgreen.svg">
+	<img src="https://img.shields.io/badge/version-v1.0.0-brightgreen.svg">
 	<img src="https://img.shields.io/badge/java-1.8+-blue.svg">
 	<img src="https://img.shields.io/badge/springboot-2.7.18-blue.svg">
 	<img src="https://img.shields.io/badge/vue-3.x-green.svg">
 	<a href="https://gitee.com/my_lyq/sourcelin-cloud-blog/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License MIT"></a>
 </p>
+
 
 
 ## 简介
