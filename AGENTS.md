@@ -31,14 +31,25 @@ sourcelin-ui/sourcelin-ui-admin/       # 管理后台主线，Vue3 + TypeScript 
 sourcelin-ui/sourcelin-ui-admin-vue2/  # 旧版迁移对照，不承载新功能
 ```
 
-## 2. 开源分支边界
-
-- `scripts/**` 不进入开源分支提交。
-- `docs/**` 可以进入开源分支，但 `docs/MARKET_ANALYSIS.md` 和 `docs/BUSINESS_MODEL.md` 不提交。
-- 规则、技能和执行入口必须避免引用开源分支未提交的本地维护脚本。
-- 数据库初始化文档和 SQL 维护在 `docs/sql/**`。
-
-## 3. 默认规则
+## 2. 开源分支边界
+
+- `scripts/**` 不进入开源分支提交。
+- `docs/**` 可以进入开源分支，但 `docs/internal/MARKET_ANALYSIS.md` 和 `docs/internal/BUSINESS_MODEL.md` 不提交。
+- 规则、技能和执行入口必须避免引用开源分支未提交的本地维护脚本。
+- 数据库初始化文档和 SQL 维护在 `docs/sql/**`。
+
+## 3. 仓库发布模型
+
+- `origin/master`：公开发布分支，只承载对外可见内容。
+- `develop`：日常开发分支，承载功能开发、规则演进和阶段性整理。
+- `master`：公开发布分支，对外只暴露稳定版本。
+- 日常开发必须先进入 `develop`，完成验证后再整理到 `master`。
+- 对外发布必须以 `master` 为唯一来源，最终推送到 `origin/master`。
+- 发布前必须完成公开边界检查，确保内部脚本、过程文档和仅内部使用的资料不会进入公开分支。
+- MUST NOT：跳过 `develop` 直接在 `master` 上做日常开发。
+- MUST NOT：将 `develop`、内部脚本或过程性资料直接推送到公开仓库。
+
+## 4. 默认规则
 
 每次开发、重构、审查或测试必须读取：
 
@@ -62,7 +73,7 @@ sourcelin-ui/sourcelin-ui-admin-vue2/  # 旧版迁移对照，不承载新功能
 5. `rules/coding-conventions.md`
 6. `rules/testing-and-validation.md`
 
-## 4. 可用技能
+## 5. 可用技能
 
 - `skills/frontend-platform-dev/SKILL.md`：博客前台开发。
 - `skills/frontend-admin-dev/SKILL.md`：管理后台开发。
@@ -78,7 +89,7 @@ sourcelin-ui/sourcelin-ui-admin-vue2/  # 旧版迁移对照，不承载新功能
 - 任何接口响应、分页、错误码、前后端 API 消费任务必须叠加 `api-contract-governance`。
 - 跨模块重构、页面拆分、规则体系改造必须使用 `architecture-refactor`。
 
-## 5. API 契约硬规则
+## 6. API 契约硬规则
 
 - MUST：对外 HTTP JSON 接口统一为 `ApiResponse<T>` 顶层结构。
 - MUST：顶层字段为 `code/message/data/requestId/timestamp`，成功码为 `0`。
@@ -88,7 +99,7 @@ sourcelin-ui/sourcelin-ui-admin-vue2/  # 旧版迁移对照，不承载新功能
 - MUST NOT：前端消费 `msg/rows/records/list/pageNum/limit` 或判断 `code === 200`。
 - CHECK：审查 Controller 返回类型、前端 request 消费和分页字段；涉及接口改动时执行对应后端编译、单测和前端类型检查。
 
-## 6. 后端执行流程
+## 7. 后端执行流程
 
 1. 读取 `rules/backend.md` 和 `skills/backend-dev/SKILL.md`。
 2. 定位模块边界：公共能力进 `sourcelin-common/*`，业务逻辑进 `sourcelin-modules/*`，Feign 进 `sourcelin-api/*`。
@@ -103,7 +114,7 @@ Maven 命令使用当前环境可用的 `mvn`。如本机需要自定义 `settin
 mvn <goal>
 ```
 
-## 7. 博客前台执行流程
+## 8. 博客前台执行流程
 
 1. 读取 `rules/frontend-platform.md` 和 `skills/frontend-platform-dev/SKILL.md`。
 2. 页面放 `src/modules/**/pages/*.vue`。
@@ -113,7 +124,7 @@ mvn <goal>
 6. 业务组件不得直连 Naive UI，必须使用 `S*` UI 抽象或业务成品组件。
 7. 按改动范围执行 `npm run typecheck`、`npm run style:guard`、`npm run test:architecture`。
 
-## 8. 管理后台执行流程
+## 9. 管理后台执行流程
 
 1. 读取 `rules/frontend-admin.md` 和 `skills/frontend-admin-dev/SKILL.md`。
 2. 新功能只落在 `sourcelin-ui/sourcelin-ui-admin`。
@@ -123,16 +134,16 @@ mvn <goal>
 6. 不改变现有权限逻辑，除非任务明确要求。
 7. 按改动范围执行 `pnpm run type-check`、`pnpm run lint`。
 
-## 9. 架构重构流程
+## 10. 架构重构流程
 
 1. 读取 `skills/architecture-refactor/SKILL.md`。
 2. 明确本轮只处理一个可验证边界。
 3. 先确认验证命令，再修改文件。
 4. 每个子模块完成后立即验证。
 5. 同步更新 `docs/architecture/**`、`rules/**`、`skills/**`、`AGENTS.md`；数据库初始化变化同步 `docs/sql/**`。
-6. 使用当前仓库存在的 Maven、npm、pnpm 命令完成验证，不依赖未提交的本地脚本。
-
-## 10. 审查流程
+6. 使用当前仓库存在的 Maven、npm、pnpm 命令完成验证，不依赖未提交的本地脚本。
+
+## 11. 审查流程
 
 审查默认只输出问题，不继续开发。审查时必须检查：
 
@@ -142,7 +153,7 @@ mvn <goal>
 - 测试是否覆盖改动范围。
 - 文档、规则、技能是否与真实目录一致。
 
-## 11. 常用命令
+## 12. 常用命令
 
 后端：
 
@@ -174,7 +185,7 @@ SQL 初始化验证：
 mysql -u root -p < docs/sql/sourcelin-cloud.sql
 ```
 
-## 12. 服务启动顺序
+## 13. 服务启动顺序
 
 1. MySQL
 2. Redis
@@ -186,11 +197,11 @@ mysql -u root -p < docs/sql/sourcelin-cloud.sql
 8. `sourcelin-file`，端口 9300，可选
 9. `sourcelin-visual-monitor`，端口 9100，可选
 
-## 13. 禁止事项
+## 14. 禁止事项
 
 - MUST NOT：提交真实账号、密码、token、cookie、私钥。
 - MUST NOT：提交 `target/`、`dist/`、`.tmp_*`、`*.class`、`*.zip`、`*.tgz`。
-- MUST NOT：开源分支提交 `scripts/**`、`docs/MARKET_ANALYSIS.md` 或 `docs/BUSINESS_MODEL.md`。
+- MUST NOT：开源分支提交 `scripts/**`、`docs/internal/MARKET_ANALYSIS.md` 或 `docs/internal/BUSINESS_MODEL.md`。
 - MUST NOT：回退用户已有无关改动。
 - MUST NOT：通过删除功能、降低测试或放宽扫描规则掩盖失败。
 - MUST NOT：引入重型框架替代当前技术栈。

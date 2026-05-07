@@ -1,0 +1,177 @@
+services:
+  redis_local:
+    image: redis:7.2-alpine
+    container_name: sourcelin-redis-local
+    restart: always
+    network_mode: host
+    command: redis-server --appendonly yes --port 6379
+    volumes:
+      - ${DATA_ROOT}/redis-local:/data
+
+  nacos:
+    image: nacos/nacos-server:v2.4.0
+    container_name: sourcelin-nacos
+    restart: always
+    network_mode: host
+    environment:
+      MODE: standalone
+      SPRING_DATASOURCE_PLATFORM: mysql
+      MYSQL_SERVICE_HOST: ${MYSQL_HOST}
+      MYSQL_SERVICE_PORT: ${MYSQL_PORT}
+      MYSQL_SERVICE_DB_NAME: ${NACOS_DB_NAME}
+      MYSQL_SERVICE_USER: ${MYSQL_USER}
+      MYSQL_SERVICE_PASSWORD: ${MYSQL_PASSWORD}
+      NACOS_AUTH_ENABLE: true
+      NACOS_AUTH_TOKEN: ${NACOS_AUTH_TOKEN}
+      NACOS_AUTH_IDENTITY_KEY: ${NACOS_AUTH_IDENTITY_KEY}
+      NACOS_AUTH_IDENTITY_VALUE: ${NACOS_AUTH_IDENTITY_VALUE}
+      JVM_XMS: 160m
+      JVM_XMX: 320m
+      JVM_XMN: 96m
+      TZ: Asia/Shanghai
+    mem_limit: 640m
+    volumes:
+      - ${DATA_ROOT}/nacos:/home/nacos/data
+
+  gateway:
+    image: eclipse-temurin:8-jre
+    container_name: sourcelin-gateway
+    restart: always
+    network_mode: host
+    depends_on:
+      - nacos
+      - redis_local
+    command: >
+      sh -c "java -Xms128m -Xmx192m -Dfile.encoding=UTF-8
+      -Dspring.cloud.sentinel.enabled=false
+      -Dfeign.sentinel.enabled=false
+      -Dspring.cloud.nacos.discovery.server-addr=${NACOS_SERVER_ADDR}
+      -Dspring.cloud.nacos.config.server-addr=${NACOS_SERVER_ADDR}
+      -Dspring.cloud.nacos.discovery.group=${NACOS_GROUP}
+      -Dspring.cloud.nacos.config.group=${NACOS_GROUP}
+      -Dspring.cloud.nacos.username=${NACOS_USERNAME}
+      -Dspring.cloud.nacos.password=${NACOS_PASSWORD}
+      -jar /app/sourcelin-gateway.jar"
+    mem_limit: 448m
+    volumes:
+      - ${JAR_ROOT}/sourcelin-gateway.jar:/app/sourcelin-gateway.jar:ro
+      - ${LOG_ROOT}/gateway:/app/logs
+
+  auth:
+    image: eclipse-temurin:8-jre
+    container_name: sourcelin-auth
+    restart: always
+    network_mode: host
+    depends_on:
+      - nacos
+      - redis_local
+    command: >
+      sh -c "java -Xms96m -Xmx112m -Dfile.encoding=UTF-8
+      -Dspring.cloud.sentinel.enabled=false
+      -Dfeign.sentinel.enabled=false
+      -Dspring.cloud.nacos.discovery.server-addr=${NACOS_SERVER_ADDR}
+      -Dspring.cloud.nacos.config.server-addr=${NACOS_SERVER_ADDR}
+      -Dspring.cloud.nacos.discovery.group=${NACOS_GROUP}
+      -Dspring.cloud.nacos.config.group=${NACOS_GROUP}
+      -Dspring.cloud.nacos.username=${NACOS_USERNAME}
+      -Dspring.cloud.nacos.password=${NACOS_PASSWORD}
+      -jar /app/sourcelin-auth.jar"
+    mem_limit: 420m
+    volumes:
+      - ${JAR_ROOT}/sourcelin-auth.jar:/app/sourcelin-auth.jar:ro
+      - ${LOG_ROOT}/auth:/app/logs
+
+  system:
+    image: eclipse-temurin:8-jre
+    container_name: sourcelin-system
+    restart: always
+    network_mode: host
+    depends_on:
+      - nacos
+      - redis_local
+    command: >
+      sh -c "java -Xms112m -Xmx144m -Dfile.encoding=UTF-8
+      -Dspring.cloud.sentinel.enabled=false
+      -Dfeign.sentinel.enabled=false
+      -Dspring.cloud.nacos.discovery.server-addr=${NACOS_SERVER_ADDR}
+      -Dspring.cloud.nacos.config.server-addr=${NACOS_SERVER_ADDR}
+      -Dspring.cloud.nacos.discovery.group=${NACOS_GROUP}
+      -Dspring.cloud.nacos.config.group=${NACOS_GROUP}
+      -Dspring.cloud.nacos.username=${NACOS_USERNAME}
+      -Dspring.cloud.nacos.password=${NACOS_PASSWORD}
+      -jar /app/sourcelin-system.jar"
+    mem_limit: 480m
+    volumes:
+      - ${JAR_ROOT}/sourcelin-system.jar:/app/sourcelin-system.jar:ro
+      - ${LOG_ROOT}/system:/app/logs
+
+  blog:
+    image: eclipse-temurin:8-jre
+    container_name: sourcelin-blog
+    restart: always
+    network_mode: host
+    depends_on:
+      - nacos
+      - redis_local
+    command: >
+      sh -c "java -Xms96m -Xmx128m -Dfile.encoding=UTF-8
+      -Dspring.cloud.sentinel.enabled=false
+      -Dfeign.sentinel.enabled=false
+      -Dspring.cloud.nacos.discovery.server-addr=${NACOS_SERVER_ADDR}
+      -Dspring.cloud.nacos.config.server-addr=${NACOS_SERVER_ADDR}
+      -Dspring.cloud.nacos.discovery.group=${NACOS_GROUP}
+      -Dspring.cloud.nacos.config.group=${NACOS_GROUP}
+      -Dspring.cloud.nacos.username=${NACOS_USERNAME}
+      -Dspring.cloud.nacos.password=${NACOS_PASSWORD}
+      -jar /app/sourcelin-blog.jar"
+    mem_limit: 420m
+    volumes:
+      - ${JAR_ROOT}/sourcelin-blog.jar:/app/sourcelin-blog.jar:ro
+      - ${LOG_ROOT}/blog:/app/logs
+
+  file:
+    image: eclipse-temurin:8-jre
+    container_name: sourcelin-file
+    restart: always
+    network_mode: host
+    depends_on:
+      - nacos
+      - redis_local
+    command: >
+      sh -c "java -Xms80m -Xmx112m -Dfile.encoding=UTF-8
+      -Dspring.cloud.sentinel.enabled=false
+      -Dfeign.sentinel.enabled=false
+      -Dspring.cloud.nacos.discovery.server-addr=${NACOS_SERVER_ADDR}
+      -Dspring.cloud.nacos.config.server-addr=${NACOS_SERVER_ADDR}
+      -Dspring.cloud.nacos.discovery.group=${NACOS_GROUP}
+      -Dspring.cloud.nacos.config.group=${NACOS_GROUP}
+      -Dspring.cloud.nacos.username=${NACOS_USERNAME}
+      -Dspring.cloud.nacos.password=${NACOS_PASSWORD}
+      -jar /app/sourcelin-file.jar"
+    mem_limit: 360m
+    volumes:
+      - ${JAR_ROOT}/sourcelin-file.jar:/app/sourcelin-file.jar:ro
+      - ${LOG_ROOT}/file:/app/logs
+
+  monitor:
+    image: eclipse-temurin:8-jre
+    container_name: sourcelin-monitor
+    restart: always
+    network_mode: host
+    depends_on:
+      - nacos
+    command: >
+      sh -c "java -Xms80m -Xmx128m -Dfile.encoding=UTF-8
+      -Dspring.cloud.sentinel.enabled=false
+      -Dfeign.sentinel.enabled=false
+      -Dspring.cloud.nacos.discovery.server-addr=${NACOS_SERVER_ADDR}
+      -Dspring.cloud.nacos.config.server-addr=${NACOS_SERVER_ADDR}
+      -Dspring.cloud.nacos.discovery.group=${NACOS_GROUP}
+      -Dspring.cloud.nacos.config.group=${NACOS_GROUP}
+      -Dspring.cloud.nacos.username=${NACOS_USERNAME}
+      -Dspring.cloud.nacos.password=${NACOS_PASSWORD}
+      -jar /app/sourcelin-monitor.jar"
+    mem_limit: 320m
+    volumes:
+      - ${JAR_ROOT}/sourcelin-monitor.jar:/app/sourcelin-monitor.jar:ro
+      - ${LOG_ROOT}/monitor:/app/logs
