@@ -164,7 +164,7 @@ sequenceDiagram
 ### 7.1 配置与开关
 
 - 功能开关（可选）：`blog.notice.enabled` — 便于灰度。
-- 文档：更新 [`docs/blog-api-url-matrix.md`](../blog-api-url-matrix.md) 与 Sa-Token 白名单清单。
+- 文档：更新 [`docs/reference/blog-api-url-matrix.md`](../reference/blog-api-url-matrix.md) 与 Sa-Token 白名单清单。
 
 ### 7.2 可观测性
 

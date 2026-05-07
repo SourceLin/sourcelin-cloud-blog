@@ -34,18 +34,19 @@ sourcelin-ui/sourcelin-ui-admin-vue2/  # 旧版迁移对照，不承载新功能
 ## 2. 开源分支边界
 
 - `scripts/**` 不进入开源分支提交。
-- `docs/**` 可以进入开源分支，但 `docs/MARKET_ANALYSIS.md` 和 `docs/BUSINESS_MODEL.md` 不提交。
+- `docs/**` 可以进入开源分支，但 `docs/internal/MARKET_ANALYSIS.md` 和 `docs/internal/BUSINESS_MODEL.md` 不提交。
 - 规则、技能和执行入口必须避免引用开源分支未提交的本地维护脚本。
 - 数据库初始化文档和 SQL 维护在 `docs/sql/**`。
 
 ## 3. 仓库发布模型
 
 - `origin/master`：公开发布分支，只承载对外可见内容。
-- `private/develop`：内部开发主分支，承载日常开发、内部脚本、过程文档和规则演进。
-- `private/master`：私有同步与备份分支，用于保留一份与内部开发主线对齐的稳定快照。
-- 对外发布必须从本地 `master` 推送到 `origin/master`。
-- 内部开发默认在本地 `develop` 进行，并推送到 `private/develop`。
-- 私有备份或私有主线同步推送到 `private/master`。
+- `develop`：日常开发分支，承载功能开发、规则演进和阶段性整理。
+- `master`：公开发布分支，对外只暴露稳定版本。
+- 日常开发必须先进入 `develop`，完成验证后再整理到 `master`。
+- 对外发布必须以 `master` 为唯一来源，最终推送到 `origin/master`。
+- 发布前必须完成公开边界检查，确保内部脚本、过程文档和仅内部使用的资料不会进入公开分支。
+- MUST NOT：跳过 `develop` 直接在 `master` 上做日常开发。
 - MUST NOT：将 `develop`、内部脚本或过程性资料直接推送到公开仓库。
 
 ## 4. 默认规则
@@ -140,8 +141,8 @@ mvn <goal>
 3. 先确认验证命令，再修改文件。
 4. 每个子模块完成后立即验证。
 5. 同步更新 `docs/architecture/**`、`rules/**`、`skills/**`、`AGENTS.md`；数据库初始化变化同步 `docs/sql/**`。
-6. 使用当前仓库存在的 Maven、npm、pnpm 命令完成验证，不依赖未提交的本地脚本。
-
+6. 使用当前仓库存在的 Maven、npm、pnpm 命令完成验证，不依赖未提交的本地脚本。
+
 ## 11. 审查流程
 
 审查默认只输出问题，不继续开发。审查时必须检查：
@@ -200,7 +201,7 @@ mysql -u root -p < docs/sql/sourcelin-cloud.sql
 
 - MUST NOT：提交真实账号、密码、token、cookie、私钥。
 - MUST NOT：提交 `target/`、`dist/`、`.tmp_*`、`*.class`、`*.zip`、`*.tgz`。
-- MUST NOT：开源分支提交 `scripts/**`、`docs/MARKET_ANALYSIS.md` 或 `docs/BUSINESS_MODEL.md`。
+- MUST NOT：开源分支提交 `scripts/**`、`docs/internal/MARKET_ANALYSIS.md` 或 `docs/internal/BUSINESS_MODEL.md`。
 - MUST NOT：回退用户已有无关改动。
 - MUST NOT：通过删除功能、降低测试或放宽扫描规则掩盖失败。
 - MUST NOT：引入重型框架替代当前技术栈。

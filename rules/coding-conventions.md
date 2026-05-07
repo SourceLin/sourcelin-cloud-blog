@@ -43,7 +43,7 @@
 - MUST：SQL 变更放入 `docs/sql/**`。
 - MUST：架构和规则变更同步更新 `AGENTS.md`、`rules/**`、`skills/**`。
 - MUST NOT：提交 `scripts/**` 到开源分支。
-- MUST NOT：提交 `docs/MARKET_ANALYSIS.md` 或 `docs/BUSINESS_MODEL.md` 到开源分支。
+- MUST NOT：提交 `docs/internal/MARKET_ANALYSIS.md` 或 `docs/internal/BUSINESS_MODEL.md` 到开源分支。
 - MUST NOT：提交 `target/`、`dist/`、`.tmp_*`、`*.class`、`*.zip`、`*.tgz`。
 - CHECK：执行 `git status --short` 并确认无生成产物；执行 `git ls-files scripts` 必须无输出。
 

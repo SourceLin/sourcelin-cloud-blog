@@ -1,364 +1,458 @@
 <p align="center">
-	<img alt="logo" src="https://pic1.imgdb.cn/item/69faac182356c9fc9194b076.png">
+  <img alt="Sourcelin Blog Logo" src="https://pic1.imgdb.cn/item/69faac182356c9fc9194b076.png" width="120">
 </p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Sourcelin Blog</h1>
-<h4 align="center">面向个人写作与生活记录的现代博客平台，支持多端访问</h4>
+
+<h1 align="center">Sourcelin Blog</h1>
+
 <p align="center">
-	<a href="https://gitee.com/my_lyq/sourcelin-cloud-blog"><img src="https://gitee.com/my_lyq/sourcelin-cloud-blog/badge/star.svg?theme=dark" alt="Gitee Stars"></a>
-	<img src="https://img.shields.io/badge/version-v1.0.0-brightgreen.svg">
-	<img src="https://img.shields.io/badge/java-1.8+-blue.svg">
-	<img src="https://img.shields.io/badge/springboot-2.7.18-blue.svg">
-	<img src="https://img.shields.io/badge/vue-3.x-green.svg">
-	<a href="https://gitee.com/my_lyq/sourcelin-cloud-blog/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License MIT"></a>
+  基于 Spring Cloud Alibaba + Vue 3 的全栈微服务博客系统，面向个人写作、毕业设计演示与小团队内容运营。
 </p>
 
+<p align="center">
+  <a href="https://gitee.com/my_lyq/sourcelin-cloud-blog"><img src="https://gitee.com/my_lyq/sourcelin-cloud-blog/badge/star.svg?theme=dark" alt="Gitee Stars"></a>
+  <img src="https://img.shields.io/badge/Java-1.8+-blue.svg" alt="Java">
+  <img src="https://img.shields.io/badge/Spring%20Boot-2.7.18-brightgreen.svg" alt="Spring Boot">
+  <img src="https://img.shields.io/badge/Spring%20Cloud-2021.0.9-brightgreen.svg" alt="Spring Cloud">
+  <img src="https://img.shields.io/badge/Vue-3.x-42b883.svg" alt="Vue">
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License"></a>
+</p>
 
+<p align="center">
+  <a href="http://sourcelin.cn/">在线演示</a> |
+  <a href="./docs/DOCS_INDEX.md">文档导航</a> |
+  <a href="./docs/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md">Docker 部署基线</a> |
+  <a href="./docs/guides/CONTRIBUTING.md">参与贡献</a> |
+  <a href="https://gitee.com/my_lyq/sourcelin-cloud-blog/issues">提交 Issue</a>
+</p>
 
-## 简介
+## 项目定位
 
-Sourcelin Blog（圆圈博客）是一套面向**个人写作与生活记录**的博客平台，采用前后端分离微服务架构，支持多端访问与内容管理。
+Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内容展示和小团队内容运营的现代博客平台，采用前后端分离微服务架构，提供博客前台、管理后台、统一 API 契约、权限体系和完整工程化规范。
 
-这是一个以 **AI Coding / Vibe Coding** 方式持续构建和演进的开源实践项目：在保持 Java 微服务、Vue 前后台、统一 API 契约和工程规则体系稳定的前提下，结合 AI 编程工具完成架构治理、组件拆分、接口契约统一、文档沉淀和开源化整理。
+它不是单纯的博客 Demo，而是一套可继续二开、可部署上线、可用于毕设展示、也适合做 AI 协作开发实践的全栈项目基线。
 
-本项目可作为：
-- ✍️ **个人博客平台** - 记录生活、写作随笔与分享见闻
-- 📚 **内容创作空间** - 文章、分类、标签、评论等完整功能
-- 🧩 **团队内容中心** - 适合小团队或社群的内容运营
-- 🗂️ **个人作品展示** - 长期沉淀与归档你的内容资产
-- 🤖 **AI Coding 实践样板** - 展示如何用 AI 辅助完成全栈项目重构、规则治理和开源交付
+## 为什么值得关注
 
-> 🌐 演示地址：[http://sourcelin.cn/](http://sourcelin.cn/)
+- 微服务全栈架构：基于 Spring Cloud Alibaba，包含网关、认证、系统、博客、文件、监控等完整服务边界。
+- 前后台完整交付：同时提供 Vue 3 博客前台和 Vue 3 管理后台，不是只做后端接口或只做单页前端。
+- AI Coding 友好：仓库内沉淀了 `AGENTS.md`、`rules/`、`skills/`，适合 Cursor、通义灵码、MarsCode、Copilot、Codex 等工具协作开发。
+- 工程规则明确：统一 API 响应体、分页协议、模块边界和验证要求，适合长期维护和多人协作。
+- 场景覆盖完整：适合作为个人博客、内容站、课程项目、毕业设计、二次开发基线。
 
-## 特性
+## 界面预览
 
-- ✅ **微服务架构** - 基于 Spring Cloud Alibaba，服务注册、配置、网关一站式支持
-- ✅ **前后端分离** - Vue 3 + Naive UI 博客前台，自研 Vue 3 + Element Plus 管理后台
-- ✅ **完整权限体系** - 基于 Spring Security + JWT 的认证授权
-- ✅ **多端支持** - PC 管理后台 + 博客前台（支持 H5/小程序扩展）
-- ✅ **丰富的博客功能** - 文章、分类、标签、评论、点赞、收藏、关注、打赏
-- ✅ **高扩展性** - 模块化设计，支持插件扩展
-- ✅ **AI Coding 友好** - 沉淀 `AGENTS.md`、`rules/`、`skills/`，让 AI 编程工具按统一规则执行开发、重构和审查
-- ✅ **开箱即用** - 提供 Docker 一键部署脚本
+### 博客前台
+
+#### 首页
+
+![首页预览](./docs/screenshot/首页.png)
+
+#### 首页内容
+
+| 默认主题 | 暗色主题 |
+|---|---|
+| ![首页内容](./docs/screenshot/首页内容.png) | ![首页内容暗色主题](./docs/screenshot/首页内容-暗色主题.png) |
+
+#### 文章详情
+
+![文章内容](./docs/screenshot/文章内容.png)
+
+#### 用户中心
+
+![个人中心](./docs/screenshot/个人中心.png)
+
+<details>
+<summary>查看更多博客前台截图</summary>
+
+#### 分类与标签
+
+| 分类 | 标签 |
+|---|---|
+| ![分类](./docs/screenshot/分类.png) | ![标签](./docs/screenshot/标签.png) |
+
+#### 归档与热门
+
+| 归档 | 热门 |
+|---|---|
+| ![归档](./docs/screenshot/归档.png) | ![热门](./docs/screenshot/热门.png) |
+
+#### 说说与树洞
+
+| 说说 | 树洞 |
+|---|---|
+| ![说说](./docs/screenshot/说说.png) | ![树洞](./docs/screenshot/树洞.png) |
+
+#### 关于本站与登录
+
+| 关于本站 | 登录 |
+|---|---|
+| ![关于本站](./docs/screenshot/关于本站.png) | ![登录](./docs/screenshot/登录.png) |
+
+</details>
+
+### 后台管理
+
+#### 首页与登录
+
+| 管理首页 | 登录页 |
+|---|---|
+| ![后台管理首页](./docs/screenshot/后台管理-首页.png) | ![后台管理登录页](./docs/screenshot/后台管理-登录页.png) |
+
+#### 核心管理页面
+
+| 系统管理 | 博客管理 |
+|---|---|
+| ![后台管理系统管理](./docs/screenshot/后台管理-系统管理.png) | ![后台管理博客管理](./docs/screenshot/后台管理-博客管理.png) |
+
+| 网站管理 | 系统监控 |
+|---|---|
+| ![后台管理网站管理](./docs/screenshot/后台管理-网站管理.png) | ![后台管理系统监控](./docs/screenshot/后台管理-系统监控.png) |
+
+#### 内容编辑与个人中心
+
+| 发布文章 | 个人中心 |
+|---|---|
+| ![发布文章](./docs/screenshot/发布文章.png) | ![后台管理个人中心](./docs/screenshot/后台管理-个人中心.png) |
+
+## 核心能力
+
+### 博客前台
+
+- 首页推荐、热门文章、分类、标签、归档
+- 文章详情、Markdown 渲染、内容展示
+- 评论、回复、点赞、收藏、关注
+- 说说、树洞、友链、导航、关于页面
+- 登录注册、个人中心、资料修改、头像上传
+
+### 管理后台
+
+- 系统管理：用户、角色、菜单、部门、岗位、字典、参数、通知
+- 博客管理：文章、分类、标签、评论、友链、用户、导航、配置
+- 系统监控：在线用户、定时任务
+- 系统工具：代码生成、表单构建
+- 文件管理和博客统计
+
+### 后端基础能力
+
+- Spring Cloud Gateway 网关统一入口
+- Sa-Token 认证鉴权与权限控制
+- Nacos 注册中心与配置中心
+- Sentinel 流量控制
+- Seata 分布式事务
+- Redis 缓存
+- MinIO 文件存储
+- Spring Boot Admin 监控
+
+## AI Coding 友好
+
+这是本项目和普通博客 CRUD 项目差异最大的一部分。
+
+仓库内已经沉淀了面向 AI 协作开发的工程资产：
+
+- [`AGENTS.md`](./AGENTS.md)：仓库执行入口、目录边界、发布边界、默认规则
+- [`rules/`](./rules/README.md)：API 契约、前后端规范、测试验证规则
+- [`skills/`](./skills/README.md)：将规则转成可执行开发流程的技能说明
+
+你可以直接把这套方式复用到自己的项目里，让 AI 工具按统一约束开发、重构、审查和补文档。
+
+### 适合的 AI 工具
+
+- Cursor
+- 通义灵码
+- 豆包 MarsCode
+- GitHub Copilot
+- Codex / 其他支持仓库规则读取的 AI 编程工具
+
+### 可直接复用的提示词示例
+
+```text
+你现在在 Sourcelin Blog 仓库中工作。
+先阅读仓库根目录 AGENTS.md，再按任务读取 rules/README.md 与对应领域规则。
+如果是后端任务，读取 rules/backend.md；
+如果是博客前台任务，读取 rules/frontend-platform.md；
+如果是管理后台任务，读取 rules/frontend-admin.md；
+涉及接口或分页时，必须同时遵守 rules/api-contract.md。
+
+输出要求：
+1. 默认使用中文沟通
+2. 只修改与任务直接相关的文件
+3. 保持 ApiResponse / PageResult 契约一致
+4. 修改后给出实际执行过的验证命令和结果
+```
+
+### 这套规则解决了什么问题
+
+- 避免 AI 在不同模块里随意改风格、改协议、改目录
+- 避免前后端继续消费旧字段和旧分页结构
+- 降低多人协作或 AI 接力开发时的上下文丢失
+- 让重构、规则治理、开源整理都能沉淀成长期资产
 
 ## 技术栈
 
-### 后端技术
-| 技术 | 版本 |
-|------|------|
+### 后端
+
+| 技术 | 版本 / 说明 |
+|---|---|
+| Java | 1.8+ |
 | Spring Boot | 2.7.18 |
 | Spring Cloud | 2021.0.9 |
 | Spring Cloud Alibaba | 2021.0.6.1 |
-| Java | 1.8+ |
-| Nacos | 注册/配置中心 |
+| Nacos | 注册中心 / 配置中心 |
 | Sentinel | 流量控制 |
 | Seata | 分布式事务 |
 | MySQL | 8.0+ |
 | Redis | 缓存 |
-| Druid | 数据库连接池 |
-| PageHelper | 分页插件 |
+| Druid | 数据源 |
+| PageHelper | 分页 |
 | MinIO | 文件存储 |
 | Hutool | 工具库 |
 | FastJSON2 | JSON 处理 |
 | Sa-Token | 认证鉴权 |
 
-### 前端技术
-| 项目 | 技术 | 版本 |
-|------|------|------|
-| 管理后台 | Vue 3 + TypeScript + Element Plus | 自研实现 |
-| 博客前台 | Vue 3 + Naive UI + TypeScript | Vue 3.5 / Naive UI 2.44 |
+### 前端
 
-## 系统架构
+| 端 | 技术栈 |
+|---|---|
+| 博客前台 | Vue 3 + TypeScript + Naive UI + Vite |
+| 管理后台 | Vue 3 + TypeScript + Element Plus |
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        客户端层                              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │  管理后台     │  │  博客前台    │  │  小程序/H5   │     │
-│  │  Vue3+EP自研 │ │  Vue3+Naive  │  │   (Uni-app)  │     │
-│  └──────────────┘  └──────────────┘  └──────────────┘     │
-└─────────────────────────────────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      API 网关 (8080)                        │
-│                  Spring Cloud Gateway                       │
-└─────────────────────────────────────────────────────────────┘
-                               │
-       ┌───────────┬───────────┼───────────┬───────────┐
-       ▼           ▼           ▼           ▼           ▼
-┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
-│ 认证服务  │ │ 系统服务  │ │ 博客服务  │ │ 文件服务  │ │ 监控中心  │
-│ (9200)   │ │ (9201)   │ │ (9204)   │ │ (9300)   │ │ (9100)   │
-└──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘
-       │           │           │           │
-       └───────────┴───────────┼───────────┘
-                               │
-               ┌───────────────┴───────────────┐
-               ▼               ▼               ▼
-         ┌──────────┐   ┌──────────┐   ┌──────────┐
-         │  MySQL   │   │  Redis   │   │  Nacos   │
-         └──────────┘   └──────────┘   └──────────┘
-```
+## 适用场景
 
-## 系统模块
+- 个人博客和内容沉淀
+- 生活记录和作品展示
+- 小团队内容运营后台
+- 微服务博客系统二次开发
+- Java + Vue 全栈练手项目
+- 毕业设计 / 课程设计展示
+- AI 辅助重构和规则治理实践
 
-~~~
-com.sourcelin     
-├── sourcelin-ui              // 前端框架
-│   ├── sourcelin-ui-admin   // 管理后台 [自研 Vue 3 + Element Plus]
-│   └── sourcelin-ui-platform // 博客前台 [Vue 3 + Naive UI]
-├── sourcelin-gateway         // 网关模块 [8080]
-├── sourcelin-auth            // 认证中心 [9200]
-├── sourcelin-api             // 接口模块
-│       └── sourcelin-api-system                          // 系统接口
-│       └── sourcelin-api-blog                            // 博客接口
-│       └── sourcelin-api-file                            // 文件接口
-├── sourcelin-common          // 通用模块
-│       └── sourcelin-common-core                         // 核心模块
-│       └── sourcelin-common-datascope                    // 权限范围
-│       └── sourcelin-common-datasource                   // 多数据源
-│       └── sourcelin-common-log                          // 日志记录
-│       └── sourcelin-common-redis                        // 缓存服务
-│       └── sourcelin-common-seata                        // 分布式事务
-│       └── sourcelin-common-security                     // 安全模块
-│       └── sourcelin-common-swagger                      // 系统接口
-├── sourcelin-modules         // 业务模块
-│       └── sourcelin-system                              // 系统模块 [9201]
-│       └── sourcelin-blog                                // 博客模块 [9204]
-│       └── sourcelin-job                                 // 定时任务 [9203]
-│       └── sourcelin-file                                // 文件服务 [9300]
-├── sourcelin-visual          // 图形化管理模块
-│       └── sourcelin-visual-monitor                      // 监控中心 [9100]
-└── pom.xml                // 公共依赖
-~~~
+## 1 分钟快速了解
 
-## API 接口规范
+如果你只是想先判断项目是否值得用，建议按下面顺序：
 
-### 接口路径前缀
-
-| 前缀 | 用途 | 示例 |
-|------|------|------|
-| `/front` | Web 前台（浏览器访问） | `/front/articles`, `/front/categories` |
-| `/app` | 移动端 App（小程序/H5） | `/app/home`, `/app/articles` |
-| `/system` | 系统管理后台 | `/system/user`, `/system/role` |
-| `/blog` | 博客管理后台 | `/blog/article`, `/blog/category` |
-
-### Controller 命名规范
-
-| 包路径 | 前缀 | 用途 |
-|--------|------|------|
-| `controller.front` | `Front` | Web 前台 Controller |
-| `controller.app` | `App` | 移动端 App Controller |
-| `controller.admin` | 无 | 管理后台 Controller |
+1. 打开 [在线演示](http://sourcelin.cn/)
+2. 查看上面的界面截图，确认前后台形态
+3. 阅读 [`AGENTS.md`](./AGENTS.md)、[`rules/`](./rules/README.md)、[`skills/`](./skills/README.md)，判断是否适合你的 AI 协作方式
+4. 再决定本地启动还是 Docker 部署
 
 ## 快速开始
 
 ### 环境要求
 
 | 组件 | 最低版本 | 推荐版本 |
-|------|----------|----------|
+|---|---|---|
 | JDK | 1.8+ | 1.8 / 11 |
 | Maven | 3.6+ | 3.8.x |
 | MySQL | 5.7+ | 8.0 |
 | Redis | 5.0+ | 6.0+ |
 | Node.js | 14+ | 18 LTS |
 | Nacos | 2.0+ | 2.0.x |
-| Docker | 20+ | 24.x (可选) |
+| Docker | 20+ | 24.x |
 
-### 本地开发启动
+### 本地启动
 
-1. **克隆项目**
+#### 1. 克隆仓库
+
 ```bash
 git clone https://gitee.com/my_lyq/sourcelin-cloud-blog.git
 cd sourcelin-cloud-blog
 ```
 
-2. **初始化数据库**
-```bash
-# 创建数据库并导入业务初始化 SQL
-mysql -u root -p < docs/sql/sourcelin-cloud.sql
+#### 2. 初始化数据库
 
-# 如需初始化 Nacos 配置和 Seata 表结构，再按需导入
+```bash
+mysql -u root -p < docs/sql/sourcelin-cloud.sql
 mysql -u root -p < docs/sql/sourcelin-config.sql
 mysql -u root -p < docs/sql/sourcelin-seata.sql
 ```
 
-3. **配置 Nacos**
+#### 3. 启动基础依赖
+
+- MySQL
+- Redis
+- Nacos
+
+#### 4. 按需调整配置
+
+修改各模块 `bootstrap.yml` 中的 MySQL、Redis、Nacos 连接信息。
+
+#### 5. 启动后端服务
+
 ```bash
-# 启动 Nacos 后，按需导入 docs/sql/sourcelin-config.sql
-# 具体连接信息以本地 Nacos、Redis、MySQL 环境为准
-```
-
-4. **修改配置**
-```yaml
-# 各模块的 bootstrap.yml 中修改 Nacos/Redis/MySQL 连接信息
-```
-
-5. **启动后端服务**（按顺序）
-```bash
-# 1. 启动 Nacos (8848)
-# 2. 启动 Redis (6379)
-# 3. 启动 MySQL (3306)
-
-# 依次启动微服务:
 mvn clean package -DskipTests
+
 java -jar sourcelin-gateway/target/sourcelin-gateway.jar
 java -jar sourcelin-auth/target/sourcelin-auth.jar
 java -jar sourcelin-modules/sourcelin-system/target/sourcelin-system.jar
 java -jar sourcelin-modules/sourcelin-blog/target/sourcelin-blog.jar
 ```
 
-6. **启动前端**
+如需完整能力，可再启动：
 
 ```bash
-# 管理后台 (自研 Vue 3 + Element Plus)
+java -jar sourcelin-modules/sourcelin-file/target/sourcelin-file.jar
+java -jar sourcelin-visual/sourcelin-visual-monitor/target/sourcelin-visual-monitor.jar
+```
+
+#### 6. 启动前端
+
+```bash
 cd sourcelin-ui/sourcelin-ui-admin
 pnpm install
 pnpm run dev
+```
 
-# 博客前台 (Vue 3 + Naive UI + TypeScript)
+```bash
 cd sourcelin-ui/sourcelin-ui-platform
 npm install
 npm run dev
 ```
 
-### Docker 部署（推荐）
+### Docker 部署
+
+当前仓库已提供可公开复用的 Compose 示例和生产部署基线文档：
+
+- [`docker-compose.example.yml`](./docker-compose.example.yml)
+- [`.env.example`](./.env.example)
+
+- [`docs/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md`](./docs/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)
+- [`docs/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md`](./docs/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md)
+- [`docs/deployment/NGINX_CONFIG.md`](./docs/deployment/NGINX_CONFIG.md)
+
+适合人群：
+
+- 想快速落地到云服务器
+- 需要单域名前后台部署
+- 需要参考现成的 Nacos、网关、Nginx、Jar 布局
+
+最小使用方式：
 
 ```bash
-# 一键启动（需要先配置 docker-compose.yml）
-docker-compose up -d
+cp .env.example .env
+# 按实际环境修改 .env
+docker compose -f docker-compose.example.yml up -d
 ```
 
-## 功能清单
+## 新手避坑指南
 
-### 博客前台 (sourcelin-ui-platform)
-- [x] 首页展示（轮播图、推荐文章、热门文章）
-- [x] 文章详情页（Markdown 渲染）
-- [x] 分类/标签页
-- [x] 归档页
-- [x] 友链页面
-- [x] 导航页面
-- [x] 说说/瞬间
-- [x] 树洞功能
-- [x] 用户中心（资料修改、头像上传）
-- [x] 评论系统（支持回复、点赞）
-- [x] 点赞/收藏功能
-- [x] 关注/粉丝功能
-- [x] 登录/注册
+- 先确认 MySQL、Redis、Nacos 已可用，再启动微服务；否则大部分启动失败都只是基础依赖未就绪。
+- `docs/sql/sourcelin-config.sql` 不是业务表，它用于初始化 Nacos 配置，缺它时服务可能能启动但配置不完整。
+- 管理后台部署到 `/admin/` 时，前端构建需要带 `--base=/admin/`。
+- 如果只是本地调试博客能力，优先启动 `gateway`、`auth`、`system`、`blog` 四个核心服务即可。
+- Docker 部署前先阅读部署文档中的固定目录结构和端口约定，不要直接照搬到不同服务器环境。
 
-### 管理后台 (sourcelin-ui-admin)
-- [x] 系统管理（用户、角色、菜单、部门、岗位、字典、参数、通知）
-- [x] 系统监控（在线用户、定时任务）
-- [x] 系统工具（代码生成、表单构建）
-- [x] 博客管理（文章、分类、标签、评论、友链、用户、导航、配置）
-- [x] 文件管理界面
-- [x] 博客统计
+## 项目结构
 
-### 后端服务
-- [x] 用户认证（JWT、验证码）
-- [x] 权限控制（Spring Security）
-- [x] 接口文档（SpringDoc OpenAPI）
-- [x] 日志记录
-- [x] 分布式事务（Seata）
-- [x] 服务监控（Spring Boot Admin）
-- [x] 流量控制（Sentinel）
+```text
+sourcelin-cloud-blog/
+├── sourcelin-api/                         # Feign 接口与跨服务 DTO
+├── sourcelin-common/                      # 公共能力
+├── sourcelin-gateway/                     # 网关
+├── sourcelin-auth/                        # 认证中心
+├── sourcelin-modules/
+│   ├── sourcelin-system/                  # 系统管理
+│   ├── sourcelin-blog/                    # 博客业务
+│   ├── sourcelin-file/                    # 文件服务
+│   └── sourcelin-job/                     # 定时任务
+├── sourcelin-visual/                      # 监控等可视化服务
+├── sourcelin-ui/
+│   ├── sourcelin-ui-platform/             # 博客前台
+│   ├── sourcelin-ui-admin/                # 管理后台
+│   └── sourcelin-ui-admin-vue2/           # 旧版迁移对照
+├── docs/                                  # 项目文档
+├── rules/                                 # 仓库规则
+├── skills/                                # AI 协作技能
+└── AGENTS.md                              # 仓库执行入口
+```
 
-### 待完成计划
-- [ ] App / 小程序端：补齐移动端阅读、评论、收藏、用户中心等核心能力
-- [ ] AI 内容助手：支持文章总结、站内问答、配图生成等内容辅助能力
-- [ ] AI 审核升级：在现有关键词机审基础上接入模型审核
-- [ ] 消息中心增强：补齐评论、点赞、收藏、关注等互动消息聚合与已读管理
-- [ ] SSE 实时推送：支持消息中心、公告、互动提醒等场景的实时下发
-- [ ] Python 转载系统：对接采集、清洗、去重、改写、草稿生成与合规校验
-- [ ] SEO / 流量增长：增强站点地图、元信息、分享卡片和搜索引擎收录
-- [ ] 运营看板：补齐文章趋势、用户活跃、来源渠道、热门内容等统计能力
+## API 契约
+
+本项目对外 HTTP JSON 接口统一使用：
+
+- `ApiResponse<T>` 顶层结构
+- 成功码固定为 `0`
+- 顶层字段固定为 `code / message / data / requestId / timestamp`
+- 分页固定为 `PageResult<T>`
+- 分页字段固定为 `items / total / page / pageSize / totalPages`
+
+详细说明见 [`rules/api-contract.md`](./rules/api-contract.md) 和 [`docs/architecture/api-contract.md`](./docs/architecture/api-contract.md)。
+
+## 文档导航
+
+- [文档索引](./docs/DOCS_INDEX.md)
+- [快速启动](./docs/guides/QUICK_START.md)
+- [Compose 示例](./docker-compose.example.yml)
+- [案例墙](./docs/guides/SHOWCASE.md)
+- [贡献指南](./docs/guides/CONTRIBUTING.md)
+- [更新日志](./docs/guides/CHANGELOG.md)
+- [支持说明](./docs/guides/SUPPORT.md)
+- [Docker 部署基线](./docs/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)
+- [单域名部署说明](./docs/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md)
+- [SQL 脚本说明](./docs/sql/README.md)
+
+## Roadmap
+
+- App / 小程序端能力完善
+- AI 内容助手
+- AI 审核升级
+- 消息中心增强
+- SSE 实时推送
+- Python 转载系统
+- SEO / 流量增长
+- 运营看板
 
 ## 参与贡献
 
-欢迎所有形式的贡献，包括但不限于：
+欢迎以下类型的贡献：
 
-- 🐛 提交 Bug 或问题
-- 💡 提出新功能或改进建议
-- 📝 完善文档
-- 🎨 提交代码（修复 Bug 或开发新功能）
-- 🌐 翻译文档
-- ⭐ Star 支持
+- 提交 Bug 和问题反馈
+- 提出新功能建议
+- 补充文档和截图
+- 修复前后端问题
+- 完善部署说明和示例配置
+- 贡献二次开发案例
 
-### 贡献流程
+开始之前建议先阅读 [`docs/guides/CONTRIBUTING.md`](./docs/guides/CONTRIBUTING.md)。
 
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/your-feature`)
-3. 提交更改 (`git commit -m 'Add some feature'`)
-4. 推送分支 (`git push origin feature/your-feature`)
-5. 创建 Pull Request
+## 用户案例征集
 
-### 代码规范
+如果你已经成功部署了 Sourcelin Blog，欢迎通过 Issue 或 PR 提交你的站点链接、使用场景和部署方式。
 
-- 后端代码遵循阿里巴巴 Java 开发规范
-- 前端代码使用 ESLint + Prettier 格式化
-- 提交信息请使用中文，描述清晰
+后续可以在 README 中收录：
 
-## 商务合作
+- 个人博客案例
+- 毕设 / 课程项目案例
+- 小团队内容站案例
 
-### 完全免费支持
-
-| 服务类型 | 说明 | 价格 |
-|----------|------|------|
-| 基础咨询 | 环境配置、部署问题答疑 | 免费 |
-| 部署协助 | 本地或服务器部署指导 | 免费 |
-| 问题排查 | 启动失败、配置错误、常见环境问题 | 免费 |
-| 小功能调整 | 简单页面、文案、配置或样式调整 | 免费 |
-| 项目讲解 | 架构说明、毕业设计、代码导读、学习答疑 | 免费 |
-
-> 📧 联系方式：lyq_0201@126.com
-
-### 企业服务
-
-- 🏢 **私有化部署** - 为企业提供专属部署方案
-- 🔧 **定制开发** - 根据业务需求深度定制
-- 📚 **培训服务** - 微服务架构培训、实战指导
-- 🛡️ **安全加固** - 安全审计、渗透测试
-
-### 商业授权
-
-本项目采用 **MIT** 开源许可证，代码可免费使用。
-
-如需：
-- 去除源码中的作者信息
-- 商业闭源使用
-- 二次开发后对外提供服务
-
-请联系商务合作获取授权。
+案例入口见 [`docs/guides/SHOWCASE.md`](./docs/guides/SHOWCASE.md)。
 
 ## 常见问题
 
-### Q: 项目可以商用吗？
-> A: 可以，本项目采用 MIT 许可证，仅需保留 LICENSE 文件中的版权声明。
+### 可以商用吗？
 
-### Q: 支持小程序吗？
-> A: 小程序正在开发中，可使用 Uni-app 快速适配。
+可以。本项目采用 [MIT License](./LICENSE)，请保留许可证和版权声明。
 
-### Q: 如何部署到服务器？
-> A: 推荐使用 Docker 部署，详见上方「Docker 部署」章节。
+### 适合拿来做毕业设计吗？
 
-### Q: 博客前台使用什么技术栈？
-> A: 博客前台使用 Vue 3 + Naive UI + TypeScript + Vite，管理后台为自研 Vue 3 + TypeScript + Element Plus 实现。
+适合。它同时包含前台、后台、微服务、权限、部署和工程规则，展示面比较完整。
 
-## 协议与来源
+### 适合二次开发吗？
 
-- 本项目采用 [MIT License](./LICENSE)
-- 管理后台（`sourcelin-ui/sourcelin-ui-admin`）为自研实现，使用 Vue 3 + TypeScript + Element Plus
-- 博客前台（`sourcelin-ui/sourcelin-ui-platform`）为自研实现，使用 Vue 3 + Naive UI + TypeScript
+适合。仓库结构、API 契约和 AI 协作规则已经做了较明确的边界约束，适合作为业务二开的基线。
 
----
+### 支持 Docker 吗？
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Version-3.6.8-blue.svg">
-  <img src="https://img.shields.io/badge/License-MIT-green.svg">
-  <img src="https://img.shields.io/badge/Java-1.8+-orange.svg">
-  <img src="https://img.shields.io/badge/Vue-3.x-green.svg">
-</p>
+支持参考现有部署基线文档落地到服务器，部署说明见上方 Docker 相关文档入口。
 
-<p align="center">
-  <strong>欢迎 Star & Fork ⭐</strong>
-</p>
+## 支持与合作
+
+- 免费支持：环境配置、部署答疑、常见问题排查
+- 企业服务：私有化部署、定制开发、培训指导、安全加固
+
+详细说明见 [`docs/guides/SUPPORT.md`](./docs/guides/SUPPORT.md)。
+
+## Star 支持
+
+如果这个项目对你有帮助，欢迎点一个 Star。
+
+你的支持会直接推动后续的功能迭代、文档完善、部署优化和 AI 协作规则继续沉淀。
