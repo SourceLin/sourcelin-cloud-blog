@@ -2,7 +2,7 @@
 
 本文档面向第一次接触 Sourcelin Blog 的开发者，目标是尽快完成本地启动和基础排错。
 
-如果你要看完整对外介绍，先读 [README.md](../../README.md)。如果你要做服务器部署，直接看 [DEPLOY_SOURCELIN_CN_DOCKER.md](../deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)。
+如果你要看完整对外介绍，先读 [README.md](../../README.md)。如果你要做服务器部署，直接看 [DEPLOY_SOURCELIN_CN_DOCKER.md](../internal/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)。
 
 ## 一、最快阅读路径
 
@@ -181,8 +181,8 @@ pnpm run build -- --base=/admin/
 
 如果你要参考现成部署方案，请看：
 
-- [DEPLOY_SOURCELIN_CN_DOCKER.md](../deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)
-- [DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md](../deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md)
+- [DEPLOY_SOURCELIN_CN_DOCKER.md](../internal/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)
+- [DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md](../internal/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md)
 - [NGINX_CONFIG.md](../deployment/NGINX_CONFIG.md)
 
 典型使用方式：

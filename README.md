@@ -20,7 +20,7 @@
 <p align="center">
   <a href="http://sourcelin.cn/">在线演示</a> |
   <a href="./docs/DOCS_INDEX.md">文档导航</a> |
-  <a href="./docs/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md">Docker 部署基线</a> |
+  <a href="./docs/internal/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md">Docker 部署基线</a> |
   <a href="./docs/guides/CONTRIBUTING.md">参与贡献</a> |
   <a href="https://gitee.com/my_lyq/sourcelin-cloud-blog/issues">提交 Issue</a>
 </p>
@@ -315,8 +315,8 @@ npm run dev
 - [`docker-compose.example.yml`](./docker-compose.example.yml)
 - [`.env.example`](./.env.example)
 
-- [`docs/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md`](./docs/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)
-- [`docs/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md`](./docs/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md)
+- [`docs/internal/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md`](./docs/internal/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)
+- [`docs/internal/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md`](./docs/internal/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md)
 - [`docs/deployment/NGINX_CONFIG.md`](./docs/deployment/NGINX_CONFIG.md)
 
 适合人群：
@@ -386,8 +386,8 @@ sourcelin-cloud-blog/
 - [贡献指南](./docs/guides/CONTRIBUTING.md)
 - [更新日志](./docs/guides/CHANGELOG.md)
 - [支持说明](./docs/guides/SUPPORT.md)
-- [Docker 部署基线](./docs/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)
-- [单域名部署说明](./docs/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md)
+- [Docker 部署基线](./docs/internal/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)
+- [单域名部署说明](./docs/internal/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md)
 - [SQL 脚本说明](./docs/sql/README.md)
 
 ## Roadmap

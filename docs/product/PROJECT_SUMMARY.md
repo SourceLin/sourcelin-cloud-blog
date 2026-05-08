@@ -178,8 +178,8 @@ sourcelin-cloud-blog/
 
 - [README.md](../../README.md)
 - [QUICK_START.md](../guides/QUICK_START.md)
-- [DEPLOY_SOURCELIN_CN_DOCKER.md](../deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)
-- [DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md](../deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md)
+- [DEPLOY_SOURCELIN_CN_DOCKER.md](../internal/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)
+- [DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md](../internal/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md)
 
 ## 当前路线图
 

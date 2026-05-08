@@ -87,7 +87,7 @@ http {
 1. 登录、注册、验证码仍走网关统一入口。
 2. 网关白名单只允许真正公开接口，不能把 `/front/**`、`/blog/**`、`/blog-api/**` 整段放开。
 3. `/blog/front/user/**`、`/blog/front/follow/**`、`/blog/front/collect/**` 等私有接口不得通过 Nginx 或白名单绕过登录校验。
-4. 前台密码传输、验证码消费、登录态创建细节以 [configs/sa-token-nacos-configs.md](../configs/sa-token-nacos-configs.md) 为准。
+4. 前台密码传输、验证码消费、登录态创建细节以 [configs/sa-token-nacos-configs.md](../internal/configs/sa-token-nacos-configs.md) 为准。
 
 ## 说明
 
