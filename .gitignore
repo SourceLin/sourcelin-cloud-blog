@@ -49,8 +49,7 @@ logs/
 ######################################################################
 # Open-source branch excludes
 scripts/
-docs/internal/MARKET_ANALYSIS.md
-docs/internal/BUSINESS_MODEL.md
+docs/internal/
 
 !*/build/*.java
 !*/build/*.html
