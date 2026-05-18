@@ -12,6 +12,7 @@
 | [deployment/](./deployment/) | 部署、升级与网关入口配置 |
 
 | [guides/](./guides/) | 快速开始、贡献、案例墙、支持、变更记录 |
+| [promotion/](./promotion/) | 对外传播文章、发布稿和 AI 实践总结 |
 | [product/](./product/) | 项目分析、需求说明、综合摘要 |
 | [reference/](./reference/) | URL 矩阵、专项架构分析等参考资料 |
 | [sql/](./sql/) | 初始化与维护 SQL |
@@ -47,6 +48,8 @@
 | [../docker-compose.example.yml](../docker-compose.example.yml) | 可公开复用的 Docker Compose 示例 |
 | [../.env.example](../.env.example) | Compose 环境变量示例 |
 | [guides/SHOWCASE.md](./guides/SHOWCASE.md) | 用户案例墙与案例征集入口 |
+| [promotion/AI_CODING_PRACTICE.md](./promotion/AI_CODING_PRACTICE.md) | AI 协作开发实践与公开资产说明 |
+| [promotion/README.md](./promotion/README.md) | 对外传播内容目录说明 |
 | [guides/CHANGELOG.md](./guides/CHANGELOG.md) | 版本更新日志 |
 | [guides/CONTRIBUTING.md](./guides/CONTRIBUTING.md) | 贡献指南 |
 | [guides/CODE_OF_CONDUCT.md](./guides/CODE_OF_CONDUCT.md) | 行为准则 |
