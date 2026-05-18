@@ -183,11 +183,6 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 
 只要工具支持读取仓库文件、遵循指令并基于代码上下文执行，这套方式就能复用到同类 AI 编程工具中。
 
-### 相关文章与实践
-
-- [AI 协作开发实践](./docs/promotion/AI_CODING_PRACTICE.md)
-- [开源中国发布文章（项目介绍）](https://my.oschina.net/u/4031952/blog/19658286)
-
 ### 可直接复用的提示词示例
 
 ```text
@@ -438,7 +433,6 @@ sourcelin-cloud-blog/
 - [快速启动](./docs/guides/QUICK_START.md)
 - [Compose 示例](./docker-compose.example.yml)
 - [案例墙](./docs/guides/SHOWCASE.md)
-- [AI 协作开发实践](./docs/promotion/AI_CODING_PRACTICE.md)
 - [贡献指南](./docs/guides/CONTRIBUTING.md)
 - [更新日志](./docs/guides/CHANGELOG.md)
 - [支持说明](./docs/guides/SUPPORT.md)
