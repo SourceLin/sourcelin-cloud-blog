@@ -17,8 +17,8 @@
 | [architecture/](./architecture/) | 长期有效的架构边界、模块职责、接口契约说明 | 开发者、维护者 |
 | [configs/](./configs/) | Nacos、鉴权、文件中心、Nginx 等配置基线 | 部署者、后端开发者 |
 | [deployment/](./deployment/) | Docker、单域名部署、Nginx、升级流程 | 部署者、运维 |
-| [design/](./design/) | 针对具体问题的方案设计、专项重构说明 | 维护者、二开开发者 |
 | [guides/](./guides/) | 快速开始、贡献、案例墙、支持、变更记录 | 新用户、贡献者 |
+| [promotion/](./promotion/) | 对外发布文章、传播稿、AI 实践总结 | 维护者、内容运营、社区传播 |
 | [product/](./product/) | 项目分析、需求说明、综合摘要 | 产品、开发者、二开评估者 |
 | [reference/](./reference/) | URL 矩阵、专项架构分析等参考资料 | 开发者、排障人员 |
 | [sql/](./sql/) | 数据库初始化与配置 SQL | 部署者、后端开发者 |
