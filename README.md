@@ -5,7 +5,7 @@
 <h1 align="center">Sourcelin Blog</h1>
 
 <p align="center">
-  基于 Spring Cloud Alibaba + Vue 3 的全栈微服务博客系统，面向个人写作、毕业设计演示与小团队内容运营。
+  基于 Spring Cloud Alibaba + Vue 3 的全栈微服务博客系统，面向个人写作、毕业设计演示与小团队内容运营，同时沉淀了可直接复用的 AI 协作开发资产。
 </p>
 
 <p align="center">
@@ -20,7 +20,8 @@
 <p align="center">
   <a href="http://sourcelin.cn/">在线演示</a> |
   <a href="./docs/DOCS_INDEX.md">文档导航</a> |
-  <a href="./docs/internal/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md">Docker 部署基线</a> |
+  <a href="./docs/guides/QUICK_START.md">快速启动</a> |
+  <a href="./docker-compose.example.yml">Compose 示例</a> |
   <a href="./docs/guides/CONTRIBUTING.md">参与贡献</a> |
   <a href="https://gitee.com/my_lyq/sourcelin-cloud-blog/issues">提交 Issue</a>
 </p>
@@ -31,11 +32,13 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 
 它不是单纯的博客 Demo，而是一套可继续二开、可部署上线、可用于毕设展示、也适合做 AI 协作开发实践的全栈项目基线。
 
+本项目当前的开源整理、文档重构、规则沉淀与发布流程治理全程使用 Codex 完成，同时兼容 Codex、Cursor、OpenCode、Claude Code、Qoder、Trae 等主流 AI 编程工具。
+
 ## 为什么值得关注
 
 - 微服务全栈架构：基于 Spring Cloud Alibaba，包含网关、认证、系统、博客、文件、监控等完整服务边界。
 - 前后台完整交付：同时提供 Vue 3 博客前台和 Vue 3 管理后台，不是只做后端接口或只做单页前端。
-- AI Coding 友好：仓库内沉淀了 `AGENTS.md`、`rules/`、`skills/`，适合 Cursor、通义灵码、MarsCode、Copilot、Codex 等工具协作开发。
+- AI Coding 友好：仓库内沉淀了 `AGENTS.md`、`rules/`、`skills/`，本项目开源整理全程使用 Codex 完成，并兼容 Codex、Cursor、OpenCode、Claude Code、Qoder、Trae 等工具协作开发。
 - 工程规则明确：统一 API 响应体、分页协议、模块边界和验证要求，适合长期维护和多人协作。
 - 场景覆盖完整：适合作为个人博客、内容站、课程项目、毕业设计、二次开发基线。
 
@@ -147,6 +150,8 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 
 这是本项目和普通博客 CRUD 项目差异最大的一部分。
 
+本项目当前的开源整理、文档体系重构、规则沉淀和发布流程治理，全程使用 Codex 完成；但这套资产本身不绑定单一工具，而是以仓库内的规则、边界和技能说明为核心，可直接迁移到其他支持仓库规则读取的 AI 编程工具中。
+
 仓库内已经沉淀了面向 AI 协作开发的工程资产：
 
 - [`AGENTS.md`](./AGENTS.md)：仓库执行入口、目录边界、发布边界、默认规则
@@ -157,11 +162,26 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 
 ### 适合的 AI 工具
 
+- Codex
 - Cursor
+- OpenCode
+- Claude Code
+- Qoder
+- Trae
 - 通义灵码
 - 豆包 MarsCode
 - GitHub Copilot
-- Codex / 其他支持仓库规则读取的 AI 编程工具
+- 其他支持仓库规则读取的 AI 编程工具
+
+### 为什么这些工具都能接入
+
+因为本项目的 AI 协作能力不是某个 IDE 插件里的私有配置，而是直接写进仓库的公开资产：
+
+- `AGENTS.md` 负责定义执行入口、目录边界、发布边界和默认约束
+- `rules/` 负责定义 API 契约、前后端规范和验证要求
+- `skills/` 负责把规则转成可执行的开发流程
+
+只要工具支持读取仓库文件、遵循指令并基于代码上下文执行，这套方式就能复用到同类 AI 编程工具中。
 
 ### 可直接复用的提示词示例
 
@@ -263,7 +283,7 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 
 1. 打开 [在线演示](http://sourcelin.cn/)
 2. 查看上面的界面截图，确认前后台形态
-3. 阅读 [`AGENTS.md`](./AGENTS.md)、[`rules/`](./rules/README.md)、[`skills/`](./skills/README.md)，判断是否适合你的 AI 协作方式
+3. 阅读 [`AGENTS.md`](./AGENTS.md)、[`rules/`](./rules/README.md)、[`skills/`](./skills/README.md)，判断是否适合你的 AI 协作方式，以及是否需要接入 Codex、Cursor、OpenCode、Claude Code、Qoder、Trae 等工具
 4. 再决定本地启动还是 Docker 部署
 
 ## 快速开始
@@ -341,20 +361,19 @@ npm run dev
 
 ### Docker 部署
 
-当前仓库已提供可公开复用的 Compose 示例和生产部署基线文档：
+当前仓库已提供可公开复用的 Compose 示例和通用部署文档：
 
 - [`docker-compose.example.yml`](./docker-compose.example.yml)
 - [`.env.example`](./.env.example)
-
-- [`docs/internal/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md`](./docs/internal/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)
-- [`docs/internal/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md`](./docs/internal/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md)
+- [`docs/guides/QUICK_START.md`](./docs/guides/QUICK_START.md)
 - [`docs/deployment/NGINX_CONFIG.md`](./docs/deployment/NGINX_CONFIG.md)
+- [`docs/deployment/UPGRADE.md`](./docs/deployment/UPGRADE.md)
 
 适合人群：
 
 - 想快速落地到云服务器
 - 需要单域名前后台部署
-- 需要参考现成的 Nacos、网关、Nginx、Jar 布局
+- 需要参考公开的 Compose、Nginx、网关入口与升级方式
 
 最小使用方式：
 
@@ -370,7 +389,7 @@ docker compose -f docker-compose.example.yml up -d
 - `docs/sql/sourcelin-config.sql` 不是业务表，它用于初始化 Nacos 配置，缺它时服务可能能启动但配置不完整。
 - 管理后台部署到 `/admin/` 时，前端构建需要带 `--base=/admin/`。
 - 如果只是本地调试博客能力，优先启动 `gateway`、`auth`、`system`、`blog` 四个核心服务即可。
-- Docker 部署前先阅读部署文档中的固定目录结构和端口约定，不要直接照搬到不同服务器环境。
+- Docker 部署前先阅读 [`docs/guides/QUICK_START.md`](./docs/guides/QUICK_START.md) 和 [`docs/deployment/NGINX_CONFIG.md`](./docs/deployment/NGINX_CONFIG.md)，确认目录、端口和网关入口是否符合你的环境。
 
 ## 项目结构
 
@@ -417,8 +436,8 @@ sourcelin-cloud-blog/
 - [贡献指南](./docs/guides/CONTRIBUTING.md)
 - [更新日志](./docs/guides/CHANGELOG.md)
 - [支持说明](./docs/guides/SUPPORT.md)
-- [Docker 部署基线](./docs/internal/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)
-- [单域名部署说明](./docs/internal/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md)
+- [Nginx 配置说明](./docs/deployment/NGINX_CONFIG.md)
+- [升级说明](./docs/deployment/UPGRADE.md)
 - [SQL 脚本说明](./docs/sql/README.md)
 
 ## Roadmap
