@@ -7,8 +7,8 @@
 <p align="center">
   基于 Spring Cloud Alibaba + Vue 3 的全栈微服务博客系统，面向个人写作、毕业设计演示与小团队内容运营，同时沉淀了可直接复用的 AI 协作开发资产。
 </p>
-
 <p align="center">
+  <a href="https://github.com/SourceLin/sourcelin-cloud-blog"><img src="https://img.shields.io/github/stars/SourceLin/sourcelin-cloud-blog?style=flat-square&logo=github&logoColor=white" alt="GitHub Stars"></a>
   <a href="https://gitee.com/my_lyq/sourcelin-cloud-blog"><img src="https://gitee.com/my_lyq/sourcelin-cloud-blog/badge/star.svg?theme=dark" alt="Gitee Stars"></a>
   <img src="https://img.shields.io/badge/Java-1.8+-blue.svg" alt="Java">
   <img src="https://img.shields.io/badge/Spring%20Boot-2.7.18-brightgreen.svg" alt="Spring Boot">
@@ -16,6 +16,7 @@
   <img src="https://img.shields.io/badge/Vue-3.x-42b883.svg" alt="Vue">
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License"></a>
 </p>
+
 
 <p align="center">
   <a href="http://sourcelin.cn/">在线演示</a> |
@@ -32,13 +33,13 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 
 它不是单纯的博客 Demo，而是一套可继续二开、可部署上线、可用于毕设展示、也适合做 AI 协作开发实践的全栈项目基线。
 
-本项目当前的开源整理、文档重构、规则沉淀与发布流程治理全程使用 Codex 完成，同时兼容 Codex、Cursor、OpenCode、Claude Code、Qoder、Trae 等主流 AI 编程工具。
+这个仓库不是只把 AI 当成辅助插件来用，而是把编码、文档、规则沉淀和发布治理都带进了同一套 AI Coding 工作流里；其中当前公开版本主要由 Codex 完成，也保留了很强的 vibe coding 协作属性。
 
 ## 为什么值得关注
 
 - 微服务全栈架构：基于 Spring Cloud Alibaba，包含网关、认证、系统、博客、文件、监控等完整服务边界。
 - 前后台完整交付：同时提供 Vue 3 博客前台和 Vue 3 管理后台，不是只做后端接口或只做单页前端。
-- AI Coding 友好：仓库内沉淀了 `AGENTS.md`、`rules/`、`skills/`，本项目开源整理全程使用 Codex 完成，并兼容 Codex、Cursor、OpenCode、Claude Code、Qoder、Trae 等工具协作开发。
+- AI Coding 友好：项目编码、文档整理与规则沉淀以 Codex 为主完成，仓库内同步沉淀了 `AGENTS.md`、`rules/`、`skills/`，适合继续做 AI Coding 与 vibe coding 协作开发。
 - 工程规则明确：统一 API 响应体、分页协议、模块边界和验证要求，适合长期维护和多人协作。
 - 场景覆盖完整：适合作为个人博客、内容站、课程项目、毕业设计、二次开发基线。
 
@@ -150,7 +151,7 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 
 这是本项目和普通博客 CRUD 项目差异最大的一部分。
 
-本项目当前的开源整理、文档体系重构、规则沉淀和发布流程治理，全程使用 Codex 完成；但这套资产本身不绑定单一工具，而是以仓库内的规则、边界和技能说明为核心，可直接迁移到其他支持仓库规则读取的 AI 编程工具中。
+本项目不是简单接了一层 AI，而是把编码、文档体系整理、规则沉淀和发布治理都沉进仓库本身。当前这套公开版本里的关键工程资产，主要由 Codex 持续完成和打磨，因此它天然带有很强的 AI Coding 与 vibe coding 实践属性；同时，这些资产又是公开、可迁移的，不会被单一工具锁死。
 
 仓库内已经沉淀了面向 AI 协作开发的工程资产：
 
@@ -160,7 +161,7 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 
 你可以直接把这套方式复用到自己的项目里，让 AI 工具按统一约束开发、重构、审查和补文档。
 
-### 适合的 AI 工具
+### 可协作的 AI 工具
 
 - Codex
 - Cursor
@@ -181,7 +182,7 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 - `rules/` 负责定义 API 契约、前后端规范和验证要求
 - `skills/` 负责把规则转成可执行的开发流程
 
-只要工具支持读取仓库文件、遵循指令并基于代码上下文执行，这套方式就能复用到同类 AI 编程工具中。
+只要工具支持读取仓库文件、遵循指令并基于代码上下文执行，这套方式就能复用到同类 AI Coding 工具中。
 
 ### 可直接复用的提示词示例
 
@@ -283,7 +284,7 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 
 1. 打开 [在线演示](http://sourcelin.cn/)
 2. 查看上面的界面截图，确认前后台形态
-3. 阅读 [`AGENTS.md`](./AGENTS.md)、[`rules/`](./rules/README.md)、[`skills/`](./skills/README.md)，判断是否适合你的 AI 协作方式，以及是否需要接入 Codex、Cursor、OpenCode、Claude Code、Qoder、Trae 等工具
+3. 阅读 [`AGENTS.md`](./AGENTS.md)、[`rules/`](./rules/README.md)、[`skills/`](./skills/README.md)，判断这套 Codex 主导沉淀出来的 AI Coding / vibe coding 工作流是否适合你的协作方式
 4. 再决定本地启动还是 Docker 部署
 
 ## 快速开始
