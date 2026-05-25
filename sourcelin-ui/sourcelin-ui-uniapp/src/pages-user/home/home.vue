@@ -42,14 +42,14 @@
       <s-empty v-if="!loading && activeItems.length === 0" text="当前没有可展示的内容" />
 
       <view v-else-if="activeTab === 'articles'" class="user-home__list">
-        <view v-for="item in articles" :key="item.id" class="user-home__card s-card" @tap="openArticle(item.id)">
+        <view v-for="item in articles" :key="item.id" class="user-home__card s-card s-card--interactive" @tap="openArticle(item.id)">
           <view class="user-home__card-title s-ellipsis-2">{{ item.title }}</view>
           <view class="user-home__card-desc s-ellipsis-2">{{ item.summary || '暂无摘要' }}</view>
         </view>
       </view>
 
       <view v-else class="user-home__list">
-        <view v-for="item in activeFollowItems" :key="item.id" class="user-home__follow s-card" @tap="openRelatedUser(item)">
+        <view v-for="item in activeFollowItems" :key="item.id" class="user-home__follow s-card s-card--interactive" @tap="openRelatedUser(item)">
           <view class="user-home__follow-head">
             <image
               v-if="resolveFollowAvatar(item)"

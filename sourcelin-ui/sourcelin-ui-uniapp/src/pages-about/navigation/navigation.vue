@@ -8,7 +8,7 @@
         placeholder="搜索导航名称或用途"
         @confirm="applyFilter"
       >
-      <view class="navigation__search" @tap="applyFilter">筛选</view>
+      <view class="navigation__search sl-button sl-button--primary sl-button--sm" @tap="applyFilter">筛选</view>
     </view>
 
     <scroll-view v-if="categories.length > 0" class="navigation__tabs" scroll-x show-scrollbar="false">
@@ -33,7 +33,7 @@
     />
 
     <view v-else class="navigation__list">
-      <view v-for="item in items" :key="item.id" class="navigation__item s-card" @tap="openNavigation(item)">
+      <view v-for="item in items" :key="item.id" class="navigation__item s-card s-card--interactive" @tap="openNavigation(item)">
         <view class="navigation__item-head">
           <view class="navigation__item-title">{{ item.name }}</view>
           <view v-if="item.isRecommend === 1" class="navigation__badge">推荐</view>
@@ -139,11 +139,7 @@ async function openNavigation(item: NavigationItem): Promise<void> {
   }
 
   &__search {
-    padding: 18rpx 28rpx;
-    border-radius: 999rpx;
-    background: $color-primary;
-    color: #fff;
-    font-size: 26rpx;
+    min-width: 128rpx;
   }
 
   &__tabs {

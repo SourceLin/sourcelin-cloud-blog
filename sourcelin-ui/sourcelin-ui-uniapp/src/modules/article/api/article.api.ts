@@ -6,7 +6,8 @@ import type {
   ArticleSummary,
   CategoryItem,
   FrontHome,
-  HomePageQuery
+  HomePageQuery,
+  TagItem
 } from '../types/article';
 import type { ListResult } from '@/shared/types/api';
 
@@ -38,6 +39,56 @@ export function searchArticles(
 ): Promise<PageResult<ArticleSummary>> {
   return http.get<PageResult<ArticleSummary>>('/front/articles/search', {
     keyword,
+    page,
+    pageSize
+  });
+}
+
+export function searchCategories(
+  keyword: string,
+  page = 1,
+  pageSize = 6
+): Promise<PageResult<CategoryItem>> {
+  return http.get<PageResult<CategoryItem>>('/front/categories/search', {
+    keyword,
+    page,
+    pageSize
+  });
+}
+
+export function searchTags(
+  keyword: string,
+  page = 1,
+  pageSize = 8
+): Promise<PageResult<TagItem>> {
+  return http.get<PageResult<TagItem>>('/front/tags/search', {
+    keyword,
+    page,
+    pageSize
+  });
+}
+
+export async function fetchTagList(): Promise<TagItem[]> {
+  const result = await http.get<ListResult<TagItem>>('/front/tags');
+  return result.items || [];
+}
+
+export async function fetchSearchHotKeywords(): Promise<string[]> {
+  const result = await http.get<ListResult<string>>('/front/search/hot');
+  return result.items || [];
+}
+
+export async function fetchSearchSuggestions(keyword: string): Promise<string[]> {
+  const result = await http.get<ListResult<string>>('/front/search/suggestions', { keyword });
+  return result.items || [];
+}
+
+export function fetchTagArticles(
+  tagId: number | string,
+  page = 1,
+  pageSize = 10
+): Promise<PageResult<ArticleSummary>> {
+  return http.get<PageResult<ArticleSummary>>(`/front/tags/articles/${tagId}`, {
     page,
     pageSize
   });

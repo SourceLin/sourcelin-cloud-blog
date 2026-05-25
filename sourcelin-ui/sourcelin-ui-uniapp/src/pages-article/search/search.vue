@@ -1,15 +1,16 @@
 <template>
   <view class="search s-container">
-    <s-loading :visible="searched && loading && items.length === 0" text="正在检索内容..." />
+    <s-loading :visible="showLoading" text="正在检索内容..." />
     <view class="search__bar s-card">
       <input
         v-model="keyword"
         class="search__input"
         confirm-type="search"
-        placeholder="搜索文章标题"
+        placeholder="搜索文章、分类或标签"
+        placeholder-style="color: rgba(107, 114, 128, 0.58);"
         @confirm="onSearch"
       >
-      <view class="search__button" @tap="onSearch">搜索</view>
+      <view class="search__button sl-button sl-button--primary sl-button--sm" @tap="onSearch">搜索</view>
     </view>
 
     <view v-if="suggestions.length > 0" class="search__section s-card">
@@ -32,7 +33,7 @@
       <view v-if="searchHistory.length > 0" class="search__section s-card">
         <view class="search__section-head">
           <view class="search__section-title">最近搜索</view>
-          <view class="search__section-action" @tap="clearSearchHistory">清空</view>
+          <view class="search__section-action sl-button sl-button--ghost sl-button--sm" @tap="clearSearchHistory">清空</view>
         </view>
         <view class="search__chips">
           <view
@@ -64,31 +65,75 @@
     </template>
 
     <s-empty
-      v-if="searched && isEmpty"
+      v-if="searched && !showLoading && !hasResults"
       scene="search"
-      title="没有找到相关文章"
-      text="换个关键词，或者试试从分类和标签中继续查找。"
+      title="没有找到匹配内容"
+      text="换个更短的关键词，或者试试从热门搜索继续浏览。"
     />
     <s-empty
       v-else-if="!searched"
       scene="search"
       title="开始搜索"
-      text="输入文章标题关键词，快速定位你想看的内容。"
+      text="输入文章、分类或标签关键词，快速定位你想看的内容。"
     />
-
-    <view v-else class="search__items">
-      <view
-        v-for="item in items"
-        :key="item.id"
-        class="search__item s-card"
-        @tap="goDetail(item.id)"
-      >
-        <view class="search__title s-ellipsis-2">{{ item.title }}</view>
-        <view class="search__summary s-ellipsis-2">{{ item.summary || '暂无摘要' }}</view>
+    <view v-else class="search__results">
+      <view v-if="categoryMatches.length > 0" class="search__section s-card">
+        <view class="search__section-head">
+          <view class="search__section-title">匹配分类</view>
+          <view class="search__section-caption">{{ categoryMatches.length }} 个结果</view>
+        </view>
+        <view class="search__chips">
+          <view
+            v-for="item in categoryMatches"
+            :key="`category-${item.id}`"
+            class="search__chip search__chip--category"
+            @tap="goCategory(item.id)"
+          >
+            # {{ item.name }}
+          </view>
+        </view>
       </view>
 
-      <s-loading v-if="loading && items.length > 0" :visible="true" :fullpage="false" compact text="正在加载更多..." />
-      <view v-else-if="finished && items.length > 0" class="search__footer">已经到底了</view>
+      <view v-if="tagMatches.length > 0" class="search__section s-card">
+        <view class="search__section-head">
+          <view class="search__section-title">匹配标签</view>
+          <view class="search__section-caption">{{ tagMatches.length }} 个结果</view>
+        </view>
+        <view class="search__chips">
+          <view
+            v-for="item in tagMatches"
+            :key="`tag-${item.id}`"
+            class="search__chip search__chip--tag"
+            @tap="goTag(item.id)"
+          >
+            # {{ item.name }}
+          </view>
+        </view>
+      </view>
+
+      <view v-if="items.length > 0" class="search__section-head search__section-head--articles">
+        <view class="search__section-title">匹配文章</view>
+        <view class="search__section-caption">{{ items.length }} 篇已加载</view>
+      </view>
+
+      <view v-if="items.length > 0" class="search__items">
+        <view
+          v-for="item in items"
+          :key="item.id"
+          class="search__item s-card s-card--interactive"
+          @tap="goDetail(item.id)"
+        >
+          <view class="search__title s-ellipsis-2">{{ item.title }}</view>
+          <view class="search__summary s-ellipsis-2">{{ item.summary || '暂无摘要' }}</view>
+          <view class="search__meta">
+            <text>{{ item.categoryName || '默认分类' }}</text>
+            <text>{{ item.viewCount || 0 }} 阅读</text>
+          </view>
+        </view>
+
+        <s-loading v-if="loading && items.length > 0" :visible="true" :fullpage="false" compact text="正在加载更多..." />
+        <view v-else-if="finished && items.length > 0" class="search__footer">已经到底了</view>
+      </view>
     </view>
 
     <s-back-to-top :visible="backToTopVisible" />
@@ -96,10 +141,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { onLoad, onPageScroll, onReachBottom } from '@dcloudio/uni-app';
-import { fetchCategoryList, fetchHotArticles, searchArticles } from '@/modules/article/api/article.api';
+import {
+  fetchCategoryList,
+  fetchSearchHotKeywords,
+  fetchSearchSuggestions,
+  fetchTagList,
+  searchArticles,
+  searchCategories,
+  searchTags
+} from '@/modules/article/api/article.api';
 import { useArticlePaging } from '@/modules/article/composables/useArticlePaging';
+import type { CategoryItem, TagItem } from '@/modules/article/types/article';
 import { showInfoToast } from '@/utils/feedback';
 import { getStorage, removeStorage, setStorage } from '@/utils/storage';
 
@@ -109,20 +163,22 @@ const keyword = ref('');
 const searched = ref(false);
 const searchHistory = ref<string[]>([]);
 const hotKeywords = ref<string[]>([]);
+const categoryMatches = ref<CategoryItem[]>([]);
+const tagMatches = ref<TagItem[]>([]);
+const facetLoading = ref(false);
+const suggestionList = ref<string[]>([]);
+let suggestionTimer: ReturnType<typeof setTimeout> | undefined;
+let suggestionSerial = 0;
 
-const { items, loading, finished, isEmpty, refresh, loadMore } = useArticlePaging((page, pageSize) =>
+const { items, loading, finished, refresh, loadMore } = useArticlePaging((page, pageSize) =>
   searchArticles(keyword.value.trim(), page, pageSize)
 );
 const backToTopVisible = ref(false);
-const suggestions = computed(() => {
-  const value = keyword.value.trim().toLowerCase();
-  if (!value) return [];
-  const pool = [...searchHistory.value, ...hotKeywords.value];
-  return pool
-    .filter((term, index, source) => source.indexOf(term) === index)
-    .filter((term) => term.toLowerCase().includes(value) && term.trim() !== keyword.value.trim())
-    .slice(0, 6);
-});
+const hasResults = computed(() => items.value.length > 0 || categoryMatches.value.length > 0 || tagMatches.value.length > 0);
+const showLoading = computed(() => searched.value && (loading.value || facetLoading.value) && !hasResults.value);
+const suggestions = computed(() =>
+  suggestionList.value.filter((term) => term.trim() !== keyword.value.trim()).slice(0, 6)
+);
 
 function onSearch(): void {
   const value = keyword.value.trim();
@@ -133,6 +189,7 @@ function onSearch(): void {
   saveSearchHistory(value);
   searched.value = true;
   refresh();
+  void loadFacetResults(value);
 }
 
 function applyKeyword(value: string): void {
@@ -157,27 +214,71 @@ function clearSearchHistory(): void {
 
 async function loadHotKeywords(): Promise<void> {
   try {
-    const [hotResult, categories] = await Promise.all([
-      fetchHotArticles(1, 6),
-      fetchCategoryList()
+    const [articleTerms, categories, tags] = await Promise.all([
+      fetchSearchHotKeywords(),
+      fetchCategoryList(),
+      fetchTagList()
     ]);
-    const articleTerms = (hotResult.items || [])
-      .map((item) => item.title?.trim())
-      .filter((item): item is string => !!item);
     const categoryTerms = categories
       .map((item) => item.name?.trim())
       .filter((item): item is string => !!item);
-    hotKeywords.value = [...articleTerms, ...categoryTerms]
+    const tagTerms = tags
+      .map((item) => item.name?.trim())
+      .filter((item): item is string => !!item);
+    hotKeywords.value = [...articleTerms, ...categoryTerms, ...tagTerms]
       .filter((term, index, source) => source.indexOf(term) === index)
-      .slice(0, 8);
+      .slice(0, 10);
   } catch {
     hotKeywords.value = [];
+  }
+}
+
+async function loadFacetResults(value: string): Promise<void> {
+  facetLoading.value = true;
+  try {
+    const [categories, tags] = await Promise.all([
+      searchCategories(value, 1, 6),
+      searchTags(value, 1, 8)
+    ]);
+    categoryMatches.value = categories.items || [];
+    tagMatches.value = tags.items || [];
+  } catch {
+    categoryMatches.value = [];
+    tagMatches.value = [];
+  } finally {
+    facetLoading.value = false;
+  }
+}
+
+async function updateSuggestions(value: string): Promise<void> {
+  const requestId = ++suggestionSerial;
+  if (!value) {
+    suggestionList.value = [];
+    return;
+  }
+  try {
+    const result = await fetchSearchSuggestions(value);
+    if (requestId !== suggestionSerial) return;
+    suggestionList.value = result;
+  } catch {
+    if (requestId !== suggestionSerial) return;
+    suggestionList.value = [];
   }
 }
 
 function goDetail(id?: number): void {
   if (!id) return;
   uni.navigateTo({ url: `/pages-article/detail/detail?id=${id}` });
+}
+
+function goCategory(id?: number): void {
+  if (!id) return;
+  uni.navigateTo({ url: `/pages-article/list/list?categoryId=${id}` });
+}
+
+function goTag(id?: number): void {
+  if (!id) return;
+  uni.navigateTo({ url: `/pages-article/list/list?tagId=${id}` });
 }
 
 onLoad((options) => {
@@ -197,6 +298,28 @@ onReachBottom(() => {
 onPageScroll((event) => {
   backToTopVisible.value = event.scrollTop > 360;
 });
+
+watch(keyword, (value) => {
+  const safeValue = value.trim();
+  if (suggestionTimer) {
+    clearTimeout(suggestionTimer);
+    suggestionTimer = undefined;
+  }
+  if (!safeValue) {
+    suggestionSerial += 1;
+    suggestionList.value = [];
+    return;
+  }
+  suggestionTimer = setTimeout(() => {
+    void updateSuggestions(safeValue);
+  }, 180);
+});
+
+onBeforeUnmount(() => {
+  if (suggestionTimer) {
+    clearTimeout(suggestionTimer);
+  }
+});
 </script>
 
 <style lang="scss" scoped>
@@ -215,17 +338,14 @@ onPageScroll((event) => {
     flex: 1;
     min-height: 72rpx;
     border-radius: 999rpx;
-    background-color: $color-bg;
+    background: rgba(248, 250, 252, 0.92);
     padding: 0 $space-md;
     font-size: 26rpx;
+    color: $color-text;
   }
 
   &__button {
-    border-radius: 999rpx;
-    background-color: $color-primary;
-    color: #fff;
-    font-size: 26rpx;
-    padding: 18rpx 28rpx;
+    min-width: 128rpx;
   }
 
   &__section {
@@ -246,10 +366,13 @@ onPageScroll((event) => {
     font-weight: 700;
   }
 
+  &__section-caption {
+    color: $color-text-tertiary;
+    font-size: 22rpx;
+  }
+
   &__section-action {
-    color: $color-primary;
-    font-size: 23rpx;
-    font-weight: 600;
+    min-width: 104rpx;
   }
 
   &__chips {
@@ -281,6 +404,30 @@ onPageScroll((event) => {
       rgba(255, 255, 255, 0.6);
   }
 
+  &__chip--category {
+    color: $color-primary;
+    background:
+      linear-gradient(135deg, rgba(31, 111, 235, 0.08), rgba(255, 255, 255, 0.72)),
+      rgba(255, 255, 255, 0.68);
+  }
+
+  &__chip--tag {
+    color: #6d4bff;
+    background:
+      linear-gradient(135deg, rgba(143, 112, 255, 0.12), rgba(255, 255, 255, 0.72)),
+      rgba(255, 255, 255, 0.68);
+  }
+
+  &__results {
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
+  }
+
+  &__section-head--articles {
+    margin-bottom: -4rpx;
+  }
+
   &__items {
     display: flex;
     flex-direction: column;
@@ -297,6 +444,14 @@ onPageScroll((event) => {
     color: $color-text-secondary;
     font-size: 25rpx;
     line-height: 1.6;
+  }
+
+  &__meta {
+    display: flex;
+    justify-content: space-between;
+    color: $color-text-tertiary;
+    font-size: 23rpx;
+    margin-top: $space-md;
   }
 
   &__footer {

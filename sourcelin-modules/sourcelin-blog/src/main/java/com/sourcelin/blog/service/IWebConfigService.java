@@ -8,7 +8,7 @@ import java.util.List;
  * 网站配置Service接口
  * 
  * @author sourcelin
- * @date 2023-11-04
+ * @date 2026-01-04
  */
 public interface IWebConfigService 
 {

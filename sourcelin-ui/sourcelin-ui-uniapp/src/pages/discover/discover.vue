@@ -2,7 +2,7 @@
   <view class="discover">
     <s-loading :visible="loading && hotArticles.length === 0" />
     <view class="discover__hero">
-      <view class="discover__search" @tap="goSearch">
+      <view class="discover__search sl-button sl-button--secondary" @tap="goSearch">
         <uni-icons type="search" size="18" color="currentColor" />
         <text>搜索文章、分类或标签</text>
       </view>
@@ -15,7 +15,7 @@
             <text class="discover__section-kicker">Trending</text>
             <text class="discover__section-title">热门文章</text>
           </view>
-          <view class="discover__more" @tap="goHotList">更多</view>
+          <view class="discover__more sl-button sl-button--ghost sl-button--sm" @tap="goHotList">更多</view>
         </view>
         <s-empty v-if="!loading && hotArticles.length === 0" text="暂无热门文章" />
         <view
@@ -48,7 +48,7 @@
             <text class="discover__section-kicker">Categories</text>
             <text class="discover__section-title">核心分类</text>
           </view>
-          <view class="discover__more" @tap="goSearch">搜索</view>
+          <view class="discover__more sl-button sl-button--ghost sl-button--sm" @tap="goSearch">搜索</view>
         </view>
         <view v-if="categories.length > 0" class="discover__chips">
           <view
@@ -188,12 +188,8 @@ function goDetail(id?: number): void {
     position: relative;
     z-index: 1;
     min-height: 78rpx;
-    display: flex;
-    align-items: center;
     gap: 14rpx;
     padding: 0 28rpx;
-    box-sizing: border-box;
-    border-radius: 999rpx;
     background:
       linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.22)),
       var(--discover-glass-tint);
@@ -218,7 +214,6 @@ function goDetail(id?: number): void {
     }
 
     &:active {
-      transform: scale(0.985);
       box-shadow:
         inset 0 1rpx 0 var(--discover-glass-highlight),
         0 16rpx 42rpx rgba(59, 89, 255, 0.12);
@@ -269,15 +264,7 @@ function goDetail(id?: number): void {
   }
 
   &__more {
-    min-height: 56rpx;
-    display: inline-flex;
-    align-items: center;
-    padding: 0 22rpx;
-    border-radius: 999rpx;
-    background: rgba(59, 89, 255, 0.08);
-    color: var(--discover-primary);
-    font-size: 24rpx;
-    font-weight: 700;
+    min-width: 104rpx;
   }
 
   &__hot {

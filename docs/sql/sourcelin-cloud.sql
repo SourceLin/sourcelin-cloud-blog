@@ -374,7 +374,6 @@ CREATE TABLE `b_user` (
   `realname_auth` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否实名认证（1未验证，2已验证）',
   `open_id` varchar(100) DEFAULT NULL COMMENT '微信登录openid',
   `session_key` varchar(100) DEFAULT NULL COMMENT '微信登录会话KEY',
-  `deleted` int(11) DEFAULT '0' COMMENT '是否删除',
   `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_by` varchar(64) DEFAULT '' COMMENT '更新者',

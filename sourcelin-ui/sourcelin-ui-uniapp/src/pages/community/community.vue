@@ -173,9 +173,9 @@
           auto-height
         />
         <view class="community__sheet-actions">
-          <button class="community__sheet-button community__sheet-button--ghost" @tap="closeCommentSheet">取消</button>
+          <button class="community__sheet-button community__sheet-button--ghost sl-button sl-button--secondary" @tap="closeCommentSheet">取消</button>
           <button
-            class="community__sheet-button community__sheet-button--primary"
+            class="community__sheet-button community__sheet-button--primary sl-button sl-button--primary"
             :disabled="commentSubmitting"
             @tap="submitComment"
           >
@@ -588,6 +588,13 @@ refresh();
       0 10rpx 28rpx rgba(59, 89, 255, 0.08);
   }
 
+  &__publish:active {
+    transform: scale(0.97);
+    box-shadow:
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.94),
+      0 8rpx 22rpx rgba(59, 89, 255, 0.1);
+  }
+
   &__tab {
     flex: 1;
     min-height: 74rpx;
@@ -611,6 +618,10 @@ refresh();
         inset 0 1rpx 0 rgba(255, 255, 255, 0.92),
         0 10rpx 28rpx rgba(59, 89, 255, 0.14);
     }
+  }
+
+  &__tab:active {
+    transform: scale(0.97);
   }
 
   &__body {
@@ -659,10 +670,6 @@ refresh();
     pointer-events: none;
   }
 
-  &__card:active {
-    transform: scale(0.985);
-  }
-
   &__card-head,
   &__actions {
     display: flex;
@@ -681,6 +688,10 @@ refresh();
     display: flex;
     align-items: center;
     gap: 16rpx;
+  }
+
+  &__identity:active {
+    transform: scale(0.985);
   }
 
   &__avatar {
@@ -804,6 +815,10 @@ refresh();
       0 12rpx 28rpx rgba(17, 24, 39, 0.06);
   }
 
+  &__media-item:active {
+    transform: scale(0.985);
+  }
+
   &__media--single &__media-item {
     min-height: 360rpx;
   }
@@ -855,6 +870,10 @@ refresh();
     font-weight: 700;
     box-shadow: 0 4rpx 10rpx rgba(17, 24, 39, 0.01);
     transition: all 0.2s ease;
+  }
+
+  &__action:active {
+    transform: scale(0.96);
   }
 
   &__action--active {

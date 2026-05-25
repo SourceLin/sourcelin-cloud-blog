@@ -42,7 +42,7 @@
       </view>
     </view>
 
-    <button class="publish-say__submit" :disabled="submitting" @tap="submit">
+    <button class="publish-say__submit sl-button sl-button--primary" :disabled="submitting" @tap="submit">
       <s-inline-loading v-if="submitting" text="发布中" light />
       <text v-else>发布说说</text>
     </button>

@@ -8,7 +8,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * 博客分类对象 b_category
  *
  * @author sourcelin
- * @date 2023-11-07
+ * @date 2026-01-07
  */
 public class Category extends BaseEntity {
     private static final long serialVersionUID = 1L;

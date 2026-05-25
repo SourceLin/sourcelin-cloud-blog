@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * 网站配置Controller
  * 
  * @author sourcelin
- * @date 2023-11-04
+ * @date 2026-01-04
  */
 @RestController
 @RequestMapping("/admin/config")

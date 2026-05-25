@@ -19,7 +19,7 @@
             <text>{{ userStore.userInfo?.followerCount || 0 }} 位关注者</text>
           </view>
         </view>
-        <button class="mine__profile-action" @tap.stop="onTapProfile">
+        <button class="mine__profile-action sl-button sl-button--primary sl-button--sm" @tap.stop="onTapProfile">
           {{ userStore.isLoggedIn ? '资料' : '登录' }}
         </button>
       </view>
@@ -70,14 +70,14 @@
         <view class="mine-login__title">欢迎加入 Sourcelin</view>
         <view class="mine-login__desc">登录后同步收藏、关注和互动记录。</view>
 
-        <button class="mine-login__primary" :disabled="wechatSubmitting" @tap="loginWithWechat">
+        <button class="mine-login__primary sl-button sl-button--primary" :disabled="wechatSubmitting" @tap="loginWithWechat">
           <s-inline-loading v-if="wechatSubmitting" text="微信登录中" light />
           <text v-else>微信一键登录</text>
         </button>
 
-        <button class="mine-login__ghost" @tap="closeLoginSheet()">暂时跳过</button>
+        <button class="mine-login__ghost sl-button sl-button--secondary" @tap="closeLoginSheet()">暂时跳过</button>
 
-        <view class="mine-login__switch" @tap="togglePasswordLogin">
+        <view class="mine-login__switch sl-button sl-button--ghost sl-button--sm" @tap="togglePasswordLogin">
           {{ showPasswordLogin ? '收起账号密码登录' : '绑定已有账号 / 备用登录' }}
         </view>
 
@@ -125,7 +125,7 @@
           </view>
 
           <button
-            class="mine-login__submit"
+            class="mine-login__submit sl-button sl-button--primary"
             :disabled="submitting"
             @tap="submitPasswordLogin"
           >
@@ -133,7 +133,11 @@
             <text v-else>账号密码登录</text>
           </button>
 
-          <view class="mine-login__bind-link" :class="{ 'mine-login__bind-link--disabled': submitting }" @tap="submitBindLogin">
+          <view
+            class="mine-login__bind-link sl-button sl-button--ghost sl-button--sm"
+            :class="{ 'mine-login__bind-link--disabled': submitting }"
+            @tap="submitBindLogin"
+          >
             <s-inline-loading v-if="submitting" text="处理中" />
             <text v-else>登录并绑定微信</text>
           </view>
@@ -915,12 +919,8 @@ function onLogout(): void {
   }
 
   &__switch {
-    width: 220rpx;
+    width: 260rpx;
     margin: 24rpx auto 0;
-    color: var(--sl-color-primary);
-    font-size: 24rpx;
-    font-weight: 600;
-    text-align: center;
   }
 
   &__form {
@@ -982,14 +982,8 @@ function onLogout(): void {
   }
 
   &__bind-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 20rpx;
-    color: var(--sl-color-primary);
-    font-size: 24rpx;
-    font-weight: 600;
-    text-align: center;
+    width: 260rpx;
+    margin: 20rpx auto 0;
   }
 
   &__bind-link--disabled {

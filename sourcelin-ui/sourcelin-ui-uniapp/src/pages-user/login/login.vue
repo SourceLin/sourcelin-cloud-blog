@@ -9,12 +9,12 @@
       <view class="login__title">微信快捷登录</view>
       <view class="login__desc">优先推荐微信快捷登录，减少输入成本并保留小程序原生体验。</view>
 
-      <button class="login__wechat" :disabled="wechatSubmitting" @tap="loginWithWechat">
+      <button class="login__wechat sl-button sl-button--success" :disabled="wechatSubmitting" @tap="loginWithWechat">
         <s-inline-loading v-if="wechatSubmitting" text="微信登录中" light />
         <text v-else>一键使用微信登录</text>
       </button>
 
-      <view class="login__switch" @tap="togglePasswordLogin">
+      <view class="login__switch sl-button sl-button--ghost sl-button--sm" @tap="togglePasswordLogin">
         {{ showPasswordLogin ? '收起账号密码登录' : '绑定已有账号 / 备用登录' }}
       </view>
 
@@ -67,7 +67,7 @@
 
       <button
         v-if="showPasswordForm"
-        class="login__button"
+        class="login__button sl-button sl-button--primary"
         :disabled="submitting"
         @tap="submitPasswordLogin"
       >
@@ -75,7 +75,12 @@
         <text v-else>账号密码登录</text>
       </button>
 
-      <view v-if="showPasswordForm" class="login__bind-action" :class="{ 'login__bind-action--disabled': submitting }" @tap="submitBindLogin">
+      <view
+        v-if="showPasswordForm"
+        class="login__bind-action sl-button sl-button--ghost sl-button--sm"
+        :class="{ 'login__bind-action--disabled': submitting }"
+        @tap="submitBindLogin"
+      >
         <s-inline-loading v-if="submitting" text="处理中" />
         <text v-else>登录并绑定微信</text>
       </view>
@@ -382,15 +387,8 @@ function backToPreviousPage(): void {
   }
 
   &__switch {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 60rpx;
+    width: 260rpx;
     margin: 18rpx auto 0;
-    border-radius: 999rpx;
-    color: $color-primary;
-    font-size: 24rpx;
-    font-weight: 600;
   }
 
   &__form {
@@ -462,14 +460,8 @@ function backToPreviousPage(): void {
   }
 
   &__bind-action {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 18rpx;
-    color: $color-primary;
-    font-size: 24rpx;
-    font-weight: 600;
-    text-align: center;
+    width: 260rpx;
+    margin: 18rpx auto 0;
   }
 
   &__bind-action--disabled {

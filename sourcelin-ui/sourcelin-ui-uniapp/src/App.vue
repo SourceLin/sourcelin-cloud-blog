@@ -92,10 +92,132 @@ page {
     linear-gradient(315deg, rgba(59, 89, 255, 0.07), rgba(255, 255, 255, 0) 38%);
 }
 
-.s-card:active {
+button[class]::after {
+  border: none;
+}
+
+button[class] {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: none;
+  background: transparent;
+  overflow: hidden;
+  transition:
+    transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+button[class][disabled] {
+  opacity: 0.68;
+  transform: none !important;
+}
+
+.sl-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 84rpx;
+  padding: 0 30rpx;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  overflow: hidden;
+  transition:
+    transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.sl-button:active {
+  transform: scale(0.98);
+}
+
+.sl-button--sm {
+  min-height: 68rpx;
+  padding: 0 22rpx;
+  font-size: 24rpx;
+}
+
+.sl-button--primary {
+  background: linear-gradient(135deg, var(--sl-color-primary), var(--sl-color-primary-soft));
+  color: #fff;
+  border: 1rpx solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.22),
+    0 14rpx 32rpx rgba(59, 89, 255, 0.2);
+}
+
+.sl-button--primary:active {
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.18),
+    0 8rpx 20rpx rgba(59, 89, 255, 0.14);
+}
+
+.sl-button--success {
+  background: linear-gradient(135deg, #0f9f7f, #18c79c);
+  color: #fff;
+  border: 1rpx solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.22),
+    0 14rpx 32rpx rgba(15, 159, 127, 0.18);
+}
+
+.sl-button--success:active {
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.18),
+    0 8rpx 20rpx rgba(15, 159, 127, 0.12);
+}
+
+.sl-button--secondary {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.48)),
+    rgba(255, 255, 255, 0.42);
+  color: var(--sl-text-sub);
+  border: 1rpx solid rgba(255, 255, 255, 0.84);
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.92),
+    0 10rpx 24rpx rgba(17, 24, 39, 0.04);
+}
+
+.sl-button--secondary:active {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.58)),
+    rgba(255, 255, 255, 0.52);
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.94),
+    0 6rpx 16rpx rgba(17, 24, 39, 0.03);
+}
+
+.sl-button--ghost {
+  background: transparent;
+  color: var(--sl-color-primary);
+  border: 1rpx solid transparent;
+  box-shadow: none;
+}
+
+.sl-button--ghost:active {
+  background: rgba(59, 89, 255, 0.08);
+}
+
+.s-card--interactive {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.s-card--interactive:active {
   transform: scale(0.985);
   box-shadow: 0 18rpx 46rpx -10rpx rgba(59, 89, 255, 0.16);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .s-liquid-tabbar {

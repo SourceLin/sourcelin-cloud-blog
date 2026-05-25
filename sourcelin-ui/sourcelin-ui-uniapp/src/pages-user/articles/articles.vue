@@ -27,7 +27,7 @@
     />
 
     <view v-else class="user-articles__list">
-      <view v-for="item in items" :key="item.id" class="user-articles__item s-card" @tap="openArticle(item)">
+      <view v-for="item in items" :key="item.id" class="user-articles__item s-card s-card--interactive" @tap="openArticle(item)">
         <view class="user-articles__item-title s-ellipsis-2">{{ item.title }}</view>
         <view class="user-articles__item-summary s-ellipsis-2">{{ item.summary || '暂无摘要' }}</view>
         <view class="user-articles__item-meta">

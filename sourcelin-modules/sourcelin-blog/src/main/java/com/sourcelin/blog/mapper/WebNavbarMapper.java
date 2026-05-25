@@ -7,7 +7,7 @@ import com.sourcelin.blog.domain.WebNavbar;
  * 门户导航栏Mapper接口
  * 
  * @author sourcelin
- * @date 2023-11-06
+ * @date 2026-01-06
  */
 public interface WebNavbarMapper 
 {

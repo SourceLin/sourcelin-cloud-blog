@@ -17,10 +17,10 @@
     <view class="about__section s-card">
       <view class="about__section-title">联系与入口</view>
       <view class="about__links">
-        <view v-if="about?.github" class="about__link" @tap="copyValue(about.github, 'GitHub 地址已复制')">GitHub</view>
-        <view v-if="about?.gitee" class="about__link" @tap="copyValue(about.gitee, 'Gitee 地址已复制')">Gitee</view>
-        <view v-if="about?.email" class="about__link" @tap="copyValue(about.email, '邮箱已复制')">邮箱</view>
-        <view v-if="about?.wechat" class="about__link" @tap="copyValue(about.wechat, '微信号已复制')">微信</view>
+        <view v-if="about?.github" class="about__link sl-button sl-button--secondary sl-button--sm" @tap="copyValue(about.github, 'GitHub 地址已复制')">GitHub</view>
+        <view v-if="about?.gitee" class="about__link sl-button sl-button--secondary sl-button--sm" @tap="copyValue(about.gitee, 'Gitee 地址已复制')">Gitee</view>
+        <view v-if="about?.email" class="about__link sl-button sl-button--secondary sl-button--sm" @tap="copyValue(about.email, '邮箱已复制')">邮箱</view>
+        <view v-if="about?.wechat" class="about__link sl-button sl-button--secondary sl-button--sm" @tap="copyValue(about.wechat, '微信号已复制')">微信</view>
       </view>
     </view>
 
@@ -135,12 +135,7 @@ function copyValue(value: string, message: string): void {
   }
 
   &__link {
-    padding: 14rpx 24rpx;
-    border-radius: 999rpx;
-    background: rgba(31, 111, 235, 0.08);
-    color: $color-primary;
-    font-size: 24rpx;
-    font-weight: 600;
+    min-width: 120rpx;
   }
 }
 </style>

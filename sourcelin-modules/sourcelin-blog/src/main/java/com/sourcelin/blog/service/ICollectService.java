@@ -8,7 +8,7 @@ import java.util.List;
  * 收藏Service接口
  * 
  * @author sourcelin
- * @date 2023-11-18
+ * @date 2026-01-18
  */
 public interface ICollectService 
 {

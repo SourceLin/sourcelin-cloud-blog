@@ -68,7 +68,7 @@
       </view>
     </view>
 
-    <button class="profile__submit" :disabled="submitting" @tap="submitProfile">
+    <button class="profile__submit sl-button sl-button--primary" :disabled="submitting" @tap="submitProfile">
       <s-inline-loading v-if="submitting" text="保存中" light />
       <text v-else>保存资料</text>
     </button>

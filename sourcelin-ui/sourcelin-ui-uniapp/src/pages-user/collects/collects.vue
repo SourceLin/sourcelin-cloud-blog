@@ -13,7 +13,7 @@
       title="登录后查看收藏记录"
       text="账号登录后会自动同步移动端收藏数据，并保留跨端回访入口。"
     >
-      <button class="collects__login" @tap="goLogin">立即登录</button>
+      <button class="collects__login sl-button sl-button--primary" @tap="goLogin">立即登录</button>
     </s-empty>
 
     <template v-else>
@@ -37,7 +37,7 @@
         <view
           v-for="item in items"
           :key="item.id"
-          class="collects__item s-card"
+          class="collects__item s-card s-card--interactive"
           @tap="openCollect(item)"
         >
           <view class="collects__item-top">

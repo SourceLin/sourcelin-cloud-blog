@@ -13,7 +13,7 @@ import java.util.List;
  * 博客文章对象 b_article
  *
  * @author sourcelin
- * @date 2023-11-09
+ * @date 2026-01-09
  */
 public class Article extends BaseEntity {
     private static final long serialVersionUID = 1L;

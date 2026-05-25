@@ -12,7 +12,7 @@
     </view>
 
     <view class="home__content">
-      <view class="home__search" @tap="goSearch">搜索文章、分类或标签</view>
+      <view class="home__search sl-button sl-button--secondary" @tap="goSearch">搜索文章、分类或标签</view>
 
       <!-- 轻公告栏 -->
       <view v-if="siteInfo?.notices && siteInfo.notices.length > 0" class="home__notice">
@@ -279,17 +279,15 @@ refresh();
 
   &__search {
     position: relative;
-    display: flex;
-    align-items: center;
     min-height: 80rpx;
     box-sizing: border-box;
-    border-radius: 999rpx;
     background:
       linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.22)),
       var(--home-glass-tint);
-    color: rgba(75, 85, 99, 0.82);
+    color: rgba(17, 24, 39, 0.44);
     font-size: 24rpx;
     font-weight: 500;
+    letter-spacing: 0.02em;
     padding: 0 26rpx 0 62rpx;
     border: 1rpx solid rgba(255, 255, 255, 0.78);
     box-shadow:
@@ -327,7 +325,6 @@ refresh();
     }
 
     &:active {
-      transform: scale(0.985);
       box-shadow:
         inset 0 1rpx 0 var(--home-glass-highlight),
         0 16rpx 42rpx rgba(59, 89, 255, 0.12);

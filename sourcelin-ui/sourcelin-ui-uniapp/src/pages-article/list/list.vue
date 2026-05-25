@@ -7,7 +7,7 @@
       <view
         v-for="item in items"
         :key="item.id"
-        class="article-list__item s-card"
+        class="article-list__item s-card s-card--interactive"
         @tap="goDetail(item.id)"
       >
         <view class="article-list__title s-ellipsis-2">{{ item.title }}</view>
@@ -29,21 +29,24 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { onLoad, onPageScroll, onPullDownRefresh, onReachBottom } from '@dcloudio/uni-app';
-import { fetchArticlePage } from '@/modules/article/api/article.api';
+import { fetchArticlePage, fetchTagArticles } from '@/modules/article/api/article.api';
 import { useArticlePaging } from '@/modules/article/composables/useArticlePaging';
 
 const query = {
   categoryId: undefined as number | undefined,
+  tagId: undefined as number | undefined,
   orderBy: undefined as 'view_count' | 'create_time' | undefined
 };
 
 const { items, loading, finished, isEmpty, refresh, loadMore } = useArticlePaging((page, pageSize) =>
-  fetchArticlePage({
-    page,
-    pageSize,
-    categoryId: query.categoryId,
-    orderBy: query.orderBy
-  })
+  query.tagId
+    ? fetchTagArticles(query.tagId, page, pageSize)
+    : fetchArticlePage({
+        page,
+        pageSize,
+        categoryId: query.categoryId,
+        orderBy: query.orderBy
+      })
 );
 const backToTopVisible = ref(false);
 
@@ -59,6 +62,7 @@ function goDetail(id?: number): void {
 
 onLoad((options) => {
   query.categoryId = parseNumber(options?.categoryId);
+  query.tagId = parseNumber(options?.tagId);
   query.orderBy = options?.orderBy === 'view_count' ? 'view_count' : undefined;
   refresh();
 });

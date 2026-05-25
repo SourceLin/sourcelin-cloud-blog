@@ -13,7 +13,7 @@
     </view>
 
     <view v-if="userStore.isLoggedIn" class="messages__toolbar">
-      <view class="messages__toolbar-action" @tap="markAllReadAction">全部已读</view>
+      <view class="messages__toolbar-action sl-button sl-button--ghost sl-button--sm" @tap="markAllReadAction">全部已读</view>
     </view>
 
     <s-empty
@@ -22,7 +22,7 @@
       title="登录后查看消息"
       text="系统公告、互动提醒和后续的回复通知都会在这里汇总。"
     >
-      <button class="messages__login" @tap="goLogin">立即登录</button>
+      <button class="messages__login sl-button sl-button--primary" @tap="goLogin">立即登录</button>
     </s-empty>
 
     <s-empty
@@ -35,7 +35,7 @@
       <view
         v-for="item in items"
         :key="item.id"
-        class="messages__item s-card"
+        class="messages__item s-card s-card--interactive"
         :class="{ 'messages__item--unread': !item.isRead }"
         @tap="openDetail(item)"
       >
@@ -235,9 +235,7 @@ function openDetail(item: MessageItem): void {
   }
 
   &__toolbar-action {
-    color: $color-primary;
-    font-size: 24rpx;
-    font-weight: 600;
+    min-width: 132rpx;
   }
 
   &__list {

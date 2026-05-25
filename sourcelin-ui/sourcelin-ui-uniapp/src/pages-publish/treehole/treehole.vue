@@ -27,7 +27,7 @@
       <view class="publish-treehole__hint">{{ content.length }}/500</view>
     </view>
 
-    <button class="publish-treehole__submit" :disabled="submitting" @tap="submit">
+    <button class="publish-treehole__submit sl-button sl-button--primary" :disabled="submitting" @tap="submit">
       <s-inline-loading v-if="submitting" text="提交中" light />
       <text v-else>匿名投递</text>
     </button>

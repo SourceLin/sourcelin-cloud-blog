@@ -13,7 +13,7 @@
       title="登录后查看关注与粉丝"
       text="移动端与博客前台共用账号体系，登录后即可同步追更作者和粉丝来访记录。"
     >
-      <button class="follows__login" @tap="goLogin">立即登录</button>
+      <button class="follows__login sl-button sl-button--primary" @tap="goLogin">立即登录</button>
     </s-empty>
 
     <template v-else>
@@ -38,7 +38,7 @@
       />
 
       <view v-else class="follows__list">
-        <view v-for="item in items" :key="item.id" class="follows__item s-card" @tap="openUserHome(item)">
+        <view v-for="item in items" :key="item.id" class="follows__item s-card s-card--interactive" @tap="openUserHome(item)">
           <view class="follows__user">
             <image
               v-if="avatarUrl(resolveFollowUser(item)?.avatar)"

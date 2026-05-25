@@ -9,7 +9,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * 友链对象 b_friend_link
  *
  * @author sourcelin
- * @date 2023-11-18
+ * @date 2026-01-18
  */
 public class FriendLink extends BaseEntity {
     private static final long serialVersionUID = 1L;

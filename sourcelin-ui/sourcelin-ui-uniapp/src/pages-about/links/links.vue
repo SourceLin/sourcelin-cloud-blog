@@ -13,7 +13,7 @@
     />
 
     <view v-else class="links__list">
-      <view v-for="item in items" :key="item.id" class="links__item s-card" @tap="copyLink(item.url)">
+      <view v-for="item in items" :key="item.id" class="links__item s-card s-card--interactive" @tap="copyLink(item.url)">
         <view class="links__item-head">
           <image v-if="item.avatar" class="links__avatar" :src="normalizeAssetUrl(item.avatar)" mode="aspectFill" />
           <view v-else class="links__avatar links__avatar--placeholder">{{ item.name.slice(0, 1) }}</view>
@@ -43,7 +43,7 @@
       <view class="links__field links__field--textarea">
         <textarea v-model.trim="form.description" class="links__textarea" maxlength="255" auto-height placeholder="站点描述（可选）" />
       </view>
-      <button class="links__submit" :disabled="submitting" @tap="submitApply">
+      <button class="links__submit sl-button sl-button--primary" :disabled="submitting" @tap="submitApply">
         <s-inline-loading v-if="submitting" text="提交中" light />
         <text v-else>提交申请</text>
       </button>

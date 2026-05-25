@@ -25,14 +25,16 @@
         {{ article.summary }}
       </view>
 
-      <view class="detail__author s-card" @tap="openAuthorHome">
-        <view class="detail__author-info">
-          <view class="detail__author-name">{{ article.user?.nickname || article.author || '作者' }}</view>
-          <view class="detail__author-desc">
-            {{ article.user?.followerCount || 0 }} 关注者 · {{ article.user?.articleCount || 0 }} 篇文章
+      <view class="detail__author s-card">
+        <view class="detail__author-main" @tap="openAuthorHome">
+          <view class="detail__author-info">
+            <view class="detail__author-name">{{ article.user?.nickname || article.author || '作者' }}</view>
+            <view class="detail__author-desc">
+              {{ article.user?.followerCount || 0 }} 关注者 · {{ article.user?.articleCount || 0 }} 篇文章
+            </view>
           </view>
         </view>
-        <button class="detail__follow" size="mini" @tap.stop="toggleFollow">
+        <button class="detail__follow sl-button sl-button--primary sl-button--sm" size="mini" @tap.stop="toggleFollow">
           {{ article.isFollowed ? '已关注' : '关注' }}
         </button>
       </view>
@@ -48,7 +50,7 @@
           title="登录后查看完整内容"
           :text="article.unlockHint || '登录后查看完整内容，还可收藏回访。'"
         >
-          <button class="detail__unlock-button" @tap="goLogin">去登录</button>
+          <button class="detail__unlock-button sl-button sl-button--primary" @tap="goLogin">去登录</button>
         </s-empty>
       </view>
 
@@ -96,7 +98,7 @@
       <view class="detail__action" @tap="openCommentSheet">
         评论 {{ article.commentCount || 0 }}
       </view>
-      <button class="detail__share" open-type="share">分享</button>
+      <button class="detail__share sl-button sl-button--secondary" open-type="share">分享</button>
     </view>
 
     <s-back-to-top :visible="backToTopVisible" />
@@ -112,8 +114,8 @@
           auto-height
         />
         <view class="detail__sheet-actions">
-          <button class="detail__sheet-cancel" @tap="closeCommentSheet">取消</button>
-          <button class="detail__sheet-submit" :disabled="commentSubmitting" @tap="submitComment">
+          <button class="detail__sheet-cancel sl-button sl-button--secondary" @tap="closeCommentSheet">取消</button>
+          <button class="detail__sheet-submit sl-button sl-button--primary" :disabled="commentSubmitting" @tap="submitComment">
             <s-inline-loading v-if="commentSubmitting" text="发布中" light />
             <text v-else>发布</text>
           </button>
@@ -312,17 +314,6 @@ function persistReadingProgress(): void {
 async function tryRestoreReadingProgress(id: number): Promise<void> {
   const progress = getArticleReadingProgress(id);
   if (!progress || progress.scrollTop < 160) return;
-  const resume = await new Promise<boolean>((resolve) => {
-    uni.showModal({
-      title: '继续上次阅读',
-      content: `检测到你上次阅读到了约 ${Math.round(progress.scrollTop)}px 位置，是否恢复？`,
-      confirmText: '继续阅读',
-      cancelText: '从头开始',
-      success: (res) => resolve(!!res.confirm),
-      fail: () => resolve(false)
-    });
-  });
-  if (!resume) return;
   await nextTick();
   setTimeout(() => {
     uni.pageScrollTo({
@@ -449,6 +440,16 @@ onShareAppMessage(() => ({
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+
+  &__author-main {
+    flex: 1;
+    min-width: 0;
+    padding: 10rpx 0;
+  }
+
+  &__author-main:active {
+    transform: scale(0.985);
   }
 
   &__author-name {
@@ -601,6 +602,11 @@ onShareAppMessage(() => ({
       0 8rpx 20rpx rgba(59, 89, 255, 0.08);
   }
 
+  &__action:active,
+  &__share:active {
+    transform: scale(0.96);
+  }
+
   &__share {
     margin: 0;
     padding: 0;
@@ -657,6 +663,11 @@ onShareAppMessage(() => ({
     line-height: 84rpx;
     border-radius: 999rpx;
     font-size: 28rpx;
+  }
+
+  &__sheet-cancel:active,
+  &__sheet-submit:active {
+    transform: scale(0.98);
   }
 
   &__sheet-cancel {
