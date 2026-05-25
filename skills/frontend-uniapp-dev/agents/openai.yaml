@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sourcelin Uniapp 移动端开发"
+  short_description: "Uniapp 小程序页面、组件、API、登录态、pages.json 与跨端兼容开发"
+  default_prompt: "在 sourcelin-ui-uniapp 中新增或修改移动端页面、组件、API、状态、样式、pages.json 或 manifest 时使用本技能。"

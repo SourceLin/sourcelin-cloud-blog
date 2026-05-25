@@ -44,6 +44,11 @@ public class RemoteUserFallbackFactory implements FallbackFactory<RemoteUserServ
                 return R.fail("获取用户失败:" + throwable.getMessage());
             }
 
+            @Override
+            public R<LoginUser> getUserInfoByOpenId(String openId, String source) {
+                return R.fail("获取用户失败:" + throwable.getMessage());
+            }
+
         };
     }
 }

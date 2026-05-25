@@ -1,0 +1,67 @@
+{
+  "name": "Sourcelin",
+  "appid": "__UNI__SOURCELIN",
+  "description": "Sourcelin 博客客户端",
+  "versionName": "0.1.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "app-plus": {
+    "usingComponents": true,
+    "nvueStyleCompiler": "uni-app",
+    "compilerVersion": 3,
+    "splashscreen": {
+      "alwaysShowBeforeRender": true,
+      "waiting": true,
+      "autoclose": true,
+      "delay": 0
+    },
+    "modules": {},
+    "distribute": {
+      "android": {
+        "permissions": [
+          "<uses-permission android:name=\"android.permission.INTERNET\"/>"
+        ]
+      },
+      "ios": {},
+      "sdkConfigs": {}
+    }
+  },
+  "quickapp": {},
+  "mp-weixin": {
+    "appid": "wx65d3af978904a17c",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "minified": true,
+      "postcss": true
+    },
+    "usingComponents": true,
+    "lazyCodeLoading": "requiredComponents",
+    "libVersion": "3.5.0",
+    "permission": {
+      "scope.userLocation": {
+        "desc": "用于在发布说说时附加地理位置（可选）"
+      }
+    },
+    "requiredPrivateInfos": [],
+    "__usePrivacyCheck__": true
+  },
+  "h5": {
+    "title": "Sourcelin",
+    "router": {
+      "mode": "history",
+      "base": "/m/"
+    },
+    "devServer": {
+      "port": 5273,
+      "https": false
+    },
+    "async": {
+      "loading": "AsyncLoading",
+      "error": "AsyncError",
+      "delay": 200,
+      "timeout": 60000
+    }
+  },
+  "vueVersion": "3"
+}

@@ -3,6 +3,8 @@ package com.sourcelin.auth.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * 微信登录
  *
@@ -13,6 +15,7 @@ import lombok.Data;
 public class WeiXinLoginDTO {
 
     @Schema(description = "code", example = "dac071e4f2604729ac676ed4c782dc8d")
+    @NotBlank(message = "微信登录 code 不能为空")
     private String code;
 
     @Schema(description = "手机号", example = "13800138000")

@@ -1,0 +1,51 @@
+{
+  "name": "sourcelin-ui-uniapp",
+  "version": "0.1.0",
+  "description": "Sourcelin Blog Uniapp 客户端（微信小程序 + H5），Vue3 + TypeScript + Vite",
+  "private": true,
+  "scripts": {
+    "dev:mp-weixin": "uni -p mp-weixin",
+    "dev:h5": "uni",
+    "dev:app": "uni -p app",
+    "build:mp-weixin": "uni build -p mp-weixin",
+    "build:h5": "uni build",
+    "build:app": "uni build -p app",
+    "type-check": "vue-tsc --noEmit -p tsconfig.json",
+    "lint": "eslint . --ext .ts,.vue --max-warnings 0"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "3.0.0-alpha-5010120260519001",
+    "@dcloudio/uni-app-harmony": "3.0.0-alpha-5010120260519001",
+    "@dcloudio/uni-app-plus": "3.0.0-alpha-5010120260519001",
+    "@dcloudio/uni-components": "3.0.0-alpha-5010120260519001",
+    "@dcloudio/uni-h5": "3.0.0-alpha-5010120260519001",
+    "@dcloudio/uni-mp-weixin": "3.0.0-alpha-5010120260519001",
+    "@dcloudio/uni-ui": "^1.5.12",
+    "jsencrypt": "^3.5.4",
+    "pinia": "^2.2.6",
+    "vue": "^3.5.13",
+    "vue-i18n": "^9.14.2"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "^3.4.14",
+    "@dcloudio/uni-automator": "3.0.0-alpha-5010120260519001",
+    "@dcloudio/uni-cli-shared": "3.0.0-alpha-5010120260519001",
+    "@dcloudio/uni-stacktracey": "3.0.0-alpha-5010120260519001",
+    "@dcloudio/vite-plugin-uni": "3.0.0-alpha-5010120260519001",
+    "@eslint/js": "^9.39.4",
+    "@types/node": "^22.10.5",
+    "@vue/runtime-core": "^3.5.13",
+    "@vue/tsconfig": "^0.7.0",
+    "eslint": "^9.18.0",
+    "eslint-plugin-vue": "^10.9.1",
+    "sass": "^1.83.4",
+    "typescript": "~5.6.3",
+    "typescript-eslint": "^8.47.0",
+    "vite": "5.2.8",
+    "vue-eslint-parser": "^10.3.0",
+    "vue-tsc": "^2.1.10"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

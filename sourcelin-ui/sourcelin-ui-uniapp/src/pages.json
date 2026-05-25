@@ -1,0 +1,189 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
+      "^s-(.*)": "@/components/s-$1/s-$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/home/home",
+      "style": {
+        "navigationBarTitleText": "首页",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/discover/discover",
+      "style": {
+        "navigationBarTitleText": "发现"
+      }
+    },
+    {
+      "path": "pages/community/community",
+      "style": {
+        "navigationBarTitleText": "社区",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/mine/mine",
+      "style": {
+        "navigationBarTitleText": "我的"
+      }
+    },
+    {
+      "path": "pages-article/detail/detail",
+      "style": {
+        "navigationBarTitleText": "文章详情"
+      }
+    },
+    {
+      "path": "pages-article/list/list",
+      "style": {
+        "navigationBarTitleText": "文章列表",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages-article/search/search",
+      "style": {
+        "navigationBarTitleText": "搜索"
+      }
+    },
+    {
+      "path": "pages-user/login/login",
+      "style": {
+        "navigationBarTitleText": "登录"
+      }
+    },
+    {
+      "path": "pages-user/profile/profile",
+      "style": {
+        "navigationBarTitleText": "个人资料"
+      }
+    },
+    {
+      "path": "pages-user/collects/collects",
+      "style": {
+        "navigationBarTitleText": "我的收藏",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages-user/follows/follows",
+      "style": {
+        "navigationBarTitleText": "关注与粉丝",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages-user/articles/articles",
+      "style": {
+        "navigationBarTitleText": "我的文章",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages-user/home/home",
+      "style": {
+        "navigationBarTitleText": "用户主页"
+      }
+    },
+    {
+      "path": "pages-messages/index/index",
+      "style": {
+        "navigationBarTitleText": "消息中心",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages-messages/detail/detail",
+      "style": {
+        "navigationBarTitleText": "消息详情"
+      }
+    },
+    {
+      "path": "pages-about/index/index",
+      "style": {
+        "navigationBarTitleText": "关于本站"
+      }
+    },
+    {
+      "path": "pages-about/links/links",
+      "style": {
+        "navigationBarTitleText": "友情链接"
+      }
+    },
+    {
+      "path": "pages-about/navigation/navigation",
+      "style": {
+        "navigationBarTitleText": "网站导航"
+      }
+    },
+    {
+      "path": "pages-publish/say/say",
+      "style": {
+        "navigationBarTitleText": "发布说说"
+      }
+    },
+    {
+      "path": "pages-publish/treehole/treehole",
+      "style": {
+        "navigationBarTitleText": "树洞投递"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "Sourcelin",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F5F7FA",
+    "backgroundTextStyle": "dark",
+    "onReachBottomDistance": 80,
+    "pageOrientation": "portrait"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#1F6FEB",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "static/tabbar/home.png",
+        "selectedIconPath": "static/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/discover/discover",
+        "text": "发现",
+        "iconPath": "static/tabbar/discover.png",
+        "selectedIconPath": "static/tabbar/discover-active.png"
+      },
+      {
+        "pagePath": "pages/community/community",
+        "text": "社区",
+        "iconPath": "static/tabbar/community.png",
+        "selectedIconPath": "static/tabbar/community-active.png"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的",
+        "iconPath": "static/tabbar/mine.png",
+        "selectedIconPath": "static/tabbar/mine-active.png"
+      }
+    ]
+  },
+  "condition": {
+    "current": 0,
+    "list": [
+      {
+        "name": "首页",
+        "path": "pages/home/home",
+        "query": ""
+      }
+    ]
+  }
+}

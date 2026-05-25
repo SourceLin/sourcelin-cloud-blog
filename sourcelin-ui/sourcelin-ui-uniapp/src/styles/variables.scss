@@ -1,0 +1,86 @@
+/* src/styles/variables.scss
+ * 业务样式变量与全局 mixin
+ * 通过 vite.config.ts 自动注入到所有 SCSS 文件
+ */
+
+/* 颜色 token */
+$color-bg: #F8FAFC;
+$color-bg-elevated: #ffffff;
+$color-text: #1f2329;
+$color-text-secondary: #4e5969;
+$color-text-tertiary: #86909c;
+$color-border: rgba(255, 255, 255, 0.72);
+$color-primary: #3B59FF;
+$color-primary-soft: #8F70FF;
+$color-primary-hover: #8F70FF;
+$color-danger: #f53f3f;
+$color-success: #00b42a;
+
+/* 液态玻璃核心设计令牌 */
+$glass-radius-main: 24rpx;
+$glass-radius-card: 32rpx;
+$glass-radius-pill: 100rpx;
+$glass-border-pure: 1rpx solid rgba(255, 255, 255, 0.72);
+$glass-border-sub: 1rpx solid rgba(255, 255, 255, 0.32);
+
+$glass-shadow: 0 8rpx 32rpx -4rpx rgba(31, 38, 135, 0.04);
+$glass-shadow-active: 0 16rpx 48rpx -2rpx rgba(59, 89, 255, 0.12);
+
+/* 液态玻璃半透明面板混合宏 */
+@mixin sl-glass-panel($opacity: 0.65, $blur: 16rpx) {
+  position: relative;
+  background: rgba(255, 255, 255, $opacity);
+  border-radius: $glass-radius-main;
+  box-shadow: $glass-shadow;
+  border: $glass-border-pure;
+  
+  /* #ifdef H5 || APP-PLUS */
+  backdrop-filter: blur($blur) saturate(1.2);
+  -webkit-backdrop-filter: blur($blur) saturate(1.2);
+  /* #endif */
+}
+
+/* 间距 token */
+$space-xs: 8rpx;
+$space-sm: 16rpx;
+$space-md: 24rpx;
+$space-lg: 32rpx;
+$space-xl: 48rpx;
+
+/* 圆角 */
+$radius-sm: 8rpx;
+$radius-md: 16rpx;
+$radius-lg: 24rpx;
+
+/* 阴影 */
+$shadow-card: 0 4rpx 16rpx rgba(31, 35, 41, 0.06);
+
+/* 文本省略 mixin */
+@mixin ellipsis() {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin ellipsis-multi($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 1px 边框，注意小程序不支持伪类 hairline 时需降级 */
+@mixin hairline-bottom($color: $color-border) {
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background-color: $color;
+    transform: scaleY(0.5);
+    transform-origin: 0 100%;
+  }
+}

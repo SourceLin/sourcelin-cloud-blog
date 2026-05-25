@@ -15,7 +15,7 @@ import java.util.List;
  * 用户信息Service业务层处理
  * 
  * @author sourcelin
- * @date 2023-11-02
+ * @date 2026-01-02
  */
 @Service
 public class UserServiceImpl implements IUserService 
@@ -131,5 +131,11 @@ public class UserServiceImpl implements IUserService
     public User selectUserByEmail(String email)
     {
         return userMapper.selectUserByEmail(email);
+    }
+
+    @Override
+    public User selectUserByOpenId(String openId)
+    {
+        return userMapper.selectUserByOpenId(openId);
     }
 }
