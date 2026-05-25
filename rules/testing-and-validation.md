@@ -27,20 +27,28 @@
 - MUST NOT：保留旧字段 fallback，例如 `items ?? list`、`items ?? rows`、`items ?? records`。
 - CHECK：后端执行受影响模块编译或单测；前端执行对应类型检查。
 
-## 4. 博客前台验证
-
-- MUST：TypeScript 或 Vue 改动执行 `npm run typecheck`。
-- MUST：样式、组件、页面或设计系统边界改动执行 `npm run style:guard`。
-- MUST：路由、模块边界、页面拆分或架构规则改动执行 `npm run test:architecture`。
-- CHECK：所有命令退出码为 0。
-
-## 5. 管理后台验证
-
-- MUST：TypeScript、Vue、API 或页面改动执行 `pnpm run type-check`。
-- MUST：样式、格式、组件或页面改动执行 `pnpm run lint`。
-- CHECK：所有命令退出码为 0。
-
-## 6. 规则与技能验证
+## 4. 博客前台验证
+
+- MUST：TypeScript 或 Vue 改动执行 `npm run typecheck`。
+- MUST：样式、组件、页面或设计系统边界改动执行 `npm run style:guard`。
+- MUST：路由、模块边界、页面拆分或架构规则改动执行 `npm run test:architecture`。
+- CHECK：所有命令退出码为 0。
+
+## 5. Uniapp 移动端验证
+
+- MUST：TypeScript、Vue、API、store 或页面改动执行 `npm run type-check`。
+- MUST：样式、组件、页面、`pages.json`、`manifest.json` 或静态资源改动执行 `npm run lint`。
+- MUST：页面、路由、Tab、分包、小程序权限、manifest 或跨端兼容改动执行 `npm run build:mp-weixin`。
+- MUST：涉及 H5 输出或 H5 兼容改动执行 `npm run build:h5`。
+- CHECK：所有命令退出码为 0；小程序构建后检查 `dist/build/mp-weixin/app.json` 中页面、Tab 和分包配置。
+
+## 6. 管理后台验证
+
+- MUST：TypeScript、Vue、API 或页面改动执行 `pnpm run type-check`。
+- MUST：样式、格式、组件或页面改动执行 `pnpm run lint`。
+- CHECK：所有命令退出码为 0。
+
+## 7. 规则与技能验证
 
 - MUST：`rules/`、`skills/` 或 `AGENTS.md` 改动后，检查引用路径均在开源分支真实存在。
 - MUST：数据库初始化脚本改动后，导入空库验证表结构和必要初始化数据。

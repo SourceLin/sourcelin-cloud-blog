@@ -4,8 +4,9 @@
 
 ## 技能列表
 
-- `frontend-platform-dev`：博客前台页面、组件、API、composable、设计系统边界开发。
-- `frontend-admin-dev`：管理后台页面、API、表格分页、权限和模块化组件开发。
+- `frontend-platform-dev`：博客前台页面、组件、API、composable、设计系统边界开发。
+- `frontend-uniapp-dev`：Uniapp 移动端页面、组件、API、登录态、pages.json、manifest 和跨端兼容开发。
+- `frontend-admin-dev`：管理后台页面、API、表格分页、权限和模块化组件开发。
 - `backend-dev`：后端 Controller、Service、Mapper、DTO/VO、异常和公共能力开发。
 - `api-contract-governance`：统一响应体、分页、错误码、前后端消费和运行态验证治理。
 - `architecture-refactor`：跨端目录整理、组件拆分、模块边界、规则和文档同步重构。

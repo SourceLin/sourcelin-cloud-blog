@@ -6,8 +6,9 @@
 
 - `api-contract.md`：对外 REST 响应体、分页、错误码、前端消费和旧协议禁用规则。
 - `backend.md`：后端模块、Controller、Service、Mapper、DTO/VO、异常和公共能力规则。
-- `frontend-platform.md`：博客前台 Vue3 + TypeScript + Naive UI 抽象层规则。
-- `frontend-admin.md`：管理后台 Vue3 + TypeScript + Element Plus 规则。
+- `frontend-platform.md`：博客前台 Vue3 + TypeScript + Naive UI 抽象层规则。
+- `frontend-uniapp.md`：Uniapp 移动端小程序页面、API、路由、Liquid Glass Mobile 和跨端兼容规则。
+- `frontend-admin.md`：管理后台 Vue3 + TypeScript + Element Plus 规则。
 - `coding-conventions.md`：命名、编码、注释、安全配置、产物管理等跨端通用规则。
 - `testing-and-validation.md`：后端、前台、后台、API 契约和规则变更验证要求。
 
@@ -23,8 +24,9 @@
 ## 使用方式
 
 - 后端开发：读取 `api-contract.md`、`backend.md`、`coding-conventions.md`、`testing-and-validation.md`。
-- 博客前台开发：读取 `api-contract.md`、`frontend-platform.md`、`coding-conventions.md`、`testing-and-validation.md`，并联查 `sourcelin-ui/sourcelin-ui-platform/AGENTS.md`。
-- 管理后台开发：读取 `api-contract.md`、`frontend-admin.md`、`coding-conventions.md`、`testing-and-validation.md`。
+- 博客前台开发：读取 `api-contract.md`、`frontend-platform.md`、`coding-conventions.md`、`testing-and-validation.md`，并联查 `sourcelin-ui/sourcelin-ui-platform/AGENTS.md`。
+- Uniapp 移动端开发：读取 `api-contract.md`、`frontend-uniapp.md`、`coding-conventions.md`、`testing-and-validation.md`，并联查 `sourcelin-ui/sourcelin-ui-uniapp/AGENTS.md`。
+- 管理后台开发：读取 `api-contract.md`、`frontend-admin.md`、`coding-conventions.md`、`testing-and-validation.md`。
 - API 契约治理：读取 `api-contract.md` 和 `testing-and-validation.md`。
 - 架构重构：读取全部规则，按影响范围执行 Maven、npm 或 pnpm 验证。
 

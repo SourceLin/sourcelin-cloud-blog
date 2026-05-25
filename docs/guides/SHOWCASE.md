@@ -39,7 +39,7 @@
 
 | 名称 | 地址 | 场景 | 说明 |
 |------|------|------|------|
-| Sourcelin Blog 官方演示 | [http://sourcelin.cn/](http://sourcelin.cn/) | 官方演示 | 用于展示当前公开版本的前后台能力 |
+| Sourcelin Blog 官方演示 | [https://sourcelin.cn/](https://sourcelin.cn/) | 官方演示 | 用于展示当前公开版本的前后台能力 |
 
 ### 社区案例
 

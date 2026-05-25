@@ -19,7 +19,7 @@
 
 
 <p align="center">
-  <a href="http://sourcelin.cn/">在线演示</a> |
+  <a href="https://sourcelin.cn/">在线演示</a> |
   <a href="./docs/DOCS_INDEX.md">文档导航</a> |
   <a href="./docs/guides/QUICK_START.md">快速启动</a> |
   <a href="./docker-compose.example.yml">Compose 示例</a> |
@@ -282,7 +282,7 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 
 如果你只是想先判断项目是否值得用，建议按下面顺序：
 
-1. 打开 [在线演示](http://sourcelin.cn/)
+1. 打开 [在线演示](https://sourcelin.cn/)
 2. 查看上面的界面截图，确认前后台形态
 3. 阅读 [`AGENTS.md`](./AGENTS.md)、[`rules/`](./rules/README.md)、[`skills/`](./skills/README.md)，判断这套 Codex 主导沉淀出来的 AI Coding / vibe coding 工作流是否适合你的协作方式
 4. 再决定本地启动还是 Docker 部署
@@ -409,7 +409,6 @@ sourcelin-cloud-blog/
 ├── sourcelin-ui/
 │   ├── sourcelin-ui-platform/             # 博客前台
 │   ├── sourcelin-ui-admin/                # 管理后台
-│   └── sourcelin-ui-admin-vue2/           # 旧版迁移对照
 ├── docs/                                  # 项目文档
 ├── rules/                                 # 仓库规则
 ├── skills/                                # AI 协作技能
