@@ -13,10 +13,12 @@ export interface ArticleSummary {
   summary?: string;
   content?: string;
   readAuth?: number;
+  status?: number;
   isComment?: number;
   isRecommend?: number;
   isTop?: number;
   isOriginal?: number;
+  originalUrl?: string;
   viewCount?: number;
   likeCount?: number;
   collectCount?: number;
@@ -34,6 +36,8 @@ export interface ArticleSummary {
 }
 
 export interface ArticleDetail extends ArticleSummary {
+  avatarFileId?: number;
+  tags?: TagItem[];
   readFull?: boolean;
   needLogin?: boolean;
   unlockHint?: string;

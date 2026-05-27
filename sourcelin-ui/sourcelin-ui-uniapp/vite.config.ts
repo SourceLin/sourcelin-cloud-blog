@@ -58,6 +58,14 @@ export default defineConfig({
       }
     }
   },
+  server: {
+    proxy: {
+      '/blog-api': {
+        target: 'https://sourcelin.cn',
+        changeOrigin: true
+      }
+    }
+  },
   build: {
     target: 'es2017',
     minify: 'terser',

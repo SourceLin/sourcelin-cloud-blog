@@ -4,15 +4,15 @@
  */
 
 /* 颜色 token */
-$color-bg: #F8FAFC;
-$color-bg-elevated: #ffffff;
-$color-text: #1f2329;
-$color-text-secondary: #4e5969;
-$color-text-tertiary: #86909c;
-$color-border: rgba(255, 255, 255, 0.72);
-$color-primary: #3B59FF;
-$color-primary-soft: #8F70FF;
-$color-primary-hover: #8F70FF;
+$color-bg: var(--sl-page-bg, #F8FAFC);
+$color-bg-elevated: var(--sl-bg-glass-pure, #ffffff);
+$color-text: var(--sl-text-main, #1f2329);
+$color-text-secondary: var(--sl-text-sub, #4e5969);
+$color-text-tertiary: var(--sl-text-muted, #86909c);
+$color-border: var(--sl-border-glass, rgba(255, 255, 255, 0.72));
+$color-primary: var(--sl-color-primary, #3B59FF);
+$color-primary-soft: var(--sl-color-primary-soft, #8F70FF);
+$color-primary-hover: var(--sl-color-primary-soft, #8F70FF);
 $color-danger: #f53f3f;
 $color-success: #00b42a;
 

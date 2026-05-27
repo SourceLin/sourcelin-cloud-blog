@@ -1,5 +1,5 @@
 <template>
-  <view class="publish-say s-container">
+  <view class="publish-say s-container" :class="themeStore.themeClass">
     <view class="publish-say__header s-card">
       <view class="publish-say__title">发布说说</view>
       <view class="publish-say__desc">支持轻量文字与多图发布，适合记录即时灵感、近况与现场感。</view>
@@ -51,12 +51,14 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { onLoad, onUnload } from '@dcloudio/uni-app';
+import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
 import { createSay } from '@/modules/community/api/community.api';
 import { markCommunityRefresh } from '@/modules/community/utils/publish';
 import { uploadPublicFile } from '@/shared/api/file.api';
 import { useUserStore } from '@/stores/user';
+import { useThemeStore } from '@/stores/theme';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
+import { pickImagePaths } from '@/utils/media';
 import { getStorage, removeStorage, setStorage } from '@/utils/storage';
 
 const DRAFT_KEY = 'publish.say.draft';
@@ -72,9 +74,14 @@ interface SelectedImage {
 }
 
 const userStore = useUserStore();
+const themeStore = useThemeStore();
 const content = ref('');
 const submitting = ref(false);
 const images = ref<SelectedImage[]>([]);
+
+onShow(() => {
+  themeStore.syncNativeArea();
+});
 
 onLoad(() => {
   if (!userStore.isLoggedIn) {
@@ -107,31 +114,23 @@ function persistDraft(): void {
   }, 3600);
 }
 
-function chooseImages(): void {
+async function chooseImages(): Promise<void> {
   const remainCount = MAX_IMAGE_COUNT - images.value.length;
   if (remainCount <= 0) return;
-  uni.chooseImage({
+  const paths = await pickImagePaths({
     count: remainCount,
     sizeType: ['compressed'],
-    sourceType: ['album', 'camera'],
-    success: (res) => {
-      const rawPaths = Array.isArray(res.tempFilePaths)
-        ? res.tempFilePaths
-        : res.tempFilePaths
-          ? [res.tempFilePaths]
-          : [];
-      const paths = rawPaths.filter((path): path is string => Boolean(path));
-      if (!paths.length) return;
-      const next = [...images.value];
-      paths.forEach((path) => {
-        if (next.length < MAX_IMAGE_COUNT) {
-          next.push({ path });
-        }
-      });
-      images.value = next;
-      persistDraft();
+    sourceType: ['album', 'camera']
+  });
+  if (!paths.length) return;
+  const next = [...images.value];
+  paths.forEach((path) => {
+    if (next.length < MAX_IMAGE_COUNT) {
+      next.push({ path });
     }
   });
+  images.value = next;
+  persistDraft();
 }
 
 function removeImage(index: number): void {
@@ -254,8 +253,8 @@ async function submit(): Promise<void> {
     height: 180rpx;
     border-radius: 24rpx;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.56);
-    border: 1rpx solid rgba(255, 255, 255, 0.78);
+    background: var(--sl-control-bg);
+    border: 1rpx solid var(--sl-control-border);
   }
 
   &__media-image {

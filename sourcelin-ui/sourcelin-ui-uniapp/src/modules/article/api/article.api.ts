@@ -2,8 +2,8 @@ import { http } from '@/utils/request';
 import type { PageResult } from '@/shared/types/api';
 import type {
   ArticleDetail,
-  ArticlePageQuery,
   ArticleSummary,
+  ArticlePageQuery,
   CategoryItem,
   FrontHome,
   HomePageQuery,
@@ -30,6 +30,47 @@ export function fetchArticlePage(query: ArticlePageQuery = {}): Promise<PageResu
 
 export function fetchArticleDetail(id: number | string): Promise<ArticleDetail> {
   return http.get<ArticleDetail>(`/front/articles/${id}`);
+}
+
+export function createArticle(payload: {
+  title: string;
+  summary?: string;
+  content: string;
+  categoryId?: number;
+  tagIds?: number[];
+  avatar?: string;
+  avatarFileId?: number;
+  readAuth?: number;
+  status?: number;
+  isComment?: number;
+  isOriginal?: number;
+  originalUrl?: string;
+}): Promise<number> {
+  return http.post<number>('/front/articles', payload);
+}
+
+export function updateArticle(
+  id: number | string,
+  payload: {
+    title: string;
+    summary?: string;
+    content: string;
+    categoryId?: number;
+    tagIds?: number[];
+    avatar?: string;
+    avatarFileId?: number;
+    readAuth?: number;
+    status?: number;
+    isComment?: number;
+    isOriginal?: number;
+    originalUrl?: string;
+  }
+): Promise<void> {
+  return http.put<void>(`/front/articles/${id}`, payload);
+}
+
+export function deleteArticle(id: number | string): Promise<void> {
+  return http.delete<void>(`/front/articles/${id}`);
 }
 
 export function searchArticles(

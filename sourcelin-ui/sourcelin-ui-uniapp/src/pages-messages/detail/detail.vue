@@ -1,5 +1,5 @@
 <template>
-  <view class="message-detail s-container">
+  <view class="message-detail s-container" :class="themeStore.themeClass">
     <s-loading :visible="loading" text="正在加载消息..." />
     <s-empty
       v-if="!loading && !detail"
@@ -21,15 +21,21 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import { fetchMessageDetail, markMessageRead } from '@/modules/message/api/message.api';
 import type { MessageItem } from '@/modules/message/types/message';
 import { useUserStore } from '@/stores/user';
+import { useThemeStore } from '@/stores/theme';
 import { showInfoToast } from '@/utils/feedback';
 
 const userStore = useUserStore();
+const themeStore = useThemeStore();
 const detail = ref<MessageItem | null>(null);
 const loading = ref(false);
+
+onShow(() => {
+  themeStore.syncNativeArea();
+});
 
 onLoad((options) => {
   if (!userStore.isLoggedIn) {

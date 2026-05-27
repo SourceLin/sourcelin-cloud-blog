@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.ContentReportMapper">
+
+    <insert id="insertContentReport" parameterType="com.sourcelin.blog.domain.ContentReport" useGeneratedKeys="true" keyProperty="id">
+        insert into blog_content_report
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            target_type,
+            target_id,
+            reason,
+            detail,
+            page_path,
+            status,
+            client_ip,
+            user_agent,
+            create_time,
+            update_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            #{targetType},
+            #{targetId},
+            #{reason},
+            #{detail},
+            #{pagePath},
+            #{status},
+            #{clientIp},
+            #{userAgent},
+            #{createTime},
+            #{updateTime}
+        </trim>
+    </insert>
+
+</mapper>

@@ -1,5 +1,5 @@
 <template>
-  <view class="article-list s-container">
+  <view class="article-list s-container" :class="themeStore.themeClass">
     <s-loading :visible="loading && items.length === 0" />
     <s-empty v-if="isEmpty" text="暂无文章" />
 
@@ -28,9 +28,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { onLoad, onPageScroll, onPullDownRefresh, onReachBottom } from '@dcloudio/uni-app';
+import { onLoad, onPageScroll, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app';
 import { fetchArticlePage, fetchTagArticles } from '@/modules/article/api/article.api';
 import { useArticlePaging } from '@/modules/article/composables/useArticlePaging';
+import { useThemeStore } from '@/stores/theme';
 
 const query = {
   categoryId: undefined as number | undefined,
@@ -49,6 +50,7 @@ const { items, loading, finished, isEmpty, refresh, loadMore } = useArticlePagin
       })
 );
 const backToTopVisible = ref(false);
+const themeStore = useThemeStore();
 
 function parseNumber(value: unknown): number | undefined {
   const n = Number(value);
@@ -65,6 +67,10 @@ onLoad((options) => {
   query.tagId = parseNumber(options?.tagId);
   query.orderBy = options?.orderBy === 'view_count' ? 'view_count' : undefined;
   refresh();
+});
+
+onShow(() => {
+  themeStore.syncNativeArea();
 });
 
 onPullDownRefresh(() => {

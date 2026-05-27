@@ -1,5 +1,5 @@
 <template>
-  <view class="messages s-container">
+  <view class="messages s-container" :class="themeStore.themeClass">
     <s-loading :visible="loading && items.length === 0" text="正在同步消息..." />
     <view class="messages__header s-card">
       <view>
@@ -63,9 +63,11 @@ import {
 } from '@/modules/message/api/message.api';
 import type { MessageItem } from '@/modules/message/types/message';
 import { useUserStore } from '@/stores/user';
+import { useThemeStore } from '@/stores/theme';
 import { showSuccessToast } from '@/utils/feedback';
 
 const userStore = useUserStore();
+const themeStore = useThemeStore();
 const items = ref<MessageItem[]>([]);
 const loading = ref(false);
 const finished = ref(false);
@@ -80,6 +82,7 @@ onLoad(() => {
 });
 
 onShow(() => {
+  themeStore.syncNativeArea();
   if (!userStore.isLoggedIn) {
     items.value = [];
     unreadCount.value = 0;

@@ -1,5 +1,5 @@
 <template>
-  <view class="user-home s-container">
+  <view class="user-home s-container" :class="themeStore.themeClass">
     <s-loading :visible="loading && !user" text="正在同步作者主页..." />
     <s-empty
       v-if="!loading && !user"
@@ -73,11 +73,12 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import { fetchUserArticlePage, fetchUserDetail, fetchUserFollowerPage, fetchUserFollowingPage } from '@/modules/user/api/user.api';
 import type { FrontUserInfo } from '@/modules/user/types/user';
 import type { ArticleSummary } from '@/modules/article/types/article';
 import type { FollowItem } from '@/modules/interaction/types/interaction';
+import { useThemeStore } from '@/stores/theme';
 import { normalizeAssetUrl } from '@/utils/url';
 
 type TabKey = 'articles' | 'followers' | 'followings';
@@ -89,6 +90,7 @@ const tabs: Array<{ key: TabKey; label: string }> = [
 ];
 
 const loading = ref(false);
+const themeStore = useThemeStore();
 const userId = ref(0);
 const user = ref<FrontUserInfo | null>(null);
 const activeTab = ref<TabKey>('articles');
@@ -103,6 +105,10 @@ const activeItems = computed(() => {
   return activeTab.value === 'followers' ? followers.value : followings.value;
 });
 const activeFollowItems = computed(() => activeTab.value === 'followers' ? followers.value : followings.value);
+
+onShow(() => {
+  themeStore.syncNativeArea();
+});
 
 onLoad((options) => {
   const id = Number(options?.id);
@@ -211,7 +217,7 @@ function openRelatedUser(item: FollowItem): void {
     flex: 1;
     padding: 18rpx 0;
     border-radius: 24rpx;
-    background: rgba(255, 255, 255, 0.42);
+    background: var(--sl-bg-glass-tint);
   }
 
   &__stat-value {
@@ -241,7 +247,7 @@ function openRelatedUser(item: FollowItem): void {
     min-width: 120rpx;
     padding: 16rpx 24rpx;
     border-radius: 999rpx;
-    background: rgba(255, 255, 255, 0.56);
+    background: var(--sl-control-bg);
     color: $color-text-secondary;
     text-align: center;
     font-size: 24rpx;

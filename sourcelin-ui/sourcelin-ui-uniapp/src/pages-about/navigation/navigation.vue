@@ -1,5 +1,5 @@
 <template>
-  <view class="navigation s-container">
+  <view class="navigation s-container" :class="themeStore.themeClass">
     <view class="navigation__bar s-card">
       <input
         v-model.trim="keyword"
@@ -50,16 +50,22 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import { fetchNavigationList, reportNavigationClick } from '@/modules/site/api/site.api';
 import type { NavigationItem } from '@/modules/site/types/site';
 import { showSuccessToast } from '@/utils/feedback';
+import { useThemeStore } from '@/stores/theme';
 
+const themeStore = useThemeStore();
 const loading = ref(false);
 const items = ref<NavigationItem[]>([]);
 const allItems = ref<NavigationItem[]>([]);
 const keyword = ref('');
 const activeCategory = ref('全部');
+
+onShow(() => {
+  themeStore.syncNativeArea();
+});
 
 const categories = computed(() => [
   '全部',
@@ -134,7 +140,7 @@ async function openNavigation(item: NavigationItem): Promise<void> {
     min-height: 72rpx;
     padding: 0 $space-md;
     border-radius: 999rpx;
-    background: rgba(255, 255, 255, 0.62);
+    background: var(--sl-control-bg);
     font-size: 26rpx;
   }
 
@@ -157,7 +163,7 @@ async function openNavigation(item: NavigationItem): Promise<void> {
     min-width: 120rpx;
     padding: 16rpx 24rpx;
     border-radius: 999rpx;
-    background: rgba(255, 255, 255, 0.56);
+    background: var(--sl-control-bg);
     color: $color-text-secondary;
     text-align: center;
     font-size: 24rpx;

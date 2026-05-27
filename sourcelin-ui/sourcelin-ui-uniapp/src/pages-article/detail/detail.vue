@@ -1,5 +1,5 @@
 <template>
-  <view class="detail s-container">
+  <view class="detail s-container" :class="[themeStore.themeClass]">
     <s-loading :visible="loading" text="正在同步灵感..." />
 
     <s-empty
@@ -12,7 +12,15 @@
       <image v-if="coverUrl" class="detail__cover" :src="coverUrl" mode="aspectFill" />
 
       <view class="detail__header s-card">
-        <view class="detail__category">{{ article.categoryName || '文章' }}</view>
+        <view class="detail__header-top">
+          <view class="detail__category">{{ article.categoryName || '文章' }}</view>
+          <view class="detail__header-actions">
+            <view class="detail__header-action" @tap="themeSheetVisible = true">
+              外观
+            </view>
+            <view class="detail__header-action" @tap="reportArticleAction">举报</view>
+          </view>
+        </view>
         <view class="detail__title">{{ article.title }}</view>
         <view class="detail__meta">
           <text>{{ article.author || article.user?.nickname || 'Sourcelin' }}</text>
@@ -86,6 +94,8 @@
           text="正在加载评论..."
         />
       </view>
+
+      <view class="detail__bottom-spacer" />
     </view>
 
     <view v-if="article" class="detail__action-bar">
@@ -102,6 +112,8 @@
     </view>
 
     <s-back-to-top :visible="backToTopVisible" />
+
+    <s-theme-sheet :visible="themeSheetVisible" @close="themeSheetVisible = false" />
 
     <view v-if="commentSheetVisible" class="detail__sheet-mask" @tap="closeCommentSheet">
       <view class="detail__sheet" @tap.stop>
@@ -127,7 +139,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue';
-import { onHide, onLoad, onPageScroll, onShareAppMessage, onUnload } from '@dcloudio/uni-app';
+import { onHide, onLoad, onPageScroll, onShareAppMessage, onShow, onUnload } from '@dcloudio/uni-app';
 import { fetchArticleDetail, reportArticleView } from '@/modules/article/api/article.api';
 import type { ArticleDetail } from '@/modules/article/types/article';
 import {
@@ -138,12 +150,16 @@ import {
 import { fetchComments, createComment } from '@/modules/comment/api/comment.api';
 import type { CommentItem } from '@/modules/comment/types/comment';
 import { collectTarget, followUser, likeTarget, uncollectTarget, unfollowById, unlikeTarget } from '@/modules/interaction/api/interaction.api';
+import { createContentReport } from '@/modules/report/api/report.api';
+import { reportAnalyticsEvent, trackArticleInterest } from '@/shared/utils/analytics';
 import { useUserStore } from '@/stores/user';
+import { useThemeStore } from '@/stores/theme';
 import { AUTH_LOGIN_SUCCESS_EVENT, type LoginSuccessEventDetail } from '@/utils/auth';
 import { showInfoToast } from '@/utils/feedback';
 import { normalizeAssetUrl } from '@/utils/url';
 
 const userStore = useUserStore();
+const themeStore = useThemeStore();
 const backToTopVisible = ref(false);
 const articleId = ref(0);
 const article = ref<ArticleDetail | null>(null);
@@ -155,6 +171,7 @@ const commentContent = ref('');
 const commentSubmitting = ref(false);
 const currentScrollTop = ref(0);
 const enterTimestamp = ref(0);
+const themeSheetVisible = ref(false);
 
 const coverUrl = computed(() => normalizeAssetUrl(article.value?.avatar));
 
@@ -168,6 +185,17 @@ async function loadDetail(id: number): Promise<void> {
   try {
     article.value = await fetchArticleDetail(id);
     reportArticleView(id);
+    trackArticleInterest(article.value);
+    void reportAnalyticsEvent({
+      eventType: 'article_view',
+      pagePath: '/pages-article/detail/detail',
+      targetType: 'article',
+      targetId: id,
+      metadata: {
+        categoryId: article.value.categoryId,
+        readAuth: article.value.readAuth
+      }
+    });
     loadComments(id);
     await tryRestoreReadingProgress(id);
   } finally {
@@ -262,10 +290,45 @@ async function submitComment(): Promise<void> {
     commentSheetVisible.value = false;
     article.value.commentCount = (article.value.commentCount || 0) + 1;
     await loadComments(article.value.id);
+    void reportAnalyticsEvent({
+      eventType: 'article_comment_submit',
+      pagePath: '/pages-article/detail/detail',
+      targetType: 'article',
+      targetId: article.value.id
+    });
     showInfoToast('评论已提交');
   } finally {
     commentSubmitting.value = false;
   }
+}
+
+
+
+async function reportArticleAction(): Promise<void> {
+  if (!article.value?.id) return;
+  const reasons = ['广告营销', '不当内容', '侵权抄袭', '其他'];
+  const selected = await new Promise<number>((resolve) => {
+    uni.showActionSheet({
+      itemList: reasons,
+      success: (res) => resolve(res.tapIndex),
+      fail: () => resolve(-1)
+    });
+  });
+  if (selected < 0) return;
+  await createContentReport({
+    targetType: 'article',
+    targetId: article.value.id,
+    reason: reasons[selected],
+    pagePath: '/pages-article/detail/detail'
+  });
+  void reportAnalyticsEvent({
+    eventType: 'article_report_submit',
+    pagePath: '/pages-article/detail/detail',
+    targetType: 'article',
+    targetId: article.value.id,
+    metadata: { reason: reasons[selected] }
+  });
+  showInfoToast('举报已提交，我们会尽快核查');
 }
 
 function goLogin(): void {
@@ -332,6 +395,10 @@ onLoad((options) => {
   enterTimestamp.value = Date.now();
   uni.$on(AUTH_LOGIN_SUCCESS_EVENT, handleLoginSuccess);
   loadDetail(id);
+});
+
+onShow(() => {
+  themeStore.syncNativeArea();
 });
 
 onHide(() => {
@@ -404,6 +471,31 @@ onShareAppMessage(() => ({
     margin-bottom: $space-xs;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+  }
+
+  &__header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16rpx;
+  }
+
+  &__header-actions {
+    display: inline-flex;
+    gap: 10rpx;
+    flex-shrink: 0;
+  }
+
+  &__header-action {
+    min-height: 46rpx;
+    padding: 0 16rpx;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999rpx;
+    background: var(--sl-control-bg);
+    color: $color-text-secondary;
+    font-size: 22rpx;
+    font-weight: 700;
   }
 
   &__title {
@@ -575,6 +667,10 @@ onShareAppMessage(() => ({
     /* #endif */
   }
 
+  &__bottom-spacer {
+    height: 24rpx;
+  }
+
   &__action,
   &__share {
     flex: 1;
@@ -586,9 +682,9 @@ onShareAppMessage(() => ({
     color: var(--sl-text-sub);
     font-size: 24rpx;
     font-weight: 700;
-    background: rgba(255, 255, 255, 0.6);
-    border: 1rpx solid rgba(255, 255, 255, 0.8);
-    transition: all 0.2s ease;
+    background: var(--sl-control-bg);
+    border: 1rpx solid var(--sl-control-border);
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
   }
 
   &__action--active {
@@ -672,7 +768,7 @@ onShareAppMessage(() => ({
 
   &__sheet-cancel {
     color: var(--sl-text-sub);
-    background: rgba(255, 255, 255, 0.72);
+    background: var(--sl-control-bg);
     border: 1rpx solid rgba(229, 231, 235, 0.9);
   }
 
@@ -680,6 +776,75 @@ onShareAppMessage(() => ({
     background: linear-gradient(135deg, var(--sl-color-primary), var(--sl-color-primary-soft));
     color: #fff;
     box-shadow: 0 14rpx 32rpx rgba(59, 89, 255, 0.2);
+  }
+}
+
+.sl-theme--dark {
+  background:
+    radial-gradient(circle at -20% 12%, rgba(89, 115, 255, 0.09), rgba(12, 18, 31, 0) 40%),
+    radial-gradient(circle at 120% 32%, rgba(143, 112, 255, 0.08), rgba(12, 18, 31, 0) 42%),
+    #080d18;
+
+  .s-card {
+    background:
+      linear-gradient(145deg, rgba(30, 41, 59, 0.88) 0%, rgba(15, 23, 42, 0.86) 100%),
+      rgba(15, 23, 42, 0.84);
+    border-color: rgba(148, 163, 184, 0.14);
+    box-shadow:
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.06),
+      0 16rpx 40rpx rgba(2, 6, 23, 0.36);
+  }
+
+  .detail__title,
+  .detail__author-name,
+  .detail__section-title,
+  .detail__body {
+    color: rgba(241, 245, 249, 0.96);
+  }
+
+  .detail__summary,
+  .detail__author-desc,
+  .detail__comment-content {
+    color: rgba(226, 232, 240, 0.82);
+  }
+
+  .detail__meta,
+  .detail__comment-head,
+  .detail__header-action,
+  .detail__empty-content {
+    color: rgba(148, 163, 184, 0.88);
+  }
+
+  .detail__header-action {
+    background: rgba(30, 41, 59, 0.92);
+  }
+
+  .detail__action-bar {
+    background:
+      linear-gradient(145deg, rgba(22, 33, 52, 0.92) 0%, rgba(15, 23, 42, 0.9) 100%),
+      rgba(15, 23, 42, 0.88);
+    border-color: rgba(148, 163, 184, 0.18);
+    box-shadow:
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.06),
+      0 20rpx 48rpx rgba(2, 6, 23, 0.36);
+  }
+
+  .detail__action,
+  .detail__share {
+    background: rgba(30, 41, 59, 0.88);
+    border-color: rgba(148, 163, 184, 0.14);
+    color: rgba(226, 232, 240, 0.82);
+  }
+
+  .detail__action--active {
+    color: rgba(196, 208, 255, 0.98);
+    background:
+      linear-gradient(145deg, rgba(59, 89, 255, 0.32), rgba(143, 112, 255, 0.26)),
+      rgba(59, 89, 255, 0.18);
+    border-color: rgba(126, 146, 255, 0.28);
+    box-shadow:
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.08),
+      0 8rpx 20rpx rgba(59, 89, 255, 0.12);
   }
 }
 </style>

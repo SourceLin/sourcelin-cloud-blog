@@ -1,5 +1,5 @@
 <template>
-  <view class="discover">
+  <view class="discover" :class="themeStore.themeClass">
     <s-loading :visible="loading && hotArticles.length === 0" />
     <view class="discover__hero">
       <view class="discover__search sl-button sl-button--secondary" @tap="goSearch">
@@ -95,6 +95,10 @@ import { onPageScroll, onShow } from '@dcloudio/uni-app';
 import { fetchCategoryList, fetchHotArticles } from '@/modules/article/api/article.api';
 import type { ArticleSummary, CategoryItem } from '@/modules/article/types/article';
 import { hideNativeTabbar, liquidTabItems, switchLiquidTab } from '@/shared/utils/liquid-tabbar';
+import { reportAnalyticsEvent, scoreCategoryInterest, sortItemsByInterest } from '@/shared/utils/analytics';
+import { useThemeStore } from '@/stores/theme';
+
+const themeStore = useThemeStore();
 
 const loading = ref(false);
 const hotArticles = ref<ArticleSummary[]>([]);
@@ -104,6 +108,7 @@ const activeTabPath = 'pages/discover/discover';
 
 onShow(() => {
   hideNativeTabbar();
+  themeStore.syncNativeArea();
   if (hotArticles.value.length === 0 && categories.value.length === 0) {
     loadDiscover();
   }
@@ -120,8 +125,18 @@ async function loadDiscover(): Promise<void> {
       fetchHotArticles(1, 5),
       fetchCategoryList()
     ]);
-    hotArticles.value = hot.items || [];
-    categories.value = (categoryList || []).slice(0, 5);
+    hotArticles.value = sortItemsByInterest(hot.items || []);
+    categories.value = [...(categoryList || [])]
+      .sort((a, b) => scoreCategoryInterest(b.id) - scoreCategoryInterest(a.id))
+      .slice(0, 5);
+    void reportAnalyticsEvent({
+      eventType: 'discover_view',
+      pagePath: '/pages/discover/discover',
+      metadata: {
+        hotCount: hotArticles.value.length,
+        categoryCount: categories.value.length
+      }
+    });
   } finally {
     loading.value = false;
   }
@@ -142,6 +157,12 @@ function goCategory(id?: number): void {
 
 function goDetail(id?: number): void {
   if (!id) return;
+  void reportAnalyticsEvent({
+    eventType: 'discover_open_article',
+    pagePath: '/pages/discover/discover',
+    targetType: 'article',
+    targetId: id
+  });
   uni.navigateTo({ url: `/pages-article/detail/detail?id=${id}` });
 }
 </script>
@@ -159,12 +180,14 @@ function goDetail(id?: number): void {
   --discover-shadow: rgba(17, 24, 39, 0.08);
 
   min-height: 100vh;
-  background:
-    radial-gradient(circle at -14% 8%, var(--sl-glow-a), rgba(255, 255, 255, 0) 36%),
-    radial-gradient(circle at 112% 24%, var(--sl-glow-b), rgba(255, 255, 255, 0) 34%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(245, 247, 250, 0.96) 430rpx),
-    $color-bg;
   padding-bottom: calc(172rpx + env(safe-area-inset-bottom));
+  transition: background-color 0.24s ease;
+
+  &.sl-theme--dark {
+    --discover-glass-border: rgba(154, 176, 255, 0.12);
+    --discover-glass-highlight: rgba(255, 255, 255, 0.08);
+    --discover-shadow: rgba(0, 0, 0, 0.18);
+  }
 
   &__hero {
     position: relative;
@@ -191,9 +214,9 @@ function goDetail(id?: number): void {
     gap: 14rpx;
     padding: 0 28rpx;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.22)),
+      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
       var(--discover-glass-tint);
-    border: 1rpx solid rgba(255, 255, 255, 0.78);
+    border: 1rpx solid var(--sl-control-border);
     box-shadow:
       inset 0 1rpx 0 var(--discover-glass-highlight),
       0 18rpx 44rpx rgba(17, 24, 39, 0.1);
@@ -209,7 +232,7 @@ function goDetail(id?: number): void {
       top: 8rpx;
       height: 18rpx;
       border-radius: 999rpx;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0));
+      background: linear-gradient(180deg, var(--sl-panel-highlight), rgba(255, 255, 255, 0));
       pointer-events: none;
     }
 
@@ -231,7 +254,7 @@ function goDetail(id?: number): void {
     padding: 30rpx 26rpx;
     border-radius: 34rpx;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.28)),
+      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
       var(--discover-glass-pure);
     border: 1rpx solid var(--discover-glass-border);
     box-shadow:
@@ -276,21 +299,21 @@ function goDetail(id?: number): void {
     padding: 24rpx;
     border-radius: 28rpx;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.28)),
+      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
       var(--discover-glass-pure);
-    border: 1rpx solid rgba(255, 255, 255, 0.72);
+    border: 1rpx solid var(--sl-border-glass);
     box-shadow:
       inset 0 1rpx 0 rgba(255, 255, 255, 0.82),
       0 12rpx 30rpx var(--discover-shadow);
-    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.2s ease, box-shadow 0.2s ease;
     overflow: hidden;
   }
 
   &__hot--lead {
     background:
       linear-gradient(135deg, rgba(59, 89, 255, 0.15) 0%, rgba(143, 112, 255, 0.08) 100%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.38) 100%);
-    border-color: rgba(255, 255, 255, 0.88);
+      linear-gradient(180deg, var(--sl-panel-highlight), var(--sl-panel-lowlight));
+    border-color: var(--sl-control-border);
     box-shadow:
       inset 0 1rpx 0 rgba(255, 255, 255, 0.9),
       0 16rpx 38rpx rgba(59, 89, 255, 0.09);
@@ -308,7 +331,7 @@ function goDetail(id?: number): void {
     height: 54rpx;
     border-radius: 50%;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.24)),
+      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
       rgba(59, 89, 255, 0.08);
     color: var(--discover-text-sub);
     font-size: 26rpx;
@@ -362,8 +385,8 @@ function goDetail(id?: number): void {
     min-height: 44rpx;
     padding: 0 18rpx;
     border-radius: 999rpx;
-    background: rgba(255, 255, 255, 0.46);
-    border: 1rpx solid rgba(255, 255, 255, 0.68);
+    background: var(--sl-control-bg);
+    border: 1rpx solid var(--sl-control-border);
   }
 
   &__meta-chip--like {
@@ -383,15 +406,15 @@ function goDetail(id?: number): void {
     padding: 0 $space-md;
     border-radius: 999rpx;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.38));
-    border: 1rpx solid rgba(255, 255, 255, 0.82);
+      linear-gradient(145deg, var(--sl-control-bg-strong), var(--sl-control-bg));
+    border: 1rpx solid var(--sl-control-border);
     color: var(--discover-text-sub);
     font-size: 26rpx;
     font-weight: 700;
     box-shadow:
       inset 0 1rpx 0 rgba(255, 255, 255, 0.9),
       0 12rpx 30rpx rgba(31, 38, 135, 0.03);
-    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.2s ease, border-color 0.2s ease;
   }
 
   &__chip:active {

@@ -54,14 +54,24 @@ const current = resolveEnv();
 
 export const env: EnvConfig = current;
 
+function resolveRequestBaseURL(): string {
+  // H5 本地调试通过 Vite 同源代理访问线上前台接口，避免跨域阻断内容预览。
+  // #ifdef H5
+  if (import.meta.env?.MODE === 'development') return '';
+  // #endif
+
+  return current.baseURL;
+}
+
 /**
  * 拼接完整 URL
  * @param path 业务接口路径，例如 /front/articles
  */
 export function resolveUrl(path: string): string {
-  if (!path) return current.baseURL;
+  const requestBaseURL = resolveRequestBaseURL();
+  if (!path) return requestBaseURL;
   if (/^https?:\/\//i.test(path)) return path;
   const prefix = current.apiPrefix || '';
-  if (path.startsWith(prefix)) return current.baseURL + path;
-  return current.baseURL + prefix + (path.startsWith('/') ? path : '/' + path);
+  if (path.startsWith(prefix)) return requestBaseURL + path;
+  return requestBaseURL + prefix + (path.startsWith('/') ? path : '/' + path);
 }

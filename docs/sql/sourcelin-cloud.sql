@@ -1529,4 +1529,56 @@ INSERT INTO `sys_user_post` (`user_id`, `post_id`) VALUES
 INSERT INTO `sys_user_role` (`user_id`, `role_id`) VALUES
 (1, 1);
 
+-- ----------------------------
+-- Table structure for `blog_content_report`
+-- ----------------------------
+DROP TABLE IF EXISTS `blog_content_report`;
+CREATE TABLE `blog_content_report` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '举报用户ID',
+  `target_type` varchar(32) NOT NULL COMMENT '目标类型',
+  `target_id` bigint(20) NOT NULL COMMENT '目标ID',
+  `reason` varchar(64) NOT NULL COMMENT '举报原因',
+  `detail` varchar(500) DEFAULT NULL COMMENT '补充说明',
+  `page_path` varchar(128) DEFAULT NULL COMMENT '来源页面',
+  `status` varchar(32) NOT NULL DEFAULT 'PENDING' COMMENT '处理状态',
+  `client_ip` varchar(64) DEFAULT NULL COMMENT '客户端IP',
+  `user_agent` varchar(255) DEFAULT NULL COMMENT '用户代理',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`id`),
+  KEY `idx_blog_report_target` (`target_type`,`target_id`),
+  KEY `idx_blog_report_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='前台内容举报记录';
+
+-- ----------------------------
+-- Table structure for `blog_analytics_event`
+-- ----------------------------
+DROP TABLE IF EXISTS `blog_analytics_event`;
+CREATE TABLE `blog_analytics_event` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
+  `event_type` varchar(64) NOT NULL COMMENT '事件类型',
+  `page_path` varchar(128) DEFAULT NULL COMMENT '页面路径',
+  `target_type` varchar(32) DEFAULT NULL COMMENT '目标类型',
+  `target_id` bigint(20) DEFAULT NULL COMMENT '目标ID',
+  `metadata_json` varchar(4000) DEFAULT NULL COMMENT '扩展数据',
+  `platform` varchar(32) DEFAULT NULL COMMENT '平台标识',
+  `app_version` varchar(64) DEFAULT NULL COMMENT '应用版本',
+  `client_ip` varchar(64) DEFAULT NULL COMMENT '客户端IP',
+  `user_agent` varchar(255) DEFAULT NULL COMMENT '用户代理',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`id`),
+  KEY `idx_blog_analytics_event_type` (`event_type`,`create_time`),
+  KEY `idx_blog_analytics_target` (`target_type`,`target_id`),
+  KEY `idx_blog_analytics_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='前台埋点事件记录';
+
 SET FOREIGN_KEY_CHECKS = 1;

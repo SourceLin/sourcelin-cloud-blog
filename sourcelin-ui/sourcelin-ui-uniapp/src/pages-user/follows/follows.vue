@@ -1,5 +1,5 @@
 <template>
-  <view class="follows s-container">
+  <view class="follows s-container" :class="themeStore.themeClass">
     <s-loading :visible="userStore.isLoggedIn && loading && items.length === 0" />
     <view class="follows__header s-card">
       <view class="follows__eyebrow">Author Radar</view>
@@ -86,6 +86,7 @@ import type { FollowItem, FollowUser } from '@/modules/interaction/types/interac
 import { fetchUserFollowerPage, fetchUserFollowingPage } from '@/modules/user/api/user.api';
 import { useBackToTop } from '@/shared/composables/useBackToTop';
 import { useUserStore } from '@/stores/user';
+import { useThemeStore } from '@/stores/theme';
 import { normalizeAssetUrl } from '@/utils/url';
 
 type FollowTab = 'followings' | 'followers';
@@ -96,6 +97,7 @@ const tabs: Array<{ label: string; value: FollowTab }> = [
 ];
 
 const userStore = useUserStore();
+const themeStore = useThemeStore();
 const { backToTopVisible } = useBackToTop();
 const activeTab = ref<FollowTab>('followings');
 const items = ref<FollowItem[]>([]);
@@ -111,6 +113,7 @@ onLoad((options) => {
 });
 
 onShow(() => {
+  themeStore.syncNativeArea();
   if (!userStore.isLoggedIn) return;
   void refresh();
 });
@@ -251,11 +254,11 @@ function openUserHome(item: FollowItem): void {
     min-width: 148rpx;
     padding: 18rpx 28rpx;
     border-radius: 999rpx;
-    background: rgba(255, 255, 255, 0.62);
+    background: var(--sl-control-bg);
     color: $color-text-secondary;
     text-align: center;
     font-size: 24rpx;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
   }
 
   &__tab--active {
@@ -326,7 +329,7 @@ function openUserHome(item: FollowItem): void {
     width: 112rpx;
     min-height: 92rpx;
     border-radius: $radius-lg;
-    background: rgba(255, 255, 255, 0.58);
+    background: var(--sl-control-bg);
   }
 
   &__meta-value {

@@ -1,5 +1,5 @@
 <template>
-  <view class="publish-treehole s-container">
+  <view class="publish-treehole s-container" :class="themeStore.themeClass">
     <view class="publish-treehole__header s-card">
       <view class="publish-treehole__title">树洞投递</view>
       <view class="publish-treehole__desc">支持匿名表达。草稿会在本地保留 1 小时，提交前请确认内容适合公开展示。</view>
@@ -36,17 +36,23 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { onLoad, onUnload } from '@dcloudio/uni-app';
+import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
 import { createTreehole } from '@/modules/community/api/community.api';
 import { markCommunityRefresh } from '@/modules/community/utils/publish';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 import { getStorage, removeStorage, setStorage } from '@/utils/storage';
+import { useThemeStore } from '@/stores/theme';
 
+const themeStore = useThemeStore();
 const DRAFT_KEY = 'publish.treehole.draft';
 const nickname = ref('');
 const avatar = ref('');
 const content = ref('');
 const submitting = ref(false);
+
+onShow(() => {
+  themeStore.syncNativeArea();
+});
 
 onLoad(() => {
   const draft = getStorage<{ nickname: string; avatar: string; content: string } | null>(DRAFT_KEY, null);

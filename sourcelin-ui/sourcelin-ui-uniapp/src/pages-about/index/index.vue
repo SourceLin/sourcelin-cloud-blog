@@ -1,5 +1,5 @@
 <template>
-  <view class="about s-container">
+  <view class="about s-container" :class="themeStore.themeClass">
     <s-loading :visible="loading && !about" text="正在整理站点信息..." />
     <view v-if="about" class="about__hero s-card">
       <image v-if="about.avatar" class="about__avatar" :src="normalizeAssetUrl(about.avatar)" mode="aspectFill" />
@@ -33,14 +33,20 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import { fetchAboutInfo } from '@/modules/site/api/site.api';
 import type { AboutInfo } from '@/modules/site/types/site';
 import { showSuccessToast } from '@/utils/feedback';
 import { normalizeAssetUrl } from '@/utils/url';
+import { useThemeStore } from '@/stores/theme';
 
+const themeStore = useThemeStore();
 const about = ref<AboutInfo | null>(null);
 const loading = ref(false);
+
+onShow(() => {
+  themeStore.syncNativeArea();
+});
 
 onLoad(() => {
   loadAbout();

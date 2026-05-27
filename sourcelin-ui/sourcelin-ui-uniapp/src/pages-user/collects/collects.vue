@@ -1,5 +1,5 @@
 <template>
-  <view class="collects s-container">
+  <view class="collects s-container" :class="themeStore.themeClass">
     <s-loading :visible="userStore.isLoggedIn && loading && items.length === 0" />
     <view class="collects__header s-card">
       <view class="collects__eyebrow">Collection Library</view>
@@ -74,6 +74,7 @@ import type {
 } from '@/modules/interaction/types/interaction';
 import { useBackToTop } from '@/shared/composables/useBackToTop';
 import { useUserStore } from '@/stores/user';
+import { useThemeStore } from '@/stores/theme';
 
 type CollectTab = InteractionTargetType | 'all';
 
@@ -83,6 +84,7 @@ interface TabOption {
 }
 
 const userStore = useUserStore();
+const themeStore = useThemeStore();
 const { backToTopVisible } = useBackToTop();
 const tabs: TabOption[] = [
   { label: '全部', value: 'all' },
@@ -104,6 +106,7 @@ const page = ref(1);
 const pageSize = 10;
 
 onShow(() => {
+  themeStore.syncNativeArea();
   if (!userStore.isLoggedIn) return;
   void refresh();
 });
@@ -260,11 +263,11 @@ function formatTime(value?: string): string {
     min-width: 132rpx;
     padding: 18rpx 28rpx;
     border-radius: 999rpx;
-    background: rgba(255, 255, 255, 0.62);
+    background: var(--sl-control-bg);
     color: $color-text-secondary;
     text-align: center;
     font-size: 24rpx;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
   }
 
   &__tab--active {

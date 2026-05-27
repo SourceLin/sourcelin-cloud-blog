@@ -1,5 +1,5 @@
 <template>
-  <view class="community">
+  <view class="community" :class="themeStore.themeClass">
     <s-loading :visible="loading && currentItems.length === 0" />
     <view class="community__hero">
       <view class="community__hero-head">
@@ -49,6 +49,7 @@
                 <view class="community__time">{{ formatDate(item.createTime) }}</view>
               </view>
             </view>
+            <view class="community__more" @tap="reportItemAction(item)">···</view>
           </view>
           <view class="community__content" :class="{ 'community__content--treehole': activeTab === 'treeholes' }">
             <text>{{ item.content }}</text>
@@ -196,11 +197,14 @@ import type { SayItem, TreeholeItem } from '@/modules/community/types/community'
 import { createComment, fetchComments } from '@/modules/comment/api/comment.api';
 import type { CommentItem, CommentSource } from '@/modules/comment/types/comment';
 import { collectTarget, likeTarget, uncollectTarget, unlikeTarget } from '@/modules/interaction/api/interaction.api';
+import { createContentReport } from '@/modules/report/api/report.api';
+import { reportAnalyticsEvent } from '@/shared/utils/analytics';
 import type { InteractionTargetType } from '@/modules/interaction/types/interaction';
 import { env } from '@/config/env';
 import { consumeCommunityRefresh } from '@/modules/community/utils/publish';
 import { hideNativeTabbar, liquidTabItems, switchLiquidTab } from '@/shared/utils/liquid-tabbar';
 import { useUserStore } from '@/stores/user';
+import { useThemeStore } from '@/stores/theme';
 import { AUTH_LOGIN_SUCCESS_EVENT, type LoginSuccessEventDetail } from '@/utils/auth';
 import { showInfoToast } from '@/utils/feedback';
 import { normalizeAssetUrl } from '@/utils/url';
@@ -219,6 +223,7 @@ const tabs: Tab[] = [
 ];
 
 const userStore = useUserStore();
+const themeStore = useThemeStore();
 const activeTab = ref<TabKey>('says');
 const says = ref<SayItem[]>([]);
 const treeholes = ref<TreeholeItem[]>([]);
@@ -478,6 +483,33 @@ async function submitComment(): Promise<void> {
   }
 }
 
+async function reportItemAction(item: CommunityItem): Promise<void> {
+  const reasons = ['广告营销', '不当内容', '侵权抄袭', '其他'];
+  const selected = await new Promise<number>((resolve) => {
+    uni.showActionSheet({
+      itemList: reasons,
+      success: (res) => resolve(res.tapIndex),
+      fail: () => resolve(-1)
+    });
+  });
+  if (selected < 0) return;
+  const currentTargetType = activeTab.value === 'says' ? 'say' : 'treehole';
+  await createContentReport({
+    targetType: currentTargetType,
+    targetId: item.id,
+    reason: reasons[selected],
+    pagePath: '/pages/community/community'
+  });
+  void reportAnalyticsEvent({
+    eventType: 'community_report_submit',
+    pagePath: '/pages/community/community',
+    targetType: currentTargetType,
+    targetId: item.id,
+    metadata: { reason: reasons[selected] }
+  });
+  showInfoToast('举报已提交，我们会尽快核查');
+}
+
 function updateCommentCount(targetId: number, delta: number): void {
   const target = currentItems.value.find((item) => item.id === targetId);
   if (!target) return;
@@ -498,6 +530,7 @@ onPageScroll((event) => {
 
 onShow(() => {
   hideNativeTabbar();
+  themeStore.syncNativeArea();
   const refreshTab = consumeCommunityRefresh();
   if (!refreshTab) return;
   if (refreshTab === activeTab.value) {
@@ -534,11 +567,14 @@ refresh();
   --community-shadow: rgba(17, 24, 39, 0.08);
 
   min-height: 100vh;
-  background:
-    radial-gradient(circle at -18% 6%, var(--sl-glow-a), rgba(255, 255, 255, 0) 36%),
-    radial-gradient(circle at 114% 26%, var(--sl-glow-b), rgba(255, 255, 255, 0) 34%),
-    $color-bg;
   padding-bottom: calc(172rpx + env(safe-area-inset-bottom));
+  transition: background-color 0.24s ease;
+
+  &.sl-theme--dark {
+    --community-glass-border: rgba(154, 176, 255, 0.12);
+    --community-glass-highlight: rgba(255, 255, 255, 0.08);
+    --community-shadow: rgba(0, 0, 0, 0.18);
+  }
 
   &__hero {
     position: relative;
@@ -559,9 +595,9 @@ refresh();
     padding: 8rpx;
     border-radius: 999rpx;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.38)),
+      linear-gradient(145deg, var(--sl-control-bg-strong), var(--sl-control-bg)),
       var(--community-glass-tint);
-    border: 1rpx solid rgba(255, 255, 255, 0.88);
+    border: 1rpx solid var(--sl-control-border);
     box-shadow:
       inset 0 1rpx 0 var(--community-glass-highlight),
       0 16rpx 42rpx rgba(17, 24, 39, 0.06);
@@ -577,9 +613,9 @@ refresh();
     padding: 0 20rpx;
     border-radius: 999rpx;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.44)),
+      linear-gradient(145deg, var(--sl-control-bg-strong), var(--sl-control-bg)),
       rgba(59, 89, 255, 0.12);
-    border: 1rpx solid rgba(255, 255, 255, 0.88);
+    border: 1rpx solid var(--sl-control-border);
     color: var(--community-primary);
     font-size: 24rpx;
     font-weight: 700;
@@ -607,12 +643,12 @@ refresh();
     font-weight: 700;
     position: relative;
     border-radius: 999rpx;
-    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
 
     &--active {
       color: var(--community-primary);
       background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.68) 100%),
+        linear-gradient(135deg, var(--sl-control-bg-strong), var(--sl-control-bg)),
         rgba(59, 89, 255, 0.08);
       box-shadow:
         inset 0 1rpx 0 rgba(255, 255, 255, 0.92),
@@ -642,9 +678,9 @@ refresh();
     padding: 34rpx 30rpx 30rpx;
     border-radius: 38rpx;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.28)),
+      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
       var(--community-glass-pure);
-    border: 1rpx solid rgba(255, 255, 255, 0.76);
+    border: 1rpx solid var(--sl-border-glass);
     box-shadow:
       inset 0 1rpx 0 var(--community-glass-highlight),
       0 18rpx 44rpx var(--community-shadow);
@@ -653,9 +689,9 @@ refresh();
 
   &__card--treeholes {
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.72) 0%, rgba(248, 250, 255, 0.32) 100%),
-      rgba(255, 255, 255, 0.46);
-    border-color: rgba(255, 255, 255, 0.8);
+      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
+      var(--sl-bg-glass-tint);
+    border-color: var(--sl-border-glass);
   }
 
   &__card::after {
@@ -666,7 +702,7 @@ refresh();
     top: 12rpx;
     height: 44rpx;
     border-radius: 999rpx;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
+    background: linear-gradient(180deg, var(--sl-panel-highlight), rgba(255, 255, 255, 0));
     pointer-events: none;
   }
 
@@ -679,8 +715,8 @@ refresh();
   &__card-head {
     position: relative;
     z-index: 1;
-    align-items: center;
-    justify-content: flex-start;
+    align-items: flex-start;
+    justify-content: space-between;
     padding-right: 0;
   }
 
@@ -694,6 +730,20 @@ refresh();
     transform: scale(0.985);
   }
 
+  &__more {
+    min-width: 54rpx;
+    height: 54rpx;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--sl-control-bg);
+    color: rgba(75, 85, 99, 0.82);
+    font-size: 28rpx;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
   &__avatar {
     width: 64rpx;
     height: 64rpx;
@@ -702,9 +752,9 @@ refresh();
     justify-content: center;
     border-radius: 22rpx;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.24)),
+      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
       rgba(59, 89, 255, 0.08);
-    border: 1rpx solid rgba(255, 255, 255, 0.7);
+    border: 1rpx solid var(--sl-border-glass);
     color: var(--community-primary);
     font-size: 28rpx;
     font-weight: 800;
@@ -753,8 +803,8 @@ refresh();
     margin-top: 22rpx;
     padding: 24rpx;
     border-radius: 26rpx;
-    background: rgba(255, 255, 255, 0.34);
-    border: 1rpx solid rgba(255, 255, 255, 0.56);
+    background: var(--sl-bg-glass-tint);
+    border: 1rpx solid var(--sl-border-glass);
     color: var(--community-text-main);
     font-size: 30rpx;
     line-height: 1.75;
@@ -766,8 +816,8 @@ refresh();
     border-radius: 12rpx 32rpx 32rpx;
     background:
       linear-gradient(135deg, rgba(59, 89, 255, 0.06) 0%, rgba(143, 112, 255, 0.06) 100%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.44) 100%);
-    border: 1rpx solid rgba(255, 255, 255, 0.78);
+      linear-gradient(180deg, var(--sl-panel-highlight), var(--sl-panel-lowlight));
+    border: 1rpx solid var(--sl-border-glass);
     box-shadow:
       inset 0 1rpx 0 rgba(255, 255, 255, 0.88),
       0 10rpx 28rpx rgba(59, 89, 255, 0.02);
@@ -781,9 +831,9 @@ refresh();
     width: 22rpx;
     height: 22rpx;
     border-radius: 6rpx 0 0;
-    background: rgba(255, 255, 255, 0.84);
-    border-left: 1rpx solid rgba(255, 255, 255, 0.8);
-    border-top: 1rpx solid rgba(255, 255, 255, 0.8);
+    background: var(--sl-control-bg-strong);
+    border-left: 1rpx solid var(--sl-border-glass);
+    border-top: 1rpx solid var(--sl-border-glass);
     transform: rotate(45deg);
   }
 
@@ -808,8 +858,8 @@ refresh();
     overflow: hidden;
     min-height: 212rpx;
     border-radius: 24rpx;
-    background: rgba(255, 255, 255, 0.34);
-    border: 1rpx solid rgba(255, 255, 255, 0.64);
+    background: var(--sl-bg-glass-tint);
+    border: 1rpx solid var(--sl-border-glass);
     box-shadow:
       inset 0 1rpx 0 rgba(255, 255, 255, 0.72),
       0 12rpx 28rpx rgba(17, 24, 39, 0.06);
@@ -863,13 +913,13 @@ refresh();
     justify-content: center;
     gap: 8rpx;
     border-radius: 999rpx;
-    background: rgba(255, 255, 255, 0.58);
-    border: 1rpx solid rgba(255, 255, 255, 0.82);
+    background: var(--sl-control-bg);
+    border: 1rpx solid var(--sl-control-border);
     color: var(--community-text-sub);
     font-size: 24rpx;
     font-weight: 700;
     box-shadow: 0 4rpx 10rpx rgba(17, 24, 39, 0.01);
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
   }
 
   &__action:active {
@@ -879,7 +929,7 @@ refresh();
   &__action--active {
     color: var(--community-primary);
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.44)),
+      linear-gradient(145deg, var(--sl-control-bg-strong), var(--sl-control-bg)),
       rgba(59, 89, 255, 0.12);
     border-color: rgba(59, 89, 255, 0.26);
     box-shadow:
@@ -909,7 +959,7 @@ refresh();
     padding: $space-lg $space-md calc(#{$space-lg} + env(safe-area-inset-bottom));
     border-radius: 36rpx 36rpx 0 0;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+      linear-gradient(180deg, var(--sl-control-bg-strong), var(--sl-page-bg));
   }
 
   &__sheet-head,
@@ -998,7 +1048,7 @@ refresh();
 
   &__sheet-button--ghost {
     color: var(--community-text-sub);
-    background: rgba(255, 255, 255, 0.72);
+    background: var(--sl-control-bg);
     border: 1rpx solid rgba(229, 231, 235, 0.9);
   }
 

@@ -118,7 +118,7 @@ const hasAction = computed(() => !!slots.default);
   &__card {
     position: absolute;
     border-radius: 30rpx;
-    border: 1rpx solid rgba(255, 255, 255, 0.82);
+    border: 1rpx solid var(--sl-border-glass, rgba(255, 255, 255, 0.82));
     box-shadow: 0 18rpx 44rpx rgba(31, 38, 135, 0.1);
   }
 
@@ -137,7 +137,7 @@ const hasAction = computed(() => !!slots.default);
     width: 164rpx;
     height: 112rpx;
     transform: rotate(5deg);
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 255, 0.74));
+    background: linear-gradient(145deg, var(--sl-control-bg-strong, rgba(255, 255, 255, 0.94)), var(--sl-control-bg, rgba(248, 250, 255, 0.74)));
     overflow: hidden;
   }
 
@@ -195,7 +195,7 @@ const hasAction = computed(() => !!slots.default);
 
   &__title {
     margin-bottom: 10rpx;
-    color: $color-text;
+    color: var(--sl-text-main, $color-text);
     font-size: 31rpx;
     font-weight: 700;
     line-height: 1.35;
@@ -204,7 +204,7 @@ const hasAction = computed(() => !!slots.default);
 
   &__text {
     max-width: 460rpx;
-    color: $color-text-secondary;
+    color: var(--sl-text-sub, $color-text-secondary);
     font-size: 27rpx;
     line-height: 1.65;
     text-align: center;

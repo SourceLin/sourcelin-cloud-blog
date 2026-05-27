@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.AnalyticsEventMapper">
+
+    <insert id="insertAnalyticsEvent" parameterType="com.sourcelin.blog.domain.AnalyticsEvent" useGeneratedKeys="true" keyProperty="id">
+        insert into blog_analytics_event
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            event_type,
+            page_path,
+            target_type,
+            target_id,
+            metadata_json,
+            platform,
+            app_version,
+            client_ip,
+            user_agent,
+            create_time,
+            update_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            #{eventType},
+            #{pagePath},
+            #{targetType},
+            #{targetId},
+            #{metadataJson},
+            #{platform},
+            #{appVersion},
+            #{clientIp},
+            #{userAgent},
+            #{createTime},
+            #{updateTime}
+        </trim>
+    </insert>
+
+</mapper>

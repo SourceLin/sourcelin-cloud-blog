@@ -1,5 +1,5 @@
 <template>
-  <view class="links s-container">
+  <view class="links s-container" :class="themeStore.themeClass">
     <s-loading :visible="loading && items.length === 0" text="正在加载友链..." />
     <view class="links__header s-card">
       <view class="links__title">友情链接</view>
@@ -53,15 +53,21 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import { applyFriendLink, fetchFriendLinks } from '@/modules/site/api/site.api';
 import type { FriendLinkItem } from '@/modules/site/types/site';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 import { normalizeAssetUrl } from '@/utils/url';
+import { useThemeStore } from '@/stores/theme';
 
+const themeStore = useThemeStore();
 const items = ref<FriendLinkItem[]>([]);
 const loading = ref(false);
 const submitting = ref(false);
+
+onShow(() => {
+  themeStore.syncNativeArea();
+});
 const form = reactive({
   name: '',
   url: '',
@@ -196,7 +202,7 @@ async function submitApply(): Promise<void> {
     margin-top: 16rpx;
     padding: 18rpx 22rpx;
     border-radius: 22rpx;
-    background: rgba(255, 255, 255, 0.54);
+    background: var(--sl-control-bg);
   }
 
   &__field--textarea {

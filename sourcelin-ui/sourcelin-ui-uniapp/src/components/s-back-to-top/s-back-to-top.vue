@@ -40,10 +40,10 @@ function scrollToTop(): void {
   padding: 10rpx 0 12rpx;
   border-radius: 999rpx;
   color: var(--sl-color-primary);
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.28)),
-    rgba(255, 255, 255, 0.48);
-  border: 1rpx solid rgba(255, 255, 255, 0.78);
+    background:
+      linear-gradient(145deg, var(--sl-control-bg-strong), var(--sl-control-bg)),
+      var(--sl-bg-glass-pure);
+    border: 1rpx solid var(--sl-control-border);
   box-shadow:
     inset 0 1rpx 0 rgba(255, 255, 255, 0.9),
     inset 0 -1rpx 0 rgba(59, 89, 255, 0.08),
@@ -98,7 +98,7 @@ function scrollToTop(): void {
 }
 
 .s-back-to-top__label {
-  color: rgba(75, 85, 99, 0.66);
+  color: var(--sl-text-muted);
   font-size: 17rpx;
   font-weight: 800;
   letter-spacing: 0.12em;

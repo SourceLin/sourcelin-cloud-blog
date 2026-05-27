@@ -1,5 +1,5 @@
 <template>
-  <view class="login s-container">
+  <view class="login s-container" :class="themeStore.themeClass">
     <view class="login__halo" />
     <view class="login__panel s-card">
       <view class="login__brand">
@@ -94,6 +94,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
+import { onShow } from '@dcloudio/uni-app';
 import {
   bindMiniProgramAccount,
   fetchCaptcha,
@@ -106,13 +107,19 @@ import { fetchCurrentUserInfo } from '@/shared/api/user.api';
 import { mapFrontUserInfo } from '@/shared/utils/user-mapper';
 import { replayPendingAction } from '@/shared/utils/pending-actions';
 import { useUserStore } from '@/stores/user';
+import { useThemeStore } from '@/stores/theme';
 import { AUTH_LOGIN_SUCCESS_EVENT, type LoginSuccessEventDetail } from '@/utils/auth';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 
 const userStore = useUserStore();
+const themeStore = useThemeStore();
 const submitting = ref(false);
 const wechatSubmitting = ref(false);
 const showPasswordLogin = ref(false);
+
+onShow(() => {
+  themeStore.syncNativeArea();
+});
 
 const form = reactive({
   username: '',
@@ -332,8 +339,8 @@ function backToPreviousPage(): void {
     z-index: 1;
     padding: 40rpx 32rpx 34rpx;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.3)),
-      rgba(255, 255, 255, 0.28);
+      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
+      var(--sl-bg-glass-pure);
   }
 
   &__brand {
@@ -344,8 +351,8 @@ function backToPreviousPage(): void {
     margin-bottom: $space-sm;
     padding: 8rpx 18rpx 8rpx 10rpx;
     border-radius: 999rpx;
-    background: rgba(255, 255, 255, 0.44);
-    border: 1rpx solid rgba(255, 255, 255, 0.68);
+    background: var(--sl-control-bg);
+    border: 1rpx solid var(--sl-control-border);
   }
 
   &__logo {
@@ -399,8 +406,8 @@ function backToPreviousPage(): void {
     margin-bottom: 18rpx;
     padding: 18rpx 22rpx;
     border-radius: 22rpx;
-    background: rgba(255, 255, 255, 0.62);
-    border: 1rpx solid rgba(255, 255, 255, 0.72);
+    background: var(--sl-control-bg);
+    border: 1rpx solid var(--sl-control-border);
     box-sizing: border-box;
   }
 

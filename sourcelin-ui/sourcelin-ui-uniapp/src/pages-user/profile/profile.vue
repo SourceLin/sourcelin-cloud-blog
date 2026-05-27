@@ -1,5 +1,5 @@
 <template>
-  <view class="profile s-container">
+  <view class="profile s-container" :class="themeStore.themeClass">
     <s-loading :visible="loading && !profile" text="正在同步资料..." />
 
     <view class="profile__hero s-card">
@@ -77,7 +77,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import {
   fetchUserProfile,
   updateUserProfile,
@@ -85,14 +85,21 @@ import {
 } from '@/modules/user/api/user.api';
 import { mapFrontUserInfo } from '@/shared/utils/user-mapper';
 import { useUserStore, type UserInfo } from '@/stores/user';
+import { useThemeStore } from '@/stores/theme';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
+import { pickSingleImagePath } from '@/utils/media';
 import { normalizeAssetUrl } from '@/utils/url';
 
 const userStore = useUserStore();
+const themeStore = useThemeStore();
 const profile = ref<UserInfo | null>(userStore.userInfo);
 const loading = ref(false);
 const submitting = ref(false);
 const avatarUploading = ref(false);
+
+onShow(() => {
+  themeStore.syncNativeArea();
+});
 
 const form = reactive({
   nickName: '',
@@ -188,20 +195,10 @@ async function submitProfile(): Promise<void> {
 
 async function chooseAvatar(): Promise<void> {
   if (avatarUploading.value) return;
-  const result = await new Promise<{ tempFilePaths?: string | string[] } | null>((resolve) => {
-    uni.chooseImage({
-      count: 1,
-      sizeType: ['compressed'],
-      success: resolve,
-      fail: () => resolve(null)
-    });
+  const filePath = await pickSingleImagePath({
+    sizeType: ['compressed'],
+    sourceType: ['album', 'camera']
   });
-  const paths = Array.isArray(result?.tempFilePaths)
-    ? result?.tempFilePaths
-    : result?.tempFilePaths
-      ? [result.tempFilePaths]
-      : [];
-  const filePath = paths[0];
   if (!filePath) return;
   avatarUploading.value = true;
   try {
@@ -298,7 +295,7 @@ async function chooseAvatar(): Promise<void> {
     align-items: center;
     padding: 20rpx 0;
     border-radius: 24rpx;
-    background: rgba(255, 255, 255, 0.42);
+    background: var(--sl-bg-glass-tint);
   }
 
   &__stat-value {
@@ -353,7 +350,7 @@ async function chooseAvatar(): Promise<void> {
     padding: 14rpx 24rpx;
     border-radius: 999rpx;
     text-align: center;
-    background: rgba(255, 255, 255, 0.42);
+    background: var(--sl-control-bg);
     color: $color-text-secondary;
     font-size: 24rpx;
   }

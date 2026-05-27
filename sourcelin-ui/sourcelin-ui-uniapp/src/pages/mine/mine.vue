@@ -1,11 +1,15 @@
 <template>
-  <view class="mine">
+  <view class="mine" :class="themeStore.themeClass">
     <view class="mine__hero">
       <image class="mine__hero-bg" src="/static/header/beijing.jpg" mode="aspectFill" />
       <view class="mine__hero-mask" />
       <image class="mine__hero-logo" src="/static/logo/logo.png" mode="aspectFit" />
       <view class="mine__hero-title">SOURCELIN</view>
       <view class="mine__hero-subtitle">Blog Studio</view>
+      <view class="mine__theme-trigger" @tap.stop="themeSheetVisible = true">
+        <uni-icons :type="themeStore.isDark ? 'moon' : 'sun'" size="18" color="#ffffff" />
+        <text class="mine__theme-label">外观</text>
+      </view>
     </view>
 
     <view class="mine__content">
@@ -154,6 +158,8 @@
 
     <s-back-to-top :visible="backToTopVisible" />
 
+    <s-theme-sheet :visible="themeSheetVisible" @close="themeSheetVisible = false" />
+
     <view class="s-liquid-tabbar">
       <view class="s-liquid-tabbar__shell">
         <view
@@ -196,11 +202,14 @@ import { hideNativeTabbar, liquidTabItems, switchLiquidTab } from '@/shared/util
 import { replayPendingAction } from '@/shared/utils/pending-actions';
 import { mapFrontUserInfo } from '@/shared/utils/user-mapper';
 import { useUserStore } from '@/stores/user';
+import { useThemeStore } from '@/stores/theme';
 import { AUTH_LOGIN_SUCCESS_EVENT, type LoginSuccessEventDetail } from '@/utils/auth';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 import { normalizeAssetUrl } from '@/utils/url';
 
 const userStore = useUserStore();
+const themeStore = useThemeStore();
+const themeSheetVisible = ref(false);
 const backToTopVisible = ref(false);
 const activeTabPath = 'pages/mine/mine';
 const loginSheetVisible = ref(false);
@@ -244,7 +253,7 @@ const captchaImage = computed(() => {
 });
 
 interface Entry {
-  key: 'collects' | 'follows' | 'profile' | 'articles' | 'about' | 'links' | 'navigation' | 'messages';
+  key: 'collects' | 'follows' | 'profile' | 'settings' | 'articles' | 'about' | 'links' | 'navigation' | 'messages';
   text: string;
   url: string;
   icon: string;
@@ -255,6 +264,7 @@ const entries: Entry[] = [
   { key: 'collects', text: '我的收藏', url: '/pages-user/collects/collects', icon: 'star-filled', iconColor: '#FFB800' },
   { key: 'follows', text: '关注/粉丝', url: '/pages-user/follows/follows', icon: 'heart-filled', iconColor: '#FF5B75' },
   { key: 'profile', text: '个人资料', url: '/pages-user/profile/profile', icon: 'person-filled', iconColor: '#3B59FF' },
+  { key: 'settings', text: '体验设置', url: '/pages-user/settings/settings', icon: 'gear-filled', iconColor: '#7C4DFF' },
   { key: 'articles', text: '我的文章', url: '/pages-user/articles/articles', icon: 'compose', iconColor: '#8F70FF' },
   { key: 'about', text: '关于本站', url: '/pages-about/index/index', icon: 'info-filled', iconColor: '#00B42A' },
   { key: 'links', text: '友情链接', url: '/pages-about/links/links', icon: 'link', iconColor: '#1DD1A1' },
@@ -265,6 +275,7 @@ const loginRequiredKeys: Entry['key'][] = ['collects', 'follows', 'profile', 'ar
 
 onShow(() => {
   hideNativeTabbar();
+  themeStore.syncNativeArea();
   refreshCurrentUser();
 });
 
@@ -514,15 +525,12 @@ function onLogout(): void {
   --mine-text-sub: var(--sl-text-sub);
   --mine-glass-pure: var(--sl-bg-glass-pure);
   --mine-glass-tint: var(--sl-bg-glass-tint);
-  --mine-border-glass: rgba(255, 255, 255, 0.72);
-  --mine-shadow-glass: rgba(17, 24, 39, 0.08);
+  --mine-border-glass: var(--sl-border-glass);
+  --mine-shadow-glass: var(--sl-glass-shadow);
 
   min-height: 100vh;
-  background:
-    radial-gradient(circle at -18% 8%, var(--sl-glow-a), rgba(255, 255, 255, 0) 34%),
-    radial-gradient(circle at 112% 28%, var(--sl-glow-b), rgba(255, 255, 255, 0) 34%),
-    $color-bg;
   padding-bottom: calc(172rpx + env(safe-area-inset-bottom));
+  transition: background-color 0.24s cubic-bezier(0.25, 0.8, 0.25, 1);
 
   &__hero {
     position: relative;
@@ -544,6 +552,12 @@ function onLogout(): void {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(17, 24, 39, 0.02) 44%, rgba(245, 247, 250, 0.16)),
       rgba(17, 24, 39, 0.06);
+
+    .sl-theme--dark & {
+      background:
+        linear-gradient(180deg, rgba(8, 13, 24, 0.04), rgba(8, 13, 24, 0.12) 44%, rgba(8, 13, 24, 0.28)),
+        rgba(8, 13, 24, 0.04);
+    }
   }
 
   &__hero-logo {
@@ -560,6 +574,11 @@ function onLogout(): void {
     box-shadow:
       inset 0 1rpx 0 rgba(255, 255, 255, 0.88),
       0 12rpx 28rpx rgba(17, 24, 39, 0.1);
+
+    .sl-theme--dark & {
+      background: rgba(18, 27, 46, 0.82);
+      border-color: rgba(154, 176, 255, 0.2);
+    }
   }
 
   &__hero-title {
@@ -603,12 +622,56 @@ function onLogout(): void {
     padding: 28rpx 26rpx;
     border-radius: 28rpx;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.42)),
+      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
       var(--mine-glass-pure);
     border: 1rpx solid var(--mine-border-glass);
     box-shadow:
       inset 0 1rpx 0 rgba(255, 255, 255, 0.86),
       0 18rpx 48rpx var(--mine-shadow-glass);
+    transition: background-color 0.24s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.24s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  &__theme-trigger {
+    position: absolute;
+    top: 36rpx;
+    right: 28rpx;
+    min-width: 112rpx;
+    height: 64rpx;
+    padding: 0 20rpx;
+    box-sizing: border-box;
+    border-radius: 999rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8rpx;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1rpx solid rgba(255, 255, 255, 0.58);
+    box-shadow:
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.42),
+      0 8rpx 22rpx rgba(17, 24, 39, 0.12);
+    z-index: 10;
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+
+    .sl-theme--dark & {
+      background: rgba(18, 27, 46, 0.28);
+      border-color: rgba(255, 255, 255, 0.46);
+      box-shadow:
+        inset 0 1rpx 0 rgba(255, 255, 255, 0.24),
+        0 8rpx 22rpx rgba(0, 0, 0, 0.18);
+    }
+
+    &:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  &__theme-label {
+    color: #fff;
+    font-size: 23rpx;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-shadow: 0 2rpx 8rpx rgba(17, 24, 39, 0.2);
   }
 
   &__avatar {
@@ -677,6 +740,10 @@ function onLogout(): void {
     margin-top: 28rpx;
     border-radius: 24rpx;
     overflow: hidden;
+
+    .sl-theme--dark & {
+      filter: brightness(0.94) contrast(1.03);
+    }
   }
 
   &__banner-mask {
@@ -716,7 +783,7 @@ function onLogout(): void {
     padding: 34rpx 28rpx 28rpx;
     border-radius: 28rpx;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.42)),
+      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
       var(--mine-glass-pure);
     border: 1rpx solid var(--mine-border-glass);
     box-shadow:
@@ -758,12 +825,12 @@ function onLogout(): void {
     justify-content: center;
     border-radius: 26rpx;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.38));
-    border: 1rpx solid rgba(255, 255, 255, 0.82);
+      linear-gradient(145deg, var(--sl-control-bg-strong), var(--sl-control-bg));
+    border: 1rpx solid var(--sl-control-border);
     box-shadow:
       inset 0 1rpx 0 rgba(255, 255, 255, 0.9),
       0 8rpx 20rpx rgba(17, 24, 39, 0.03);
-    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease;
   }
 
   &__feature-badge {
@@ -803,9 +870,15 @@ function onLogout(): void {
     border-radius: 999rpx;
     background: rgba(255, 255, 255, 0.8);
     text-align: center;
-    color: $color-danger;
+    color: #e54866;
     font-size: 26rpx;
     padding: 20rpx 0;
+    transition: background-color 0.24s ease;
+
+    .sl-theme--dark & {
+      background: rgba(18, 27, 46, 0.62);
+      border: 1rpx solid var(--sl-border-glass);
+    }
   }
 
   &__support {
@@ -828,7 +901,7 @@ function onLogout(): void {
 
   &__support-text {
     margin-top: 16rpx;
-    color: rgba(75, 85, 99, 0.58);
+    color: var(--sl-text-muted);
     font-size: 26rpx;
   }
 }
@@ -839,7 +912,11 @@ function onLogout(): void {
   z-index: 120;
   display: flex;
   align-items: flex-end;
-  background: rgba(0, 0, 0, 0.62);
+  background: rgba(8, 13, 24, 0.46);
+  /* #ifdef H5 || APP-PLUS */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* #endif */
 
   &__sheet {
     position: relative;
@@ -848,9 +925,14 @@ function onLogout(): void {
     padding: 18rpx 48rpx calc(42rpx + env(safe-area-inset-bottom));
     box-sizing: border-box;
     border-radius: 42rpx 42rpx 0 0;
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+    border-top: 1rpx solid var(--sl-border-glass);
     overflow-y: auto;
+    transition: background-color 0.24s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    .sl-theme--dark & {
+      background: linear-gradient(180deg, rgba(18, 27, 46, 0.98), rgba(8, 13, 24, 0.98));
+    }
   }
 
   &__handle {
@@ -913,7 +995,7 @@ function onLogout(): void {
 
   &__ghost {
     margin-top: 22rpx;
-    background: rgba(255, 255, 255, 0.72);
+    background: var(--sl-control-bg);
     color: var(--sl-color-primary);
     border: 2rpx solid rgba(59, 89, 255, 0.34);
   }
@@ -934,6 +1016,11 @@ function onLogout(): void {
     background: rgba(248, 250, 252, 0.9);
     border: 1rpx solid rgba(229, 231, 235, 0.88);
     box-sizing: border-box;
+
+    .sl-theme--dark & {
+      background: rgba(8, 13, 24, 0.6);
+      border-color: rgba(154, 176, 255, 0.12);
+    }
   }
 
   &__field--captcha {
@@ -970,7 +1057,7 @@ function onLogout(): void {
     width: 184rpx;
     height: 66rpx;
     border-radius: 12rpx;
-    background: #f5f7fa;
+    background: var(--sl-control-bg);
     overflow: hidden;
   }
 

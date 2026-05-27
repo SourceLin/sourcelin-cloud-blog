@@ -57,7 +57,7 @@ withDefaults(
     background:
       radial-gradient(circle at -10% 10%, var(--sl-glow-a), rgba(255, 255, 255, 0) 34%),
       radial-gradient(circle at 110% 30%, var(--sl-glow-b), rgba(255, 255, 255, 0) 34%),
-      #f8fafc;
+      var(--sl-page-bg, #f8fafc);
   }
 
   &--inline {
@@ -108,7 +108,7 @@ withDefaults(
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    border: 5rpx solid rgba(255, 255, 255, 0.78);
+    border: 5rpx solid var(--sl-border-glass, rgba(255, 255, 255, 0.78));
     box-shadow:
       inset 0 1rpx 0 rgba(255, 255, 255, 0.9),
       0 12rpx 30rpx rgba(17, 24, 39, 0.03);

@@ -65,6 +65,12 @@
       }
     },
     {
+      "path": "pages-user/settings/settings",
+      "style": {
+        "navigationBarTitleText": "体验设置"
+      }
+    },
+    {
       "path": "pages-user/collects/collects",
       "style": {
         "navigationBarTitleText": "我的收藏",
@@ -133,22 +139,28 @@
       "style": {
         "navigationBarTitleText": "树洞投递"
       }
+    },
+    {
+      "path": "pages-publish/article/article",
+      "style": {
+        "navigationBarTitleText": "写文章"
+      }
     }
   ],
   "globalStyle": {
-    "navigationBarTextStyle": "black",
+    "navigationBarTextStyle": "@navigationBarTextStyle",
     "navigationBarTitleText": "Sourcelin",
-    "navigationBarBackgroundColor": "#FFFFFF",
-    "backgroundColor": "#F5F7FA",
-    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "@navigationBarBackgroundColor",
+    "backgroundColor": "@backgroundColor",
+    "backgroundTextStyle": "@backgroundTextStyle",
     "onReachBottomDistance": 80,
     "pageOrientation": "portrait"
   },
   "tabBar": {
-    "color": "#999999",
-    "selectedColor": "#1F6FEB",
-    "backgroundColor": "#FFFFFF",
-    "borderStyle": "white",
+    "color": "@tabBarColor",
+    "selectedColor": "@tabBarSelectedColor",
+    "backgroundColor": "@tabBarBackgroundColor",
+    "borderStyle": "@tabBarBorderStyle",
     "list": [
       {
         "pagePath": "pages/home/home",

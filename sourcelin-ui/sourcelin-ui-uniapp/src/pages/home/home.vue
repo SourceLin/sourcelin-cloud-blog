@@ -1,19 +1,28 @@
 <template>
-  <view class="home">
+  <view class="home" :class="themeStore.themeClass">
     <s-loading :visible="loading && feedItems.length === 0" />
     <view class="home__hero">
       <image class="home__hero-bg" src="/static/backgrounds/home-bg.jpg" mode="aspectFill" />
-      <view class="home__brand">
-        <image class="home__logo" src="/static/logo/logo.png" mode="aspectFit" />
-        <view class="home__eyebrow">Sourcelin Blog</view>
+
+      <!-- 顶部精细双端排列：Logo品牌与精致毛玻璃搜索按钮 -->
+      <view class="home__hero-header">
+        <view class="home__brand">
+          <image class="home__logo" src="/static/logo/logo.png" mode="aspectFit" />
+          <view class="home__eyebrow">Sourcelin Blog</view>
+        </view>
+        <view class="home__search-btn" @tap="goSearch">
+          <uni-icons type="search" size="18" color="var(--home-primary)" />
+        </view>
       </view>
-      <view class="home__title">欢迎光临</view>
-      <view class="home__subtitle s-ellipsis-2">{{ siteSubtitle }}</view>
+
+      <!-- 欢迎词与简介 -->
+      <view class="home__hero-body">
+        <view class="home__title">欢迎光临</view>
+        <view class="home__subtitle s-ellipsis-2">{{ siteSubtitle }}</view>
+      </view>
     </view>
 
     <view class="home__content">
-      <view class="home__search sl-button sl-button--secondary" @tap="goSearch">搜索文章、分类或标签</view>
-
       <!-- 轻公告栏 -->
       <view v-if="siteInfo?.notices && siteInfo.notices.length > 0" class="home__notice">
         <uni-icons type="sound" size="18" color="var(--home-primary)" />
@@ -23,20 +32,6 @@
           </swiper-item>
         </swiper>
       </view>
-
-      <!-- 分类快捷入口 -->
-      <scroll-view v-if="categories && categories.length > 0" class="home__categories" scroll-x show-scrollbar="false">
-        <view class="home__categories-wrap">
-          <view
-            v-for="cat in categories.slice(0, 6)"
-            :key="cat.id"
-            class="home__cat-chip"
-            @tap="goCategory(cat.id)"
-          >
-            <text class="home__cat-name">{{ cat.name }}</text>
-          </view>
-        </view>
-      </scroll-view>
 
       <s-empty v-if="isEmpty" text="暂无文章" />
 
@@ -135,10 +130,12 @@
 import { computed, ref } from 'vue';
 import { onPageScroll, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app';
 import { useHomeFeed } from '@/modules/article/composables/useHomeFeed';
+import { useThemeStore } from '@/stores/theme';
 import { hideNativeTabbar, liquidTabItems, switchLiquidTab } from '@/shared/utils/liquid-tabbar';
 import { normalizeAssetUrl } from '@/utils/url';
 
-const { loading, siteInfo, categories, featured, feedItems, finished, isEmpty, refresh, loadMore } = useHomeFeed();
+const { loading, siteInfo, featured, feedItems, finished, isEmpty, refresh, loadMore } = useHomeFeed();
+const themeStore = useThemeStore();
 const backToTopVisible = ref(false);
 const activeTabPath = 'pages/home/home';
 
@@ -157,11 +154,6 @@ function goDetail(id?: number): void {
   uni.navigateTo({ url: `/pages-article/detail/detail?id=${id}` });
 }
 
-function goCategory(id?: number): void {
-  if (!id) return;
-  uni.navigateTo({ url: `/pages-article/list/list?categoryId=${id}` });
-}
-
 onPullDownRefresh(() => {
   refresh().finally(() => uni.stopPullDownRefresh());
 });
@@ -176,6 +168,7 @@ onPageScroll((event) => {
 
 onShow(() => {
   hideNativeTabbar();
+  themeStore.syncNativeArea();
 });
 
 refresh();
@@ -194,13 +187,24 @@ refresh();
   --home-glass-shadow: rgba(17, 24, 39, 0.08);
 
   min-height: 100vh;
-  background: $color-bg;
   padding-bottom: calc(172rpx + env(safe-area-inset-bottom));
+  transition: background-color 0.24s ease;
+
+  &.sl-theme--dark {
+    --home-glass-border: rgba(154, 176, 255, 0.12);
+    --home-glass-highlight: rgba(255, 255, 255, 0.08);
+    --home-glass-shadow: rgba(0, 0, 0, 0.18);
+  }
 
   &__hero {
     position: relative;
     overflow: hidden;
-    height: 590rpx;
+    height: 520rpx;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 32rpx 32rpx 110rpx;
+    box-sizing: border-box;
   }
 
   &__hero-bg {
@@ -211,26 +215,26 @@ refresh();
     display: block;
   }
 
-  &__brand,
-  &__title,
-  &__subtitle,
-  &__search {
-    position: relative;
-    z-index: 1;
+  &__hero-header {
+    position: absolute;
+    left: 32rpx;
+    right: 32rpx;
+    top: 110rpx;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
   }
 
   &__brand {
-    position: absolute;
-    left: 32rpx;
-    top: 150rpx;
     display: inline-flex;
     align-items: center;
     gap: 12rpx;
     padding: 7rpx 18rpx 7rpx 8rpx;
     border-radius: 999rpx;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.18)),
-      rgba(255, 255, 255, 0.22);
+      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
+      var(--sl-bg-glass-tint);
     border: 1rpx solid var(--home-glass-border);
     box-shadow:
       inset 0 1rpx 0 var(--home-glass-highlight),
@@ -251,95 +255,73 @@ refresh();
     letter-spacing: 0.12em;
   }
 
+  &__search-btn {
+    width: 68rpx;
+    height: 68rpx;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
+      var(--sl-bg-glass-tint);
+    border: 1rpx solid var(--home-glass-border);
+    box-shadow:
+      inset 0 1rpx 0 var(--home-glass-highlight),
+      inset 0 -1rpx 0 rgba(59, 89, 255, 0.06),
+      0 12rpx 30rpx var(--home-glass-shadow);
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+
+    /* #ifdef H5 || APP-PLUS */
+    backdrop-filter: blur(14rpx) saturate(1.2);
+    -webkit-backdrop-filter: blur(14rpx) saturate(1.2);
+    /* #endif */
+
+    &:active {
+      transform: scale(0.92);
+      background: var(--sl-control-bg);
+    }
+  }
+
+  &__hero-body {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
+  }
+
   &__title {
-    position: absolute;
-    left: 32rpx;
-    top: 228rpx;
-    color: rgba(255, 255, 255, 0.96);
-    font-size: 44rpx;
+    color: rgba(255, 255, 255, 0.98);
+    font-size: 46rpx;
     font-weight: 800;
-    text-shadow: 0 8rpx 28rpx rgba(17, 24, 39, 0.2);
+    text-shadow: 0 4rpx 16rpx rgba(17, 24, 39, 0.15);
   }
 
   &__subtitle {
-    position: absolute;
-    left: 32rpx;
-    top: 300rpx;
-    max-width: 460rpx;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 25rpx;
-    line-height: 1.6;
+    max-width: 480rpx;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 26rpx;
+    line-height: 1.5;
+    text-shadow: 0 2rpx 8rpx rgba(17, 24, 39, 0.15);
   }
 
   &__content {
     position: relative;
-    margin-top: -132rpx;
-    padding: 0 30rpx;
-  }
-
-  &__search {
-    position: relative;
-    min-height: 80rpx;
-    box-sizing: border-box;
-    background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.22)),
-      var(--home-glass-tint);
-    color: rgba(17, 24, 39, 0.44);
-    font-size: 24rpx;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    padding: 0 26rpx 0 62rpx;
-    border: 1rpx solid rgba(255, 255, 255, 0.78);
-    box-shadow:
-      inset 0 1rpx 0 var(--home-glass-highlight),
-      inset 0 -1rpx 0 rgba(59, 89, 255, 0.05),
-      0 18rpx 44rpx rgba(17, 24, 39, 0.1);
-
-    /* #ifdef H5 || APP-PLUS */
-    backdrop-filter: blur(18rpx) saturate(1.28);
-    -webkit-backdrop-filter: blur(18rpx) saturate(1.28);
-    /* #endif */
-
-    &::after {
-      content: '';
-      position: absolute;
-      left: 86rpx;
-      right: 28rpx;
-      top: 7rpx;
-      height: 18rpx;
-      border-radius: 999rpx;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0));
-      pointer-events: none;
-    }
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 28rpx;
-      top: 50%;
-      width: 16rpx;
-      height: 16rpx;
-      border: 3rpx solid rgba(59, 89, 255, 0.48);
-      border-radius: 50%;
-      transform: translateY(-50%);
-    }
-
-    &:active {
-      box-shadow:
-        inset 0 1rpx 0 var(--home-glass-highlight),
-        0 16rpx 42rpx rgba(59, 89, 255, 0.12);
-    }
+    margin-top: -60rpx;
+    padding: 0 32rpx;
+    z-index: 2;
   }
 
   &__notice {
-    margin-top: 28rpx;
+    margin-bottom: 28rpx;
     display: flex;
     align-items: center;
     gap: 16rpx;
     padding: 18rpx 28rpx;
     border-radius: 22rpx;
-    background: rgba(255, 255, 255, 0.46);
-    border: 1rpx solid rgba(255, 255, 255, 0.76);
+    background: var(--sl-control-bg);
+    border: 1rpx solid var(--sl-control-border);
     box-shadow: 0 8rpx 24rpx rgba(17, 24, 39, 0.02);
   }
 
@@ -359,40 +341,6 @@ refresh();
     font-weight: 600;
   }
 
-  &__categories {
-    margin-top: 28rpx;
-    white-space: nowrap;
-    width: 100%;
-  }
-
-  &__categories-wrap {
-    display: inline-flex;
-    gap: 16rpx;
-    padding: 4rpx 0;
-  }
-
-  &__cat-chip {
-    padding: 12rpx 28rpx;
-    border-radius: 999rpx;
-    background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.38));
-    border: 1rpx solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 6rpx 16rpx rgba(31, 38, 135, 0.02);
-    transition: all 0.2s ease;
-
-    &:active {
-      transform: scale(0.95);
-      background: rgba(59, 89, 255, 0.08);
-      border-color: rgba(59, 89, 255, 0.12);
-    }
-  }
-
-  &__cat-name {
-    color: var(--home-text-sub);
-    font-size: 24rpx;
-    font-weight: 600;
-  }
-
   &__feed {
     display: flex;
     flex-direction: column;
@@ -405,7 +353,7 @@ refresh();
     overflow: hidden;
     border-radius: 34rpx;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.24)),
+      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
       var(--home-glass-pure);
     border: 1rpx solid var(--home-glass-border);
     box-shadow:
@@ -603,8 +551,8 @@ refresh();
   &__tag {
     padding: 12rpx 20rpx;
     border-radius: 12rpx;
-    background: rgba(255, 255, 255, 0.46);
-    border: 1rpx solid rgba(255, 255, 255, 0.68);
+    background: var(--sl-control-bg);
+    border: 1rpx solid var(--sl-control-border);
     color: var(--home-text-main);
     font-size: 24rpx;
     font-weight: 700;
@@ -631,8 +579,8 @@ refresh();
     min-height: 48rpx;
     padding: 0 18rpx;
     border-radius: 999rpx;
-    background: rgba(255, 255, 255, 0.44);
-    border: 1rpx solid rgba(255, 255, 255, 0.7);
+    background: var(--sl-control-bg);
+    border: 1rpx solid var(--sl-control-border);
   }
 
   &__article-meta-item--like {

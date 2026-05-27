@@ -1,5 +1,5 @@
 <template>
-  <view class="search s-container">
+  <view class="search s-container" :class="themeStore.themeClass">
     <s-loading :visible="showLoading" text="正在检索内容..." />
     <view class="search__bar s-card">
       <input
@@ -71,7 +71,7 @@
       text="换个更短的关键词，或者试试从热门搜索继续浏览。"
     />
     <s-empty
-      v-else-if="!searched"
+      v-else-if="!searched && !showSearchDiscovery"
       scene="search"
       title="开始搜索"
       text="输入文章、分类或标签关键词，快速定位你想看的内容。"
@@ -142,7 +142,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
-import { onLoad, onPageScroll, onReachBottom } from '@dcloudio/uni-app';
+import { onLoad, onPageScroll, onReachBottom, onShow } from '@dcloudio/uni-app';
 import {
   fetchCategoryList,
   fetchSearchHotKeywords,
@@ -154,11 +154,14 @@ import {
 } from '@/modules/article/api/article.api';
 import { useArticlePaging } from '@/modules/article/composables/useArticlePaging';
 import type { CategoryItem, TagItem } from '@/modules/article/types/article';
+import { reportAnalyticsEvent, trackSearchKeyword } from '@/shared/utils/analytics';
+import { useThemeStore } from '@/stores/theme';
 import { showInfoToast } from '@/utils/feedback';
 import { getStorage, removeStorage, setStorage } from '@/utils/storage';
 
 const SEARCH_HISTORY_KEY = 'article.search.history';
 const SEARCH_HISTORY_LIMIT = 8;
+const themeStore = useThemeStore();
 const keyword = ref('');
 const searched = ref(false);
 const searchHistory = ref<string[]>([]);
@@ -176,6 +179,11 @@ const { items, loading, finished, refresh, loadMore } = useArticlePaging((page, 
 const backToTopVisible = ref(false);
 const hasResults = computed(() => items.value.length > 0 || categoryMatches.value.length > 0 || tagMatches.value.length > 0);
 const showLoading = computed(() => searched.value && (loading.value || facetLoading.value) && !hasResults.value);
+const showSearchDiscovery = computed(() => searchHistory.value.length > 0 || hotKeywords.value.length > 0 || suggestions.value.length > 0);
+
+onShow(() => {
+  themeStore.syncNativeArea();
+});
 const suggestions = computed(() =>
   suggestionList.value.filter((term) => term.trim() !== keyword.value.trim()).slice(0, 6)
 );
@@ -187,9 +195,17 @@ function onSearch(): void {
     return;
   }
   saveSearchHistory(value);
+  trackSearchKeyword(value);
   searched.value = true;
   refresh();
   void loadFacetResults(value);
+  void reportAnalyticsEvent({
+    eventType: 'search_submit',
+    pagePath: '/pages-article/search/search',
+    metadata: {
+      keyword: value
+    }
+  });
 }
 
 function applyKeyword(value: string): void {
@@ -385,8 +401,8 @@ onBeforeUnmount(() => {
     max-width: 100%;
     padding: 14rpx 24rpx;
     border-radius: 999rpx;
-    background: rgba(255, 255, 255, 0.62);
-    border: 1rpx solid rgba(255, 255, 255, 0.82);
+    background: var(--sl-control-bg);
+    border: 1rpx solid var(--sl-control-border);
     color: $color-text-secondary;
     font-size: 24rpx;
     line-height: 1.2;
@@ -401,21 +417,21 @@ onBeforeUnmount(() => {
     color: $color-text;
     background:
       linear-gradient(135deg, rgba(31, 111, 235, 0.08), rgba(143, 112, 255, 0.08)),
-      rgba(255, 255, 255, 0.6);
+      var(--sl-control-bg);
   }
 
   &__chip--category {
     color: $color-primary;
     background:
-      linear-gradient(135deg, rgba(31, 111, 235, 0.08), rgba(255, 255, 255, 0.72)),
-      rgba(255, 255, 255, 0.68);
+      linear-gradient(135deg, rgba(31, 111, 235, 0.12), var(--sl-control-bg)),
+      var(--sl-control-bg);
   }
 
   &__chip--tag {
     color: #6d4bff;
     background:
-      linear-gradient(135deg, rgba(143, 112, 255, 0.12), rgba(255, 255, 255, 0.72)),
-      rgba(255, 255, 255, 0.68);
+      linear-gradient(135deg, rgba(143, 112, 255, 0.14), var(--sl-control-bg)),
+      var(--sl-control-bg);
   }
 
   &__results {

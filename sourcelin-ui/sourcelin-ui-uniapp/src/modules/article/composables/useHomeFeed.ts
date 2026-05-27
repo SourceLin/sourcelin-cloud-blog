@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue';
 import { fetchHome } from '../api/article.api';
 import type { ArticleSummary, CategoryItem, FrontSiteInfo, TagItem } from '../types/article';
+import { scoreCategoryInterest, sortItemsByInterest } from '@/shared/utils/analytics';
 
 export function useHomeFeed() {
   const loading = ref(false);
@@ -17,7 +18,7 @@ export function useHomeFeed() {
   const featured = computed(() => carousel.value[0] || recommend.value[0] || latest.value[0]);
   const feedItems = computed(() => {
     const usedId = featured.value?.id;
-    const pool = [...recommend.value, ...latest.value];
+    const pool = sortItemsByInterest([...recommend.value, ...latest.value]);
     const seen = new Set<number>();
     return pool.filter((item) => {
       if (!item?.id || item.id === usedId || seen.has(item.id)) return false;
@@ -34,14 +35,15 @@ export function useHomeFeed() {
     try {
       const result = await fetchHome({ page: targetPage, pageSize: pageSize.value });
       siteInfo.value = result.siteInfo;
-      recommend.value = result.recommend || [];
+      recommend.value = sortItemsByInterest(result.recommend || []);
       carousel.value = result.carousel || [];
-      categories.value = result.categories || [];
+      categories.value = [...(result.categories || [])].sort((a, b) => scoreCategoryInterest(b.id) - scoreCategoryInterest(a.id));
       tags.value = result.tags || [];
       const latestPage = result.latest;
+      const nextItems = sortItemsByInterest(latestPage.items || []);
       latest.value = targetPage === 1
-        ? latestPage.items || []
-        : latest.value.concat(latestPage.items || []);
+        ? nextItems
+        : latest.value.concat(nextItems);
       page.value = latestPage.page || targetPage;
       totalPages.value = latestPage.totalPages || 1;
     } finally {
