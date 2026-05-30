@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { createHead } from '@unhead/vue/client'
 import App from './App.vue'
 import router from './router'
 import { useThemeStore } from '@/stores/theme.store'
@@ -12,8 +13,10 @@ const STARTUP_LOADING_MIN_DURATION = 1400
 
 const app = createApp(App)
 const pinia = createPinia()
+const head = createHead()
 
 app.use(pinia)
+app.use(head)
 useThemeStore(pinia).init()
 useDictStore(pinia).ensureDicts(['blog_status', 'blog_comment_audit_status'])
 

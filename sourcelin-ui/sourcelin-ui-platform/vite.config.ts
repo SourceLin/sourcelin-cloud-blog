@@ -1,8 +1,9 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { resolve } from 'path'
+import { writeFileSync } from 'fs'
 
 function manualChunks(id: string) {
   const normalizedId = id.replace(/\\/g, '/')
@@ -51,6 +52,108 @@ function manualChunks(id: string) {
   return undefined
 }
 
+/**
+ * Sitemap 构建插件。
+ * 构建完成后在产物目录生成 sitemap.xml。
+ * 静态路由条目直接读取路由配置，动态文章条目按需从后端 API 拉取。
+ *
+ * 使用方式：
+ *   - VITE_SITE_ORIGIN: 站点根 URL，例如 https://your-domain.com
+ *   - VITE_API_ORIGIN: 后端 API 根地址，例如 http://localhost:8080
+ *     若未配置则跳过动态文章条目，仅生成静态路由
+ */
+function sitemapPlugin(): Plugin {
+  // 静态路由列表（path、changefreq、priority）
+  const staticRoutes = [
+    { path: '/', changefreq: 'daily', priority: '1.0' },
+    { path: '/archive', changefreq: 'weekly', priority: '0.8' },
+    { path: '/categories', changefreq: 'weekly', priority: '0.7' },
+    { path: '/tags', changefreq: 'weekly', priority: '0.7' },
+    { path: '/hot', changefreq: 'daily', priority: '0.8' },
+    { path: '/say', changefreq: 'daily', priority: '0.6' },
+    { path: '/treehole', changefreq: 'daily', priority: '0.6' },
+    { path: '/about', changefreq: 'monthly', priority: '0.5' },
+    { path: '/navigation', changefreq: 'monthly', priority: '0.5' }
+  ]
+
+  function buildSitemapXml(origin: string, urlEntries: { loc: string; lastmod?: string; changefreq: string; priority: string }[]) {
+    const items = urlEntries
+      .map((entry) => [
+        '  <url>',
+        `    <loc>${entry.loc}</loc>`,
+        entry.lastmod ? `    <lastmod>${entry.lastmod}</lastmod>` : '',
+        `    <changefreq>${entry.changefreq}</changefreq>`,
+        `    <priority>${entry.priority}</priority>`,
+        '  </url>'
+      ].filter(Boolean).join('\n'))
+      .join('\n')
+
+    void origin
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${items}\n</urlset>`
+  }
+
+  return {
+    name: 'vite-plugin-sitemap-gen',
+    apply: 'build',
+    async closeBundle() {
+      const siteOrigin = process.env['VITE_SITE_ORIGIN'] || ''
+      const apiOrigin = process.env['VITE_API_ORIGIN'] || ''
+      const outDir = 'sourcelin-ui-platform'
+
+      if (!siteOrigin) {
+        console.warn('[sitemap] VITE_SITE_ORIGIN 未配置，跳过 sitemap 生成。请在 .env.production 中设置 VITE_SITE_ORIGIN。')
+        return
+      }
+
+      const urlEntries: { loc: string; lastmod?: string; changefreq: string; priority: string }[] = staticRoutes.map(
+        (route) => ({
+          loc: `${siteOrigin}${route.path}`,
+          changefreq: route.changefreq,
+          priority: route.priority
+        })
+      )
+
+      // 动态文章条目：构建时请求后端全量文章列表
+      if (apiOrigin) {
+        try {
+          const articleListUrl = `${apiOrigin}/blog/front/article/list?pageSize=9999&pageNum=1`
+          const { default: https } = await import('node:https')
+          const { default: http } = await import('node:http')
+          const fetcher = articleListUrl.startsWith('https') ? https : http
+
+          const rawBody = await new Promise<string>((ok, fail) => {
+            fetcher.get(articleListUrl, (res) => {
+              let data = ''
+              res.on('data', (chunk: string) => { data += chunk })
+              res.on('end', () => ok(data))
+              res.on('error', fail)
+            }).on('error', fail)
+          })
+
+          const parsed = JSON.parse(rawBody) as { code: number; data?: { items?: Array<{ id: number; updateTime?: string }> } }
+          if (parsed.code === 0 && Array.isArray(parsed.data?.items)) {
+            for (const item of parsed.data.items) {
+              urlEntries.push({
+                loc: `${siteOrigin}/article/${item.id}`,
+                lastmod: item.updateTime ? item.updateTime.split(' ')[0] : undefined,
+                changefreq: 'weekly',
+                priority: '0.9'
+              })
+            }
+            console.info(`[sitemap] 动态文章条目: ${parsed.data.items.length} 条`)
+          }
+        } catch (err) {
+          console.warn('[sitemap] 拉取文章列表失败，仅生成静态路由条目。', err)
+        }
+      }
+
+      const xml = buildSitemapXml(siteOrigin, urlEntries)
+      writeFileSync(`${outDir}/sitemap.xml`, xml, 'utf-8')
+      console.info(`[sitemap] 已生成 ${outDir}/sitemap.xml，共 ${urlEntries.length} 条记录`)
+    }
+  }
+}
+
 export default defineConfig({
   plugins: [
     vue(),
@@ -61,7 +164,8 @@ export default defineConfig({
     Components({
       dirs: ['src/shared/components', 'src/modules'],
       dts: 'src/components.d.ts'
-    })
+    }),
+    sitemapPlugin()
   ],
   resolve: {
     alias: {

@@ -136,6 +136,7 @@ import EmptyState from '@/shared/components/feedback/EmptyState.vue'
 import { useHomePage } from '@/modules/home/composables/useHomePage'
 import { useDiscoverFeed } from '@/modules/home/composables/useDiscoverFeed'
 import { parseDiscoverCategoryId } from '@/modules/home/model/home-discover-route'
+import { useSeoHead } from '@/shared/composables/useSeoHead'
 
 const route = useRoute()
 const router = useRouter()
@@ -158,6 +159,18 @@ const {
 } = useHomePage()
 
 const discoverFeed = useDiscoverFeed(displayCategories)
+
+// 首页 SEO：使用站点名和描述语作为详情
+const homeSeoDescription = computed(() => {
+  const desc = siteInfo.value.description
+  return desc ? `${siteInfo.value.siteName} - ${desc}` : `${siteInfo.value.siteName} - 记录技术、写作与长期主义`
+})
+
+useSeoHead({
+  title: computed(() => siteInfo.value.siteName || ''),
+  description: homeSeoDescription,
+  canonicalUrl: computed(() => typeof window !== 'undefined' ? `${window.location.origin}/` : '')
+})
 
 const refreshMobileLayout = () => {
   isMobileLayout.value = window.matchMedia('(max-width: 1024px)').matches

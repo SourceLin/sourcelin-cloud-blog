@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# 禁止爬取登录、个人中心等敏感路由
+Disallow: /auth/
+Disallow: /login
+Disallow: /register
+Disallow: /user/
+
+# Sitemap 地址（请将域名替换为实际部署地址）
+Sitemap: https://sourcelin.cn/sitemap.xml

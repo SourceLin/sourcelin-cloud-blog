@@ -1,10 +1,12 @@
 ﻿<script setup lang="ts">
+import { computed } from 'vue'
 import { useTagPageQuery } from '@/modules/article/composables/useTagPageQuery'
 import TagArticleList from '@/modules/article/components/TagArticleList.vue'
 import TagFilterBar from '@/modules/article/components/TagFilterBar.vue'
 import TagHeroSection from '@/modules/article/components/TagHeroSection.vue'
 import EmptyState from '@/shared/components/feedback/EmptyState.vue'
 import PageShell from '@/shared/components/layout/PageShell.vue'
+import { useSeoHead } from '@/shared/composables/useSeoHead'
 import '@/modules/article/styles/tag-page.scss'
 
 const {
@@ -36,6 +38,13 @@ const {
   handleArticlePageChange,
   goToArticle
 } = useTagPageQuery()
+
+// 标签页 SEO
+useSeoHead({
+  title: computed(() => '文章标签'),
+  description: computed(() => '按标签浏览全部文章，探索不同技术主题与内容。'),
+  canonicalUrl: computed(() => typeof window !== 'undefined' ? `${window.location.origin}/tags` : '')
+})
 </script>
 
 <template>

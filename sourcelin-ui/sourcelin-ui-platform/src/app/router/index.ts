@@ -12,6 +12,7 @@ import { userRoutes } from '@/modules/user/routes'
 import { setupRouterNavigation, type AppRouteRecordRaw } from './route-meta'
 import { resolveAppScrollPosition } from './scroll-behavior'
 import { useUiStore } from '@/stores/ui.store'
+import { useSiteStore } from '@/stores/site.store'
 
 export const appRoutes: AppRouteRecordRaw[] = [
   ...homeRoutes,
@@ -48,7 +49,17 @@ setupRouterNavigation(router)
 
 let startupRouteReadyMarked = false
 
-router.afterEach(() => {
+router.afterEach((to) => {
+  // 动态更新页面标题：使用 seoTitle 或降级为 title
+  const siteStore = useSiteStore()
+  const siteName = siteStore.siteInfo.webName || '圆圈博客'
+  const pageTitle = (to.meta?.seoTitle as string | undefined) || (to.meta?.title as string | undefined)
+  if (pageTitle) {
+    document.title = `${pageTitle} - ${siteName}`
+  } else {
+    document.title = siteName
+  }
+
   if (startupRouteReadyMarked) {
     return
   }

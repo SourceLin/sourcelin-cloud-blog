@@ -2,8 +2,10 @@
 import { computed } from 'vue'
 import { darkTheme, NConfigProvider, NDialogProvider } from 'naive-ui'
 import { useRoute } from 'vue-router'
+import { useHead } from '@unhead/vue'
 import { useThemeStore } from '@/stores/theme.store'
 import { useUiStore } from '@/stores/ui.store'
+import { useSiteStore } from '@/stores/site.store'
 import SearchDialog from '@/shared/components/feedback/SearchDialog.vue'
 import StartupLoadingOverlay from '@/shared/components/feedback/StartupLoadingOverlay.vue'
 import AppFooter from '@/shared/components/layout/AppFooter.vue'
@@ -16,11 +18,33 @@ import SNotification from '@/shared/components/ui/SNotification.vue'
 
 const themeStore = useThemeStore()
 const uiStore = useUiStore()
+const siteStore = useSiteStore()
 const route = useRoute()
 
 const isDark = computed(() => themeStore.isDark)
 const startupLoadingVisible = computed(() => uiStore.startupLoadingVisible)
 const useStandaloneShell = computed(() => route.meta?.shell === 'auth')
+
+// 全局默认 TDK，各页面可通过 useSeoHead composable 覆盖
+const siteName = computed(() => siteStore.siteInfo.webName || '圆圈博客')
+const siteDescription = computed(() => {
+  const titles = siteStore.siteInfo.webTitle
+  return titles?.length > 0
+    ? `${siteName.value} - ${titles[0]}`
+    : `${siteName.value} - 记录技术、写作与长期主义`
+})
+
+useHead(
+  computed(() => ({
+    title: siteName.value,
+    meta: [
+      { name: 'description', content: siteDescription.value },
+      { property: 'og:site_name', content: siteName.value },
+      { property: 'og:type', content: 'website' },
+      { property: 'twitter:card', content: 'summary_large_image' }
+    ]
+  }))
+)
 
 function readCssVariable(variableName: string, fallback: string) {
   if (typeof window === 'undefined') {

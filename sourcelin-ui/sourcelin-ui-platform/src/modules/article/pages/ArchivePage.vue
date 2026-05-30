@@ -214,6 +214,7 @@ import { getCategoryDetail } from '@/modules/article/api/category.api'
 import { buildArchiveArticleRoute } from '@/modules/article/utils/article-source'
 import EmptyState from '@/shared/components/feedback/EmptyState.vue'
 import HeroStatCard from '@/shared/components/business/HeroStatCard.vue'
+import { useSeoHead } from '@/shared/composables/useSeoHead'
 import PageShell from '@/shared/components/layout/PageShell.vue'
 import SButton from '@/shared/components/ui/SButton.vue'
 import SIcon from '@/shared/components/ui/SIcon.vue'
@@ -243,6 +244,13 @@ const archiveItems = ref<Article[]>([])
 const filterCategoryName = ref('')
 const loadingArchives = ref(false)
 const archivePage = ref(1)
+
+// 归档页 SEO
+useSeoHead({
+  title: computed(() => '文章归档'),
+  description: computed(() => '浏览全部文章，按时间线序排列，查找你感兴趣的内容。'),
+  canonicalUrl: computed(() => typeof window !== 'undefined' ? `${window.location.origin}/archive` : '')
+})
 const archivePageSize = 120
 const archiveTotal = ref(0)
 const archiveHasMore = ref(false)
