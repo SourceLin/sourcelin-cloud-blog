@@ -1,0 +1,41 @@
+/* uni.scss
+ * Uniapp 主题变量入口（uview-plus 等组件库会读取此文件）
+ * 仅放置主题相关变量，业务样式请使用 src/styles/variables.scss
+ */
+
+/* 主题色 */
+$uni-color-primary: #3B59FF;
+$uni-color-success: #00b42a;
+$uni-color-warning: #ff7d00;
+$uni-color-error: #f53f3f;
+
+/* 文字 */
+$uni-text-color: #1f2329;
+$uni-text-color-inverse: #ffffff;
+$uni-text-color-grey: #4e5969;
+$uni-text-color-placeholder: #86909c;
+$uni-text-color-disable: #c9cdd4;
+
+/* 背景 */
+$uni-bg-color: #F8FAFC;
+$uni-bg-color-grey: #F8FAFC;
+$uni-bg-color-hover: #f1f3f5;
+$uni-bg-color-mask: rgba(31, 35, 41, 0.4);
+
+/* 边框 */
+$uni-border-color: rgba(255, 255, 255, 0.72);
+
+/* 字号 */
+$uni-font-size-sm: 24rpx;
+$uni-font-size-base: 28rpx;
+$uni-font-size-lg: 32rpx;
+
+/* 圆角 */
+$uni-border-radius-sm: 12rpx;
+$uni-border-radius-base: 24rpx;
+$uni-border-radius-lg: 32rpx;
+
+/* 间距 */
+$uni-spacing-row-sm: 8rpx;
+$uni-spacing-row-base: 16rpx;
+$uni-spacing-row-lg: 24rpx;

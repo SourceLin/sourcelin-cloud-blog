@@ -8,7 +8,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * 门户导航栏对象 b_web_navbar
  *
  * @author sourcelin
- * @date 2023-11-06
+ * @date 2026-01-06
  */
 public class WebNavbar extends TreeEntity {
     private static final long serialVersionUID = 1L;

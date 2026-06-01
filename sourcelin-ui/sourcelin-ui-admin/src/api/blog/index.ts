@@ -2,6 +2,7 @@ export { default as ArticleAPI } from "./article";
 export { default as CategoryAPI } from "./category";
 export { default as TagAPI } from "./tag";
 export { default as CommentAPI } from "./comment";
+export { default as ContentReportAPI } from "./report";
 export { default as ModerationAPI } from "./moderation";
 export { default as SayAPI } from "./say";
 export { default as TreeholeAPI } from "./treehole";

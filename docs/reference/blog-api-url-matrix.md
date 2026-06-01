@@ -43,6 +43,10 @@
 | DELETE | `/admin/collect/{ids}` | `/blog/admin/collect/{ids}` |
 | GET | `/admin/interactions/dashboard/overview` | `/blog/admin/interactions/dashboard/overview` |
 | GET | `/admin/interactions/actions` | `/blog/admin/interactions/actions` |
+| GET | `/admin/report/list` | `/blog/admin/report/list` |
+| GET | `/admin/report/{id}` | `/blog/admin/report/{id}` |
+| PUT | `/admin/report/{id}/status` | `/blog/admin/report/{id}/status` |
+| DELETE | `/admin/report/{ids}` | `/blog/admin/report/{ids}` |
 | GET | `/admin/config/getWebConfig` | `/blog/admin/config/getWebConfig` |
 | POST/PUT | `/admin/config` | `/blog/admin/config` |
 | GET | `/admin/navbar/list` | `/blog/admin/navbar/list` |
@@ -53,7 +57,7 @@
 | GET | `/admin/stats/summary` | `/blog/admin/stats/summary` |
 | GET | `/admin/stats/trend` | `/blog/admin/stats/trend` |
 
-**前端对照**：`sourcelin-ui-admin/src/api/blog/*.js`（article、category、tag、comment、moderation、say、treehole、link、user、follow、collect、config、navbar、navigation、stats）。
+**前端对照**：`sourcelin-ui-admin/src/api/blog/*.ts`（article、category、tag、comment、moderation、say、treehole、link、user、follow、collect、report、config、navbar、navigation、stats）。
 
 ---
 
@@ -124,7 +128,10 @@
 | PUT | `/front/interactions/collects/{targetType}/{targetId}` | 收藏（幂等） |
 | DELETE | `/front/interactions/collects/{targetType}/{targetId}` | 取消收藏（幂等） |
 | GET | `/front/interactions/targets/stat` | 多目标互动状态聚合 |
-| GET | `/front/interactions/collects` | 收藏列表（互动域统一路由） |
+| GET | `/front/interactions/collects` | 我的收藏列表（需登录） |
+| GET | `/front/interactions/likes` | 我的点赞列表（需登录） |
+| GET | `/front/comments/mine` | 我发出的评论列表（需登录，`source` 可选：`article` / `say` / `treehole`） |
+| POST | `/front/subscriptions/authorizations` | 记录小程序订阅消息授权结果（需登录） |
 
 **前端对照**：`sourcelin-ui-platform/src/modules/**/api/*.api.ts` 与 `src/shared/api/comment.api.ts`。
 

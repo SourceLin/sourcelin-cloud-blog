@@ -8,7 +8,7 @@ import java.util.List;
  * 新增/修改博客文章对象DTO
  *
  * @author sourcelin
- * @date 2023-11-15
+ * @date 2026-01-15
  */
 @Data
 public class ArticleInsertDTO {

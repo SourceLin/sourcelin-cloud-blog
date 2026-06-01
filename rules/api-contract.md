@@ -1,6 +1,6 @@
 # API 契约规则
 
-适用范围：`sourcelin-auth`、`sourcelin-gateway`、`sourcelin-modules/*` 对外 HTTP JSON 接口，以及 `sourcelin-ui/sourcelin-ui-platform`、`sourcelin-ui/sourcelin-ui-admin` 的接口消费代码。
+适用范围：`sourcelin-auth`、`sourcelin-gateway`、`sourcelin-modules/*` 对外 HTTP JSON 接口，以及 `sourcelin-ui/sourcelin-ui-platform`、`sourcelin-ui/sourcelin-ui-uniapp`、`sourcelin-ui/sourcelin-ui-admin` 的接口消费代码。
 
 ## 1. 统一响应体
 

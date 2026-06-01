@@ -39,9 +39,10 @@ description: 用于执行 Sourcelin 跨端架构重构、目录整理、页面�
 ## 依赖 rules
 
 - `rules/api-contract.md`
-- `rules/backend.md`
-- `rules/frontend-platform.md`
-- `rules/frontend-admin.md`
+- `rules/backend.md`
+- `rules/frontend-platform.md`
+- `rules/frontend-uniapp.md`
+- `rules/frontend-admin.md`
 - `rules/coding-conventions.md`
 - `rules/testing-and-validation.md`
 

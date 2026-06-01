@@ -7,6 +7,7 @@ import type { CategoryOption } from '@/modules/article/api/category.api'
 import type { ArticleListItem } from '@/modules/article/api/article.api'
 import { buildCategoryArticleRoute } from '@/modules/article/utils/article-source'
 import ContextArticleCardSkeleton from '@/modules/article/components/ContextArticleCardSkeleton.vue'
+import { useSeoHead } from '@/shared/composables/useSeoHead'
 import EmptyState from '@/shared/components/feedback/EmptyState.vue'
 import HeroStatCard from '@/shared/components/business/HeroStatCard.vue'
 import FoldableOverflowBlock from '@/shared/components/layout/FoldableOverflowBlock.vue'
@@ -49,6 +50,13 @@ interface CategoryHeroStatTile {
 const route = useRoute()
 const router = useRouter()
 const message = useSMessage()
+
+// 分类页 SEO
+useSeoHead({
+  title: computed(() => '文章分类'),
+  description: computed(() => '按分类浏览所有文章，快速找到你感兴趣的主题内容。'),
+  canonicalUrl: computed(() => typeof window !== 'undefined' ? `${window.location.origin}/categories` : '')
+})
 
 const categorySwitchSectionRef = ref<HTMLElement | null>(null)
 

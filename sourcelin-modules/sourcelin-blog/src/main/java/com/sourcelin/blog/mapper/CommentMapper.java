@@ -3,6 +3,7 @@ package com.sourcelin.blog.mapper;
 import com.sourcelin.blog.domain.Comment;
 import com.sourcelin.blog.dto.CommentDTO;
 import com.sourcelin.blog.vo.CommentVO;
+import com.sourcelin.blog.vo.FrontMyCommentVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  * 评论管理Mapper接口
  * 
  * @author sourcelin
- * @date 2023-11-16
+ * @date 2026-01-16
  */
 public interface CommentMapper 
 {
@@ -35,6 +36,8 @@ public interface CommentMapper
      * 前台评论列表（合并本人 0/2）
      */
     List<CommentVO> selectFrontCommentList(CommentDTO dto);
+
+    List<FrontMyCommentVO> selectMyCommentList(@Param("userId") Long userId, @Param("source") String source);
 
     /**
      * 新增文章评论

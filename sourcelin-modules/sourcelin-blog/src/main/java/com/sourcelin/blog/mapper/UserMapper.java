@@ -8,7 +8,7 @@ import java.util.List;
  * 用户信息Mapper接口
  * 
  * @author sourcelin
- * @date 2023-11-02
+ * @date 2026-01-02
  */
 public interface UserMapper 
 {
@@ -75,4 +75,12 @@ public interface UserMapper
      * @return 用户信息
      */
     public User selectUserByEmail(String email);
+
+    /**
+     * 通过微信 openId 查询用户
+     *
+     * @param openId 微信 openId
+     * @return 用户信息
+     */
+    public User selectUserByOpenId(String openId);
 }

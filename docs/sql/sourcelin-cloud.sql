@@ -374,7 +374,6 @@ CREATE TABLE `b_user` (
   `realname_auth` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否实名认证（1未验证，2已验证）',
   `open_id` varchar(100) DEFAULT NULL COMMENT '微信登录openid',
   `session_key` varchar(100) DEFAULT NULL COMMENT '微信登录会话KEY',
-  `deleted` int(11) DEFAULT '0' COMMENT '是否删除',
   `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
@@ -1405,7 +1404,11 @@ INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`
 (1207, '公告删除', 1201, 6, '', '', '', '', 1, 0, 'F', '0', '0', 'blog:announcement:remove', '#', 'admin', '2026-04-16 14:59:53', '', NULL, ''),
 (1211, '互动记录', 1063, 17, 'interactions/records', 'blog/interactions/records', '', 'Interaction', 1, 0, 'C', '0', '0', 'blog:interaction:list', 'Comment', 'admin', '2026-04-23 21:01:04', 'admin', '2026-04-23 21:35:01', '点赞/收藏行为记录'),
 (1212, '互动记录查询', 1211, 1, '', '', NULL, '', 1, 0, 'F', '0', '0', 'blog:interaction:query', '#', 'admin', '2026-04-23 21:41:30', '', NULL, '互动记录详情查询权限'),
-(1213, '互动记录删除', 1211, 2, '', '', NULL, '', 1, 0, 'F', '0', '0', 'blog:interaction:remove', '#', 'admin', '2026-04-23 21:52:36', '', NULL, '互动记录删除权限');
+(1213, '互动记录删除', 1211, 2, '', '', NULL, '', 1, 0, 'F', '0', '0', 'blog:interaction:remove', '#', 'admin', '2026-04-23 21:52:36', '', NULL, '互动记录删除权限'),
+(1214, '内容举报', 1063, 18, 'report', 'blog/report/index', '', 'BlogReport', 1, 0, 'C', '0', '0', 'blog:report:list', 'Warning', 'admin', '2026-05-28 14:30:00', '', NULL, '前台内容举报处理'),
+(1215, '内容举报查询', 1214, 1, '', '', NULL, '', 1, 0, 'F', '0', '0', 'blog:report:query', '#', 'admin', '2026-05-28 14:30:00', '', NULL, '内容举报详情查询权限'),
+(1216, '内容举报处理', 1214, 2, '', '', NULL, '', 1, 0, 'F', '0', '0', 'blog:report:edit', '#', 'admin', '2026-05-28 14:30:00', '', NULL, '内容举报状态处理权限'),
+(1217, '内容举报删除', 1214, 3, '', '', NULL, '', 1, 0, 'F', '0', '0', 'blog:report:remove', '#', 'admin', '2026-05-28 14:30:00', '', NULL, '内容举报删除权限');
 
 -- ----------------------------
 -- Seed data for `sys_post`
@@ -1438,6 +1441,10 @@ INSERT INTO `sys_role_menu` (`role_id`, `menu_id`) VALUES
 (1, 1211),
 (1, 1212),
 (1, 1213),
+(1, 1214),
+(1, 1215),
+(1, 1216),
+(1, 1217),
 (2, 1),
 (2, 2),
 (2, 100),
@@ -1529,5 +1536,81 @@ INSERT INTO `sys_user_post` (`user_id`, `post_id`) VALUES
 -- ----------------------------
 INSERT INTO `sys_user_role` (`user_id`, `role_id`) VALUES
 (1, 1);
+
+-- ----------------------------
+-- Table structure for `b_content_report`
+-- ----------------------------
+DROP TABLE IF EXISTS `b_content_report`;
+CREATE TABLE `b_content_report` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '举报用户ID',
+  `target_type` varchar(32) NOT NULL COMMENT '目标类型',
+  `target_id` bigint(20) NOT NULL COMMENT '目标ID',
+  `reason` varchar(64) NOT NULL COMMENT '举报原因',
+  `detail` varchar(500) DEFAULT NULL COMMENT '补充说明',
+  `page_path` varchar(128) DEFAULT NULL COMMENT '来源页面',
+  `status` varchar(32) NOT NULL DEFAULT 'PENDING' COMMENT '处理状态',
+  `client_ip` varchar(64) DEFAULT NULL COMMENT '客户端IP',
+  `user_agent` varchar(255) DEFAULT NULL COMMENT '用户代理',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`id`),
+  KEY `idx_b_content_report_status` (`status`,`create_time`),
+  KEY `idx_b_content_report_target` (`target_type`,`target_id`),
+  KEY `idx_b_content_report_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='前台内容举报记录';
+
+-- ----------------------------
+-- Table structure for `b_analytics_event`
+-- ----------------------------
+DROP TABLE IF EXISTS `b_analytics_event`;
+CREATE TABLE `b_analytics_event` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
+  `event_type` varchar(64) NOT NULL COMMENT '事件类型',
+  `page_path` varchar(128) DEFAULT NULL COMMENT '页面路径',
+  `target_type` varchar(32) DEFAULT NULL COMMENT '目标类型',
+  `target_id` bigint(20) DEFAULT NULL COMMENT '目标ID',
+  `metadata_json` varchar(4000) DEFAULT NULL COMMENT '扩展数据',
+  `platform` varchar(32) DEFAULT NULL COMMENT '平台标识',
+  `app_version` varchar(64) DEFAULT NULL COMMENT '应用版本',
+  `client_ip` varchar(64) DEFAULT NULL COMMENT '客户端IP',
+  `user_agent` varchar(255) DEFAULT NULL COMMENT '用户代理',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`id`),
+  KEY `idx_b_analytics_event_type` (`event_type`,`create_time`),
+  KEY `idx_b_analytics_target` (`target_type`,`target_id`),
+  KEY `idx_b_analytics_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='前台埋点事件记录';
+
+-- ----------------------------
+-- Table structure for `blog_subscribe_authorization`
+-- ----------------------------
+DROP TABLE IF EXISTS `blog_subscribe_authorization`;
+CREATE TABLE `blog_subscribe_authorization` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
+  `template_id` varchar(128) NOT NULL COMMENT '微信订阅消息模板ID',
+  `scene` varchar(64) DEFAULT NULL COMMENT '授权场景',
+  `authorization_status` varchar(32) NOT NULL COMMENT '授权结果 accept/reject/ban/fail',
+  `platform` varchar(32) DEFAULT NULL COMMENT '平台标识',
+  `client_ip` varchar(64) DEFAULT NULL COMMENT '客户端IP',
+  `user_agent` varchar(255) DEFAULT NULL COMMENT '用户代理',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`id`),
+  KEY `idx_blog_subscribe_user` (`user_id`,`create_time`),
+  KEY `idx_blog_subscribe_template` (`template_id`,`authorization_status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='小程序订阅消息授权记录';
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -3,17 +3,22 @@ package com.sourcelin.auth.controller;
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpLogic;
+import com.sourcelin.auth.dto.MiniProgramBindDTO;
 import com.sourcelin.auth.dto.LoginDTO;
 import com.sourcelin.auth.dto.RegisterDTO;
 import com.sourcelin.auth.dto.EmailCodeRequestDTO;
 import com.sourcelin.auth.dto.EmailLoginDTO;
+import com.sourcelin.auth.dto.WeiXinLoginDTO;
 import com.sourcelin.auth.vo.AuthTokenVo;
 import com.sourcelin.auth.vo.CaptchaVo;
 import com.sourcelin.auth.service.BlogLoginService;
+import com.sourcelin.auth.service.MiniProgramAuthService;
 import com.sourcelin.auth.service.RegisterService;
 import com.sourcelin.auth.service.SysLoginService;
 import com.sourcelin.auth.service.EmailCodeService;
 import com.sourcelin.auth.service.ShearCaptchaService;
+import com.sourcelin.auth.vo.MiniProgramBindPrepareVo;
+import com.sourcelin.auth.vo.MiniProgramLoginVo;
 import com.sourcelin.blog.api.domain.User;
 import com.sourcelin.blog.api.model.LoginUser;
 import com.sourcelin.common.core.constant.SecurityConstants;
@@ -45,6 +50,8 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class SysLoginController {
     private static final String LOGIN_TYPE_BLOG = "blog";
+    private static final String LOGIN_TYPE_MINI = "mini";
+    private static final String LOGIN_TYPE_ADMIN = "admin";
 
     @Autowired
     private SysLoginService sysLoginService;
@@ -61,6 +68,9 @@ public class SysLoginController {
     @Autowired
     private ShearCaptchaService shearCaptchaService;
 
+    @Autowired
+    private MiniProgramAuthService miniProgramAuthService;
+
     @GetMapping("/captcha")
     public CaptchaVo getCaptcha(@RequestParam(value = "loginType", required = false) String loginType) {
         return shearCaptchaService.createCaptcha(normalizeLoginType(loginType));
@@ -71,8 +81,8 @@ public class SysLoginController {
         String loginType = normalizeLoginType(param.getLoginType());
         shearCaptchaService.verifyCaptcha(param.getCaptchaCode(), param.getCaptchaUuid(), loginType);
         param.setPassword(decryptPasswordIfNeeded(param.getPassword()));
-        if ("blog".equals(loginType)) {
-            return blogLogin(param);
+        if (isBlogClientLogin(loginType)) {
+            return blogLogin(param, loginType);
         }
         return adminLogin(param);
     }
@@ -82,14 +92,14 @@ public class SysLoginController {
         Long userId = userInfo.getSysUser().getUserId();
         StpAdminUtil.login(userId);
         saveLoginContext(StpAdminUtil.stpLogic, userInfo);
-        return buildTokenPayload(StpAdminUtil.stpLogic, "admin");
+        return buildTokenPayload(StpAdminUtil.stpLogic, LOGIN_TYPE_ADMIN);
     }
 
-    private AuthTokenVo blogLogin(LoginDTO param) {
+    private AuthTokenVo blogLogin(LoginDTO param, String loginType) {
         LoginUser userInfo = blogLoginService.login(param.getUsername(), param.getPassword());
         StpBlogUtil.login(userInfo.getUser().getId());
         saveLoginContext(StpBlogUtil.stpLogic, userInfo);
-        return buildTokenPayload(StpBlogUtil.stpLogic, "blog");
+        return buildTokenPayload(StpBlogUtil.stpLogic, loginType);
     }
 
     @DeleteMapping("logout")
@@ -123,7 +133,7 @@ public class SysLoginController {
         String loginType = normalizeLoginType(registerParam.getLoginType());
         shearCaptchaService.verifyCaptcha(registerParam.getCaptchaCode(), registerParam.getCaptchaUuid(), loginType);
         registerParam.setPassword(decryptPasswordIfNeeded(registerParam.getPassword()));
-        if ("blog".equals(loginType)) {
+        if (isBlogClientLogin(loginType)) {
             Long userId = registerService.registerUser(
                 registerParam.getUsername(),
                 registerParam.getPassword(),
@@ -137,7 +147,7 @@ public class SysLoginController {
             loginUser.setUserid(userId);
             loginUser.setUsername(registerParam.getUsername());
             saveLoginContext(StpBlogUtil.stpLogic, loginUser);
-            return buildTokenPayload(StpBlogUtil.stpLogic, "blog");
+            return buildTokenPayload(StpBlogUtil.stpLogic, loginType);
         }
         sysLoginService.register(registerParam.getUsername(), registerParam.getPassword());
         return true;
@@ -177,7 +187,7 @@ public class SysLoginController {
             }
             StpBlogUtil.login(userInfo.getUser().getId());
             saveLoginContext(StpBlogUtil.stpLogic, userInfo);
-            return buildTokenPayload(StpBlogUtil.stpLogic, "blog");
+            return buildTokenPayload(StpBlogUtil.stpLogic, LOGIN_TYPE_BLOG);
         }
         if (StringUtils.isEmpty(loginDTO.getPassword())) {
             throw new ServiceException("密码不能为空");
@@ -186,7 +196,46 @@ public class SysLoginController {
         LoginUser userInfo = blogLoginService.login(loginDTO.getEmail(), loginDTO.getPassword());
         StpBlogUtil.login(userInfo.getUser().getId());
         saveLoginContext(StpBlogUtil.stpLogic, userInfo);
-        return buildTokenPayload(StpBlogUtil.stpLogic, "blog");
+        return buildTokenPayload(StpBlogUtil.stpLogic, LOGIN_TYPE_BLOG);
+    }
+
+    @PostMapping("/wechat/mini/login")
+    public MiniProgramLoginVo miniProgramLogin(@Valid @RequestBody WeiXinLoginDTO loginDTO) {
+        MiniProgramAuthService.MiniProgramLoginAttempt attempt = miniProgramAuthService.login(loginDTO.getCode());
+        MiniProgramLoginVo result = new MiniProgramLoginVo();
+        result.setBound(attempt.isBound());
+        result.setNewUser(attempt.isNewUser());
+        LoginUser userInfo = attempt.getLoginUser();
+        StpBlogUtil.login(userInfo.getUser().getId());
+        saveLoginContext(StpBlogUtil.stpLogic, userInfo);
+        result.setToken(buildTokenPayload(StpBlogUtil.stpLogic, LOGIN_TYPE_MINI));
+        return result;
+    }
+
+    @PostMapping("/wechat/mini/prepare-bind")
+    public MiniProgramBindPrepareVo miniProgramPrepareBind(@Valid @RequestBody WeiXinLoginDTO loginDTO) {
+        MiniProgramAuthService.MiniProgramBindContext bindContext = miniProgramAuthService.prepareBind(loginDTO.getCode());
+        MiniProgramBindPrepareVo result = new MiniProgramBindPrepareVo();
+        result.setBindToken(bindContext.getBindToken());
+        result.setBindMessage("请登录已有账号完成绑定，后续可直接使用微信登录");
+        return result;
+    }
+
+    @PostMapping("/wechat/mini/bind")
+    public AuthTokenVo miniProgramBind(@Valid @RequestBody MiniProgramBindDTO bindDTO) {
+        shearCaptchaService.verifyCaptcha(
+            bindDTO.getCaptchaCode(),
+            bindDTO.getCaptchaUuid(),
+            LOGIN_TYPE_MINI
+        );
+        LoginUser userInfo = miniProgramAuthService.bindExistingAccount(
+            bindDTO.getBindToken(),
+            bindDTO.getUsername(),
+            decryptPasswordIfNeeded(bindDTO.getPassword())
+        );
+        StpBlogUtil.login(userInfo.getUser().getId());
+        saveLoginContext(StpBlogUtil.stpLogic, userInfo);
+        return buildTokenPayload(StpBlogUtil.stpLogic, LOGIN_TYPE_MINI);
     }
 
     private String decryptPasswordIfNeeded(String password) {
@@ -326,12 +375,16 @@ public class SysLoginController {
 
     private String normalizeLoginType(String loginType) {
         if (StringUtils.isEmpty(loginType)) {
-            return "blog";
+            return LOGIN_TYPE_BLOG;
         }
-        if (!"blog".equals(loginType) && !"admin".equals(loginType)) {
-            throw new ServiceException("loginType 仅支持 blog/admin");
+        if (!LOGIN_TYPE_BLOG.equals(loginType) && !LOGIN_TYPE_MINI.equals(loginType) && !LOGIN_TYPE_ADMIN.equals(loginType)) {
+            throw new ServiceException("loginType 仅支持 blog/mini/admin");
         }
         return loginType;
+    }
+
+    private boolean isBlogClientLogin(String loginType) {
+        return LOGIN_TYPE_BLOG.equals(loginType) || LOGIN_TYPE_MINI.equals(loginType);
     }
 
     private String normalizeEmailLoginType(String loginType) {

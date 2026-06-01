@@ -8,7 +8,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * 评论管理对象 b_comment
  *
  * @author sourcelin
- * @date 2023-11-16
+ * @date 2026-01-16
  */
 public class Comment extends BaseEntity {
     private static final long serialVersionUID = 1L;

@@ -13,6 +13,10 @@ export interface AppRouteMeta {
   mobile?: boolean
   footer?: boolean
   shell?: 'default' | 'auth'
+  /** SEO 专用标题，未指定时降级使用 title */
+  seoTitle?: string
+  /** SEO 专用描述，未指定时使用站点默认描述 */
+  seoDescription?: string
 }
 
 export type AppRouteRecordRaw = Omit<RouteRecordRaw, 'children' | 'meta'> & {

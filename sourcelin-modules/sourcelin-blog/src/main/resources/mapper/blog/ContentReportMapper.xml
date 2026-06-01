@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.ContentReportMapper">
+
+    <resultMap id="ContentReportResult" type="com.sourcelin.blog.domain.ContentReport">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="targetType" column="target_type"/>
+        <result property="targetId" column="target_id"/>
+        <result property="reason" column="reason"/>
+        <result property="detail" column="detail"/>
+        <result property="pagePath" column="page_path"/>
+        <result property="status" column="status"/>
+        <result property="clientIp" column="client_ip"/>
+        <result property="userAgent" column="user_agent"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectContentReportVo">
+        select id, user_id, target_type, target_id, reason, detail, page_path, status,
+               client_ip, user_agent, create_by, create_time, update_by, update_time, remark
+        from b_content_report
+    </sql>
+
+    <select id="selectContentReportList" parameterType="com.sourcelin.blog.domain.ContentReport" resultMap="ContentReportResult">
+        <include refid="selectContentReportVo"/>
+        <where>
+            <if test="userId != null">and user_id = #{userId}</if>
+            <if test="targetType != null and targetType != ''">and target_type = #{targetType}</if>
+            <if test="targetId != null">and target_id = #{targetId}</if>
+            <if test="reason != null and reason != ''">and reason like concat('%', #{reason}, '%')</if>
+            <if test="status != null and status != ''">and status = #{status}</if>
+        </where>
+        order by create_time desc, id desc
+    </select>
+
+    <select id="selectContentReportById" parameterType="Long" resultMap="ContentReportResult">
+        <include refid="selectContentReportVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertContentReport" parameterType="com.sourcelin.blog.domain.ContentReport" useGeneratedKeys="true" keyProperty="id">
+        insert into b_content_report
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            target_type,
+            target_id,
+            reason,
+            detail,
+            page_path,
+            status,
+            client_ip,
+            user_agent,
+            create_time,
+            update_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            #{targetType},
+            #{targetId},
+            #{reason},
+            #{detail},
+            #{pagePath},
+            #{status},
+            #{clientIp},
+            #{userAgent},
+            #{createTime},
+            #{updateTime}
+        </trim>
+    </insert>
+
+    <update id="updateContentReport" parameterType="com.sourcelin.blog.domain.ContentReport">
+        update b_content_report
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteContentReportByIds" parameterType="Long">
+        delete from b_content_report where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

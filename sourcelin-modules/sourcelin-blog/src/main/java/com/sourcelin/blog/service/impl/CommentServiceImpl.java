@@ -9,6 +9,7 @@ import com.sourcelin.blog.mapper.CommentMapper;
 import com.sourcelin.blog.mapper.CommentModerationMapper;
 import com.sourcelin.blog.service.ICommentService;
 import com.sourcelin.blog.vo.CommentVO;
+import com.sourcelin.blog.vo.FrontMyCommentVO;
 import com.sourcelin.blog.vo.ModerationOutcome;
 import com.sourcelin.common.core.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import java.util.List;
  * 评论管理Service业务层处理
  * 
  * @author sourcelin
- * @date 2023-11-16
+ * @date 2026-01-16
  */
 @Service
 public class CommentServiceImpl implements ICommentService 
@@ -63,6 +64,12 @@ public class CommentServiceImpl implements ICommentService
     public List<CommentVO> selectFrontCommentList(CommentDTO dto)
     {
         return commentMapper.selectFrontCommentList(dto);
+    }
+
+    @Override
+    public List<FrontMyCommentVO> selectMyCommentList(Long userId, String source)
+    {
+        return commentMapper.selectMyCommentList(userId, source);
     }
 
     /**

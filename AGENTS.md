@@ -56,6 +56,8 @@ sourcelin-visual/     # 监控等可视化服务
 
 sourcelin-ui/sourcelin-ui-platform/    # 博客前台，Vue3 + TypeScript + Naive UI 抽象层
 
+sourcelin-ui/sourcelin-ui-uniapp/      # 移动端小程序，Uniapp + Vue3 + TypeScript
+
 sourcelin-ui/sourcelin-ui-admin/       # 管理后台主线，Vue3 + TypeScript + Element Plus
 
 sourcelin-ui/sourcelin-ui-admin-vue2/  # 旧版迁移对照，不承载新功能
@@ -107,6 +109,8 @@ sourcelin-ui/sourcelin-ui-admin-vue2/  # 旧版迁移对照，不承载新功能
 
 - 博客前台：`rules/frontend-platform.md`，并联查 `sourcelin-ui/sourcelin-ui-platform/AGENTS.md`
 
+- Uniapp 移动端：`rules/frontend-uniapp.md`，并联查 `sourcelin-ui/sourcelin-ui-uniapp/AGENTS.md`
+
 - 管理后台：`rules/frontend-admin.md`
 
 
@@ -134,6 +138,8 @@ sourcelin-ui/sourcelin-ui-admin-vue2/  # 旧版迁移对照，不承载新功能
 
 - `skills/frontend-platform-dev/SKILL.md`：博客前台开发。
 
+- `skills/frontend-uniapp-dev/SKILL.md`：Uniapp 移动端开发。
+
 - `skills/frontend-admin-dev/SKILL.md`：管理后台开发。
 
 - `skills/backend-dev/SKILL.md`：后端开发。
@@ -149,6 +155,8 @@ sourcelin-ui/sourcelin-ui-admin-vue2/  # 旧版迁移对照，不承载新功能
 
 
 - 前台任务使用 `frontend-platform-dev`。
+
+- Uniapp 移动端任务使用 `frontend-uniapp-dev`。
 
 - 后台任务使用 `frontend-admin-dev`。
 
@@ -227,7 +235,25 @@ mvn <goal>
 
 
 
-## 9. 管理后台执行流程
+## 9. Uniapp 移动端执行流程
+
+
+1. 读取 `rules/frontend-uniapp.md`、`skills/frontend-uniapp-dev/SKILL.md` 和 `sourcelin-ui/sourcelin-ui-uniapp/AGENTS.md`。
+
+2. Tab 页面放 `src/pages/<tab>/<tab>.vue`，分组页面放 `src/pages-article/**`、`src/pages-user/**`、`src/pages-messages/**`、`src/pages-about/**`、`src/pages-publish/**`。
+
+3. 业务域 API、types、composables、utils 放 `src/modules/<domain>/**`。
+
+4. 请求统一经过 `src/utils/request.ts`，移动端前台接口走 `/blog-api`，登录 `loginType` 固定为 `mini`。
+
+5. 新增页面必须同步 `src/pages.json`；新增 Tab 必须同步 `src/static/tabbar/**` 图标。
+
+6. 小程序分包 root 必须是真实目录，不满足条件时保持普通页面注册。
+
+7. 按改动范围执行 `npm run lint`、`npm run type-check`、`npm run build:mp-weixin`。
+
+
+## 10. 管理后台执行流程
 
 
 1. 读取 `rules/frontend-admin.md` 和 `skills/frontend-admin-dev/SKILL.md`。
@@ -246,7 +272,7 @@ mvn <goal>
 
 
 
-## 10. 架构重构流程
+## 11. 架构重构流程
 
 
 1. 读取 `skills/architecture-refactor/SKILL.md`。
@@ -261,7 +287,7 @@ mvn <goal>
 
 6. 使用当前仓库存在的 Maven、npm、pnpm 命令完成验证，不依赖未提交的本地脚本。
 
-## 11. 审查流程
+## 12. 审查流程
 
 
 审查默认只输出问题，不继续开发。审查时必须检查：
@@ -280,7 +306,7 @@ mvn <goal>
 
 
 
-## 12. 常用命令
+## 13. 常用命令
 
 
 后端：
@@ -314,6 +340,23 @@ npm run test:architecture
 ```
 
 
+Uniapp 移动端：
+
+
+
+```powershell
+
+cd sourcelin-ui\sourcelin-ui-uniapp
+
+npm run lint
+
+npm run type-check
+
+npm run build:mp-weixin
+
+```
+
+
 
 管理后台：
 
@@ -343,7 +386,7 @@ mysql -u root -p < docs/sql/sourcelin-cloud.sql
 
 
 
-## 13. 服务启动顺序
+## 14. 服务启动顺序
 
 
 1. MySQL
@@ -366,7 +409,7 @@ mysql -u root -p < docs/sql/sourcelin-cloud.sql
 
 
 
-## 14. 禁止事项
+## 15. 禁止事项
 
 
 - MUST NOT：提交真实账号、密码、token、cookie、私钥。

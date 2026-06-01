@@ -10,7 +10,7 @@ import java.util.List;
  * 博客文章Service接口
  * 
  * @author sourcelin
- * @date 2023-11-09
+ * @date 2026-01-09
  */
 public interface IArticleService 
 {

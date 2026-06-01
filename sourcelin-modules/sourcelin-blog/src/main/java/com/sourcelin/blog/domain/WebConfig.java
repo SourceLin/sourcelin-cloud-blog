@@ -8,7 +8,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * 网站配置对象 b_web_config
  *
  * @author sourcelin
- * @date 2023-11-04
+ * @date 2026-01-04
  */
 public class WebConfig extends BaseEntity {
     private static final long serialVersionUID = 1L;

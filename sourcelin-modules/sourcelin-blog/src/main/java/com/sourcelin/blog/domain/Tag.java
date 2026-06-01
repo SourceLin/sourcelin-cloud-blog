@@ -8,7 +8,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * 博客标签对象 b_tag
  *
  * @author sourcelin
- * @date 2023-11-07
+ * @date 2026-01-07
  */
 public class Tag extends BaseEntity {
     private static final long serialVersionUID = 1L;

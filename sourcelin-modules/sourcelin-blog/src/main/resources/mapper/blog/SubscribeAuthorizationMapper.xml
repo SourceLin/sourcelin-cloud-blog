@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.SubscribeAuthorizationMapper">
+
+    <insert id="insertSubscribeAuthorization" parameterType="com.sourcelin.blog.domain.SubscribeAuthorization" useGeneratedKeys="true" keyProperty="id">
+        insert into blog_subscribe_authorization
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            template_id,
+            scene,
+            authorization_status,
+            platform,
+            client_ip,
+            user_agent,
+            create_time,
+            update_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            #{templateId},
+            #{scene},
+            #{authorizationStatus},
+            #{platform},
+            #{clientIp},
+            #{userAgent},
+            #{createTime},
+            #{updateTime}
+        </trim>
+    </insert>
+
+</mapper>

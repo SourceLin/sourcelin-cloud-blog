@@ -25,7 +25,7 @@ import java.util.List;
  * 用户信息Controller
  *
  * @author sourcelin
- * @date 2023-11-02
+ * @date 2026-01-02
  */
 @RestController
 @RequestMapping("/admin/user")

@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
  * 收藏Mapper接口
  * 
  * @author sourcelin
- * @date 2023-11-18
+ * @date 2026-01-18
  */
 public interface CollectMapper 
 {

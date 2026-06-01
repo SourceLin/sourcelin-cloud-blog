@@ -13,6 +13,7 @@ import type { FrontUserDetailVO } from '@/modules/user/api/user.api'
 import { getToken } from '@/shared/utils/auth'
 import { resolveRequestErrorMessage } from '@/shared/api/error-message'
 import { useSMessage } from '@/shared/composables/useSMessage'
+import { useSeoHead } from '@/shared/composables/useSeoHead'
 import { useUserStore } from '@/stores/user'
 import defaultCover from '@/assets/images/backgrounds/home-bg.jpg'
 import defaultAvatar from '@/assets/images/logo/logo.png'
@@ -74,6 +75,29 @@ export function useArticleDetail(articleId: Ref<number>) {
   const authorIntroduction = computed(() => articleUser.value?.introduction || '记录技术、写作与长期主义。')
   const articleIdentityLabel = computed(() => (article.value.isOriginal === 0 ? '转载' : '原创'))
   const heroKicker = computed(() => `${articleIdentityLabel.value}专栏`)
+
+  // 文章详情页 SEO：动态注入 TDK + Open Graph
+  const articleOgImage = computed(() => {
+    const cover = article.value.avatar
+    if (!cover) return ''
+    // 如果封面是相对路径则保持，绝对 URL 直接使用
+    if (cover.startsWith('http')) return cover
+    return typeof window !== 'undefined' ? `${window.location.origin}${cover}` : cover
+  })
+
+  const articleCanonicalUrl = computed(() => {
+    if (typeof window === 'undefined') return ''
+    return `${window.location.origin}/article/${articleId.value}`
+  })
+
+  useSeoHead({
+    title: articleTitle,
+    description: articleSummary,
+    ogImage: articleOgImage,
+    canonicalUrl: articleCanonicalUrl,
+    ogType: computed(() => (article.value.title ? 'article' : 'website')),
+    publishedTime: computed(() => article.value.createTime || '')
+  })
 
   const formatDate = (value?: string) => (value ? value.split(' ')[0] : '')
   const issueLabel = computed(() => {

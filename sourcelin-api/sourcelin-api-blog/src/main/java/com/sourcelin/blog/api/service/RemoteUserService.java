@@ -61,4 +61,15 @@ public interface RemoteUserService {
     public R<LoginUser> getUserInfoByEmail(@PathVariable("email") String email,
                                            @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
+    /**
+     * 通过微信 openId 查询用户
+     *
+     * @param openId 微信 openId
+     * @param source 请求来源
+     * @return 结果
+     */
+    @GetMapping("/user/info/openid/{openId}")
+    public R<LoginUser> getUserInfoByOpenId(@PathVariable("openId") String openId,
+                                            @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+
 }

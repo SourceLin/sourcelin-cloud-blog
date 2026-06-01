@@ -106,6 +106,65 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         order by create_time desc
     </select>
 
+    <resultMap type="LikeRecord" id="LikeRecordResultVO">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="targetType" column="target_type"/>
+        <result property="targetId" column="like_target_id"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createTime" column="create_time"/>
+        <association property="article" javaType="com.sourcelin.blog.domain.Article">
+            <result property="id" column="article_id"/>
+            <result property="title" column="title"/>
+            <result property="avatar" column="avatar"/>
+            <result property="summary" column="summary"/>
+            <result property="viewCount" column="view_count"/>
+            <result property="likeCount" column="like_count"/>
+            <result property="createTime" column="article_create_time"/>
+        </association>
+        <association property="say" javaType="com.sourcelin.blog.domain.Say">
+            <result property="id" column="say_id"/>
+            <result property="content" column="say_content"/>
+            <result property="images" column="say_images"/>
+            <result property="likeCount" column="say_like_count"/>
+            <result property="commentCount" column="say_comment_count"/>
+            <result property="createTime" column="say_create_time"/>
+        </association>
+        <association property="treehole" javaType="com.sourcelin.blog.domain.Treehole">
+            <result property="id" column="treehole_id"/>
+            <result property="content" column="treehole_content"/>
+            <result property="likeCount" column="treehole_like_count"/>
+            <result property="commentCount" column="treehole_comment_count"/>
+            <result property="createTime" column="treehole_create_time"/>
+        </association>
+    </resultMap>
+
+    <select id="selectLikeRecordListWithTarget" parameterType="LikeRecord" resultMap="LikeRecordResultVO">
+        SELECT l.id, l.user_id, l.target_type, l.target_id as like_target_id, l.deleted, l.create_time,
+               a.id as article_id,
+               a.title, a.avatar, a.summary, a.view_count, a.like_count, a.create_time as article_create_time,
+               s.id as say_id, s.content as say_content, s.images as say_images,
+               s.like_count as say_like_count, s.comment_count as say_comment_count, s.create_time as say_create_time,
+               t.id as treehole_id, t.content as treehole_content,
+               t.like_count as treehole_like_count, t.comment_count as treehole_comment_count,
+               t.create_time as treehole_create_time
+        FROM b_like_record l
+        LEFT JOIN b_article a ON l.target_type = 'article' AND l.target_id = a.id AND a.deleted = 0
+        LEFT JOIN b_say s ON l.target_type = 'say' AND l.target_id = s.id AND s.deleted = 0
+        LEFT JOIN b_treehole t ON l.target_type = 'treehole' AND l.target_id = t.id AND t.deleted = 0
+        WHERE l.deleted = 0
+        <if test="userId != null">AND l.user_id = #{userId}</if>
+        <if test="targetType != null and targetType != ''">AND l.target_type = #{targetType}</if>
+        <if test="params != null and params.relationState == 'active'">
+            AND (
+                (l.target_type = 'article' AND a.id IS NOT NULL)
+                OR (l.target_type = 'say' AND s.id IS NOT NULL)
+                OR (l.target_type = 'treehole' AND t.id IS NOT NULL)
+            )
+        </if>
+        ORDER BY l.create_time DESC
+    </select>
+
     <select id="countActiveLikeRecords" resultType="long">
         select count(1) from b_like_record where deleted = 0
     </select>

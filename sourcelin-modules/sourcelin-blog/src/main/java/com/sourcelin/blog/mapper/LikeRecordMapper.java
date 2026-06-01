@@ -38,6 +38,8 @@ public interface LikeRecordMapper
 
     List<LikeRecord> selectLikeRecordList(LikeRecord record);
 
+    List<LikeRecord> selectLikeRecordListWithTarget(LikeRecord record);
+
     long countActiveLikeRecords();
 
     long countTodayActiveLikeUsers();

@@ -9,7 +9,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * 关注对象（用户关注） b_follow
  * 
  * @author sourcelin
- * @date 2023-11-18
+ * @date 2026-01-18
  */
 public class Follow extends BaseEntity
 {

@@ -108,6 +108,7 @@ Sourcelin Blog
 │   │   ├── 分类管理
 │   │   ├── 标签管理
 │   │   ├── 评论管理
+│   │   ├── 内容举报管理
 │   │   ├── 友链管理
 │   │   ├── 用户管理 (博客用户)
 │   │   ├── 导航管理
@@ -158,6 +159,8 @@ Sourcelin Blog
 **关联表**: b_article_tag (文章-标签关联)
 
 #### 3.1.2 用户表 (b_user)
+
+说明：博客前台用户表统一使用 `del_flag` 作为删除标识，不再使用 `deleted` 字段。
 
 | 字段 | 类型 | 说明 | 备注 |
 |------|------|------|------|
@@ -381,6 +384,15 @@ Sourcelin Blog
 | POST | /say | 发布说说 | 登录 |
 | GET | /treehole/list | 树洞列表 | 公开 |
 | POST | /treehole | 发布树洞 | 公开 |
+
+#### 4.2.7 管理端内容举报接口
+
+| 方法 | 路径 | 说明 | 权限 |
+|------|------|------|------|
+| GET | /blog/admin/report/list | 内容举报列表 | blog:report:list |
+| GET | /blog/admin/report/{id} | 内容举报详情 | blog:report:query |
+| PUT | /blog/admin/report/{id}/status | 处理举报状态 | blog:report:edit |
+| DELETE | /blog/admin/report/{ids} | 删除举报记录 | blog:report:remove |
 
 ---
 

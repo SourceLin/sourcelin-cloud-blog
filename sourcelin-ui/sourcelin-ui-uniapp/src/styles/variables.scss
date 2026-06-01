@@ -1,0 +1,184 @@
+/* src/styles/variables.scss
+ * 业务样式变量与全局 mixin
+ * 通过 vite.config.ts 自动注入到所有 SCSS 文件
+ */
+
+/* 颜色 token */
+$color-bg: var(--sl-page-bg, #F8FAFC);
+$color-bg-elevated: var(--sl-bg-glass-pure, #ffffff);
+$color-text: var(--sl-text-main, #1f2329);
+$color-text-secondary: var(--sl-text-sub, #4e5969);
+$color-text-tertiary: var(--sl-text-muted, #86909c);
+$color-border: var(--sl-border-glass, rgba(255, 255, 255, 0.72));
+$color-primary: var(--sl-color-primary, #3B59FF);
+$color-primary-soft: var(--sl-color-primary-soft, #8F70FF);
+$color-primary-hover: var(--sl-color-primary-soft, #8F70FF);
+$color-danger: #f53f3f;
+$color-success: #00b42a;
+
+/* 液态玻璃核心设计令牌 */
+$glass-radius-main: 24rpx;
+$glass-radius-card: 32rpx;
+$glass-radius-pill: 100rpx;
+$glass-border-pure: 1rpx solid rgba(255, 255, 255, 0.72);
+$glass-border-sub: 1rpx solid rgba(255, 255, 255, 0.32);
+
+$glass-shadow: 0 8rpx 32rpx -4rpx rgba(31, 38, 135, 0.04);
+$glass-shadow-active: 0 16rpx 48rpx -2rpx rgba(59, 89, 255, 0.12);
+
+/* 液态玻璃半透明面板混合宏 */
+@mixin sl-glass-panel($opacity: 0.65, $blur: 16rpx) {
+  position: relative;
+  background: rgba(255, 255, 255, $opacity);
+  border-radius: $glass-radius-main;
+  box-shadow: $glass-shadow;
+  border: $glass-border-pure;
+  
+  /* #ifdef H5 || APP-PLUS */
+  backdrop-filter: blur($blur) saturate(1.2);
+  -webkit-backdrop-filter: blur($blur) saturate(1.2);
+  /* #endif */
+}
+
+/* 间距 token */
+$space-xs: 8rpx;
+$space-sm: 16rpx;
+$space-md: 24rpx;
+$space-lg: 32rpx;
+$space-xl: 48rpx;
+
+/* 圆角 */
+$radius-sm: 8rpx;
+$radius-md: 16rpx;
+$radius-lg: 24rpx;
+$radius-pill: 999rpx;
+
+/* 阴影 */
+$shadow-card: 0 4rpx 16rpx rgba(31, 35, 41, 0.06);
+
+/* 输入框设计 token */
+$input-radius: $radius-lg;
+$input-min-height: 88rpx;
+$input-padding: 22rpx 24rpx;
+$input-font-size: 28rpx;
+$input-line-height: 44rpx;
+
+/* 输入框基础 mixin —— 统一设计 token 入口，页面通过 @include 消费 */
+@mixin sl-input() {
+  display: block;
+  width: 100%;
+  color: $color-text;
+  font-size: $input-font-size;
+  background: var(--sl-input-bg);
+  border: 1rpx solid var(--sl-input-border);
+  border-radius: $input-radius;
+  padding: $input-padding;
+  box-sizing: border-box;
+  box-shadow: var(--sl-input-shadow);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+/* 文本省略 mixin */
+@mixin ellipsis() {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin ellipsis-multi($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 分段 Tab 组，轨道 + 等分项 */
+@mixin sl-tab-group-track() {
+  display: flex;
+  padding: $space-xs;
+  border-radius: $radius-pill;
+  background:
+    linear-gradient(145deg, var(--sl-control-bg-strong), var(--sl-control-bg)),
+    var(--sl-bg-glass-tint);
+  border: 1rpx solid var(--sl-control-border);
+  box-shadow: var(--sl-tab-group-shadow);
+  transition: background-color 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
+
+  /* #ifdef H5 || APP-PLUS */
+  backdrop-filter: blur(14rpx) saturate(1.2);
+  -webkit-backdrop-filter: blur(14rpx) saturate(1.2);
+  /* #endif */
+
+  .sl-theme--dark & {
+    background: linear-gradient(145deg, var(--sl-bg-glass-pure), var(--sl-control-bg));
+    border-color: var(--sl-border-light, var(--sl-control-border));
+  }
+}
+
+@mixin sl-tab-group-item() {
+  flex: 1;
+  min-width: 0;
+  min-height: 74rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--sl-text-sub);
+  font-size: 28rpx;
+  font-weight: 700;
+  border-radius: $radius-pill;
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+@mixin sl-tab-group-item-active() {
+  color: var(--sl-color-primary);
+  background:
+    linear-gradient(135deg, var(--sl-control-bg-strong), var(--sl-control-bg)),
+    var(--sl-primary-tint);
+  box-shadow: var(--sl-tab-active-shadow);
+}
+
+/* 筛选胶囊 Tab（我的文章同款），横向滚动 */
+@mixin sl-filter-tabs-track() {
+  display: inline-flex;
+  gap: $space-sm;
+  min-width: 100%;
+}
+
+@mixin sl-filter-tab-item() {
+  flex-shrink: 0;
+  min-width: 132rpx;
+  padding: 18rpx 28rpx;
+  border-radius: $radius-pill;
+  background: var(--sl-control-bg);
+  color: var(--sl-text-sub);
+  text-align: center;
+  font-size: 24rpx;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+@mixin sl-filter-tab-item-active() {
+  color: $color-primary;
+  background: var(--sl-filter-tab-active-bg);
+  font-weight: 600;
+}
+
+/* 1px 边框，注意小程序不支持伪类 hairline 时需降级 */
+@mixin hairline-bottom($color: $color-border) {
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background-color: $color;
+    transform: scaleY(0.5);
+    transform-origin: 0 100%;
+  }
+}

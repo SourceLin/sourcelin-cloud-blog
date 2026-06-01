@@ -129,5 +129,28 @@ public class RemoteUserController {
 
         return R.ok(loginUser);
     }
+
+    /**
+     * 通过微信 openId 查询用户
+     */
+    @GetMapping("/info/openid/{openId}")
+    public R<LoginUser> getUserInfoByOpenId(@PathVariable("openId") String openId,
+                                            @RequestHeader(SecurityConstants.FROM_SOURCE) String source) {
+        if (!isInner(source)) {
+            return R.fail("非法访问来源");
+        }
+        if (StringUtils.isBlank(openId)) {
+            return R.fail("openId 不能为空");
+        }
+
+        User user = userService.selectUserByOpenId(openId);
+        if (user == null) {
+            return R.fail("用户不存在");
+        }
+
+        LoginUser loginUser = new LoginUser();
+        loginUser.setUser(user);
+        return R.ok(loginUser);
+    }
 }
 

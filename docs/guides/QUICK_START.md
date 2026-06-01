@@ -8,7 +8,7 @@
 
 如果你只有 5 分钟，建议按这个顺序：
 
-1. 打开演示站：[http://sourcelin.cn/](http://sourcelin.cn/)
+1. 打开演示站：[https://sourcelin.cn/](https://sourcelin.cn/)
 2. 阅读 [README.md](../../README.md) 的界面预览和项目定位
 3. 确认本地是否具备 MySQL、Redis、Nacos
 4. 按本文档完成最小本地启动
@@ -64,6 +64,15 @@ SQL 说明见 [sql/README.md](../sql/README.md)。
 - MySQL 连接
 - Redis 连接
 - Nacos 地址与账号
+
+如果需要联调 Uniapp 微信快捷登录，还必须在 Nacos 的 `BLOG_GROUP / sourcelin-auth-dev.yml` 中补齐：
+
+- `sourcelin.mini-program.app-id`
+- `sourcelin.mini-program.app-secret`
+
+推荐直接参考：
+
+- [Sa-Token + Nacos 配置基线](../internal/configs/sa-token-nacos-configs.md)
 
 ### 5. 启动后端核心服务
 
