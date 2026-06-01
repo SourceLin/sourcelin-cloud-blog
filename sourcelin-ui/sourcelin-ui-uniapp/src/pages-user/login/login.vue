@@ -15,12 +15,12 @@
       </button>
 
       <view class="login__switch sl-button sl-button--ghost sl-button--sm" @tap="togglePasswordLogin">
-        {{ showPasswordLogin ? '收起账号密码登录' : '绑定已有账号 / 备用登录' }}
+        {{ showPasswordLogin ? '收起账号密码登录' : '绑定已有账号 / 登录' }}
       </view>
 
       <view v-if="showPasswordForm" class="login__form">
         <view class="login__field">
-          <text class="login__label">账号密码备用登录</text>
+          <text class="login__label">账号密码登录</text>
           <input
             v-model.trim="form.username"
             class="login__input"
@@ -86,7 +86,7 @@
       </view>
 
       <view class="login__tip">
-        微信登录优先，账号密码保留为绑定已有账号或备用登录。
+        微信登录优先，账号密码保留为绑定已有账号或登录。
       </view>
     </view>
   </view>
