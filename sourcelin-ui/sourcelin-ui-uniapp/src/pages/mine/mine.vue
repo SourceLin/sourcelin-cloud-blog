@@ -111,7 +111,7 @@
         <button class="mine-login__ghost sl-button sl-button--secondary" @tap="closeLoginSheet()">暂时跳过</button>
 
         <view class="mine-login__switch sl-button sl-button--ghost sl-button--sm" @tap="togglePasswordLogin">
-          {{ showPasswordLogin ? '收起账号密码登录' : '绑定已有账号 / 备用登录' }}
+          {{ showPasswordLogin ? '收起账号密码登录' : '绑定已有账号 / 登录' }}
         </view>
 
         <view v-if="showPasswordForm" class="mine-login__form">
