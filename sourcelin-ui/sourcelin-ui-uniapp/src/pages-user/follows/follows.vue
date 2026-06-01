@@ -50,7 +50,7 @@
               {{ getAvatarText(resolveFollowUser(item)?.nickname || resolveFollowUser(item)?.username) }}
             </view>
             <view class="follows__info">
-              <view class="follows__name">{{ resolveFollowUser(item)?.nickname || resolveFollowUser(item)?.username || 'Sourcelin 用户' }}</view>
+              <view class="follows__name">{{ resolveFollowUser(item)?.nickname || resolveFollowUser(item)?.username || '圆圈博客 用户' }}</view>
               <view class="follows__intro s-ellipsis-2">{{ resolveFollowUser(item)?.introduction || '这个用户还没有留下简介。' }}</view>
             </view>
           </view>
