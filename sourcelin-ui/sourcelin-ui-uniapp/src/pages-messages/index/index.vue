@@ -1,36 +1,68 @@
 <template>
   <view class="messages s-container" :class="themeStore.themeClass">
-    <s-loading :visible="loading && items.length === 0" text="正在同步消息..." />
+    <!-- 顶部标题与未读角标 -->
     <view class="messages__header s-card">
-      <view>
+      <view class="messages__header-left">
         <view class="messages__title">消息中心</view>
-        <view class="messages__desc">先承载系统公告，后续逐步并入评论回复与互动提醒。</view>
+        <view class="messages__desc">系统公告、互动提醒与回复通知汇总。</view>
       </view>
-      <view class="messages__meta">
-        <text class="messages__meta-value">{{ unreadCount }}</text>
+      <view class="messages__meta" :class="{ 'messages__meta--zero': unreadCount <= 0 }">
+        <text class="messages__meta-value">{{ unreadCount > 99 ? '99+' : unreadCount }}</text>
         <text class="messages__meta-label">未读</text>
       </view>
     </view>
 
-    <view v-if="userStore.isLoggedIn" class="messages__toolbar">
-      <view class="messages__toolbar-action sl-button sl-button--ghost sl-button--sm" @tap="markAllReadAction">全部已读</view>
+    <!-- 频道 Tab 栏（多频道时显示） -->
+    <scroll-view
+      v-if="userStore.isLoggedIn && showTabs"
+      class="messages__tabs"
+      scroll-x
+      :show-scrollbar="false"
+    >
+      <view class="messages__tabs-inner">
+        <view
+          v-for="ch in channels"
+          :key="ch.id"
+          class="messages__tab"
+          :class="{ 'messages__tab--active': activeChannel === ch.id }"
+          @tap="handleSwitchChannel(ch.id)"
+        >
+          {{ ch.name }}
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 工具栏 -->
+    <view
+      v-if="userStore.isLoggedIn && items.length > 0"
+      class="messages__toolbar"
+    >
+      <view class="messages__toolbar-action sl-button sl-button--ghost sl-button--sm" @tap="handleMarkAllRead">
+        全部已读
+      </view>
     </view>
 
+    <!-- 未登录空态 -->
     <s-empty
       v-if="!userStore.isLoggedIn"
       scene="login"
       title="登录后查看消息"
-      text="系统公告、互动提醒和后续的回复通知都会在这里汇总。"
+      text="系统公告、互动提醒和回复通知都会在这里汇总。"
     >
       <button class="messages__login sl-button sl-button--primary" @tap="goLogin">立即登录</button>
     </s-empty>
 
+    <!-- 无数据空态 -->
     <s-empty
-      v-else-if="!loading && items.length === 0"
-      title="暂无消息"
-      text="当前没有新的系统公告或互动提醒。"
+      v-else-if="isEmpty"
+      title="暂无公告"
+      text="当前没有新的系统公告或站务通知。"
     />
 
+    <!-- 加载中（首次） -->
+    <s-loading v-else-if="loading && items.length === 0" :visible="true" text="正在同步消息..." />
+
+    <!-- 消息列表 -->
     <view v-else class="messages__list">
       <view
         v-for="item in items"
@@ -40,40 +72,59 @@
         @tap="openDetail(item)"
       >
         <view class="messages__item-head">
+          <view
+            class="messages__item-indicator"
+            :style="{ background: currentChannelConfig.color }"
+          />
           <view class="messages__item-title s-ellipsis">{{ item.title }}</view>
           <view v-if="!item.isRead" class="messages__dot" />
         </view>
         <view class="messages__item-content s-ellipsis-2">{{ summarizeContent(item.content) }}</view>
-        <view class="messages__item-time">{{ formatTime(item.publishTime || item.createTime) }}</view>
+        <view class="messages__item-foot">
+          <text class="messages__item-channel">{{ currentChannelConfig.name }}</text>
+          <text class="messages__item-time">{{ formatTime(item.publishTime || item.createTime) }}</text>
+        </view>
       </view>
 
-      <s-loading v-if="loading && items.length > 0" :visible="true" :fullpage="false" compact text="正在加载更多..." />
+      <s-loading
+        v-if="loading && items.length > 0"
+        :visible="true"
+        :fullpage="false"
+        compact
+        text="正在加载更多..."
+      />
       <view v-else-if="finished && items.length > 0" class="messages__footer">已经到底了</view>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { onLoad, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app';
-import {
-  fetchMessagePage,
-  fetchUnreadMessageCount,
-  markAllMessagesRead
-} from '@/modules/message/api/message.api';
-import type { MessageItem } from '@/modules/message/types/message';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { showSuccessToast } from '@/utils/feedback';
+import { useMessageCenter } from '@/modules/message/composables/useMessageCenter';
+import type { MessageChannel } from '@/modules/message/config/channels';
+import type { MessageItem } from '@/modules/message/types/message';
 
 const userStore = useUserStore();
 const themeStore = useThemeStore();
-const items = ref<MessageItem[]>([]);
-const loading = ref(false);
-const finished = ref(false);
-const unreadCount = ref(0);
-const page = ref(1);
-const pageSize = 10;
+
+const {
+  channels,
+  activeChannel,
+  currentChannelConfig,
+  showTabs,
+  isEmpty,
+  items,
+  loading,
+  finished,
+  unreadCount,
+  switchChannel,
+  refresh,
+  loadMore,
+  markAllRead
+} = useMessageCenter();
 
 onLoad(() => {
   if (userStore.isLoggedIn) {
@@ -84,8 +135,6 @@ onLoad(() => {
 onShow(() => {
   themeStore.syncNativeArea();
   if (!userStore.isLoggedIn) {
-    items.value = [];
-    unreadCount.value = 0;
     return;
   }
   void refresh();
@@ -104,46 +153,17 @@ onReachBottom(() => {
   loadMore();
 });
 
-async function refresh(): Promise<void> {
-  page.value = 1;
-  finished.value = false;
-  await Promise.all([loadPage(true), loadUnreadCount()]);
+function handleSwitchChannel(channel: MessageChannel): void {
+  switchChannel(channel);
 }
 
-async function loadMore(): Promise<void> {
-  if (loading.value || finished.value) return;
-  page.value += 1;
-  await loadPage(false);
-}
-
-async function loadPage(reset: boolean): Promise<void> {
-  loading.value = true;
-  try {
-    const result = await fetchMessagePage(page.value, pageSize);
-    const nextItems = (result.items || []).map(normalizeMessage);
-    items.value = reset ? nextItems : [...items.value, ...nextItems];
-    finished.value = page.value >= (result.totalPages || 1) || nextItems.length < pageSize;
-  } catch {
-    if (!reset) page.value -= 1;
-  } finally {
-    loading.value = false;
+async function handleMarkAllRead(): Promise<void> {
+  if (!userStore.isLoggedIn) {
+    goLogin();
+    return;
   }
-}
-
-async function loadUnreadCount(): Promise<void> {
-  try {
-    const stat = await fetchUnreadMessageCount();
-    unreadCount.value = stat.total || 0;
-  } catch {
-    unreadCount.value = 0;
-  }
-}
-
-function normalizeMessage(item: MessageItem): MessageItem {
-  return {
-    ...item,
-    isRead: Number(item.isRead) === 1 ? 1 : 0
-  };
+  await markAllRead();
+  showSuccessToast('已全部标为已读');
 }
 
 function summarizeContent(content?: string): string {
@@ -152,17 +172,6 @@ function summarizeContent(content?: string): string {
 
 function formatTime(value?: string): string {
   return value ? value.slice(0, 16).replace('T', ' ') : '刚刚';
-}
-
-async function markAllReadAction(): Promise<void> {
-  if (!userStore.isLoggedIn) {
-    goLogin();
-    return;
-  }
-  await markAllMessagesRead();
-  items.value = items.value.map((item) => ({ ...item, isRead: 1 }));
-  unreadCount.value = 0;
-  showSuccessToast('已全部标为已读');
 }
 
 function goLogin(): void {
@@ -185,6 +194,11 @@ function openDetail(item: MessageItem): void {
     gap: $space-md;
   }
 
+  &__header-left {
+    flex: 1;
+    min-width: 0;
+  }
+
   &__title {
     font-size: 40rpx;
     font-weight: 700;
@@ -205,12 +219,21 @@ function openDetail(item: MessageItem): void {
     padding: 18rpx 0;
     border-radius: 24rpx;
     background: rgba(31, 111, 235, 0.08);
+    flex-shrink: 0;
+
+    &--zero {
+      background: rgba(0, 0, 0, 0.03);
+    }
   }
 
   &__meta-value {
     color: $color-primary;
     font-size: 34rpx;
     font-weight: 700;
+
+    .messages__meta--zero & {
+      color: $color-text-tertiary;
+    }
   }
 
   &__meta-label {
@@ -219,12 +242,47 @@ function openDetail(item: MessageItem): void {
     font-size: 22rpx;
   }
 
+  // 频道 Tab 栏
+  &__tabs {
+    margin-bottom: $space-md;
+    white-space: nowrap;
+  }
+
+  &__tabs-inner {
+    display: inline-flex;
+    gap: 16rpx;
+    min-width: 100%;
+  }
+
+  &__tab {
+    min-width: 132rpx;
+    padding: 18rpx 28rpx;
+    border-radius: 999rpx;
+    background: var(--sl-control-bg);
+    color: $color-text-secondary;
+    text-align: center;
+    font-size: 24rpx;
+    flex-shrink: 0;
+
+    &--active {
+      color: $color-primary;
+      background: rgba(31, 111, 235, 0.12);
+      font-weight: 600;
+    }
+  }
+
+  // 工具栏
   &__toolbar {
     display: flex;
     justify-content: flex-end;
-    margin: $space-md 0;
+    margin-bottom: $space-md;
   }
 
+  &__toolbar-action {
+    min-width: 132rpx;
+  }
+
+  // 登录按钮
   &__login {
     width: 280rpx;
     height: 84rpx;
@@ -237,18 +295,19 @@ function openDetail(item: MessageItem): void {
     font-weight: 600;
   }
 
-  &__toolbar-action {
-    min-width: 132rpx;
-  }
-
+  // 消息列表
   &__list {
     display: flex;
     flex-direction: column;
     gap: $space-md;
   }
 
-  &__item--unread {
-    border-color: rgba(31, 111, 235, 0.2);
+  &__item {
+    transition: border-color 0.2s ease;
+
+    &--unread {
+      border-color: rgba(31, 111, 235, 0.2);
+    }
   }
 
   &__item-head {
@@ -257,10 +316,19 @@ function openDetail(item: MessageItem): void {
     gap: 12rpx;
   }
 
+  &__item-indicator {
+    width: 8rpx;
+    height: 32rpx;
+    border-radius: 999rpx;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
   &__item-title {
     flex: 1;
     font-size: 30rpx;
     font-weight: 700;
+    min-width: 0;
   }
 
   &__dot {
@@ -276,16 +344,34 @@ function openDetail(item: MessageItem): void {
     color: $color-text-secondary;
     font-size: 24rpx;
     line-height: 1.7;
+    padding-left: 20rpx;
   }
 
-  &__item-time,
-  &__footer {
+  &__item-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 16rpx;
+    padding-left: 20rpx;
+  }
+
+  &__item-channel {
+    color: $color-text-tertiary;
+    font-size: 22rpx;
+    padding: 2rpx 14rpx;
+    border-radius: 999rpx;
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  &__item-time {
     color: $color-text-tertiary;
     font-size: 22rpx;
   }
 
   &__footer {
+    margin-top: 16rpx;
+    color: $color-text-tertiary;
+    font-size: 22rpx;
     text-align: center;
     padding: $space-md 0;
   }

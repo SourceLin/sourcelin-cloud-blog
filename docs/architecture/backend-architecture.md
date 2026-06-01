@@ -44,6 +44,12 @@ blog/
 
 后续可按领域拆分到 `article/comment/interaction/message/moderation/file/auth`，但不做一次性大搬迁。
 
+## 博客管理端闭环
+
+- 内容举报已形成“小程序/前台举报入库 -> 博客管理端列表查询 -> 详情查看 -> 状态处理/删除”的闭环。
+- 管理端路径位于 `/admin/report/**`，经网关暴露为 `/blog/admin/report/**`。
+- Controller 返回仍遵守统一契约：列表返回 `PageResult<T>`，详情返回业务对象，处理和删除返回 `Void`。
+
 ## 验证命令
 
 ```bash

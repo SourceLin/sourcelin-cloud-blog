@@ -27,10 +27,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { onLoad, onPageScroll, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app';
 import { fetchArticlePage, fetchTagArticles } from '@/modules/article/api/article.api';
 import { useArticlePaging } from '@/modules/article/composables/useArticlePaging';
+import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { useThemeStore } from '@/stores/theme';
 
 const query = {
@@ -51,6 +52,24 @@ const { items, loading, finished, isEmpty, refresh, loadMore } = useArticlePagin
 );
 const backToTopVisible = ref(false);
 const themeStore = useThemeStore();
+const pageTitle = computed(() => {
+  if (query.tagId) return '标签文章';
+  if (query.categoryId) return '分类文章';
+  if (query.orderBy === 'view_count') return '热门文章';
+  return '文章列表';
+});
+
+watch([pageTitle, items], () => {
+  applyH5Seo({
+    title: buildSeoTitle(pageTitle.value),
+    description: extractSeoSummary(
+      items.value[0]?.summary,
+      `${pageTitle.value}，当前已加载 ${items.value.length} 篇内容。`,
+      '浏览文章列表与内容摘要。'
+    ),
+    keywords: [pageTitle.value, '文章列表', '博客', '阅读']
+  });
+}, { immediate: true });
 
 function parseNumber(value: unknown): number | undefined {
   const n = Number(value);

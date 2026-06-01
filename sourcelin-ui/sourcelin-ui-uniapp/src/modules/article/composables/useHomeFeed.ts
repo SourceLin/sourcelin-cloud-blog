@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue';
 import { fetchHome } from '../api/article.api';
+import { fetchMessagePage } from '@/modules/message/api/message.api';
 import type { ArticleSummary, CategoryItem, FrontSiteInfo, TagItem } from '../types/article';
 import { scoreCategoryInterest, sortItemsByInterest } from '@/shared/utils/analytics';
 
@@ -14,6 +15,7 @@ export function useHomeFeed() {
   const page = ref(1);
   const pageSize = ref(10);
   const totalPages = ref(1);
+  const announcementNotices = ref<string[]>([]);
 
   const featured = computed(() => carousel.value[0] || recommend.value[0] || latest.value[0]);
   const feedItems = computed(() => {
@@ -28,6 +30,30 @@ export function useHomeFeed() {
   });
   const finished = computed(() => page.value >= totalPages.value);
   const isEmpty = computed(() => !loading.value && !featured.value && feedItems.value.length === 0);
+
+  /**
+   * 首页公告优先级链（与 Web 前台 useHomePage 对齐）：
+   * 1. announcement 表数据（/front/messages）
+   * 2. web config notices 兜底
+   */
+  const notices = computed<string[]>(() => {
+    if (announcementNotices.value.length) {
+      return announcementNotices.value;
+    }
+    return siteInfo.value?.notices?.filter(Boolean) || [];
+  });
+
+  async function loadAnnouncements(): Promise<void> {
+    try {
+      const result = await fetchMessagePage({ channel: 'system', page: 1, pageSize: 10 });
+      announcementNotices.value = (result.items || [])
+        .map((item) => String(item.title || item.content || '').trim())
+        .filter(Boolean)
+        .slice(0, 8);
+    } catch {
+      announcementNotices.value = [];
+    }
+  }
 
   async function load(targetPage = 1): Promise<void> {
     if (loading.value) return;
@@ -54,7 +80,7 @@ export function useHomeFeed() {
   function refresh(): Promise<void> {
     page.value = 1;
     totalPages.value = 1;
-    return load(1);
+    return Promise.all([load(1), loadAnnouncements()]).then(() => undefined);
   }
 
   function loadMore(): Promise<void> {
@@ -70,6 +96,7 @@ export function useHomeFeed() {
     categories,
     tags,
     siteInfo,
+    notices,
     featured,
     feedItems,
     finished,

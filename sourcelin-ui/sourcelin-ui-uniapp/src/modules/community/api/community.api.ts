@@ -23,5 +23,13 @@ export function createTreehole(payload: {
   nickname?: string;
   avatar?: string;
 }): Promise<number> {
-  return http.post<number>('/front/treeholes', payload, { isToken: false });
+  return http.post<number>('/front/treeholes', payload);
+}
+
+export function deleteSay(id: number): Promise<void> {
+  return http.delete<void>(`/front/says/${id}`);
+}
+
+export function deleteTreehole(id: number): Promise<void> {
+  return http.delete<void>(`/front/treeholes/${id}`);
 }

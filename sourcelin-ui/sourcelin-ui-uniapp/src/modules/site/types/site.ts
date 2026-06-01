@@ -1,3 +1,36 @@
+/** `/front/config/siteInfo` 品牌与全局站点信息 */
+export interface SiteBrandInfo {
+  webName?: string;
+  siteName?: string;
+  author?: string;
+  authorInfo?: string;
+  avatar?: string;
+  logo?: string;
+  bio?: string;
+  footer?: string;
+  recordNum?: string;
+  github?: string;
+  gitee?: string;
+  qqNumber?: string;
+  qqGroup?: string;
+  email?: string;
+  wechat?: string;
+  webUrl?: string;
+  showList?: number[];
+  notices?: string[];
+}
+
+export interface AboutContactItem {
+  key: string;
+  label: string;
+  value: string;
+}
+
+export interface AboutFactItem {
+  label: string;
+  value: string;
+}
+
 export interface AboutInfo {
   author?: string;
   authorInfo?: string;

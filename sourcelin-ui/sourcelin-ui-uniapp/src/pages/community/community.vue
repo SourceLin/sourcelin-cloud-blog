@@ -1,22 +1,26 @@
 <template>
   <view class="community" :class="themeStore.themeClass">
     <s-loading :visible="loading && currentItems.length === 0" />
-    <view class="community__hero">
-      <view class="community__hero-head">
-        <view class="community__tabs">
-          <view
-            v-for="tab in tabs"
-            :key="tab.key"
-            class="community__tab"
-            :class="{ 'community__tab--active': activeTab === tab.key }"
-            @tap="switchTab(tab.key)"
-          >
-            {{ tab.text }}
-          </view>
+
+    <!-- 固定 Tab 切换器 -->
+    <view class="community__tabbar">
+      <view class="community__tabs">
+        <view
+          v-for="tab in tabs"
+          :key="tab.key"
+          class="community__tab"
+          :class="{ 'community__tab--active': activeTab === tab.key }"
+          @tap="switchTab(tab.key)"
+        >
+          {{ tab.text }}
         </view>
-        <view class="community__publish" @tap="goPublish">
-          {{ activeTab === 'says' ? '发说说' : '写树洞' }}
-        </view>
+      </view>
+      <view
+        class="community__fab"
+        :aria-label="activeTab === 'says' ? '发说说' : '写树洞'"
+        @tap="goPublish"
+      >
+        <uni-icons type="plusempty" size="22" color="currentColor" />
       </view>
     </view>
 
@@ -38,6 +42,7 @@
                   class="community__avatar-img"
                   :src="resolveAvatar(item)"
                   mode="aspectFill"
+                  @error="onImageError(resolveAvatar(item))"
                 />
                 <text v-else>{{ resolveAuthor(item).slice(0, 1) }}</text>
               </view>
@@ -49,7 +54,7 @@
                 <view class="community__time">{{ formatDate(item.createTime) }}</view>
               </view>
             </view>
-            <view class="community__more" @tap="reportItemAction(item)">···</view>
+            <view class="community__more" @tap="openItemAction(item)">···</view>
           </view>
           <view class="community__content" :class="{ 'community__content--treehole': activeTab === 'treeholes' }">
             <text>{{ item.content }}</text>
@@ -70,7 +75,7 @@
               :class="{ 'community__media-item--featured': index === 0 && resolveImages(item).length >= 3 }"
               @tap="previewImages(resolveImages(item), index)"
             >
-              <image class="community__media-img" :src="image" mode="aspectFill" lazy-load />
+              <image class="community__media-img" :src="image" mode="aspectFill" lazy-load @error="onImageError(image)" />
               <view v-if="index === resolveGalleryImages(item).length - 1 && resolveExtraImageCount(item) > 0" class="community__media-more">
                 +{{ resolveExtraImageCount(item) }}
               </view>
@@ -130,7 +135,7 @@
     </view>
 
     <view v-if="commentSheetVisible" class="community__sheet-mask" @tap="closeCommentSheet">
-      <view class="community__sheet" @tap.stop>
+      <view class="community__sheet" :class="{ 'community__sheet--keyboard': keyboardVisible }" :style="commentSheetStyle" @tap.stop>
         <view class="community__sheet-head">
           <view>
             <view class="community__sheet-title">评论互动</view>
@@ -170,8 +175,12 @@
           v-model="commentContent"
           class="community__textarea"
           placeholder="写下你的看法..."
+          placeholder-class="community__textarea-placeholder"
           maxlength="300"
           auto-height
+          fixed
+          :adjust-position="false"
+          :cursor-spacing="keyboardCursorSpacing"
         />
         <view class="community__sheet-actions">
           <button class="community__sheet-button community__sheet-button--ghost sl-button sl-button--secondary" @tap="closeCommentSheet">取消</button>
@@ -190,23 +199,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { onPageScroll, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app';
-import { fetchSayPage, fetchTreeholePage } from '@/modules/community/api/community.api';
+import { computed, ref, watch } from 'vue';
+import { onHide, onLoad, onPageScroll, onPullDownRefresh, onReachBottom, onShareAppMessage, onShow, onUnload } from '@dcloudio/uni-app';
+import { fetchSayPage, fetchTreeholePage, deleteSay, deleteTreehole } from '@/modules/community/api/community.api';
 import type { SayItem, TreeholeItem } from '@/modules/community/types/community';
 import { createComment, fetchComments } from '@/modules/comment/api/comment.api';
 import type { CommentItem, CommentSource } from '@/modules/comment/types/comment';
 import { collectTarget, likeTarget, uncollectTarget, unlikeTarget } from '@/modules/interaction/api/interaction.api';
 import { createContentReport } from '@/modules/report/api/report.api';
+import { useKeyboardInset } from '@/shared/composables/useBackToTop';
 import { reportAnalyticsEvent } from '@/shared/utils/analytics';
+import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import type { InteractionTargetType } from '@/modules/interaction/types/interaction';
 import { env } from '@/config/env';
 import { consumeCommunityRefresh } from '@/modules/community/utils/publish';
-import { hideNativeTabbar, liquidTabItems, switchLiquidTab } from '@/shared/utils/liquid-tabbar';
+import { liquidTabItems, switchLiquidTab } from '@/shared/utils/liquid-tabbar';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { AUTH_LOGIN_SUCCESS_EVENT, type LoginSuccessEventDetail } from '@/utils/auth';
-import { showInfoToast } from '@/utils/feedback';
+import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 import { normalizeAssetUrl } from '@/utils/url';
 
 type TabKey = 'says' | 'treeholes';
@@ -237,9 +248,22 @@ const commentContent = ref('');
 const commentList = ref<CommentItem[]>([]);
 const activeCommentId = ref<number | null>(null);
 const activeCommentSource = ref<CommentSource>('say');
+const brokenUrls = ref<Set<string>>(new Set());
 const activeCommentLabel = ref('');
 const backToTopVisible = ref(false);
 const activeTabPath = 'pages/community/community';
+const {
+  cursorSpacing: keyboardCursorSpacing,
+  keyboardVisible,
+  sheetStyle: commentSheetStyle,
+  startKeyboardWatch,
+  stopKeyboardWatch
+} = useKeyboardInset();
+
+const currentUserId = computed(() => {
+  const id = userStore.userInfo?.id;
+  return id != null ? Number(id) : undefined;
+});
 
 const currentItems = computed<CommunityItem[]>(() =>
   activeTab.value === 'says' ? says.value : treeholes.value
@@ -250,6 +274,25 @@ const targetType = computed<InteractionTargetType>(() =>
 const finished = computed(() => pageMap.value[activeTab.value] >= totalPageMap.value[activeTab.value]);
 const isEmpty = computed(() => !loading.value && currentItems.value.length === 0);
 const emptyText = computed(() => activeTab.value === 'says' ? '暂无说说' : '暂无树洞');
+
+watch([activeTab, currentItems], () => {
+  const isTreehole = activeTab.value === 'treeholes';
+  const firstItem = currentItems.value[0];
+  applyH5Seo({
+    title: buildSeoTitle(isTreehole ? '树洞广场' : '轻社区'),
+    description: extractSeoSummary(
+      firstItem?.content ? `浏览${isTreehole ? '匿名树洞' : '说说互动'}：${firstItem.content}` : '',
+      isTreehole ? '浏览匿名树洞、轻讨论与互动内容。' : '浏览说说动态、轻互动与作者社区内容。'
+    ),
+    keywords: [isTreehole ? '树洞' : '社区', '说说', '互动', '评论', '轻社区']
+  });
+}, { immediate: true });
+
+onLoad((options) => {
+  if (options?.tab === 'treeholes') {
+    activeTab.value = 'treeholes';
+  }
+});
 
 function formatDate(value?: string): string {
   return value ? value.slice(0, 10) : '刚刚';
@@ -276,10 +319,16 @@ function resolveImages(item: CommunityItem): string[] {
   const ids = say.imageFileIds
     ? say.imageFileIds.split(',').map((id) => id.trim()).filter((id) => /^\d+$/.test(id))
     : [];
-  if (ids.length > 0) {
-    return ids.map((id) => `${env.baseURL}/file/download/${id}`);
+  const urls = ids.length > 0
+    ? ids.map((id) => `${env.baseURL}/file/download/${id}`)
+    : splitStoredUrls(say.images);
+  return urls.filter((url) => !brokenUrls.value.has(url));
+}
+
+function onImageError(url: string): void {
+  if (!brokenUrls.value.has(url)) {
+    brokenUrls.value = new Set([...brokenUrls.value, url]);
   }
-  return splitStoredUrls(say.images);
 }
 
 function resolveGalleryImages(item: CommunityItem): string[] {
@@ -291,11 +340,14 @@ function resolveExtraImageCount(item: CommunityItem): number {
 }
 
 function resolveAvatar(item: CommunityItem): string {
+  let url: string;
   if (activeTab.value === 'treeholes') {
-    return normalizeAssetUrl((item as TreeholeItem).avatar);
+    url = normalizeAssetUrl((item as TreeholeItem).avatar);
+  } else {
+    const say = item as SayItem;
+    url = normalizeAssetUrl(say.user?.avatar);
   }
-  const say = item as SayItem;
-  return normalizeAssetUrl(say.user?.avatar);
+  return url && !brokenUrls.value.has(url) ? url : '';
 }
 
 function previewImages(images: string[], index: number): void {
@@ -423,6 +475,7 @@ async function handleLoginSuccess(detail?: LoginSuccessEventDetail): Promise<voi
 
 function closeCommentSheet(): void {
   commentSheetVisible.value = false;
+  uni.hideKeyboard();
 }
 
 async function toggleLike(item: CommunityItem): Promise<void> {
@@ -483,6 +536,48 @@ async function submitComment(): Promise<void> {
   }
 }
 
+function canDelete(item: CommunityItem): boolean {
+  if (!userStore.isLoggedIn) return false;
+  const ownerId = activeTab.value === 'says'
+    ? ((item as SayItem).user?.id || (item as SayItem).userId)
+    : (item as TreeholeItem).userId;
+  return ownerId != null && currentUserId.value != null && Number(ownerId) === currentUserId.value;
+}
+
+async function openItemAction(item: CommunityItem): Promise<void> {
+  if (canDelete(item)) {
+    await handleDelete(item);
+    return;
+  }
+  await reportItemAction(item);
+}
+
+async function handleDelete(item: CommunityItem): Promise<void> {
+  const confirmed = await new Promise<boolean>((resolve) => {
+    uni.showModal({
+      title: '确认删除',
+      content: '删除后无法恢复，确定删除吗？',
+      confirmText: '删除',
+      confirmColor: '#DC2626',
+      success: (res) => resolve(!!res.confirm),
+      fail: () => resolve(false)
+    });
+  });
+  if (!confirmed) return;
+  try {
+    if (activeTab.value === 'says') {
+      await deleteSay(item.id);
+      says.value = says.value.filter((s) => s.id !== item.id);
+    } else {
+      await deleteTreehole(item.id);
+      treeholes.value = treeholes.value.filter((t) => t.id !== item.id);
+    }
+    showSuccessToast('已删除');
+  } catch {
+    showInfoToast('删除失败，请稍后重试');
+  }
+}
+
 async function reportItemAction(item: CommunityItem): Promise<void> {
   const reasons = ['广告营销', '不当内容', '侵权抄袭', '其他'];
   const selected = await new Promise<number>((resolve) => {
@@ -529,7 +624,6 @@ onPageScroll((event) => {
 });
 
 onShow(() => {
-  hideNativeTabbar();
   themeStore.syncNativeArea();
   const refreshTab = consumeCommunityRefresh();
   if (!refreshTab) return;
@@ -546,6 +640,39 @@ onShow(() => {
   treeholes.value = [];
   pageMap.value.treeholes = 1;
   totalPageMap.value.treeholes = 1;
+});
+
+onHide(() => {
+  stopKeyboardWatch();
+});
+
+onUnload(() => {
+  stopKeyboardWatch();
+});
+
+watch(commentSheetVisible, (visible) => {
+  if (visible) {
+    startKeyboardWatch();
+    return;
+  }
+  stopKeyboardWatch();
+});
+
+onShareAppMessage(() => {
+  const isTreehole = activeTab.value === 'treeholes';
+  void reportAnalyticsEvent({
+    eventType: 'community_share',
+    pagePath: '/pages/community/community',
+    targetType: isTreehole ? 'treehole' : 'say',
+    metadata: {
+      activeTab: activeTab.value,
+      itemCount: currentItems.value.length
+    }
+  });
+  return {
+    title: isTreehole ? '来树洞看看匿名故事 - 圆圈博客' : '来社区看看最新说说 - 圆圈博客',
+    path: `/pages/community/community?tab=${activeTab.value}`
+  };
 });
 
 uni.$off(AUTH_LOGIN_SUCCESS_EVENT, handleLoginSuccess);
@@ -568,67 +695,144 @@ refresh();
 
   min-height: 100vh;
   padding-bottom: calc(172rpx + env(safe-area-inset-bottom));
+  background: var(--sl-page-bg, #f5f7fb);
   transition: background-color 0.24s ease;
 
   &.sl-theme--dark {
-    --community-glass-border: rgba(154, 176, 255, 0.12);
+    --community-glass-border: var(--sl-border-light);
     --community-glass-highlight: rgba(255, 255, 255, 0.08);
     --community-shadow: rgba(0, 0, 0, 0.18);
+    background: var(--sl-page-bg, #09090b);
+
+    .community__tabbar {
+      background: var(--sl-page-bg, #080d18);
+      border-bottom-color: var(--sl-border-light);
+    }
+
+    .community__tabs {
+      background:
+        linear-gradient(145deg, rgba(24, 27, 38, 0.92), rgba(18, 20, 28, 0.88));
+      border-color: var(--sl-border-light);
+      box-shadow:
+        inset 0 1rpx 0 rgba(255, 255, 255, 0.06),
+        0 8rpx 20rpx rgba(0, 0, 0, 0.24);
+    }
+
+    .community__fab {
+      background:
+        linear-gradient(145deg, rgba(18, 27, 46, 0.66), rgba(18, 27, 46, 0.4)),
+        rgba(105, 129, 255, 0.08);
+      border-color: rgba(105, 129, 255, 0.2);
+      box-shadow:
+        inset 0 1rpx 0 rgba(255, 255, 255, 0.08),
+        0 6rpx 16rpx rgba(105, 129, 255, 0.1);
+    }
+
+    .community__fab:active {
+      background:
+        linear-gradient(145deg, rgba(18, 27, 46, 0.74), rgba(18, 27, 46, 0.52)),
+        rgba(105, 129, 255, 0.12);
+    }
+
+    .community__card {
+      background: var(--sl-card-glass-bg);
+      border-color: var(--sl-border-light);
+      box-shadow: var(--sl-shadow-soft);
+    }
+
+    .community__card:active {
+      transform: scale(0.985);
+      background: rgba(47, 61, 85, 0.7);
+    }
+
+    .community__time,
+    .community__more {
+      color: var(--sl-text-sub);
+    }
+
+    .community__author,
+    .community__content {
+      color: var(--sl-text-main);
+      text-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.5);
+    }
+
+    .community__sheet {
+      background:
+        linear-gradient(180deg, var(--sl-surface-bg), var(--sl-page-bg));
+      border-top: 1rpx solid var(--sl-border-light);
+      box-shadow:
+        inset 0 2rpx 0 rgba(255, 255, 255, 0.08),
+        0 -18rpx 48rpx rgba(0, 0, 0, 0.34);
+    }
+
+    .community__sheet-subtitle,
+    .community__sheet-close,
+    .community__sheet-comment-head,
+    .community__sheet-empty,
+    .community__sheet-loading {
+      color: var(--sl-text-sub);
+    }
+
+    .community__sheet-comment::after {
+      background-color: var(--sl-border-light);
+    }
+
+    .community__textarea {
+      color: var(--sl-text-main);
+      background: var(--sl-input-bg);
+      border-color: var(--sl-control-border);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .community__textarea:focus {
+      border-color: var(--sl-border-focused);
+      box-shadow: 0 0 12rpx rgba(112, 152, 218, 0.25);
+    }
+
+    .community__textarea-placeholder {
+      color: var(--sl-text-muted);
+    }
+
+    .community__sheet-button--ghost {
+      color: var(--sl-text-sub);
+      background: var(--sl-control-bg);
+      border-color: var(--sl-border-light);
+    }
   }
 
-  &__hero {
-    position: relative;
-    padding: 34rpx 30rpx 30rpx;
-    overflow: hidden;
-  }
-
-  &__hero-head {
+  /* ─── 固定 Tab 栏 ─── */
+  &__tabbar {
+    position: sticky;
+    top: 0;
+    z-index: 80;
     display: flex;
     align-items: center;
     gap: 16rpx;
+    padding: 16rpx 30rpx 12rpx;
+    background: var(--sl-page-bg, #f5f7fb);
+    border-bottom: 1rpx solid var(--sl-border-glass);
+    transition: background-color 0.24s ease, border-color 0.24s ease;
   }
 
   &__tabs {
     position: relative;
     display: flex;
     flex: 1;
+    min-width: 0;
     padding: 8rpx;
     border-radius: 999rpx;
     background:
-      linear-gradient(145deg, var(--sl-control-bg-strong), var(--sl-control-bg)),
+      linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.82)),
       var(--community-glass-tint);
-    border: 1rpx solid var(--sl-control-border);
+    border: 1rpx solid rgba(255, 255, 255, 0.88);
     box-shadow:
-      inset 0 1rpx 0 var(--community-glass-highlight),
-      0 16rpx 42rpx rgba(17, 24, 39, 0.06);
-  }
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.96),
+      0 8rpx 20rpx rgba(17, 24, 39, 0.06);
 
-  &__publish {
-    flex-shrink: 0;
-    min-width: 132rpx;
-    min-height: 74rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 20rpx;
-    border-radius: 999rpx;
-    background:
-      linear-gradient(145deg, var(--sl-control-bg-strong), var(--sl-control-bg)),
-      rgba(59, 89, 255, 0.12);
-    border: 1rpx solid var(--sl-control-border);
-    color: var(--community-primary);
-    font-size: 24rpx;
-    font-weight: 700;
-    box-shadow:
-      inset 0 1rpx 0 rgba(255, 255, 255, 0.94),
-      0 10rpx 28rpx rgba(59, 89, 255, 0.08);
-  }
-
-  &__publish:active {
-    transform: scale(0.97);
-    box-shadow:
-      inset 0 1rpx 0 rgba(255, 255, 255, 0.94),
-      0 8rpx 22rpx rgba(59, 89, 255, 0.1);
+    /* #ifdef H5 || APP-PLUS */
+    backdrop-filter: blur(14rpx) saturate(1.2);
+    -webkit-backdrop-filter: blur(14rpx) saturate(1.2);
+    /* #endif */
   }
 
   &__tab {
@@ -663,7 +867,41 @@ refresh();
   &__body {
     position: relative;
     margin-top: 0;
-    padding: 0 30rpx;
+    padding: 20rpx 30rpx;
+  }
+
+  &__fab {
+    flex-shrink: 0;
+    width: 74rpx;
+    height: 74rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999rpx;
+    color: var(--community-primary);
+    background:
+      linear-gradient(145deg, var(--sl-control-bg-strong), var(--sl-control-bg)),
+      rgba(59, 89, 255, 0.08);
+    border: 1rpx solid rgba(59, 89, 255, 0.18);
+    box-shadow:
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.92),
+      0 8rpx 20rpx rgba(59, 89, 255, 0.1);
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+
+    /* #ifdef H5 || APP-PLUS */
+    backdrop-filter: blur(14rpx) saturate(1.2);
+    -webkit-backdrop-filter: blur(14rpx) saturate(1.2);
+    /* #endif */
+
+    &:active {
+      transform: scale(0.92);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.58)),
+        rgba(59, 89, 255, 0.12);
+      box-shadow:
+        inset 0 1rpx 0 rgba(255, 255, 255, 0.94),
+        0 6rpx 14rpx rgba(59, 89, 255, 0.08);
+    }
   }
 
   &__list {
@@ -956,10 +1194,16 @@ refresh();
   &__sheet {
     width: 100%;
     max-height: 78vh;
-    padding: $space-lg $space-md calc(#{$space-lg} + env(safe-area-inset-bottom));
+    padding: $space-lg $space-md $space-lg;
     border-radius: 36rpx 36rpx 0 0;
     background:
       linear-gradient(180deg, var(--sl-control-bg-strong), var(--sl-page-bg));
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__sheet--keyboard {
+    padding-bottom: $space-lg;
   }
 
   &__sheet-head,
@@ -987,7 +1231,8 @@ refresh();
   }
 
   &__sheet-list {
-    max-height: 340rpx;
+    flex: 1;
+    min-height: 0;
     margin-top: $space-md;
     padding-right: 8rpx;
   }

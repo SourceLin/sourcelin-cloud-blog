@@ -39,12 +39,13 @@ export const useThemeStore = defineStore('theme', () => {
 
   function syncNativeArea(): void {
     const isDarkTheme = resolvedTheme.value === 'dark';
+    const nativeBackgroundColor = isDarkTheme ? '#080d18' : '#f5f7fb';
     
     // 同步导航栏配色
     try {
       uni.setNavigationBarColor({
         frontColor: isDarkTheme ? '#ffffff' : '#000000',
-        backgroundColor: isDarkTheme ? '#080d18' : '#f5f7fb',
+        backgroundColor: nativeBackgroundColor,
         animation: {
           duration: 180,
           timingFunc: 'easeIn'
@@ -57,7 +58,7 @@ export const useThemeStore = defineStore('theme', () => {
     // 同步 Tab 栏配色 (原生兜底)
     try {
       uni.setTabBarStyle({
-        backgroundColor: isDarkTheme ? '#080d18' : '#ffffff',
+        backgroundColor: nativeBackgroundColor,
         borderStyle: isDarkTheme ? 'black' : 'white',
         color: isDarkTheme ? '#687693' : '#86909c',
         selectedColor: isDarkTheme ? '#8f82ff' : '#3b59ff'
@@ -68,9 +69,9 @@ export const useThemeStore = defineStore('theme', () => {
 
     try {
       uni.setBackgroundColor({
-        backgroundColor: isDarkTheme ? '#080d18' : '#f5f7fb',
-        backgroundColorTop: isDarkTheme ? '#080d18' : '#f5f7fb',
-        backgroundColorBottom: isDarkTheme ? '#080d18' : '#f5f7fb'
+        backgroundColor: nativeBackgroundColor,
+        backgroundColorTop: nativeBackgroundColor,
+        backgroundColorBottom: nativeBackgroundColor
       });
       uni.setBackgroundTextStyle({
         textStyle: isDarkTheme ? 'light' : 'dark'
@@ -78,6 +79,18 @@ export const useThemeStore = defineStore('theme', () => {
     } catch (_e) {
       // 页面不支持背景同步时仍可保持内容区域主题正确
     }
+
+    /* #ifdef H5 */
+    if (typeof document !== 'undefined') {
+      document.documentElement.style.setProperty('--sl-page-bg', nativeBackgroundColor);
+      document.documentElement.style.setProperty('--sl-text-main', isDarkTheme ? '#f3f6ff' : '#111827');
+      document.documentElement.style.colorScheme = isDarkTheme ? 'dark' : 'light';
+      if (document.body) {
+        document.body.style.backgroundColor = nativeBackgroundColor;
+        document.body.style.color = isDarkTheme ? '#f3f6ff' : '#111827';
+      }
+    }
+    /* #endif */
   }
 
   function resolveTheme(): void {

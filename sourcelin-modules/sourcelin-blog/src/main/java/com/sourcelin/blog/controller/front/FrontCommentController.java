@@ -18,7 +18,9 @@ import com.sourcelin.blog.service.ITreeholeService;
 import com.sourcelin.blog.service.ModerationPipeline;
 import com.sourcelin.blog.support.BlogRichTextSanitizer;
 import com.sourcelin.blog.vo.CommentVO;
+import com.sourcelin.blog.vo.FrontMyCommentVO;
 import com.sourcelin.blog.vo.ModerationOutcome;
+import com.sourcelin.common.core.utils.PageUtils;
 import com.sourcelin.common.core.enums.ResultCode;
 import com.sourcelin.common.core.exception.BusinessException;
 import com.sourcelin.common.core.utils.ip.IpUtils;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,6 +65,25 @@ public class FrontCommentController
     private ModerationPipeline moderationPipeline;
     @Autowired
     private BlogRichTextSanitizer blogRichTextSanitizer;
+
+    @GetMapping("/mine")
+    public PageResult<FrontMyCommentVO> mine(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                                             @RequestParam(value = "source", required = false) String source)
+    {
+        Long userId = blogLoginAccessor.getCurrentUserId();
+        if (userId == null || userId <= 0)
+        {
+            throw new BusinessException(ResultCode.UNAUTHORIZED, "请先登录");
+        }
+        page = PageUtils.clampPage(page);
+        pageSize = PageUtils.clampPageSize(pageSize);
+        PageHelper.startPage(page, pageSize);
+        String normalizedSource = normalizeMyCommentSource(source);
+        List<FrontMyCommentVO> list = commentService.selectMyCommentList(userId, normalizedSource);
+        PageInfo<FrontMyCommentVO> pageInfo = new PageInfo<FrontMyCommentVO>(list);
+        return BlogPageResults.of(list, pageInfo, page, pageSize);
+    }
 
     @GetMapping
     public PageResult<CommentVO> list(CommentDTO dto)
@@ -289,6 +311,20 @@ public class FrontCommentController
             return "article";
         }
         return source.trim().toLowerCase();
+    }
+
+    private String normalizeMyCommentSource(String source)
+    {
+        if (source == null || source.trim().isEmpty() || "all".equalsIgnoreCase(source.trim()))
+        {
+            return null;
+        }
+        String normalized = source.trim().toLowerCase();
+        if ("article".equals(normalized) || "say".equals(normalized) || "treehole".equals(normalized))
+        {
+            return normalized;
+        }
+        throw new BusinessException(ResultCode.VALIDATION_ERROR, "评论来源类型不合法");
     }
 
     private void validateTarget(Long targetId, String source)

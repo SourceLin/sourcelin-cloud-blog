@@ -6,6 +6,12 @@ export interface EnvConfig {
   name: 'develop' | 'trial' | 'release';
   baseURL: string;
   apiPrefix: string;
+  /**
+   * 微信小程序订阅消息模板 ID 列表。
+   * 获取路径：微信公众平台/小程序后台 -> 功能 -> 订阅消息 -> 公共模板库/我的模板。
+   * 按环境分别填写，前端会在请求订阅前读取这里的模板 ID。
+   */
+  subscribeMessageTemplateIds: string[];
   isProd: boolean;
 }
 
@@ -14,18 +20,21 @@ const ENV_MAP: Record<EnvConfig['name'], EnvConfig> = {
     name: 'develop',
     baseURL: 'https://sourcelin.cn',
     apiPrefix: '/blog-api',
+    subscribeMessageTemplateIds: ['y24CeVVFAMDOvRrmMzp7TK4spP8QFG5eEeiT0pxXazM'],
     isProd: false
   },
   trial: {
     name: 'trial',
     baseURL: 'https://sourcelin.cn',
     apiPrefix: '/blog-api',
+    subscribeMessageTemplateIds: ['y24CeVVFAMDOvRrmMzp7TK4spP8QFG5eEeiT0pxXazM'],
     isProd: false
   },
   release: {
     name: 'release',
     baseURL: 'https://sourcelin.cn',
     apiPrefix: '/blog-api',
+    subscribeMessageTemplateIds: ['y24CeVVFAMDOvRrmMzp7TK4spP8QFG5eEeiT0pxXazM'],
     isProd: true
   }
 };

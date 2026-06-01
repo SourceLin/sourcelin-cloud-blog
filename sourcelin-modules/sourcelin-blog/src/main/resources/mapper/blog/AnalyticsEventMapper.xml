@@ -5,7 +5,7 @@
 <mapper namespace="com.sourcelin.blog.mapper.AnalyticsEventMapper">
 
     <insert id="insertAnalyticsEvent" parameterType="com.sourcelin.blog.domain.AnalyticsEvent" useGeneratedKeys="true" keyProperty="id">
-        insert into blog_analytics_event
+        insert into b_analytics_event
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="userId != null">user_id,</if>
             event_type,

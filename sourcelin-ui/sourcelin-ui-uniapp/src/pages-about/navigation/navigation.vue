@@ -6,6 +6,7 @@
         class="navigation__input"
         confirm-type="search"
         placeholder="搜索导航名称或用途"
+        placeholder-class="s-placeholder"
         @confirm="applyFilter"
       >
       <view class="navigation__search sl-button sl-button--primary sl-button--sm" @tap="applyFilter">筛选</view>
@@ -33,12 +34,12 @@
     />
 
     <view v-else class="navigation__list">
-      <view v-for="item in items" :key="item.id" class="navigation__item s-card s-card--interactive" @tap="openNavigation(item)">
+      <view v-for="item in items" :key="item.id" class="navigation__item s-card" @tap="trackNavigationClick(item)">
         <view class="navigation__item-head">
           <view class="navigation__item-title">{{ item.name }}</view>
           <view v-if="item.isRecommend === 1" class="navigation__badge">推荐</view>
         </view>
-        <view class="navigation__item-desc s-ellipsis-2">{{ item.description || '点击复制链接并打开站点。' }}</view>
+        <view class="navigation__item-desc s-ellipsis-2">{{ item.description || '常用站点入口。' }}</view>
         <view class="navigation__item-meta">
           <text>{{ item.category || '未分类' }}</text>
           <text>{{ item.clickCount || 0 }} 次访问</text>
@@ -53,7 +54,6 @@ import { computed, ref } from 'vue';
 import { onLoad, onShow } from '@dcloudio/uni-app';
 import { fetchNavigationList, reportNavigationClick } from '@/modules/site/api/site.api';
 import type { NavigationItem } from '@/modules/site/types/site';
-import { showSuccessToast } from '@/utils/feedback';
 import { useThemeStore } from '@/stores/theme';
 
 const themeStore = useThemeStore();
@@ -110,16 +110,12 @@ function filterItems(): void {
   });
 }
 
-async function openNavigation(item: NavigationItem): Promise<void> {
+async function trackNavigationClick(item: NavigationItem): Promise<void> {
   try {
     await reportNavigationClick(item.id);
   } catch {
-    // 点击统计失败不阻塞后续动作。
+    // 点击统计失败不阻塞展示。
   }
-  uni.setClipboardData({
-    data: item.url,
-    success: () => showSuccessToast('链接已复制，可在浏览器打开')
-  });
 }
 </script>
 
@@ -136,12 +132,11 @@ async function openNavigation(item: NavigationItem): Promise<void> {
   }
 
   &__input {
+    @include sl-input;
     flex: 1;
-    min-height: 72rpx;
+    min-height: $input-min-height;
+    border-radius: $radius-pill;
     padding: 0 $space-md;
-    border-radius: 999rpx;
-    background: var(--sl-control-bg);
-    font-size: 26rpx;
   }
 
   &__search {

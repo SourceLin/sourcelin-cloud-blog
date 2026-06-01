@@ -260,8 +260,8 @@ export function useAboutPage() {
     return [
       { label: '站点名称', value: siteInfo.value.webName?.trim() || siteStore.siteInfo.webName?.trim() || '未设置' },
       { label: '关键词数量', value: `${keywordCount} 个` },
-      { label: '备案号', value: recordNum },
-      { label: '站点地址', value: siteInfo.value.webUrl?.trim() || '未设置' }
+      { label: '站点地址', value: siteInfo.value.webUrl?.trim() || '未设置' },
+      { label: '备案号', value: recordNum }
     ]
   })
 

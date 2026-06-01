@@ -65,7 +65,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app';
+import { onLoad, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app';
+
+onLoad(() => {
+  uni.redirectTo({ url: '/pages-user/interactions/interactions?tab=collect' });
+});
 import { fetchMyCollects } from '@/modules/interaction/api/interaction.api';
 import type {
   CollectItem,

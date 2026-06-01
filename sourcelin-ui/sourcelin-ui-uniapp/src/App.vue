@@ -7,7 +7,6 @@ import { onLaunch, onShow, onError } from '@dcloudio/uni-app';
 import { useUserStore } from '@/stores/user';
 import { useAppStore } from '@/stores/app';
 import { useThemeStore } from '@/stores/theme';
-
 const userStore = useUserStore();
 const appStore = useAppStore();
 const themeStore = useThemeStore();
@@ -57,11 +56,22 @@ page {
   --sl-text-main: #111827;
   --sl-text-sub: #4b5563;
   --sl-text-muted: #86909c;
+  --sl-surface-bg: rgba(255, 255, 255, 0.74);
+  --sl-input-bg: rgba(255, 255, 255, 0.92);
+  --sl-input-border: rgba(209, 219, 232, 0.96);
+  --sl-input-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.92),
+    0 8rpx 18rpx rgba(17, 24, 39, 0.04);
+  --sl-border-focused: rgba(59, 89, 255, 0.22);
   --sl-panel-highlight: rgba(255, 255, 255, 0.56);
   --sl-panel-lowlight: rgba(255, 255, 255, 0.28);
   --sl-control-bg: rgba(255, 255, 255, 0.54);
   --sl-control-bg-strong: rgba(255, 255, 255, 0.82);
   --sl-control-border: rgba(255, 255, 255, 0.84);
+  --sl-primary-tint: rgba(59, 89, 255, 0.08);
+  --sl-filter-tab-active-bg: rgba(31, 111, 235, 0.12);
+  --sl-tab-group-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.96), 0 8rpx 20rpx rgba(17, 24, 39, 0.06);
+  --sl-tab-active-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.92), 0 10rpx 28rpx rgba(59, 89, 255, 0.14);
 
   background: var(--sl-page-bg);
   color: var(--sl-text-main);
@@ -69,6 +79,39 @@ page {
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.5;
 }
+
+/*
+ * 暗色主题 page 兜底
+ * page 元素是 webview 根，无法挂载 .sl-theme--dark 类
+ * 这里通过 prefers-color-scheme 让跟随系统暗色时 page 自身也用暗色
+ * 避免 iOS 微信小程序 uni.setBackgroundColor 不可靠导致的底部白带
+ */
+@media (prefers-color-scheme: dark) {
+  page {
+    --sl-page-bg: #080d18;
+    background: var(--sl-page-bg);
+  }
+}
+
+/* #ifdef H5 */
+html,
+body,
+#app,
+uni-app,
+uni-page-body,
+uni-page-wrapper {
+  background: var(--sl-page-bg, #f5f7fb);
+  color: var(--sl-text-main, #111827);
+}
+
+body,
+#app,
+uni-app,
+uni-page-body,
+uni-page-wrapper {
+  min-height: 100%;
+}
+/* #endif */
 
 /* 核心主题类设计：符合液态玻璃 UI 视觉规范 */
 .sl-theme--light {
@@ -82,6 +125,13 @@ page {
   --sl-text-main: #111827;
   --sl-text-sub: #4b5563;
   --sl-text-muted: #86909c;
+  --sl-surface-bg: rgba(255, 255, 255, 0.74);
+  --sl-input-bg: rgba(255, 255, 255, 0.92);
+  --sl-input-border: rgba(209, 219, 232, 0.96);
+  --sl-input-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.92),
+    0 8rpx 18rpx rgba(17, 24, 39, 0.04);
+  --sl-border-focused: rgba(59, 89, 255, 0.22);
   --sl-color-primary: #3b59ff;
   --sl-color-primary-soft: #8f70ff;
   --sl-panel-highlight: rgba(255, 255, 255, 0.56);
@@ -89,6 +139,10 @@ page {
   --sl-control-bg: rgba(255, 255, 255, 0.54);
   --sl-control-bg-strong: rgba(255, 255, 255, 0.82);
   --sl-control-border: rgba(255, 255, 255, 0.84);
+  --sl-primary-tint: rgba(59, 89, 255, 0.08);
+  --sl-filter-tab-active-bg: rgba(31, 111, 235, 0.12);
+  --sl-tab-group-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.96), 0 8rpx 20rpx rgba(17, 24, 39, 0.06);
+  --sl-tab-active-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.92), 0 10rpx 28rpx rgba(59, 89, 255, 0.14);
 
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(248, 250, 252, 0.76) 42%),
@@ -101,35 +155,67 @@ page {
 
 .sl-theme--dark {
   --sl-page-bg: #080d18;
+  --sl-surface-bg: #121b2e;
+  --sl-input-bg: #121b2e;
   --sl-glow-a: rgba(89, 115, 255, 0.08);
   --sl-glow-b: rgba(143, 112, 255, 0.06);
   --sl-bg-glass-pure: rgba(18, 27, 46, 0.62);
-  --sl-bg-glass-tint: rgba(18, 27, 46, 0.40);
-  --sl-border-glass: rgba(154, 176, 255, 0.12);
+  --sl-bg-glass-tint: rgba(18, 27, 46, 0.4);
+  --sl-card-glass-bg: linear-gradient(145deg, rgba(18, 27, 46, 0.72) 0%, rgba(18, 27, 46, 0.36) 100%), rgba(18, 27, 46, 0.62);
+  --sl-border-light: rgba(154, 176, 255, 0.12);
+  --sl-border-glass: var(--sl-border-light);
+  --sl-input-border: rgba(154, 176, 255, 0.12);
+  --sl-border-focused: rgba(105, 129, 255, 0.32);
   --sl-glass-shadow: 0 22rpx 54rpx rgba(0, 0, 0, 0.18);
+  --sl-input-shadow:
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.06),
+    0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+  --sl-shadow-soft:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.08),
+    0 22rpx 54rpx rgba(0, 0, 0, 0.18);
+  --sl-shadow-pressed:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.06),
+    0 14rpx 32rpx rgba(0, 0, 0, 0.16);
   --sl-text-main: #f3f6ff;
   --sl-text-sub: #a8b2c8;
   --sl-text-muted: #687693;
   --sl-color-primary: #6981ff;
   --sl-color-primary-soft: #8f82ff;
-  --sl-panel-highlight: rgba(129, 151, 221, 0.10);
-  --sl-panel-lowlight: rgba(8, 13, 24, 0.12);
-  --sl-control-bg: rgba(17, 26, 44, 0.72);
-  --sl-control-bg-strong: rgba(26, 38, 62, 0.82);
-  --sl-control-border: rgba(154, 176, 255, 0.16);
+  --sl-panel-highlight: rgba(255, 255, 255, 0.08);
+  --sl-panel-lowlight: rgba(18, 27, 46, 0.36);
+  --sl-control-bg: rgba(18, 27, 46, 0.44);
+  --sl-control-bg-strong: rgba(18, 27, 46, 0.62);
+  --sl-control-border: rgba(154, 176, 255, 0.12);
+  --sl-primary-tint: rgba(105, 129, 255, 0.12);
+  --sl-filter-tab-active-bg: rgba(105, 129, 255, 0.16);
+  --sl-tab-group-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.06), 0 8rpx 20rpx rgba(0, 0, 0, 0.24);
+  --sl-tab-active-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.08), 0 10rpx 28rpx rgba(105, 129, 255, 0.16);
 
   background:
     linear-gradient(180deg, rgba(8, 13, 24, 0.36), rgba(8, 13, 24, 0.94) 42%),
     radial-gradient(circle at -14% 0%, var(--sl-glow-a), rgba(8, 13, 24, 0) 34%),
     radial-gradient(circle at 112% 22%, var(--sl-glow-b), rgba(8, 13, 24, 0) 32%),
-    #080d18;
+    var(--sl-page-bg);
   color: var(--sl-text-main);
   transition: background-color 0.24s cubic-bezier(0.25, 0.8, 0.25, 1), color 0.24s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 /* 通用容器 */
 .s-container {
+  min-height: 100vh;
   padding: $space-md $space-md calc(172rpx + env(safe-area-inset-bottom));
+  background: var(--sl-page-bg, #f5f7fb);
+  transition: background-color 0.24s ease;
+
+  /*
+   * 暗色主题根容器兜底
+   * page 元素是 webview 根，无法挂载主题类
+   * 该双类选择器优先级高于全局 .sl-theme--dark 的复合渐变
+   * 保证手动切暗色时不依赖 native page 背景（iOS 微信 setBackgroundColor 不可靠）
+   */
+  &.sl-theme--dark {
+    background: var(--sl-page-bg, #080d18);
+  }
 }
 
 .s-card {
@@ -141,7 +227,9 @@ page {
   border-radius: 28rpx;
   box-shadow:
     inset 0 1rpx 0 var(--sl-border-glass),
+    inset 0 18rpx 32rpx rgba(255, 255, 255, 0.08),
     inset 0 -1rpx 0 rgba(59, 89, 255, 0.05),
+    0 10rpx 26rpx rgba(17, 24, 39, 0.03),
     var(--sl-glass-shadow);
   padding: $space-md;
   overflow: hidden;
@@ -160,8 +248,27 @@ page {
   border-radius: inherit;
   pointer-events: none;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0) 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 24%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 34%),
     linear-gradient(315deg, rgba(59, 89, 255, 0.07), rgba(255, 255, 255, 0) 38%);
+}
+
+.sl-theme--dark .s-card {
+  background: var(--sl-card-glass-bg);
+  border-color: var(--sl-border-light);
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.08),
+    inset 0 18rpx 30rpx rgba(255, 255, 255, 0.02),
+    inset 0 -1rpx 0 rgba(105, 129, 255, 0.04),
+    0 10rpx 24rpx rgba(0, 0, 0, 0.12),
+    var(--sl-glass-shadow);
+}
+
+.sl-theme--dark .s-card::after {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 22%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 30%),
+    linear-gradient(315deg, rgba(105, 129, 255, 0.06), rgba(255, 255, 255, 0) 40%);
 }
 
 button[class]::after {
@@ -235,13 +342,32 @@ button[class][disabled] {
   border: 1rpx solid rgba(255, 255, 255, 0.18);
   box-shadow:
     inset 0 1rpx 0 rgba(255, 255, 255, 0.22),
+    inset 0 -10rpx 18rpx rgba(23, 37, 84, 0.12),
+    0 4rpx 10rpx rgba(59, 89, 255, 0.16),
     0 14rpx 32rpx rgba(59, 89, 255, 0.2);
+}
+
+.sl-theme--dark .sl-button--primary {
+  border: 1rpx solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.15),
+    inset 0 -10rpx 18rpx rgba(8, 13, 24, 0.18),
+    0 4rpx 12rpx rgba(105, 129, 255, 0.18),
+    0 14rpx 32rpx rgba(105, 129, 255, 0.24);
 }
 
 .sl-button--primary:active {
   box-shadow:
     inset 0 1rpx 0 rgba(255, 255, 255, 0.18),
+    inset 0 -8rpx 14rpx rgba(23, 37, 84, 0.08),
     0 8rpx 20rpx rgba(59, 89, 255, 0.14);
+}
+
+.sl-theme--dark .sl-button--primary:active {
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.1),
+    inset 0 -8rpx 14rpx rgba(8, 13, 24, 0.16),
+    0 8rpx 20rpx rgba(105, 129, 255, 0.15);
 }
 
 .sl-button--primary[disabled] {
@@ -251,6 +377,13 @@ button[class][disabled] {
   box-shadow:
     inset 0 1rpx 0 rgba(255, 255, 255, 0.18),
     0 8rpx 20rpx rgba(59, 89, 255, 0.08);
+}
+
+.sl-theme--dark .sl-button--primary[disabled] {
+  background: linear-gradient(135deg, rgba(105, 129, 255, 0.36), rgba(143, 130, 255, 0.34));
+  color: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.05);
+  box-shadow: none;
 }
 
 .sl-button--success {
@@ -285,7 +418,20 @@ button[class][disabled] {
   border: 1rpx solid var(--sl-control-border);
   box-shadow:
     inset 0 1rpx 0 rgba(255, 255, 255, 0.92),
+    inset 0 -10rpx 18rpx rgba(59, 89, 255, 0.04),
     0 10rpx 24rpx rgba(17, 24, 39, 0.04);
+}
+
+.sl-theme--dark .sl-button--secondary {
+  background:
+    linear-gradient(145deg, rgba(18, 27, 46, 0.66), rgba(18, 27, 46, 0.4)),
+    rgba(18, 27, 46, 0.44);
+  color: var(--sl-text-main);
+  border-color: rgba(154, 176, 255, 0.12);
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.08),
+    inset 0 -10rpx 18rpx rgba(8, 13, 24, 0.16),
+    0 10rpx 24rpx rgba(0, 0, 0, 0.12);
 }
 
 .sl-button--secondary:active {
@@ -294,12 +440,19 @@ button[class][disabled] {
     rgba(255, 255, 255, 0.52);
   box-shadow:
     inset 0 1rpx 0 rgba(255, 255, 255, 0.94),
+    inset 0 -8rpx 14rpx rgba(59, 89, 255, 0.03),
     0 6rpx 16rpx rgba(17, 24, 39, 0.03);
 }
 
 .sl-theme--dark .sl-button--secondary:active {
-  background: rgba(31, 43, 67, 0.92);
-  border-color: rgba(154, 176, 255, 0.22);
+  background:
+    linear-gradient(145deg, rgba(18, 27, 46, 0.74), rgba(18, 27, 46, 0.52)),
+    rgba(18, 27, 46, 0.5);
+  border-color: rgba(154, 176, 255, 0.16);
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.06),
+    inset 0 -8rpx 14rpx rgba(8, 13, 24, 0.14),
+    0 6rpx 16rpx rgba(0, 0, 0, 0.1);
 }
 
 .sl-button--secondary[disabled] {
@@ -350,9 +503,20 @@ button[class][disabled] {
 }
 
 .sl-theme--dark .sl-button--danger {
-  background: rgba(229, 72, 102, 0.12);
-  border-color: rgba(229, 72, 102, 0.25);
-  box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.05);
+  background: linear-gradient(145deg, rgba(229, 72, 102, 0.18), rgba(229, 72, 102, 0.1));
+  border-color: rgba(229, 72, 102, 0.3);
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.05),
+    inset 0 -8rpx 14rpx rgba(8, 13, 24, 0.18),
+    0 8rpx 20rpx rgba(229, 72, 102, 0.1);
+}
+
+.sl-theme--dark .sl-button--danger:active {
+  background: linear-gradient(145deg, rgba(229, 72, 102, 0.24), rgba(229, 72, 102, 0.14));
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.02),
+    inset 0 -6rpx 12rpx rgba(8, 13, 24, 0.16),
+    0 6rpx 16rpx rgba(229, 72, 102, 0.08);
 }
 
 .s-card--interactive {
@@ -362,6 +526,10 @@ button[class][disabled] {
 .s-card--interactive:active {
   transform: scale(0.985);
   box-shadow: 0 18rpx 46rpx -10rpx rgba(59, 89, 255, 0.16);
+}
+
+.sl-theme--dark .s-card--interactive:active {
+  box-shadow: var(--sl-shadow-pressed);
 }
 
 .s-liquid-tabbar {
@@ -403,7 +571,14 @@ button[class][disabled] {
   /* #endif */
 
   .sl-theme--dark & {
-    background: rgba(8, 13, 24, 0.88);
+    background:
+      linear-gradient(145deg, rgba(10, 18, 32, 0.9), rgba(13, 22, 38, 0.76)),
+      rgba(8, 13, 24, 0.78);
+    border-color: rgba(154, 176, 255, 0.1);
+    box-shadow:
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.06),
+      inset 0 -1rpx 0 rgba(105, 129, 255, 0.04),
+      0 12rpx 30rpx rgba(0, 0, 0, 0.16);
   }
 }
 
@@ -419,7 +594,7 @@ button[class][disabled] {
   pointer-events: none;
 
   .sl-theme--dark & {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
   }
 }
 
@@ -454,7 +629,11 @@ button[class][disabled] {
     0 10rpx 24rpx rgba(59, 89, 255, 0.08);
 
   .sl-theme--dark & {
-    background: rgba(143, 112, 255, 0.08);
+    background: rgba(105, 129, 255, 0.08);
+    box-shadow:
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.08),
+      inset 0 0 0 1rpx rgba(154, 176, 255, 0.1),
+      0 8rpx 18rpx rgba(105, 129, 255, 0.08);
   }
 }
 
@@ -480,6 +659,10 @@ button[class][disabled] {
 
 .s-safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+.s-placeholder {
+  color: var(--sl-text-muted);
 }
 
 .s-ellipsis {

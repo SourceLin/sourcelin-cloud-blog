@@ -7,7 +7,7 @@
         class="search__input"
         confirm-type="search"
         placeholder="搜索文章、分类或标签"
-        placeholder-style="color: rgba(107, 114, 128, 0.58);"
+        placeholder-class="s-placeholder"
         @confirm="onSearch"
       >
       <view class="search__button sl-button sl-button--primary sl-button--sm" @tap="onSearch">搜索</view>
@@ -155,6 +155,7 @@ import {
 import { useArticlePaging } from '@/modules/article/composables/useArticlePaging';
 import type { CategoryItem, TagItem } from '@/modules/article/types/article';
 import { reportAnalyticsEvent, trackSearchKeyword } from '@/shared/utils/analytics';
+import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { useThemeStore } from '@/stores/theme';
 import { showInfoToast } from '@/utils/feedback';
 import { getStorage, removeStorage, setStorage } from '@/utils/storage';
@@ -187,6 +188,21 @@ onShow(() => {
 const suggestions = computed(() =>
   suggestionList.value.filter((term) => term.trim() !== keyword.value.trim()).slice(0, 6)
 );
+
+watch([keyword, searched, items, categoryMatches, tagMatches], () => {
+  const safeKeyword = keyword.value.trim();
+  const resultSummary = searched.value
+    ? `匹配文章 ${items.value.length} 篇、分类 ${categoryMatches.value.length} 个、标签 ${tagMatches.value.length} 个。`
+    : '搜索文章、分类与标签，快速定位你想看的内容。';
+  applyH5Seo({
+    title: buildSeoTitle(safeKeyword ? `${safeKeyword} 搜索结果` : '搜索'),
+    description: extractSeoSummary(
+      safeKeyword ? `搜索关键词：${safeKeyword}。${resultSummary}` : '',
+      resultSummary
+    ),
+    keywords: safeKeyword ? [safeKeyword, '搜索', '文章', '分类', '标签'] : ['搜索', '文章', '分类', '标签']
+  });
+}, { immediate: true });
 
 function onSearch(): void {
   const value = keyword.value.trim();
@@ -342,6 +358,30 @@ onBeforeUnmount(() => {
 .search {
   min-height: 100vh;
 
+  &.sl-theme--dark {
+    .search__bar {
+      background: var(--sl-surface-bg);
+      border-color: var(--sl-border-light);
+      box-shadow:
+        inset 0 2rpx 0 rgba(255, 255, 255, 0.08),
+        0 14rpx 34rpx rgba(0, 0, 0, 0.24);
+    }
+
+    .search__input {
+      color: var(--sl-text-main);
+      background-color: var(--sl-input-bg);
+      box-shadow:
+        inset 0 2rpx 0 rgba(255, 255, 255, 0.06),
+        0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+    }
+
+    .search__input:focus {
+      box-shadow:
+        inset 0 0 0 1rpx var(--sl-border-focused),
+        0 0 12rpx rgba(112, 152, 218, 0.25);
+    }
+  }
+
   &__bar {
     display: flex;
     align-items: center;
@@ -351,13 +391,22 @@ onBeforeUnmount(() => {
   }
 
   &__input {
+    @include sl-input;
     flex: 1;
-    min-height: 72rpx;
-    border-radius: 999rpx;
-    background: rgba(248, 250, 252, 0.92);
-    padding: 0 $space-md;
-    font-size: 26rpx;
-    color: $color-text;
+    min-height: 88rpx;
+    height: 88rpx;
+    border-radius: $radius-pill;
+    padding: 0 28rpx;
+    font-size: 28rpx;
+    line-height: 88rpx;
+    transition: box-shadow 0.3s cubic-bezier(0.32, 0.94, 0.6, 1), background-color 0.3s cubic-bezier(0.32, 0.94, 0.6, 1), color 0.3s cubic-bezier(0.32, 0.94, 0.6, 1), border-color 0.3s cubic-bezier(0.32, 0.94, 0.6, 1);
+  }
+
+  &__input:focus {
+    border-color: var(--sl-border-focused);
+    box-shadow:
+      inset 0 0 0 1rpx var(--sl-border-focused),
+      0 0 12rpx rgba(59, 89, 255, 0.1);
   }
 
   &__button {

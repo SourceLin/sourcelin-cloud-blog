@@ -9,6 +9,7 @@
 - `components/CURD/PageContent.vue`：拆出 `parts/PageToolbar.vue`、`parts/PageTableContainer.vue`、`parts/PagePagination.vue`。
 - `views/blog/shared/ModuleListShell.vue`：拆出查询表单、表格区、操作列和共享类型。
 - `views/dashboard/index.vue`：拆出 Hero、指标、趋势、最近访问组件，以及 `useDashboard.ts`。
+- `views/blog/report/index.vue`：新增内容举报管理页，复用博客管理共享列表壳，承接小程序和前台举报入库后的处理闭环。
 
 ## 目录边界
 
@@ -27,6 +28,7 @@ src/views/blog/shared # 博客管理模块共享壳和类型
 - 页面组件只做装配，复杂状态进入 composables。
 - 管理后台统一通过 `src/utils/request.ts` 和 `src/api/**` 调用接口。
 - 分页只消费统一 `PageResult` 字段。
+- 内容举报管理权限固定为 `blog:report:list/query/edit/remove`，状态处理走 `/blog/admin/report/{id}/status`。
 
 ## 验证命令
 

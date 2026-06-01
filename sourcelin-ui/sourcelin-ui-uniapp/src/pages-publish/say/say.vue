@@ -12,6 +12,7 @@
         maxlength="500"
         auto-height
         placeholder="记录此刻的想法、近况或想分享的内容..."
+        placeholder-class="s-placeholder"
       />
       <view class="publish-say__hint">{{ content.length }}/500</view>
 
@@ -207,10 +208,8 @@ async function submit(): Promise<void> {
   }
 
   &__textarea {
-    width: 100%;
+    @include sl-input;
     min-height: 280rpx;
-    color: $color-text;
-    font-size: 28rpx;
     line-height: 1.8;
   }
 

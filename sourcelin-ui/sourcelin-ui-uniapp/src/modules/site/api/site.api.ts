@@ -4,11 +4,16 @@ import type {
   AboutInfo,
   FriendLinkApplyPayload,
   FriendLinkItem,
-  NavigationItem
+  NavigationItem,
+  SiteBrandInfo
 } from '../types/site';
 
 export function fetchAboutInfo(): Promise<AboutInfo> {
   return http.get<AboutInfo>('/front/config/about');
+}
+
+export function fetchSiteBrandInfo(): Promise<SiteBrandInfo> {
+  return http.get<SiteBrandInfo>('/front/config/siteInfo');
 }
 
 export async function fetchFriendLinks(): Promise<FriendLinkItem[]> {

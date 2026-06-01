@@ -403,12 +403,10 @@ function backToPreviousPage(): void {
   }
 
   &__field {
+    @include sl-input;
     margin-bottom: 18rpx;
-    padding: 18rpx 22rpx;
     border-radius: 22rpx;
-    background: var(--sl-control-bg);
-    border: 1rpx solid var(--sl-control-border);
-    box-sizing: border-box;
+    padding: 18rpx 22rpx;
   }
 
   &__field--captcha {
@@ -435,6 +433,13 @@ function backToPreviousPage(): void {
     height: 44rpx;
     color: $color-text;
     font-size: 28rpx;
+  }
+
+  &__field:focus-within {
+    border-color: var(--sl-border-focused);
+    box-shadow:
+      inset 0 0 0 1rpx var(--sl-border-focused),
+      0 0 12rpx rgba(59, 89, 255, 0.1);
   }
 
   &__placeholder {

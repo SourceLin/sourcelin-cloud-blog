@@ -21,6 +21,7 @@
           class="publish-article__input publish-article__input--title"
           maxlength="80"
           placeholder="给这篇文章起一个清晰标题"
+          placeholder-class="publish-article__placeholder"
         >
       </view>
 
@@ -32,6 +33,7 @@
           maxlength="180"
           auto-height
           placeholder="用 1-2 句话概括重点，方便分享与回访"
+          placeholder-class="publish-article__placeholder"
         />
       </view>
 
@@ -114,6 +116,7 @@
           maxlength="-1"
           auto-height
           placeholder="输入正文内容。段落之间空一行，提交后会自动整理为阅读友好的段落。"
+          placeholder-class="publish-article__placeholder"
         />
       </view>
 
@@ -136,6 +139,7 @@
               class="publish-article__input"
               maxlength="255"
               placeholder="请输入原文地址"
+              placeholder-class="publish-article__placeholder"
             >
           </view>
 
@@ -511,6 +515,21 @@ async function removeArticleAction(): Promise<void> {
   min-height: 100vh;
   padding-bottom: calc(244rpx + env(safe-area-inset-bottom));
 
+  &.sl-theme--dark {
+    .publish-article__form {
+      background: var(--sl-surface-bg);
+    }
+
+    .publish-article__placeholder {
+      color: var(--sl-text-muted);
+    }
+
+    .publish-article__toolbar-button.sl-button--primary:not([disabled]) {
+      color: #fff;
+      background: linear-gradient(135deg, #4a90e2 0%, #60a5fa 100%);
+    }
+  }
+
   &__hero {
     margin-bottom: $space-md;
   }
@@ -594,23 +613,28 @@ async function removeArticleAction(): Promise<void> {
 
   &__input,
   &__textarea {
-    display: block;
-    width: 100%;
-    color: $color-text;
-    font-size: 27rpx;
-    background: rgba(248, 250, 252, 0.88);
-    border-radius: 24rpx;
-    padding: 22rpx 24rpx;
-    box-sizing: border-box;
+    @include sl-input;
+  }
+
+  &__input:focus,
+  &__textarea:focus {
+    border-color: var(--sl-border-focused);
+    box-shadow:
+      inset 0 0 0 1rpx var(--sl-border-focused),
+      0 0 12rpx rgba(59, 89, 255, 0.1);
+  }
+
+  &__placeholder {
+    color: var(--sl-text-muted);
   }
 
   &__input {
-    min-height: 88rpx;
-    line-height: 44rpx;
+    min-height: $input-min-height;
+    line-height: $input-line-height;
   }
 
   &__input--title {
-    height: 88rpx;
+    height: $input-min-height;
     padding-top: 0;
     padding-bottom: 0;
   }

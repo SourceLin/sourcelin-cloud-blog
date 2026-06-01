@@ -5,7 +5,10 @@ import type {
   CollectItem,
   FollowAction,
   FollowItem,
-  InteractionTargetType
+  InteractionTargetType,
+  LikeItem,
+  MyCommentItem,
+  MyCommentSource
 } from '../types/interaction';
 
 export function likeTarget(targetType: InteractionTargetType, targetId: number): Promise<void> {
@@ -36,6 +39,33 @@ export function fetchMyCollects(
     state: 'active',
     sortBy: 'createTime',
     sortOrder: 'desc'
+  });
+}
+
+export function fetchMyLikes(
+  page = 1,
+  pageSize = 10,
+  type: InteractionTargetType | 'all' = 'all'
+): Promise<PageResult<LikeItem<ArticleSummary>>> {
+  return http.get<PageResult<LikeItem<ArticleSummary>>>('/front/interactions/likes', {
+    page,
+    pageSize,
+    type,
+    state: 'active',
+    sortBy: 'createTime',
+    sortOrder: 'desc'
+  });
+}
+
+export function fetchMyComments(
+  page = 1,
+  pageSize = 10,
+  source: MyCommentSource = 'all'
+): Promise<PageResult<MyCommentItem>> {
+  return http.get<PageResult<MyCommentItem>>('/front/comments/mine', {
+    page,
+    pageSize,
+    source: source === 'all' ? undefined : source
   });
 }
 

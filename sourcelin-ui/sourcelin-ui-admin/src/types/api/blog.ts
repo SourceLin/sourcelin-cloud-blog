@@ -80,6 +80,20 @@ export interface CommentItem extends BlogBaseEntity {
   deleted?: number;
 }
 
+export interface ContentReportItem extends BlogBaseEntity {
+  id: number;
+  userId?: number;
+  targetType?: string;
+  targetId?: number;
+  reason?: string;
+  detail?: string;
+  pagePath?: string;
+  status?: "PENDING" | "PROCESSING" | "RESOLVED" | "REJECTED" | string;
+  clientIp?: string;
+  userAgent?: string;
+  remark?: string;
+}
+
 export interface ModerationItem {
   version?: number;
   loadedVersion?: number;

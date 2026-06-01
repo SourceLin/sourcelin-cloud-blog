@@ -10,13 +10,13 @@
     "tabBarBorderStyle": "white"
   },
   "dark": {
-    "navigationBarBackgroundColor": "#080D18",
+    "navigationBarBackgroundColor": "#0F172A",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#080D18",
+    "backgroundColor": "#0F172A",
     "backgroundTextStyle": "light",
     "tabBarColor": "#687693",
     "tabBarSelectedColor": "#8F82FF",
-    "tabBarBackgroundColor": "#080D18",
+    "tabBarBackgroundColor": "#0F172A",
     "tabBarBorderStyle": "black"
   }
 }

@@ -5,6 +5,8 @@ import com.sourcelin.blog.shared.support.BlogPageResults;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.sourcelin.blog.domain.Collect;
+import com.sourcelin.blog.domain.LikeRecord;
+import com.sourcelin.blog.mapper.LikeRecordMapper;
 import com.sourcelin.blog.service.ICollectService;
 import com.sourcelin.blog.service.interaction.IInteractionCollectService;
 import com.sourcelin.blog.service.interaction.IInteractionLikeService;
@@ -40,6 +42,8 @@ public class FrontInteractionController
     private IInteractionCollectService interactionCollectService;
     @Autowired
     private ICollectService collectService;
+    @Autowired
+    private LikeRecordMapper likeRecordMapper;
     @Autowired
     private BlogLoginAccessor blogLoginAccessor;
 
@@ -133,6 +137,68 @@ public class FrontInteractionController
         return BlogPageResults.of(collects, pageInfo, page, pageSize);
     }
 
+    @GetMapping("/likes")
+    public PageResult<LikeRecord> likes(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                        @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                                        @RequestParam(value = "sortBy", required = false) String sortBy,
+                                        @RequestParam(value = "sortOrder", required = false) String sortOrder,
+                                        @RequestParam(value = "type", required = false) String type,
+                                        @RequestParam(value = "state", required = false) String state,
+                                        Long userId)
+    {
+        if (userId == null || userId <= 0)
+        {
+            Long currentUserId = blogLoginAccessor.getCurrentUserId();
+            if (currentUserId != null && currentUserId > 0)
+            {
+                userId = currentUserId;
+            }
+        }
+        if (userId == null || userId <= 0)
+        {
+            return PageResult.empty(page, pageSize);
+        }
+        String orderBy = buildLikeOrderBy(sortBy, sortOrder);
+        page = PageUtils.clampPage(page);
+        pageSize = PageUtils.clampPageSize(pageSize);
+        if (orderBy == null)
+        {
+            PageHelper.startPage(page, pageSize);
+        }
+        else
+        {
+            PageHelper.startPage(page, pageSize, orderBy);
+        }
+
+        LikeRecord filter = new LikeRecord();
+        filter.setUserId(userId);
+        filter.setDeleted(0);
+        String likeType = normalizeLikeType(type);
+        if (likeType != null)
+        {
+            filter.setTargetType(likeType);
+        }
+        if (state != null && state.length() > 0)
+        {
+            if ("active".equals(state) || "inactive".equals(state))
+            {
+                filter.getParams().put("relationState", state);
+            }
+            else if (!"all".equals(state))
+            {
+                throw new BusinessException(ResultCode.VALIDATION_ERROR, "筛选参数不合法");
+            }
+        }
+        else
+        {
+            filter.getParams().put("relationState", "active");
+        }
+
+        List<LikeRecord> likes = likeRecordMapper.selectLikeRecordListWithTarget(filter);
+        PageInfo<LikeRecord> pageInfo = new PageInfo<LikeRecord>(likes);
+        return BlogPageResults.of(likes, pageInfo, page, pageSize);
+    }
+
     @GetMapping("/targets/stat")
     public List<InteractionTargetStatVO> stats(@RequestParam("targetType") String targetType,
                                                @RequestParam("targetIds") List<Long> targetIds)
@@ -149,6 +215,35 @@ public class FrontInteractionController
             throw new BusinessException(ResultCode.UNAUTHORIZED, "请先登录");
         }
         return userId;
+    }
+
+    private String normalizeLikeType(String type)
+    {
+        return normalizeCollectType(type);
+    }
+
+    private String buildLikeOrderBy(String sortBy, String sortOrder)
+    {
+        if (sortBy == null || sortBy.length() == 0)
+        {
+            return null;
+        }
+        String normalizedOrder = sortOrder == null ? "desc" : sortOrder.toLowerCase();
+        if (!"asc".equals(normalizedOrder) && !"desc".equals(normalizedOrder))
+        {
+            throw new BusinessException(ResultCode.VALIDATION_ERROR, "排序参数不合法");
+        }
+        Map<String, String> sortColumnMap = new HashMap<String, String>();
+        sortColumnMap.put("id", "l.id");
+        sortColumnMap.put("targetId", "l.target_id");
+        sortColumnMap.put("targetType", "l.target_type");
+        sortColumnMap.put("createTime", "l.create_time");
+        String column = sortColumnMap.get(sortBy);
+        if (column == null)
+        {
+            throw new BusinessException(ResultCode.VALIDATION_ERROR, "排序参数不合法");
+        }
+        return column + " " + normalizedOrder;
     }
 
     private String normalizeCollectType(String type)

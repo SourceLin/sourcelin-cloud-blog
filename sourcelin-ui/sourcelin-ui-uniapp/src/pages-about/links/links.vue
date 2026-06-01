@@ -13,7 +13,7 @@
     />
 
     <view v-else class="links__list">
-      <view v-for="item in items" :key="item.id" class="links__item s-card s-card--interactive" @tap="copyLink(item.url)">
+      <view v-for="item in items" :key="item.id" class="links__item s-card">
         <view class="links__item-head">
           <image v-if="item.avatar" class="links__avatar" :src="normalizeAssetUrl(item.avatar)" mode="aspectFill" />
           <view v-else class="links__avatar links__avatar--placeholder">{{ item.name.slice(0, 1) }}</view>
@@ -22,26 +22,26 @@
             <view class="links__url s-ellipsis">{{ item.url }}</view>
           </view>
         </view>
-        <view class="links__desc-text s-ellipsis-2">{{ item.description || '点击复制站点链接后可前往访问。' }}</view>
+        <view class="links__desc-text s-ellipsis-2">{{ item.description || '伙伴站点简介。' }}</view>
       </view>
     </view>
 
     <view class="links__apply s-card">
       <view class="links__apply-title">申请友链</view>
       <view class="links__field">
-        <input v-model.trim="form.name" class="links__input" maxlength="50" placeholder="网站名称">
+        <input v-model.trim="form.name" class="links__input" maxlength="50" placeholder="网站名称" placeholder-class="s-placeholder">
       </view>
       <view class="links__field">
-        <input v-model.trim="form.url" class="links__input" maxlength="90" placeholder="网站地址（支持直接粘贴域名）">
+        <input v-model.trim="form.url" class="links__input" maxlength="90" placeholder="网站地址（支持直接粘贴域名）" placeholder-class="s-placeholder">
       </view>
       <view class="links__field">
-        <input v-model.trim="form.email" class="links__input" maxlength="75" placeholder="联系邮箱">
+        <input v-model.trim="form.email" class="links__input" maxlength="75" placeholder="联系邮箱" placeholder-class="s-placeholder">
       </view>
       <view class="links__field">
-        <input v-model.trim="form.avatar" class="links__input" maxlength="255" placeholder="头像链接（可选）">
+        <input v-model.trim="form.avatar" class="links__input" maxlength="255" placeholder="头像链接（可选）" placeholder-class="s-placeholder">
       </view>
       <view class="links__field links__field--textarea">
-        <textarea v-model.trim="form.description" class="links__textarea" maxlength="255" auto-height placeholder="站点描述（可选）" />
+        <textarea v-model.trim="form.description" class="links__textarea" maxlength="255" auto-height placeholder="站点描述（可选）" placeholder-class="s-placeholder" />
       </view>
       <button class="links__submit sl-button sl-button--primary" :disabled="submitting" @tap="submitApply">
         <s-inline-loading v-if="submitting" text="提交中" light />
@@ -87,13 +87,6 @@ async function loadLinks(): Promise<void> {
   } finally {
     loading.value = false;
   }
-}
-
-function copyLink(url: string): void {
-  uni.setClipboardData({
-    data: url,
-    success: () => showSuccessToast('链接已复制')
-  });
 }
 
 function validateApply(): boolean {
@@ -200,9 +193,6 @@ async function submitApply(): Promise<void> {
 
   &__field {
     margin-top: 16rpx;
-    padding: 18rpx 22rpx;
-    border-radius: 22rpx;
-    background: var(--sl-control-bg);
   }
 
   &__field--textarea {
@@ -211,9 +201,12 @@ async function submitApply(): Promise<void> {
 
   &__input,
   &__textarea {
-    width: 100%;
-    color: $color-text;
-    font-size: 26rpx;
+    @include sl-input;
+  }
+
+  &__input {
+    min-height: $input-min-height;
+    line-height: $input-line-height;
   }
 
   &__textarea {

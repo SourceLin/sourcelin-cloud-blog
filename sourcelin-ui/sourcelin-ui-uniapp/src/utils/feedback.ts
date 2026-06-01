@@ -22,3 +22,8 @@ export function showInfoToast(title: string, duration?: number): void {
 export function showSuccessToast(title: string, duration?: number): void {
   showToast({ title, icon: 'success', duration });
 }
+
+/** 短文案、无图标的轻提示 */
+export function showLightToast(title: string): void {
+  showToast({ title, icon: 'none', duration: 1500 });
+}

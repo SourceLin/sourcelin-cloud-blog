@@ -49,3 +49,24 @@ export interface FollowAction {
   id: number;
   followed: boolean;
 }
+
+/** 与收藏列表结构一致，用于「我的点赞」 */
+export type LikeItem<T = CollectTargetSummary> = CollectItem<T>;
+
+export type MyCommentSource = InteractionTargetType | 'all';
+
+export interface MyCommentItem {
+  id: number;
+  userId?: number;
+  content: string;
+  status?: number;
+  source?: string;
+  targetType?: InteractionTargetType;
+  targetId?: number;
+  targetTitle?: string;
+  parentCommentId?: number;
+  parentNickname?: string;
+  createTime?: string;
+}
+
+export type InteractionTab = 'collect' | 'like' | 'comment';

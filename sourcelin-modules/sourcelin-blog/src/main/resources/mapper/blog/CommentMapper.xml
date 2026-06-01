@@ -82,6 +82,47 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where c.id = #{id}
     </select>
 
+    <select id="selectMyCommentList" resultType="com.sourcelin.blog.vo.FrontMyCommentVO">
+        select c.id,
+               c.user_id as userId,
+               c.content,
+               c.status,
+               c.source,
+               c.article_id as targetId,
+               case
+                   when c.source = 'say' then 'say'
+                   when c.source = 'treehole' then 'treehole'
+                   else 'article'
+               end as targetType,
+               case
+                   when c.source = 'say' then s.content
+                   when c.source = 'treehole' then t.content
+                   else a.title
+               end as targetTitle,
+               c.parent_comment_id as parentCommentId,
+               pu.nickname as parentNickname,
+               c.create_time as createTime
+        from b_comment c
+        left join b_user pu on c.parent_user_id = pu.id
+        left join b_article a on (c.source is null or c.source = '' or c.source = 'article')
+            and c.article_id = a.id and a.deleted = 0
+        left join b_say s on c.source = 'say' and c.article_id = s.id and s.deleted = 0
+        left join b_treehole t on c.source = 'treehole' and c.article_id = t.id and t.deleted = 0
+        where c.deleted = 0
+          and c.user_id = #{userId}
+        <if test="source != null and source != '' and source != 'all'">
+            <choose>
+                <when test="source == 'article'">
+                    and (c.source is null or c.source = '' or c.source = 'article')
+                </when>
+                <otherwise>
+                    and c.source = #{source}
+                </otherwise>
+            </choose>
+        </if>
+        order by c.create_time desc
+    </select>
+
     <select id="countByArticleIdAndUserId" resultType="int">
         select count(1) from b_comment c
         where c.deleted = 0 and c.article_id = #{articleId} and c.user_id = #{userId}

@@ -1,5 +1,6 @@
 package com.sourcelin.blog.domain;
 
+import com.sourcelin.blog.api.domain.User;
 import com.sourcelin.common.core.web.domain.BaseEntity;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -23,6 +24,14 @@ public class LikeRecord extends BaseEntity
      * 软删除标记，0=有效 1=已取消。
      */
     private Integer deleted;
+
+    private Article article;
+
+    private Say say;
+
+    private Treehole treehole;
+
+    private User user;
 
     public Long getId()
     {
@@ -72,6 +81,46 @@ public class LikeRecord extends BaseEntity
     public void setDeleted(Integer deleted)
     {
         this.deleted = deleted;
+    }
+
+    public Article getArticle()
+    {
+        return article;
+    }
+
+    public void setArticle(Article article)
+    {
+        this.article = article;
+    }
+
+    public Say getSay()
+    {
+        return say;
+    }
+
+    public void setSay(Say say)
+    {
+        this.say = say;
+    }
+
+    public Treehole getTreehole()
+    {
+        return treehole;
+    }
+
+    public void setTreehole(Treehole treehole)
+    {
+        this.treehole = treehole;
+    }
+
+    public User getUser()
+    {
+        return user;
+    }
+
+    public void setUser(User user)
+    {
+        this.user = user;
     }
 
     @Override

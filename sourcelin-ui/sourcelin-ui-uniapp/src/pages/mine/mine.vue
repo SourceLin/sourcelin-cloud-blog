@@ -3,12 +3,10 @@
     <view class="mine__hero">
       <image class="mine__hero-bg" src="/static/header/beijing.jpg" mode="aspectFill" />
       <view class="mine__hero-mask" />
-      <image class="mine__hero-logo" src="/static/logo/logo.png" mode="aspectFit" />
-      <view class="mine__hero-title">SOURCELIN</view>
-      <view class="mine__hero-subtitle">Blog Studio</view>
-      <view class="mine__theme-trigger" @tap.stop="themeSheetVisible = true">
-        <uni-icons :type="themeStore.isDark ? 'moon' : 'sun'" size="18" color="#ffffff" />
-        <text class="mine__theme-label">外观</text>
+      <view class="mine__hero-body">
+        <image class="mine__hero-logo" src="/static/logo/logo.png" mode="aspectFit" />
+        <view class="mine__hero-title">SOURCELIN</view>
+        <view class="mine__hero-subtitle">Blog Studio</view>
       </view>
     </view>
 
@@ -35,23 +33,54 @@
         <view class="mine__banner-desc">收藏灵感，追更作者，回访每一篇值得重读的内容。</view>
       </view>
 
-      <view class="mine__functions">
-        <view class="mine__section-title">我的功能</view>
-        <view class="mine__grid">
+      <view class="mine__section mine__section--assets">
+        <view class="mine__section-head">
+          <view class="mine__section-title">互动与创作</view>
+        </view>
+        <view class="mine__asset-grid">
           <view
-            v-for="entry in entries"
+            v-for="entry in coreEntries"
             :key="entry.key"
-            class="mine__feature"
-            hover-class="mine__feature--hover"
+            class="mine__asset-card"
+            hover-class="mine__asset-card--hover"
             @tap="onTapEntry(entry.key)"
           >
-            <view class="mine__feature-icon">
+            <view class="mine__asset-icon">
               <uni-icons :type="entry.icon" size="24" :color="entry.iconColor" />
               <view v-if="entry.key === 'messages' && unreadMessageCount > 0" class="mine__feature-badge">
                 {{ unreadMessageCount > 99 ? '99+' : unreadMessageCount }}
               </view>
             </view>
-            <view class="mine__feature-text">{{ entry.text }}</view>
+            <view class="mine__asset-info">
+              <view class="mine__asset-title">{{ entry.text }}</view>
+              <view class="mine__asset-desc">{{ entry.desc }}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="mine__section mine__section--tools">
+        <view class="mine__section-head">
+          <view class="mine__section-title">设置与服务</view>
+        </view>
+        <view class="mine__menu">
+          <view
+            v-for="entry in secondaryEntries"
+            :key="entry.key"
+            class="mine__menu-item"
+            hover-class="mine__menu-item--hover"
+            @tap="onTapEntry(entry.key)"
+          >
+            <view class="mine__menu-main">
+              <view class="mine__menu-icon">
+                <uni-icons :type="entry.icon" size="21" :color="entry.iconColor" />
+              </view>
+              <view class="mine__menu-copy">
+                <view class="mine__menu-title">{{ entry.text }}</view>
+                <view class="mine__menu-desc">{{ entry.desc }}</view>
+              </view>
+            </view>
+            <uni-icons class="mine__menu-arrow" type="right" size="17" color="currentColor" />
           </view>
         </view>
       </view>
@@ -150,15 +179,17 @@
         <view class="mine-login__agreement" @tap="toggleAgreement">
           <view class="mine-login__check" :class="{ 'mine-login__check--active': agreementChecked }" />
           <view class="mine-login__agreement-text">
-            允许我们在必要场景下，合理使用您的个人信息，并同意《隐私条款》《会员协议》等内容
+            允许我们在必要场景下，合理使用您的个人信息，并同意
+            <text class="mine-login__agreement-link" @tap.stop="openPolicyPage('privacy-policy')">《隐私政策》</text>
+            、
+            <text class="mine-login__agreement-link" @tap.stop="openPolicyPage('user-agreement')">《用户协议》</text>
+            等内容
           </view>
         </view>
       </view>
     </view>
 
     <s-back-to-top :visible="backToTopVisible" />
-
-    <s-theme-sheet :visible="themeSheetVisible" @close="themeSheetVisible = false" />
 
     <view class="s-liquid-tabbar">
       <view class="s-liquid-tabbar__shell">
@@ -185,7 +216,7 @@
 
 <script setup lang="ts">
 // 我的：登录态展示与基础入口（骨架）
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { onPageScroll, onShow } from '@dcloudio/uni-app';
 import {
   bindMiniProgramAccount,
@@ -200,16 +231,17 @@ import { fetchUnreadMessageCount } from '@/modules/message/api/message.api';
 import { fetchCurrentUserInfo } from '@/shared/api/user.api';
 import { hideNativeTabbar, liquidTabItems, switchLiquidTab } from '@/shared/utils/liquid-tabbar';
 import { replayPendingAction } from '@/shared/utils/pending-actions';
+import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { mapFrontUserInfo } from '@/shared/utils/user-mapper';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { AUTH_LOGIN_SUCCESS_EVENT, type LoginSuccessEventDetail } from '@/utils/auth';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 import { normalizeAssetUrl } from '@/utils/url';
+import type { LegalArticleType } from '@/modules/site/constants/legal';
 
 const userStore = useUserStore();
 const themeStore = useThemeStore();
-const themeSheetVisible = ref(false);
 const backToTopVisible = ref(false);
 const activeTabPath = 'pages/mine/mine';
 const loginSheetVisible = ref(false);
@@ -252,26 +284,43 @@ const captchaImage = computed(() => {
   return captcha.img.startsWith('data:') ? captcha.img : `data:image/png;base64,${captcha.img}`;
 });
 
+watch([displayName, hintText], () => {
+  applyH5Seo({
+    title: buildSeoTitle('我的'),
+    description: extractSeoSummary(
+      userStore.isLoggedIn
+        ? `${displayName.value} 的移动端主页，管理资料、内容回访、收藏、关注与消息中心。`
+        : '登录后同步收藏、关注、消息与互动记录。'
+    ),
+    keywords: ['我的', '用户中心', '收藏', '关注', '消息中心', userStore.isLoggedIn ? displayName.value : '登录']
+  });
+}, { immediate: true });
+
 interface Entry {
-  key: 'collects' | 'follows' | 'profile' | 'settings' | 'articles' | 'about' | 'links' | 'navigation' | 'messages';
+  key: 'interactions' | 'follows' | 'profile' | 'settings' | 'articles' | 'about' | 'policies' | 'links' | 'navigation' | 'messages';
   text: string;
+  desc: string;
   url: string;
   icon: string;
   iconColor: string;
 }
 
 const entries: Entry[] = [
-  { key: 'collects', text: '我的收藏', url: '/pages-user/collects/collects', icon: 'star-filled', iconColor: '#FFB800' },
-  { key: 'follows', text: '关注/粉丝', url: '/pages-user/follows/follows', icon: 'heart-filled', iconColor: '#FF5B75' },
-  { key: 'profile', text: '个人资料', url: '/pages-user/profile/profile', icon: 'person-filled', iconColor: '#3B59FF' },
-  { key: 'settings', text: '体验设置', url: '/pages-user/settings/settings', icon: 'gear-filled', iconColor: '#7C4DFF' },
-  { key: 'articles', text: '我的文章', url: '/pages-user/articles/articles', icon: 'compose', iconColor: '#8F70FF' },
-  { key: 'about', text: '关于本站', url: '/pages-about/index/index', icon: 'info-filled', iconColor: '#00B42A' },
-  { key: 'links', text: '友情链接', url: '/pages-about/links/links', icon: 'link', iconColor: '#1DD1A1' },
-  { key: 'navigation', text: '网站导航', url: '/pages-about/navigation/navigation', icon: 'location-filled', iconColor: '#FF7D00' },
-  { key: 'messages', text: '消息中心', url: '/pages-messages/index/index', icon: 'chat-filled', iconColor: '#00D2D3' }
+  { key: 'interactions', text: '我的互动', desc: '收藏、点赞与评论记录', url: '/pages-user/interactions/interactions', icon: 'star-filled', iconColor: '#FFB800' },
+  { key: 'follows', text: '关注/粉丝', desc: '管理关注与回访', url: '/pages-user/follows/follows', icon: 'heart-filled', iconColor: '#FF5B75' },
+  { key: 'profile', text: '个人资料', desc: '编辑昵称、头像与简介', url: '/pages-user/profile/profile', icon: 'person-filled', iconColor: '#3B59FF' },
+  { key: 'settings', text: '体验设置', desc: '外观、推荐与订阅消息', url: '/pages-user/settings/settings', icon: 'gear-filled', iconColor: '#7C4DFF' },
+  { key: 'articles', text: '我的文章', desc: '管理草稿与已发布内容', url: '/pages-user/articles/articles', icon: 'compose', iconColor: '#8F70FF' },
+  { key: 'policies', text: '协议与政策', desc: '查看用户协议与隐私政策', url: '/pages-about/policies/policies', icon: 'compose', iconColor: '#3B59FF' },
+  { key: 'about', text: '关于本站', desc: '查看站点介绍与作者信息', url: '/pages-about/index/index', icon: 'info-filled', iconColor: '#00B42A' },
+  // { key: 'navigation', text: '网站导航', desc: '快速进入常用站点入口', url: '/pages-about/navigation/navigation', icon: 'location-filled', iconColor: '#FF7D00' },
+  { key: 'links', text: '友情链接', desc: '浏览合作站点与推荐链接', url: '/pages-about/links/links', icon: 'link', iconColor: '#1DD1A1' },
+  { key: 'messages', text: '消息中心', desc: '查看回复、点赞与系统通知', url: '/pages-messages/index/index', icon: 'chat-filled', iconColor: '#00D2D3' }
 ];
-const loginRequiredKeys: Entry['key'][] = ['collects', 'follows', 'profile', 'articles', 'messages'];
+const coreEntryKeys: Entry['key'][] = ['interactions', 'articles', 'follows', 'messages'];
+const coreEntries = computed(() => entries.filter((entry) => coreEntryKeys.includes(entry.key)));
+const secondaryEntries = computed(() => entries.filter((entry) => !coreEntryKeys.includes(entry.key)));
+const loginRequiredKeys: Entry['key'][] = ['interactions', 'follows', 'profile', 'articles', 'messages'];
 
 onShow(() => {
   hideNativeTabbar();
@@ -515,6 +564,10 @@ function onLogout(): void {
     }
   });
 }
+
+function openPolicyPage(type: LegalArticleType): void {
+  uni.navigateTo({ url: `/pages-about/policy/policy?type=${type}` });
+}
 </script>
 
 <style lang="scss" scoped>
@@ -530,12 +583,60 @@ function onLogout(): void {
 
   min-height: 100vh;
   padding-bottom: calc(172rpx + env(safe-area-inset-bottom));
+  background: var(--sl-page-bg, #f5f7fb);
   transition: background-color 0.24s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  &.sl-theme--dark {
+    background: var(--sl-page-bg, #0f172a);
+    .mine__profile,
+    .mine__section,
+    .mine__menu-item,
+    .mine__asset-card {
+      background: var(--sl-card-glass-bg);
+      border-color: var(--sl-border-light);
+      box-shadow: var(--sl-shadow-soft);
+    }
+
+    .mine__menu-icon,
+    .mine__asset-icon {
+      background: var(--sl-card-glass-bg);
+      border-color: var(--sl-border-light);
+      box-shadow: var(--sl-shadow-soft);
+    }
+
+    .mine__nickname,
+    .mine__section-title,
+    .mine__asset-title,
+    .mine__menu-title {
+      color: var(--sl-text-main);
+      text-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.5);
+    }
+
+    .mine__asset-desc {
+      color: rgba(149, 164, 185, 0.85);
+    }
+
+    .mine__menu-desc,
+    .mine__menu-arrow {
+      color: var(--sl-text-sub);
+    }
+
+    .mine__feature-badge {
+      background: #ef4444;
+    }
+
+    .mine__hero-mask {
+      background:
+        linear-gradient(180deg, rgba(8, 13, 24, 0.08) 0%, rgba(8, 13, 24, 0.28) 52%, rgba(9, 9, 11, 0.92) 100%),
+        rgba(8, 13, 24, 0.18);
+    }
+  }
 
   &__hero {
     position: relative;
-    height: 430rpx;
+    height: 560rpx;
     overflow: hidden;
+    box-sizing: border-box;
   }
 
   &__hero-bg,
@@ -544,33 +645,38 @@ function onLogout(): void {
     inset: 0;
     width: 100%;
     height: 100%;
+    display: block;
   }
 
   &__hero-mask {
     position: absolute;
     inset: 0;
+    z-index: 1;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(17, 24, 39, 0.02) 44%, rgba(245, 247, 250, 0.16)),
-      rgba(17, 24, 39, 0.06);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(17, 24, 39, 0.06) 52%, rgba(245, 247, 250, 0.35) 100%),
+      rgba(17, 24, 39, 0.03);
+    pointer-events: none;
+  }
 
-    .sl-theme--dark & {
-      background:
-        linear-gradient(180deg, rgba(8, 13, 24, 0.04), rgba(8, 13, 24, 0.12) 44%, rgba(8, 13, 24, 0.28)),
-        rgba(8, 13, 24, 0.04);
-    }
+  &__hero-body {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 112rpx;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12rpx;
   }
 
   &__hero-logo {
-    position: absolute;
-    top: 96rpx;
-    left: 50%;
     width: 78rpx;
     height: 78rpx;
     padding: 10rpx;
     border-radius: 50%;
-    transform: translateX(-50%);
     background: rgba(255, 255, 255, 0.72);
-    border: 1rpx solid rgba(255, 255, 255, 0.86);
+    border: 1rpx solid rgba(255, 255, 255, 0.65);
     box-shadow:
       inset 0 1rpx 0 rgba(255, 255, 255, 0.88),
       0 12rpx 28rpx rgba(17, 24, 39, 0.1);
@@ -582,40 +688,35 @@ function onLogout(): void {
   }
 
   &__hero-title {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 214rpx;
     color: #fff;
-    font-size: 74rpx;
+    font-size: 56rpx;
     font-weight: 800;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     text-align: center;
-    text-shadow: 0 10rpx 28rpx rgba(17, 24, 39, 0.18);
+    text-shadow: 0 12rpx 36rpx rgba(17, 24, 39, 0.25);
   }
 
   &__hero-subtitle {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 306rpx;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.95);
     font-size: 24rpx;
     font-weight: 600;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.22em;
     text-align: center;
     text-transform: uppercase;
+    text-shadow: 0 4rpx 16rpx rgba(17, 24, 39, 0.2);
   }
 
   &__content {
     position: relative;
-    margin-top: -60rpx;
-    padding: 0 $space-md;
+    margin-top: 20rpx;
+    padding: 0 30rpx;
+    z-index: 2;
   }
 
   &__profile {
     position: relative;
-    z-index: 2;
+    z-index: 3;
+    margin-top: -72rpx;
     display: flex;
     align-items: center;
     min-height: 154rpx;
@@ -626,52 +727,17 @@ function onLogout(): void {
       var(--mine-glass-pure);
     border: 1rpx solid var(--mine-border-glass);
     box-shadow:
-      inset 0 1rpx 0 rgba(255, 255, 255, 0.86),
-      0 18rpx 48rpx var(--mine-shadow-glass);
-    transition: background-color 0.24s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.24s cubic-bezier(0.25, 0.8, 0.25, 1);
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.92),
+      0 24rpx 52rpx rgba(17, 24, 39, 0.14),
+      0 8rpx 20rpx rgba(59, 89, 255, 0.06);
+    transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.24s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.24s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.2s ease;
   }
 
-  &__theme-trigger {
-    position: absolute;
-    top: 36rpx;
-    right: 28rpx;
-    min-width: 112rpx;
-    height: 64rpx;
-    padding: 0 20rpx;
-    box-sizing: border-box;
-    border-radius: 999rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8rpx;
-    background: rgba(255, 255, 255, 0.2);
-    border: 1rpx solid rgba(255, 255, 255, 0.58);
+  &__profile:active {
+    transform: translateY(2rpx);
     box-shadow:
-      inset 0 1rpx 0 rgba(255, 255, 255, 0.42),
-      0 8rpx 22rpx rgba(17, 24, 39, 0.12);
-    z-index: 10;
-    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-
-    .sl-theme--dark & {
-      background: rgba(18, 27, 46, 0.28);
-      border-color: rgba(255, 255, 255, 0.46);
-      box-shadow:
-        inset 0 1rpx 0 rgba(255, 255, 255, 0.24),
-        0 8rpx 22rpx rgba(0, 0, 0, 0.18);
-    }
-
-    &:active {
-      transform: scale(0.92);
-      background: rgba(255, 255, 255, 0.3);
-    }
-  }
-
-  &__theme-label {
-    color: #fff;
-    font-size: 23rpx;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-shadow: 0 2rpx 8rpx rgba(17, 24, 39, 0.2);
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.88),
+      0 16rpx 36rpx rgba(17, 24, 39, 0.1);
   }
 
   &__avatar {
@@ -691,9 +757,10 @@ function onLogout(): void {
 
   &__nickname {
     color: var(--mine-text-main);
-    font-size: 34rpx;
-    font-weight: 700;
-    line-height: 1.3;
+    font-size: 38rpx;
+    font-weight: 800;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
   }
 
   &__hint {
@@ -736,10 +803,15 @@ function onLogout(): void {
 
   &__banner {
     position: relative;
-    height: 170rpx;
-    margin-top: 28rpx;
+    height: 220rpx;
+    margin-top: 22rpx;
     border-radius: 24rpx;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 42rpx;
+    box-sizing: border-box;
 
     .sl-theme--dark & {
       filter: brightness(0.94) contrast(1.03);
@@ -758,7 +830,6 @@ function onLogout(): void {
   &__banner-desc {
     position: relative;
     z-index: 1;
-    margin-left: 42rpx;
     color: #fff;
     text-shadow:
       0 4rpx 12rpx rgba(17, 24, 39, 0.2),
@@ -766,21 +837,20 @@ function onLogout(): void {
   }
 
   &__banner-title {
-    padding-top: 38rpx;
     font-size: 34rpx;
     font-weight: 800;
   }
 
   &__banner-desc {
-    width: 440rpx;
-    margin-top: 8rpx;
+    max-width: 520rpx;
+    margin-top: 10rpx;
     font-size: 22rpx;
-    line-height: 1.5;
+    line-height: 1.55;
   }
 
-  &__functions {
-    margin-top: 28rpx;
-    padding: 34rpx 28rpx 28rpx;
+  &__section {
+    margin-top: 22rpx;
+    padding: 28rpx 24rpx 24rpx;
     border-radius: 28rpx;
     background:
       linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
@@ -791,45 +861,61 @@ function onLogout(): void {
       0 12rpx 34rpx rgba(17, 24, 39, 0.05);
   }
 
+  &__section-head {
+    margin-bottom: 20rpx;
+  }
+
   &__section-title {
     color: var(--mine-text-main);
     font-size: 34rpx;
     font-weight: 800;
   }
 
-  &__grid {
-    display: flex;
-    flex-wrap: wrap;
-    row-gap: 42rpx;
-    margin-top: 42rpx;
+  &__asset-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14rpx;
   }
 
-  &__feature {
-    width: 25%;
+  &__asset-card {
+    min-height: 200rpx;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 26rpx;
+    border-radius: 30rpx;
+    background:
+      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
+      var(--mine-glass-pure);
+    border: 1rpx solid var(--mine-border-glass);
+    box-shadow:
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.88),
+      0 16rpx 36rpx rgba(17, 24, 39, 0.05);
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease;
   }
 
-  &__feature--hover {
-    opacity: 0.72;
+  &__asset-card--hover {
+    opacity: 0.9;
   }
 
-  &__feature-icon {
+  &__asset-card:active {
+    transform: scale(0.97);
+  }
+
+  &__asset-icon {
     position: relative;
-    width: 82rpx;
-    height: 82rpx;
+    width: 72rpx;
+    height: 72rpx;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 26rpx;
+    border-radius: 22rpx;
     background:
       linear-gradient(145deg, var(--sl-control-bg-strong), var(--sl-control-bg));
     border: 1rpx solid var(--sl-control-border);
     box-shadow:
       inset 0 1rpx 0 rgba(255, 255, 255, 0.9),
-      0 8rpx 20rpx rgba(17, 24, 39, 0.03);
+      0 8rpx 20rpx rgba(17, 24, 39, 0.04);
     transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease;
   }
 
@@ -851,22 +937,103 @@ function onLogout(): void {
     box-sizing: border-box;
   }
 
-  &__feature:active &__feature-icon {
-    transform: scale(0.92);
-    box-shadow: 0 4rpx 10rpx rgba(17, 24, 39, 0.01);
+  &__asset-info {
+    margin-top: 18rpx;
   }
 
-  &__feature-text {
-    margin-top: 18rpx;
+  &__asset-title {
+    color: var(--mine-text-main);
+    font-size: 28rpx;
+    font-weight: 800;
+    line-height: 1.35;
+  }
+
+  &__asset-desc {
+    margin-top: 6rpx;
     color: var(--mine-text-sub);
-    font-size: 24rpx;
-    line-height: 1.2;
-    text-align: center;
+    font-size: 22rpx;
+    line-height: 1.4;
+  }
+
+  &__menu {
+    display: flex;
+    flex-direction: column;
+    gap: 12rpx;
+  }
+
+  &__menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18rpx;
+    padding: 18rpx 18rpx;
+    border-radius: 22rpx;
+    background:
+      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
+      rgba(255, 255, 255, 0.44);
+    border: 1rpx solid rgba(255, 255, 255, 0.7);
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease;
+  }
+
+  &__menu-item--hover {
+    opacity: 0.92;
+  }
+
+  &__menu-item:active {
+    transform: scale(0.985);
+  }
+
+  &__menu-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 16rpx;
+  }
+
+  &__menu-icon {
+    width: 64rpx;
+    height: 64rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 22rpx;
+    background:
+      linear-gradient(145deg, var(--sl-control-bg-strong), var(--sl-control-bg));
+    border: 1rpx solid var(--sl-control-border);
+    box-shadow:
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.9),
+      0 8rpx 18rpx rgba(17, 24, 39, 0.03);
+    flex-shrink: 0;
+  }
+
+  &__menu-copy {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__menu-title {
+    color: var(--mine-text-main);
+    font-size: 26rpx;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  &__menu-desc {
+    margin-top: 6rpx;
+    color: var(--mine-text-sub);
+    font-size: 20rpx;
+    line-height: 1.5;
+  }
+
+  &__menu-arrow {
+    color: var(--sl-text-muted);
+    flex-shrink: 0;
   }
 
   &__logout {
     width: 280rpx;
-    margin: 30rpx auto 0;
+    margin: 22rpx auto 0;
     border-radius: 999rpx;
     background: rgba(255, 255, 255, 0.8);
     text-align: center;
@@ -882,7 +1049,7 @@ function onLogout(): void {
   }
 
   &__support {
-    margin-top: 170rpx;
+    margin-top: 84rpx;
     text-align: center;
   }
 
@@ -900,9 +1067,9 @@ function onLogout(): void {
   }
 
   &__support-text {
-    margin-top: 16rpx;
+    margin-top: 12rpx;
     color: var(--sl-text-muted);
-    font-size: 26rpx;
+    font-size: 24rpx;
   }
 }
 
@@ -1010,17 +1177,10 @@ function onLogout(): void {
   }
 
   &__field {
+    @include sl-input;
     margin-bottom: 18rpx;
-    padding: 18rpx 22rpx;
     border-radius: 22rpx;
-    background: rgba(248, 250, 252, 0.9);
-    border: 1rpx solid rgba(229, 231, 235, 0.88);
-    box-sizing: border-box;
-
-    .sl-theme--dark & {
-      background: rgba(8, 13, 24, 0.6);
-      border-color: rgba(154, 176, 255, 0.12);
-    }
+    padding: 18rpx 22rpx;
   }
 
   &__field--captcha {
@@ -1037,7 +1197,7 @@ function onLogout(): void {
   &__label {
     display: block;
     margin-bottom: 8rpx;
-    color: rgba(75, 85, 99, 0.68);
+    color: $color-text-tertiary;
     font-size: 22rpx;
   }
 
@@ -1102,6 +1262,11 @@ function onLogout(): void {
     color: var(--sl-text-sub);
     font-size: 24rpx;
     line-height: 1.65;
+  }
+
+  &__agreement-link {
+    color: var(--sl-color-primary);
+    font-weight: 700;
   }
 }
 </style>

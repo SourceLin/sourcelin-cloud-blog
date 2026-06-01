@@ -4,10 +4,10 @@
   "description": "Sourcelin Blog Uniapp 客户端（微信小程序 + H5），Vue3 + TypeScript + Vite",
   "private": true,
   "scripts": {
-    "dev:mp-weixin": "uni -p mp-weixin",
+    "dev:mp-weixin": "node build-tools/with-local-wechat-appid.mjs -- uni -p mp-weixin",
     "dev:h5": "uni",
     "dev:app": "uni -p app",
-    "build:mp-weixin": "uni build -p mp-weixin",
+    "build:mp-weixin": "node build-tools/with-local-wechat-appid.mjs -- uni build -p mp-weixin",
     "build:h5": "uni build",
     "build:app": "uni build -p app",
     "type-check": "vue-tsc --noEmit -p tsconfig.json",

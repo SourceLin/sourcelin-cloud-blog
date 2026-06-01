@@ -10,14 +10,15 @@
     {
       "path": "pages/home/home",
       "style": {
-        "navigationBarTitleText": "首页",
+        "navigationStyle": "custom",
         "enablePullDownRefresh": true
       }
     },
     {
       "path": "pages/discover/discover",
       "style": {
-        "navigationBarTitleText": "发现"
+        "navigationBarTitleText": "发现",
+        "enablePullDownRefresh": true
       }
     },
     {
@@ -30,7 +31,7 @@
     {
       "path": "pages/mine/mine",
       "style": {
-        "navigationBarTitleText": "我的"
+        "navigationStyle": "custom"
       }
     },
     {
@@ -68,6 +69,13 @@
       "path": "pages-user/settings/settings",
       "style": {
         "navigationBarTitleText": "体验设置"
+      }
+    },
+    {
+      "path": "pages-user/interactions/interactions",
+      "style": {
+        "navigationBarTitleText": "我的互动",
+        "enablePullDownRefresh": true
       }
     },
     {
@@ -117,6 +125,18 @@
       }
     },
     {
+      "path": "pages-about/policies/policies",
+      "style": {
+        "navigationBarTitleText": "协议与政策"
+      }
+    },
+    {
+      "path": "pages-about/policy/policy",
+      "style": {
+        "navigationBarTitleText": "政策详情"
+      }
+    },
+    {
       "path": "pages-about/links/links",
       "style": {
         "navigationBarTitleText": "友情链接"
@@ -152,6 +172,8 @@
     "navigationBarTitleText": "Sourcelin",
     "navigationBarBackgroundColor": "@navigationBarBackgroundColor",
     "backgroundColor": "@backgroundColor",
+    "backgroundColorTop": "@backgroundColor",
+    "backgroundColorBottom": "@backgroundColor",
     "backgroundTextStyle": "@backgroundTextStyle",
     "onReachBottomDistance": 80,
     "pageOrientation": "portrait"

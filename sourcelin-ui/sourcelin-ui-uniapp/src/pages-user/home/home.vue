@@ -72,12 +72,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { onLoad, onShow } from '@dcloudio/uni-app';
+import { computed, ref, watch } from 'vue';
+import { onLoad, onShareAppMessage, onShow } from '@dcloudio/uni-app';
 import { fetchUserArticlePage, fetchUserDetail, fetchUserFollowerPage, fetchUserFollowingPage } from '@/modules/user/api/user.api';
 import type { FrontUserInfo } from '@/modules/user/types/user';
 import type { ArticleSummary } from '@/modules/article/types/article';
 import type { FollowItem } from '@/modules/interaction/types/interaction';
+import { reportAnalyticsEvent } from '@/shared/utils/analytics';
+import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { useThemeStore } from '@/stores/theme';
 import { normalizeAssetUrl } from '@/utils/url';
 
@@ -105,6 +107,18 @@ const activeItems = computed(() => {
   return activeTab.value === 'followers' ? followers.value : followings.value;
 });
 const activeFollowItems = computed(() => activeTab.value === 'followers' ? followers.value : followings.value);
+
+watch(user, (currentUser) => {
+  const userName = currentUser?.nickName || currentUser?.userName || 'Sourcelin 用户';
+  applyH5Seo({
+    title: buildSeoTitle(`${userName} 的主页`),
+    description: extractSeoSummary(
+      currentUser?.introduction,
+      `${userName} 的作者主页，当前展示 ${articles.value.length} 篇文章、${followers.value.length} 位粉丝与 ${followings.value.length} 个关注对象。`
+    ),
+    keywords: [userName, '作者主页', '用户主页', '文章', '关注']
+  });
+}, { immediate: true });
 
 onShow(() => {
   themeStore.syncNativeArea();
@@ -168,6 +182,25 @@ function openRelatedUser(item: FollowItem): void {
   if (!target?.id || target.id === userId.value) return;
   uni.navigateTo({ url: `/pages-user/home/home?id=${target.id}` });
 }
+
+onShareAppMessage(() => {
+  const title = user.value?.nickName || user.value?.userName || 'Sourcelin 用户';
+  void reportAnalyticsEvent({
+    eventType: 'user_home_share',
+    pagePath: '/pages-user/home/home',
+    targetType: 'user',
+    targetId: userId.value || undefined,
+    metadata: {
+      articleCount: articles.value.length,
+      followerCount: followers.value.length
+    }
+  });
+  return {
+    title: `${title} 的主页 - 圆圈博客`,
+    path: userId.value ? `/pages-user/home/home?id=${userId.value}` : '/pages/home/home',
+    imageUrl: avatarUrl.value
+  };
+});
 </script>
 
 <style lang="scss" scoped>

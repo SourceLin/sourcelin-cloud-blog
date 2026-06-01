@@ -3,6 +3,7 @@ package com.sourcelin.blog.service;
 import com.sourcelin.blog.domain.Comment;
 import com.sourcelin.blog.dto.CommentDTO;
 import com.sourcelin.blog.vo.CommentVO;
+import com.sourcelin.blog.vo.FrontMyCommentVO;
 import com.sourcelin.blog.vo.ModerationOutcome;
 
 import java.util.List;
@@ -35,6 +36,8 @@ public interface ICommentService
      * 前台评论列表（含本人待审/拒绝合并）
      */
     List<CommentVO> selectFrontCommentList(CommentDTO dto);
+
+    List<FrontMyCommentVO> selectMyCommentList(Long userId, String source);
 
     /**
      * 新增文章评论

@@ -1,36 +1,80 @@
 <template>
   <view class="home" :class="themeStore.themeClass">
     <s-loading :visible="loading && feedItems.length === 0" />
-    <view class="home__hero">
-      <image class="home__hero-bg" src="/static/backgrounds/home-bg.jpg" mode="aspectFill" />
 
-      <!-- 顶部精细双端排列：Logo品牌与精致毛玻璃搜索按钮 -->
-      <view class="home__hero-header">
-        <view class="home__brand">
-          <image class="home__logo" src="/static/logo/logo.png" mode="aspectFit" />
-          <view class="home__eyebrow">Sourcelin Blog</view>
-        </view>
-        <view class="home__search-btn" @tap="goSearch">
-          <uni-icons type="search" size="18" color="var(--home-primary)" />
-        </view>
+    <view
+      class="home__hero-header"
+      :style="headerPaddingStyle"
+    >
+      <view class="home__search-btn" @tap="goSearch">
+        <uni-icons type="search" size="18" color="currentColor" />
       </view>
+      <view :style="headerSpacerStyle" />
+    </view>
 
-      <!-- 欢迎词与简介 -->
+    <view class="home__hero">
+      <view class="home__hero-capsule-spacer" :style="headerSpacerStyle" />
+      <image class="home__hero-bg" src="/static/backgrounds/home-bg.jpg" mode="aspectFill" />
+      <view class="home__hero-mask" />
+
       <view class="home__hero-body">
-        <view class="home__title">欢迎光临</view>
+        <view class="home__hero-title-row">
+          <view class="home__title">欢迎光临</view>
+          <view class="home__hero-brand">
+            <!-- <image class="home__hero-brand-logo" src="/static/logo/logo.png" mode="aspectFit" /> -->
+            <view class="home__hero-brand-name">{{ siteEyebrow }}</view>
+          </view>
+        </view>
         <view class="home__subtitle s-ellipsis-2">{{ siteSubtitle }}</view>
       </view>
     </view>
 
     <view class="home__content">
       <!-- 轻公告栏 -->
-      <view v-if="siteInfo?.notices && siteInfo.notices.length > 0" class="home__notice">
+      <view v-if="notices.length > 0" class="home__notice">
         <uni-icons type="sound" size="18" color="var(--home-primary)" />
         <swiper class="home__notice-swiper" vertical autoplay circular interval="4000">
-          <swiper-item v-for="(notice, nIdx) in siteInfo.notices" :key="nIdx" class="home__notice-item">
+          <swiper-item v-for="(notice, nIdx) in notices" :key="nIdx" class="home__notice-item">
             <text class="home__notice-text s-ellipsis">{{ notice }}</text>
           </swiper-item>
         </swiper>
+      </view>
+
+      <view class="home__showcase">
+        <view class="home__showcase-mosaic">
+          <view class="home__showcase-tile home__showcase-tile--0" @tap="goDiscover">
+            <image class="home__showcase-slice" src="/static/backgrounds/home-bg.jpg" mode="aspectFill" />
+            <view class="home__showcase-overlay" />
+            <view class="home__showcase-meta">
+              <text class="home__showcase-kicker">Discover</text>
+              <text class="home__showcase-title">发现热门</text>
+              <text class="home__showcase-desc">趋势文章与核心分类</text>
+            </view>
+          </view>
+          <view class="home__showcase-tile home__showcase-tile--1" @tap="goCommunity">
+            <image class="home__showcase-slice" src="/static/backgrounds/home-bg.jpg" mode="aspectFill" />
+            <view class="home__showcase-overlay" />
+            <view class="home__showcase-meta">
+              <text class="home__showcase-kicker">Community</text>
+              <text class="home__showcase-title">轻社区</text>
+              <text class="home__showcase-desc">说说互动与树洞</text>
+            </view>
+          </view>
+          <view class="home__showcase-tile home__showcase-tile--2" @tap="goHotList">
+            <image class="home__showcase-slice" src="/static/backgrounds/home-bg.jpg" mode="aspectFill" />
+            <view class="home__showcase-overlay" />
+            <view class="home__showcase-meta home__showcase-meta--compact">
+              <text class="home__showcase-title">热门榜单</text>
+            </view>
+          </view>
+          <view class="home__showcase-tile home__showcase-tile--3" @tap="goAbout">
+            <image class="home__showcase-slice" src="/static/backgrounds/home-bg.jpg" mode="aspectFill" />
+            <view class="home__showcase-overlay" />
+            <view class="home__showcase-meta home__showcase-meta--compact">
+              <text class="home__showcase-title">关于本站</text>
+            </view>
+          </view>
+        </view>
       </view>
 
       <s-empty v-if="isEmpty" text="暂无文章" />
@@ -38,7 +82,7 @@
       <view v-else class="home__feed">
         <!-- 精选卡片：统一采用精美模板 A 风格 -->
         <view v-if="featured" class="home__article-card home__article-card--template-a home__article-card--float" @tap="goDetail(featured.id)">
-          <image v-if="imageUrl(featured.avatar)" class="home__article-cover" :src="imageUrl(featured.avatar)" mode="aspectFill" />
+          <image v-if="imageUrl(featured.avatar) && !brokenCoverArticleIds.has(featured.id)" class="home__article-cover" :src="imageUrl(featured.avatar)" mode="aspectFill" @error="onCoverError(featured.id)" />
           <view v-else class="home__article-cover home__article-cover--fallback">
             <image class="home__article-logo" src="/static/logo/logo.png" mode="aspectFit" />
           </view>
@@ -71,7 +115,7 @@
         >
           <!-- 仅模板 A 和模板 B 渲染图片（模板 C 纯文字留白） -->
           <block v-if="index % 3 !== 2">
-            <image v-if="imageUrl(item.avatar)" class="home__article-cover" :src="imageUrl(item.avatar)" mode="aspectFill" />
+            <image v-if="imageUrl(item.avatar) && !brokenCoverArticleIds.has(item.id)" class="home__article-cover" :src="imageUrl(item.avatar)" mode="aspectFill" @error="onCoverError(item.id)" />
             <view v-else class="home__article-cover home__article-cover--fallback">
               <image class="home__article-logo" src="/static/logo/logo.png" mode="aspectFit" />
             </view>
@@ -127,26 +171,98 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { onPageScroll, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app';
+import { computed, ref, watch } from 'vue';
+import { onPageScroll, onPullDownRefresh, onReachBottom, onShareAppMessage, onShow } from '@dcloudio/uni-app';
 import { useHomeFeed } from '@/modules/article/composables/useHomeFeed';
+import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { useThemeStore } from '@/stores/theme';
+import { useAppStore } from '@/stores/app';
+import { reportAnalyticsEvent } from '@/shared/utils/analytics';
 import { hideNativeTabbar, liquidTabItems, switchLiquidTab } from '@/shared/utils/liquid-tabbar';
 import { normalizeAssetUrl } from '@/utils/url';
 
-const { loading, siteInfo, featured, feedItems, finished, isEmpty, refresh, loadMore } = useHomeFeed();
+const { loading, siteInfo, notices, featured, feedItems, finished, isEmpty, refresh, loadMore } = useHomeFeed();
 const themeStore = useThemeStore();
+const appStore = useAppStore();
 const backToTopVisible = ref(false);
+const brokenCoverArticleIds = ref<Set<number>>(new Set());
 const activeTabPath = 'pages/home/home';
 
+function resolveCapsuleMetrics() {
+  const windowInfo = appStore.systemInfo?.windowInfo ?? appStore.systemInfo?.legacy;
+  return {
+    menuButton: appStore.systemInfo?.menuButton,
+    windowWidth: windowInfo?.windowWidth ?? 375
+  };
+}
+
+const headerPaddingStyle = computed(() => {
+  const { menuButton, windowWidth } = resolveCapsuleMetrics();
+  const top = menuButton?.width
+    ? `${menuButton.top}px`
+    : 'calc(env(safe-area-inset-top) + 24rpx)';
+  const paddingRight = menuButton?.width
+    ? `${windowWidth - menuButton.left + 12}px`
+    : '28rpx';
+  const height = menuButton?.width
+    ? `${menuButton.height}px`
+    : '68rpx';
+  return { top, paddingRight, height };
+});
+
+const headerSpacerStyle = computed(() => {
+  const { menuButton } = resolveCapsuleMetrics();
+  if (menuButton?.width) {
+    return { height: `${menuButton.top + menuButton.height + 8}px` };
+  }
+  return { height: 'calc(env(safe-area-inset-top) + 24rpx + 68rpx)' };
+});
+
+function refreshCapsuleMetrics(): void {
+  appStore.collectSystemInfo();
+}
+
+const siteEyebrow = computed(() =>
+  siteInfo.value?.webName || siteInfo.value?.siteName || '圆圈博客'
+);
 const siteSubtitle = computed(() => siteInfo.value?.bio || siteInfo.value?.authorInfo || '记录技术、生活与灵感。');
+
+watch([siteEyebrow, siteSubtitle], ([eyebrow, subtitle]) => {
+  applyH5Seo({
+    title: buildSeoTitle('首页', eyebrow),
+    description: extractSeoSummary(subtitle, siteInfo.value?.authorInfo, notices.value[0], siteInfo.value?.title),
+    keywords: [eyebrow, '首页', '博客', '技术', '生活', '灵感']
+  });
+}, { immediate: true });
 
 function imageUrl(value?: string): string {
   return normalizeAssetUrl(value);
 }
 
+function onCoverError(articleId: number): void {
+  if (!brokenCoverArticleIds.value.has(articleId)) {
+    brokenCoverArticleIds.value = new Set([...brokenCoverArticleIds.value, articleId]);
+  }
+}
+
 function goSearch(): void {
   uni.navigateTo({ url: '/pages-article/search/search' });
+}
+
+function goDiscover(): void {
+  uni.switchTab({ url: '/pages/discover/discover' });
+}
+
+function goCommunity(): void {
+  uni.switchTab({ url: '/pages/community/community' });
+}
+
+function goHotList(): void {
+  uni.navigateTo({ url: '/pages-article/list/list?orderBy=view_count' });
+}
+
+function goAbout(): void {
+  uni.navigateTo({ url: '/pages-about/index/index' });
 }
 
 function goDetail(id?: number): void {
@@ -168,7 +284,24 @@ onPageScroll((event) => {
 
 onShow(() => {
   hideNativeTabbar();
+  refreshCapsuleMetrics();
   themeStore.syncNativeArea();
+});
+
+onShareAppMessage(() => {
+  void reportAnalyticsEvent({
+    eventType: 'home_share',
+    pagePath: '/pages/home/home',
+    metadata: {
+      featuredId: featured.value?.id,
+      feedCount: feedItems.value.length
+    }
+  });
+  return {
+    title: `${siteEyebrow.value} - ${siteSubtitle.value}`,
+    path: '/pages/home/home',
+    imageUrl: '/static/backgrounds/home-bg.jpg'
+  };
 });
 
 refresh();
@@ -188,22 +321,67 @@ refresh();
 
   min-height: 100vh;
   padding-bottom: calc(172rpx + env(safe-area-inset-bottom));
+  background: var(--sl-page-bg, #f5f7fb);
   transition: background-color 0.24s ease;
 
   &.sl-theme--dark {
-    --home-glass-border: rgba(154, 176, 255, 0.12);
+    --home-glass-border: var(--sl-border-light);
     --home-glass-highlight: rgba(255, 255, 255, 0.08);
     --home-glass-shadow: rgba(0, 0, 0, 0.18);
+    background: var(--sl-page-bg, #0f172a);
+
+    .home__hero-mask {
+      background:
+        linear-gradient(180deg, rgba(8, 13, 24, 0.08) 0%, rgba(8, 13, 24, 0.28) 52%, rgba(9, 9, 11, 0.92) 100%),
+        rgba(8, 13, 24, 0.18);
+    }
+
+    .home__hero-brand {
+      background:
+        linear-gradient(145deg, rgba(24, 27, 38, 0.28), rgba(18, 20, 28, 0.22));
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow:
+        inset 0 1rpx 0 rgba(255, 255, 255, 0.08),
+        0 10rpx 28rpx rgba(0, 0, 0, 0.32);
+    }
+
+    .home__search-btn {
+      background:
+        linear-gradient(145deg, rgba(24, 27, 38, 0.28), rgba(18, 20, 28, 0.22));
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow:
+        inset 0 1rpx 0 rgba(255, 255, 255, 0.08),
+        0 10rpx 28rpx rgba(0, 0, 0, 0.32);
+    }
+
+    .home__article-card {
+      background: var(--sl-card-glass-bg);
+      border-color: var(--sl-border-light);
+      box-shadow: var(--sl-shadow-soft);
+    }
+
+    .home__article-card:active {
+      box-shadow: var(--sl-shadow-pressed);
+    }
+
+    .home__article-card::after {
+      display: none;
+    }
+
+    .home__article-title {
+      color: var(--sl-text-main);
+      text-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.5);
+    }
+
+    .home__article-meta {
+      color: var(--sl-text-sub);
+    }
   }
 
   &__hero {
     position: relative;
+    height: 600rpx;
     overflow: hidden;
-    height: 520rpx;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 32rpx 32rpx 110rpx;
     box-sizing: border-box;
   }
 
@@ -215,77 +393,109 @@ refresh();
     display: block;
   }
 
-  &__hero-header {
+  &__hero-mask {
     position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(17, 24, 39, 0.06) 52%, rgba(245, 247, 250, 0.35) 100%),
+      rgba(17, 24, 39, 0.03);
+    pointer-events: none;
+  }
+
+  &__hero-header {
+    position: fixed;
     left: 32rpx;
     right: 32rpx;
-    top: 110rpx;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 2;
+    z-index: 100;
+    box-sizing: border-box;
   }
 
-  &__brand {
+  &__hero-capsule-spacer {
+    position: relative;
+    z-index: 0;
+    flex-shrink: 0;
+    width: 100%;
+  }
+
+  &__hero-title-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 12rpx;
+    flex-wrap: wrap;
+  }
+
+  &__hero-brand {
     display: inline-flex;
     align-items: center;
     gap: 12rpx;
-    padding: 7rpx 18rpx 7rpx 8rpx;
+    padding: 8rpx 20rpx 8rpx 10rpx;
     border-radius: 999rpx;
     background:
-      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
-      var(--sl-bg-glass-tint);
-    border: 1rpx solid var(--home-glass-border);
+      linear-gradient(145deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.12)),
+      rgba(255, 255, 255, 0.06);
+    border: 1rpx solid rgba(255, 255, 255, 0.38);
     box-shadow:
-      inset 0 1rpx 0 var(--home-glass-highlight),
-      inset 0 -1rpx 0 rgba(59, 89, 255, 0.06),
-      0 12rpx 30rpx var(--home-glass-shadow);
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.46),
+      0 10rpx 28rpx rgba(17, 24, 39, 0.14);
+
+    /* #ifdef H5 || APP-PLUS */
+    backdrop-filter: blur(18rpx) saturate(1.3);
+    -webkit-backdrop-filter: blur(18rpx) saturate(1.3);
+    /* #endif */
   }
 
-  &__logo {
+  &__hero-brand-logo {
     width: 38rpx;
     height: 38rpx;
     border-radius: 50%;
   }
 
-  &__eyebrow {
-    color: var(--home-primary);
+  &__hero-brand-name {
+    color: rgba(255, 255, 255, 0.96);
     font-size: 22rpx;
     font-weight: 700;
     letter-spacing: 0.12em;
+    text-shadow: 0 2rpx 8rpx rgba(17, 24, 39, 0.3);
   }
 
   &__search-btn {
-    width: 68rpx;
-    height: 68rpx;
+    height: 100%;
+    aspect-ratio: 1;
+    color: rgba(255, 255, 255, 0.92);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     background:
-      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
-      var(--sl-bg-glass-tint);
-    border: 1rpx solid var(--home-glass-border);
+      linear-gradient(145deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.1)),
+      rgba(255, 255, 255, 0.06);
+    border: 1rpx solid rgba(255, 255, 255, 0.36);
     box-shadow:
-      inset 0 1rpx 0 var(--home-glass-highlight),
-      inset 0 -1rpx 0 rgba(59, 89, 255, 0.06),
-      0 12rpx 30rpx var(--home-glass-shadow);
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.44),
+      0 10rpx 28rpx rgba(17, 24, 39, 0.14);
     transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 
     /* #ifdef H5 || APP-PLUS */
-    backdrop-filter: blur(14rpx) saturate(1.2);
-    -webkit-backdrop-filter: blur(14rpx) saturate(1.2);
+    backdrop-filter: blur(18rpx) saturate(1.3);
+    -webkit-backdrop-filter: blur(18rpx) saturate(1.3);
     /* #endif */
 
     &:active {
       transform: scale(0.92);
-      background: var(--sl-control-bg);
+      background: rgba(255, 255, 255, 0.16);
     }
   }
 
   &__hero-body {
-    position: relative;
-    z-index: 1;
+    position: absolute;
+    left: 32rpx;
+    right: 32rpx;
+    bottom: 56rpx;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     gap: 8rpx;
@@ -293,36 +503,43 @@ refresh();
 
   &__title {
     color: rgba(255, 255, 255, 0.98);
-    font-size: 46rpx;
+    font-size: 52rpx;
     font-weight: 800;
-    text-shadow: 0 4rpx 16rpx rgba(17, 24, 39, 0.15);
+    letter-spacing: -0.02em;
+    text-shadow: 0 4rpx 16rpx rgba(17, 24, 39, 0.25);
   }
 
   &__subtitle {
-    max-width: 480rpx;
-    color: rgba(255, 255, 255, 0.88);
-    font-size: 26rpx;
-    line-height: 1.5;
-    text-shadow: 0 2rpx 8rpx rgba(17, 24, 39, 0.15);
+    max-width: 520rpx;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 28rpx;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    text-shadow: 0 2rpx 8rpx rgba(17, 24, 39, 0.2);
   }
 
   &__content {
     position: relative;
-    margin-top: -60rpx;
-    padding: 0 32rpx;
+    margin-top: 20rpx;
+    padding: 0 30rpx;
     z-index: 2;
   }
 
   &__notice {
+    position: relative;
+    z-index: 3;
+    margin-top: -56rpx;
     margin-bottom: 28rpx;
     display: flex;
     align-items: center;
     gap: 16rpx;
-    padding: 18rpx 28rpx;
-    border-radius: 22rpx;
+    padding: 20rpx 32rpx;
+    border-radius: 999rpx;
     background: var(--sl-control-bg);
     border: 1rpx solid var(--sl-control-border);
-    box-shadow: 0 8rpx 24rpx rgba(17, 24, 39, 0.02);
+    box-shadow:
+      0 14rpx 36rpx rgba(17, 24, 39, 0.06),
+      0 2rpx 8rpx rgba(17, 24, 39, 0.04);
   }
 
   &__notice-swiper {
@@ -341,11 +558,110 @@ refresh();
     font-weight: 600;
   }
 
+  &__showcase {
+    margin-bottom: 28rpx;
+  }
+
+  &__showcase-mosaic {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: 220rpx 128rpx;
+    gap: 16rpx;
+  }
+
+  &__showcase-tile {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24rpx;
+    border: 1rpx solid var(--home-glass-border);
+    box-shadow:
+      inset 0 1rpx 0 var(--home-glass-highlight),
+      0 14rpx 32rpx var(--home-glass-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  &__showcase-tile:active {
+    transform: scale(0.985);
+  }
+
+  &__showcase-slice {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(200% + 16rpx);
+    height: 364rpx;
+    display: block;
+  }
+
+  &__showcase-tile--1 &__showcase-slice {
+    left: calc(-100% - 16rpx);
+  }
+
+  &__showcase-tile--2 &__showcase-slice {
+    top: -236rpx;
+  }
+
+  &__showcase-tile--3 &__showcase-slice {
+    top: -236rpx;
+    left: calc(-100% - 16rpx);
+  }
+
+  &__showcase-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(180deg, rgba(17, 24, 39, 0.06) 0%, rgba(17, 24, 39, 0.38) 100%);
+    pointer-events: none;
+  }
+
+  &__showcase-meta {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 6rpx;
+    height: 100%;
+    justify-content: flex-end;
+    padding: 22rpx 20rpx;
+    box-sizing: border-box;
+  }
+
+  &__showcase-meta--compact {
+    padding: 18rpx 20rpx;
+  }
+
+  &__showcase-kicker {
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 20rpx;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  &__showcase-title {
+    color: #fff;
+    font-size: 32rpx;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-shadow: 0 4rpx 14rpx rgba(17, 24, 39, 0.28);
+  }
+
+  &__showcase-meta--compact &__showcase-title {
+    font-size: 28rpx;
+  }
+
+  &__showcase-desc {
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 22rpx;
+    line-height: 1.45;
+  }
+
   &__feed {
     display: flex;
     flex-direction: column;
     gap: 34rpx;
-    margin-top: 48rpx;
+    margin-top: 28rpx;
   }
 
   &__article-card {
@@ -358,8 +674,8 @@ refresh();
     border: 1rpx solid var(--home-glass-border);
     box-shadow:
       inset 0 1rpx 0 var(--home-glass-highlight),
-      inset 0 -1rpx 0 rgba(59, 89, 255, 0.06),
-      0 22rpx 54rpx var(--home-glass-shadow);
+      inset 0 -1rpx 0 rgba(59, 89, 255, 0.04),
+      var(--sl-glass-shadow);
 
     /* #ifdef H5 || APP-PLUS */
     backdrop-filter: blur(18rpx) saturate(1.22);
@@ -388,7 +704,7 @@ refresh();
   }
 
   &__article-card--float {
-    margin-top: -10rpx;
+    margin-top: 0;
   }
 
   /* 杂志卡片模板 A：视觉出格大图 */
@@ -411,9 +727,10 @@ refresh();
 
     .home__article-title {
       color: var(--home-text-main);
-      font-size: 36rpx;
+      font-size: 38rpx;
       font-weight: 800;
-      line-height: 1.38;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
     }
   }
 
@@ -549,13 +866,14 @@ refresh();
   }
 
   &__tag {
-    padding: 12rpx 20rpx;
-    border-radius: 12rpx;
+    padding: 8rpx 20rpx;
+    border-radius: 999rpx;
     background: var(--sl-control-bg);
     border: 1rpx solid var(--sl-control-border);
     color: var(--home-text-main);
-    font-size: 24rpx;
-    font-weight: 700;
+    font-size: 22rpx;
+    font-weight: 600;
+    letter-spacing: 0.02em;
   }
 
   &__tag--soft {

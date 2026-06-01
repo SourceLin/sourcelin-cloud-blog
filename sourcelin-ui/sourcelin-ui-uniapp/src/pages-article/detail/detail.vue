@@ -116,14 +116,18 @@
     <s-theme-sheet :visible="themeSheetVisible" @close="themeSheetVisible = false" />
 
     <view v-if="commentSheetVisible" class="detail__sheet-mask" @tap="closeCommentSheet">
-      <view class="detail__sheet" @tap.stop>
+      <view class="detail__sheet" :class="{ 'detail__sheet--keyboard': keyboardVisible }" :style="commentSheetStyle" @tap.stop>
         <view class="detail__sheet-title">写评论</view>
         <textarea
           v-model="commentContent"
           class="detail__textarea"
           placeholder="说点什么..."
+          placeholder-class="detail__textarea-placeholder"
           maxlength="300"
           auto-height
+          fixed
+          :adjust-position="false"
+          :cursor-spacing="keyboardCursorSpacing"
         />
         <view class="detail__sheet-actions">
           <button class="detail__sheet-cancel sl-button sl-button--secondary" @tap="closeCommentSheet">取消</button>
@@ -138,7 +142,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { onHide, onLoad, onPageScroll, onShareAppMessage, onShow, onUnload } from '@dcloudio/uni-app';
 import { fetchArticleDetail, reportArticleView } from '@/modules/article/api/article.api';
 import type { ArticleDetail } from '@/modules/article/types/article';
@@ -151,7 +155,9 @@ import { fetchComments, createComment } from '@/modules/comment/api/comment.api'
 import type { CommentItem } from '@/modules/comment/types/comment';
 import { collectTarget, followUser, likeTarget, uncollectTarget, unfollowById, unlikeTarget } from '@/modules/interaction/api/interaction.api';
 import { createContentReport } from '@/modules/report/api/report.api';
+import { useKeyboardInset } from '@/shared/composables/useBackToTop';
 import { reportAnalyticsEvent, trackArticleInterest } from '@/shared/utils/analytics';
+import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { AUTH_LOGIN_SUCCESS_EVENT, type LoginSuccessEventDetail } from '@/utils/auth';
@@ -172,8 +178,34 @@ const commentSubmitting = ref(false);
 const currentScrollTop = ref(0);
 const enterTimestamp = ref(0);
 const themeSheetVisible = ref(false);
+const {
+  cursorSpacing: keyboardCursorSpacing,
+  keyboardVisible,
+  sheetStyle: commentSheetStyle,
+  startKeyboardWatch,
+  stopKeyboardWatch
+} = useKeyboardInset();
 
 const coverUrl = computed(() => normalizeAssetUrl(article.value?.avatar));
+
+watch(article, (currentArticle) => {
+  applyH5Seo({
+    title: buildSeoTitle(currentArticle?.title || '文章详情'),
+    description: extractSeoSummary(
+      currentArticle?.summary,
+      currentArticle?.content,
+      currentArticle?.unlockHint,
+      '浏览文章详情、评论互动与作者信息。'
+    ),
+    keywords: [
+      currentArticle?.categoryName || '文章',
+      currentArticle?.author || currentArticle?.user?.nickname || 'Sourcelin',
+      currentArticle?.title || '文章详情',
+      '博客',
+      '阅读'
+    ]
+  });
+}, { immediate: true });
 
 function formatDate(value?: string): string {
   return value ? value.slice(0, 10) : '刚刚';
@@ -274,6 +306,7 @@ function openCommentSheet(): void {
 
 function closeCommentSheet(): void {
   commentSheetVisible.value = false;
+  uni.hideKeyboard();
 }
 
 async function submitComment(): Promise<void> {
@@ -402,12 +435,22 @@ onShow(() => {
 });
 
 onHide(() => {
+  stopKeyboardWatch();
   persistReadingProgress();
 });
 
 onUnload(() => {
+  stopKeyboardWatch();
   persistReadingProgress();
   uni.$off(AUTH_LOGIN_SUCCESS_EVENT, handleLoginSuccess);
+});
+
+watch(commentSheetVisible, (visible) => {
+  if (visible) {
+    startKeyboardWatch();
+    return;
+  }
+  stopKeyboardWatch();
 });
 
 onPageScroll((event) => {
@@ -415,11 +458,22 @@ onPageScroll((event) => {
   backToTopVisible.value = event.scrollTop > 360;
 });
 
-onShareAppMessage(() => ({
-  title: article.value?.title || 'Sourcelin Blog',
-  path: article.value?.id ? `/pages-article/detail/detail?id=${article.value.id}` : '/pages/home/home',
-  imageUrl: coverUrl.value
-}));
+onShareAppMessage(() => {
+  void reportAnalyticsEvent({
+    eventType: 'article_share',
+    pagePath: '/pages-article/detail/detail',
+    targetType: 'article',
+    targetId: article.value?.id,
+    metadata: {
+      title: article.value?.title
+    }
+  });
+  return {
+    title: article.value?.title || 'Sourcelin Blog',
+    path: article.value?.id ? `/pages-article/detail/detail?id=${article.value.id}` : '/pages/home/home',
+    imageUrl: coverUrl.value
+  };
+});
 </script>
 
 <style lang="scss" scoped>
@@ -722,10 +776,16 @@ onShareAppMessage(() => ({
 
   &__sheet {
     width: 100%;
-    padding: $space-lg $space-md calc(#{$space-lg} + env(safe-area-inset-bottom));
+    padding: $space-lg $space-md $space-lg;
     border-radius: 36rpx 36rpx 0 0;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__sheet--keyboard {
+    padding-bottom: $space-lg;
   }
 
   &__sheet-title {
@@ -736,14 +796,8 @@ onShareAppMessage(() => ({
   }
 
   &__textarea {
-    width: 100%;
+    @include sl-input;
     min-height: 180rpx;
-    padding: $space-md;
-    box-sizing: border-box;
-    border-radius: $radius-lg;
-    background: rgba(245, 247, 250, 0.92);
-    border: 1rpx solid rgba(229, 231, 235, 0.88);
-    font-size: 28rpx;
   }
 
   &__sheet-actions {
@@ -787,12 +841,15 @@ onShareAppMessage(() => ({
 
   .s-card {
     background:
-      linear-gradient(145deg, rgba(30, 41, 59, 0.88) 0%, rgba(15, 23, 42, 0.86) 100%),
-      rgba(15, 23, 42, 0.84);
-    border-color: rgba(148, 163, 184, 0.14);
+      linear-gradient(145deg, rgba(18, 27, 46, 0.72) 0%, rgba(18, 27, 46, 0.36) 100%),
+      rgba(18, 27, 46, 0.62);
+    border-color: rgba(154, 176, 255, 0.12);
     box-shadow:
-      inset 0 1rpx 0 rgba(255, 255, 255, 0.06),
-      0 16rpx 40rpx rgba(2, 6, 23, 0.36);
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.08),
+      inset 0 18rpx 30rpx rgba(255, 255, 255, 0.02),
+      inset 0 -1rpx 0 rgba(105, 129, 255, 0.04),
+      0 10rpx 24rpx rgba(0, 0, 0, 0.12),
+      0 22rpx 54rpx rgba(0, 0, 0, 0.18);
   }
 
   .detail__title,
@@ -816,24 +873,60 @@ onShareAppMessage(() => ({
   }
 
   .detail__header-action {
-    background: rgba(30, 41, 59, 0.92);
+    background:
+      linear-gradient(145deg, rgba(18, 27, 46, 0.66), rgba(18, 27, 46, 0.4)),
+      rgba(18, 27, 46, 0.44);
+    border-color: rgba(154, 176, 255, 0.12);
+    box-shadow:
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.08),
+      0 8rpx 18rpx rgba(0, 0, 0, 0.1);
+  }
+
+  .detail__sheet {
+    background:
+      linear-gradient(180deg, var(--sl-surface-bg), var(--sl-page-bg));
+    border-top: 1rpx solid var(--sl-border-light);
+    box-shadow:
+      inset 0 2rpx 0 rgba(255, 255, 255, 0.08),
+      0 -18rpx 48rpx rgba(0, 0, 0, 0.34);
+  }
+
+  .detail__textarea:focus {
+    border-color: var(--sl-border-focused);
+    box-shadow: 0 0 12rpx rgba(112, 152, 218, 0.25);
+  }
+
+  .detail__textarea-placeholder {
+    color: var(--sl-text-muted);
+  }
+
+  .detail__sheet-cancel {
+    color: var(--sl-text-sub);
+    background: var(--sl-control-bg);
+    border-color: var(--sl-border-light);
   }
 
   .detail__action-bar {
     background:
-      linear-gradient(145deg, rgba(22, 33, 52, 0.92) 0%, rgba(15, 23, 42, 0.9) 100%),
-      rgba(15, 23, 42, 0.88);
-    border-color: rgba(148, 163, 184, 0.18);
+      linear-gradient(145deg, rgba(18, 27, 46, 0.78) 0%, rgba(18, 27, 46, 0.42) 100%),
+      rgba(18, 27, 46, 0.68);
+    border-color: rgba(154, 176, 255, 0.14);
     box-shadow:
-      inset 0 1rpx 0 rgba(255, 255, 255, 0.06),
-      0 20rpx 48rpx rgba(2, 6, 23, 0.36);
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.08),
+      inset 0 18rpx 28rpx rgba(255, 255, 255, 0.02),
+      0 18rpx 42rpx rgba(0, 0, 0, 0.22);
   }
 
   .detail__action,
   .detail__share {
-    background: rgba(30, 41, 59, 0.88);
-    border-color: rgba(148, 163, 184, 0.14);
+    background:
+      linear-gradient(145deg, rgba(18, 27, 46, 0.66), rgba(18, 27, 46, 0.42)),
+      rgba(18, 27, 46, 0.5);
+    border-color: rgba(154, 176, 255, 0.12);
     color: rgba(226, 232, 240, 0.82);
+    box-shadow:
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.06),
+      0 8rpx 20rpx rgba(0, 0, 0, 0.12);
   }
 
   .detail__action--active {

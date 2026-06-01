@@ -32,15 +32,15 @@
     <view class="profile__form s-card">
       <view class="profile__field">
         <view class="profile__label">昵称</view>
-        <input v-model.trim="form.nickName" class="profile__input" maxlength="24" placeholder="请输入昵称">
+        <input v-model.trim="form.nickName" class="profile__input" maxlength="24" placeholder="请输入昵称" placeholder-class="s-placeholder">
       </view>
       <view class="profile__field">
         <view class="profile__label">邮箱</view>
-        <input v-model.trim="form.email" class="profile__input" maxlength="75" placeholder="请输入邮箱">
+        <input v-model.trim="form.email" class="profile__input" maxlength="75" placeholder="请输入邮箱" placeholder-class="s-placeholder">
       </view>
       <view class="profile__field">
         <view class="profile__label">手机号</view>
-        <input v-model.trim="form.phonenumber" class="profile__input" maxlength="20" placeholder="请输入手机号">
+        <input v-model.trim="form.phonenumber" class="profile__input" maxlength="20" placeholder="请输入手机号" placeholder-class="s-placeholder">
       </view>
       <view class="profile__field">
         <view class="profile__label">性别</view>
@@ -64,6 +64,7 @@
           maxlength="120"
           auto-height
           placeholder="介绍一下你的创作方向或兴趣。"
+          placeholder-class="s-placeholder"
         />
       </view>
     </view>
@@ -335,9 +336,12 @@ async function chooseAvatar(): Promise<void> {
 
   &__input,
   &__textarea {
-    width: 100%;
-    color: $color-text;
-    font-size: 28rpx;
+    @include sl-input;
+  }
+
+  &__input {
+    min-height: $input-min-height;
+    line-height: $input-line-height;
   }
 
   &__gender {
