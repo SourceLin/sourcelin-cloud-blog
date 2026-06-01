@@ -29,7 +29,7 @@
       <view class="mine__banner">
         <image class="mine__banner-bg" src="/static/backgrounds/home-bg.jpg" mode="aspectFill" />
         <view class="mine__banner-mask" />
-        <view class="mine__banner-title">欢迎来到 Sourcelin Town</view>
+        <view class="mine__banner-title">欢迎来到 圆圈 Town</view>
         <view class="mine__banner-desc">收藏灵感，追更作者，回访每一篇值得重读的内容。</view>
       </view>
 
@@ -91,7 +91,7 @@
 
       <view class="mine__support">
         <image class="mine__support-logo" src="/static/logo/logo.png" mode="aspectFit" />
-        <view class="mine__support-name">Sourcelin Blog</view>
+        <view class="mine__support-name">圆圈博客</view>
         <view class="mine__support-text">由 Sourcelin 提供技术支持</view>
       </view>
     </view>
@@ -100,7 +100,7 @@
       <view class="mine-login__sheet" @tap.stop>
         <view class="mine-login__handle" />
         <image class="mine-login__logo" src="/static/logo/logo.png" mode="aspectFit" />
-        <view class="mine-login__title">欢迎加入 Sourcelin</view>
+        <view class="mine-login__title">欢迎加入 圆圈博客</view>
         <view class="mine-login__desc">登录后同步收藏、关注和互动记录。</view>
 
         <button class="mine-login__primary sl-button sl-button--primary" :disabled="wechatSubmitting" @tap="loginWithWechat">

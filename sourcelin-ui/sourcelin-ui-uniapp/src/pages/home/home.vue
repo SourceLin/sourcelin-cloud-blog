@@ -43,7 +43,7 @@
       <view class="home__showcase">
         <view class="home__showcase-mosaic">
           <view class="home__showcase-tile home__showcase-tile--0" @tap="goDiscover">
-            <image class="home__showcase-slice" src="/static/backgrounds/home-bg.jpg" mode="aspectFill" />
+            <image class="home__showcase-slice" src="/static/backgrounds/showcase-bg.png" mode="aspectFill" />
             <view class="home__showcase-overlay" />
             <view class="home__showcase-meta">
               <text class="home__showcase-kicker">Discover</text>
@@ -52,7 +52,7 @@
             </view>
           </view>
           <view class="home__showcase-tile home__showcase-tile--1" @tap="goCommunity">
-            <image class="home__showcase-slice" src="/static/backgrounds/home-bg.jpg" mode="aspectFill" />
+            <image class="home__showcase-slice" src="/static/backgrounds/showcase-bg.png" mode="aspectFill" />
             <view class="home__showcase-overlay" />
             <view class="home__showcase-meta">
               <text class="home__showcase-kicker">Community</text>
@@ -61,14 +61,14 @@
             </view>
           </view>
           <view class="home__showcase-tile home__showcase-tile--2" @tap="goHotList">
-            <image class="home__showcase-slice" src="/static/backgrounds/home-bg.jpg" mode="aspectFill" />
+            <image class="home__showcase-slice" src="/static/backgrounds/showcase-bg.png" mode="aspectFill" />
             <view class="home__showcase-overlay" />
             <view class="home__showcase-meta home__showcase-meta--compact">
               <text class="home__showcase-title">热门榜单</text>
             </view>
           </view>
           <view class="home__showcase-tile home__showcase-tile--3" @tap="goAbout">
-            <image class="home__showcase-slice" src="/static/backgrounds/home-bg.jpg" mode="aspectFill" />
+            <image class="home__showcase-slice" src="/static/backgrounds/showcase-bg.png" mode="aspectFill" />
             <view class="home__showcase-overlay" />
             <view class="home__showcase-meta home__showcase-meta--compact">
               <text class="home__showcase-title">关于本站</text>
@@ -460,6 +460,7 @@ refresh();
     font-weight: 700;
     letter-spacing: 0.12em;
     text-shadow: 0 2rpx 8rpx rgba(17, 24, 39, 0.3);
+    text-align: center;
   }
 
   &__search-btn {

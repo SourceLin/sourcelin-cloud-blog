@@ -192,7 +192,7 @@ function getCollectSummary(item: CollectItem<CollectTargetSummary>): string {
 
 function getCollectAuthor(item: CollectItem<CollectTargetSummary>): string {
   const target = getCollectData(item);
-  return target?.userNickname || target?.authorName || 'Sourcelin 用户';
+  return target?.userNickname || target?.authorName || '圆圈博客 用户';
 }
 
 function getCollectCategory(item: CollectItem<CollectTargetSummary>): string {

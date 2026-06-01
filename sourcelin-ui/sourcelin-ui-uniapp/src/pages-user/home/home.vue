@@ -11,7 +11,7 @@
       <view class="user-home__hero s-card">
         <image v-if="avatarUrl" class="user-home__avatar" :src="avatarUrl" mode="aspectFill" />
         <view v-else class="user-home__avatar user-home__avatar--placeholder">{{ avatarText }}</view>
-        <view class="user-home__name">{{ user.nickName || user.userName || 'Sourcelin 用户' }}</view>
+        <view class="user-home__name">{{ user.nickName || user.userName || '圆圈博客 用户' }}</view>
         <view class="user-home__intro">{{ user.introduction || '这个作者还没有留下简介。' }}</view>
         <view class="user-home__stats">
           <view class="user-home__stat">
@@ -109,7 +109,7 @@ const activeItems = computed(() => {
 const activeFollowItems = computed(() => activeTab.value === 'followers' ? followers.value : followings.value);
 
 watch(user, (currentUser) => {
-  const userName = currentUser?.nickName || currentUser?.userName || 'Sourcelin 用户';
+  const userName = currentUser?.nickName || currentUser?.userName || '圆圈博客 用户';
   applyH5Seo({
     title: buildSeoTitle(`${userName} 的主页`),
     description: extractSeoSummary(
@@ -166,7 +166,7 @@ function resolveFollowUser(item: FollowItem) {
 
 function resolveFollowName(item: FollowItem): string {
   const target = resolveFollowUser(item);
-  return target?.nickname || target?.username || 'Sourcelin 用户';
+  return target?.nickname || target?.username || '圆圈博客 用户';
 }
 
 function resolveFollowIntro(item: FollowItem): string {
@@ -184,7 +184,7 @@ function openRelatedUser(item: FollowItem): void {
 }
 
 onShareAppMessage(() => {
-  const title = user.value?.nickName || user.value?.userName || 'Sourcelin 用户';
+  const title = user.value?.nickName || user.value?.userName || '圆圈博客 用户';
   void reportAnalyticsEvent({
     eventType: 'user_home_share',
     pagePath: '/pages-user/home/home',

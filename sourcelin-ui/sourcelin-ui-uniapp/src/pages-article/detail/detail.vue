@@ -469,7 +469,7 @@ onShareAppMessage(() => {
     }
   });
   return {
-    title: article.value?.title || 'Sourcelin Blog',
+    title: article.value?.title || '圆圈博客',
     path: article.value?.id ? `/pages-article/detail/detail?id=${article.value.id}` : '/pages/home/home',
     imageUrl: coverUrl.value
   };

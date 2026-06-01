@@ -37,7 +37,7 @@ export function useAboutPage() {
   const loading = ref(false);
 
   const siteName = computed(() =>
-    pickText(about.value?.webName, siteBrand.value?.webName, siteBrand.value?.siteName, 'Sourcelin Blog')
+    pickText(about.value?.webName, siteBrand.value?.webName, siteBrand.value?.siteName, '圆圈博客')
   );
 
   const authorName = computed(() => pickText(about.value?.author, siteBrand.value?.author, 'Sourcelin'));
