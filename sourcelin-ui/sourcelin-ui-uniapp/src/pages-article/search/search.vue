@@ -152,13 +152,14 @@ import {
   searchCategories,
   searchTags
 } from '@/modules/article/api/article.api';
-import { useArticlePaging } from '@/modules/article/composables/useArticlePaging';
+import { useArticlePaging } from '../modules/article/composables/useArticlePaging';
 import type { CategoryItem, TagItem } from '@/modules/article/types/article';
 import { reportAnalyticsEvent, trackSearchKeyword } from '@/shared/utils/analytics';
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { useThemeStore } from '@/stores/theme';
 import { showInfoToast } from '@/utils/feedback';
 import { getStorage, removeStorage, setStorage } from '@/utils/storage';
+import { useBackToTop } from '@/shared/composables/useBackToTop';
 
 const SEARCH_HISTORY_KEY = 'article.search.history';
 const SEARCH_HISTORY_LIMIT = 8;
@@ -177,7 +178,7 @@ let suggestionSerial = 0;
 const { items, loading, finished, refresh, loadMore } = useArticlePaging((page, pageSize) =>
   searchArticles(keyword.value.trim(), page, pageSize)
 );
-const backToTopVisible = ref(false);
+const { backToTopVisible, handlePageScroll } = useBackToTop();
 const hasResults = computed(() => items.value.length > 0 || categoryMatches.value.length > 0 || tagMatches.value.length > 0);
 const showLoading = computed(() => searched.value && (loading.value || facetLoading.value) && !hasResults.value);
 const showSearchDiscovery = computed(() => searchHistory.value.length > 0 || hotKeywords.value.length > 0 || suggestions.value.length > 0);
@@ -327,9 +328,7 @@ onReachBottom(() => {
   if (searched.value) loadMore();
 });
 
-onPageScroll((event) => {
-  backToTopVisible.value = event.scrollTop > 360;
-});
+onPageScroll(handlePageScroll);
 
 watch(keyword, (value) => {
   const safeValue = value.trim();

@@ -1,4 +1,4 @@
-﻿@import '@/shared/styles/responsive';
+@import '@/shared/styles/responsive';
 
 .tag-page {
   --content-max-width: 1080px;
@@ -253,15 +253,15 @@
   gap: var(--spacing-lg);
   padding: var(--spacing-xl);
   overflow: hidden;
-  border: 1px solid var(--border-content-card);
+  border: 1px solid var(--border-panel-default);
   border-radius: var(--context-shell-radius);
   background:
     var(--surface-panel-specular-soft),
-    var(--surface-content-card);
+    var(--surface-panel-soft);
   background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-soft);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
   transition:
     border-color var(--transition-base),
     box-shadow var(--transition-base),
@@ -270,9 +270,7 @@
 
 .tag-switch-shell:hover {
   border-color: var(--border-interactive-hover);
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card-hover);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter-hover);
-  backdrop-filter: var(--content-card-backdrop-filter-hover);
+  box-shadow: var(--highlight-panel-default), var(--shadow-panel-hover);
 }
 
 .tag-switch-shell::before {
@@ -350,13 +348,13 @@
   min-height: clamp(6.9rem, 10vw, 7.7rem);
   padding: 1rem;
   border-radius: var(--context-entry-radius);
-  border: 1px solid var(--border-content-card);
-  background: var(--surface-content-card);
-  background-blend-mode: normal, normal, overlay;
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  border: 1px solid var(--border-panel-default);
+  background: 
+    var(--surface-panel-specular-soft),
+    var(--surface-panel-soft);
+  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-soft);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
   cursor: pointer;
   isolation: isolate;
   text-align: left;
@@ -391,11 +389,8 @@
 .tag-grid-card:hover {
   transform: translateY(-2px);
   border-color: color-mix(in srgb, var(--tag-accent) 34%, var(--border-interactive-hover));
-  background: var(--surface-content-card-featured);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card-hover);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter-hover);
-  backdrop-filter: var(--content-card-backdrop-filter-hover);
+  background: var(--surface-panel-default);
+  box-shadow: var(--highlight-panel-default), var(--shadow-panel-hover);
 }
 
 .tag-grid-card:hover::after,
@@ -406,12 +401,9 @@
 
 .tag-grid-card.is-armed {
   transform: translateY(-2px) scale(0.995);
-  border-color: color-mix(in srgb, var(--tag-accent) 34%, var(--border-panel-subtle));
-  background: var(--surface-content-card-featured);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card-hover);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter-hover);
-  backdrop-filter: var(--content-card-backdrop-filter-hover);
+  border-color: color-mix(in srgb, var(--tag-accent) 34%, var(--border-panel-strong));
+  background: var(--surface-panel-strong);
+  box-shadow: var(--highlight-panel-strong), var(--shadow-panel-hover), var(--shadow-panel-glow);
 }
 
 .tag-grid-head,
@@ -455,13 +447,12 @@
   min-height: 6.8rem;
   padding: var(--spacing-md) var(--spacing-lg);
   overflow: hidden;
-  border: 1px solid var(--border-content-card-featured);
+  border: 1px solid var(--border-panel-strong);
   border-radius: var(--context-entry-radius);
-  background: var(--surface-content-card-featured);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  background: var(--surface-panel-strong);
+  box-shadow: var(--highlight-panel-strong), var(--shadow-panel-default);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
 }
 
 .context-focus-strip::before {
@@ -537,20 +528,26 @@
   display: grid;
   gap: 2px;
   padding: 0.8rem 0.95rem;
-  border: 1px solid var(--border-content-card);
+  border: 1px solid var(--border-panel-subtle);
   border-radius: var(--context-inset-radius);
-  background:
-    linear-gradient(
-      145deg,
-      color-mix(in srgb, var(--context-accent) 6%, transparent),
-      transparent 58%
-    ),
-    var(--surface-content-card);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-panel-inline);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  background: var(--surface-panel-inset);
+  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-inline);
+  -webkit-backdrop-filter: blur(var(--glass-nested-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-nested-blur)) saturate(var(--glass-saturate));
 }
+
+.context-focus-strip__metric-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.context-focus-strip__metric-value {
+  font-size: 1.12rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--title-color);
 
 .context-focus-strip__metric-label {
   font-size: 0.72rem;
@@ -577,19 +574,12 @@
   font: inherit;
   line-height: 1;
   cursor: pointer;
-  border: 1px solid var(--border-content-card);
+  border: 1px solid var(--border-panel-default);
   border-radius: var(--context-inset-radius);
-  background:
-    linear-gradient(
-      145deg,
-      color-mix(in srgb, var(--context-accent) 6%, transparent),
-      transparent 58%
-    ),
-    var(--surface-content-card);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-panel-inline);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  background: var(--surface-panel-soft);
+  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-inline);
+  -webkit-backdrop-filter: blur(var(--glass-nested-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-nested-blur)) saturate(var(--glass-saturate));
   transition:
     border-color var(--transition-base),
     box-shadow var(--transition-base),
@@ -600,11 +590,8 @@
 .context-back-button:hover {
   transform: translateY(-1px);
   border-color: color-mix(in srgb, var(--context-accent) 26%, var(--border-interactive-hover));
-  background: var(--surface-content-card-featured);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card-hover);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter-hover);
-  backdrop-filter: var(--content-card-backdrop-filter-hover);
+  background: var(--surface-panel-default);
+  box-shadow: var(--highlight-panel-default), var(--shadow-panel-hover);
 }
 
 .context-state,
@@ -627,13 +614,14 @@
   gap: var(--spacing-lg);
   padding: var(--spacing-md);
   cursor: pointer;
-  border: 1px solid var(--border-content-card);
+  border: 1px solid var(--border-panel-default);
   border-radius: var(--context-entry-radius);
-  background: var(--surface-content-card);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  background: 
+    var(--surface-panel-specular-soft),
+    var(--surface-panel-soft);
+  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-soft);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
   transition:
     border-color var(--transition-base),
     box-shadow var(--transition-base),
@@ -644,11 +632,8 @@
 .context-article-card:hover {
   transform: translateY(-2px);
   border-color: color-mix(in srgb, var(--tag-accent) 24%, var(--border-interactive-hover));
-  background: var(--surface-content-card-featured);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card-hover);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter-hover);
-  backdrop-filter: var(--content-card-backdrop-filter-hover);
+  background: var(--surface-panel-default);
+  box-shadow: var(--highlight-panel-default), var(--shadow-panel-hover);
 }
 
 .context-article-card__cover {
@@ -663,7 +648,7 @@
     var(--article-cover) center / cover no-repeat,
     radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--tag-accent) 12%, transparent), transparent 42%),
     var(--surface-panel-inset);
-  border: 1px solid color-mix(in srgb, var(--border-content-card) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-panel-subtle) 88%, transparent);
 }
 
 .context-article-card__body {

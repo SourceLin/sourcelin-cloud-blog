@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { onLoad, onShow } from '@dcloudio/uni-app';
-import { fetchNavigationList, reportNavigationClick } from '@/modules/site/api/site.api';
+import { fetchNavigationList, reportNavigationClick } from '../modules/site/api/site.api';
 import type { NavigationItem } from '@/modules/site/types/site';
 import { useThemeStore } from '@/stores/theme';
 

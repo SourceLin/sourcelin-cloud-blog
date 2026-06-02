@@ -103,12 +103,12 @@ import {
   prepareMiniProgramBind
 } from '@/shared/api/auth.api';
 import type { CaptchaInfo, LoginToken } from '@/modules/auth/types/auth';
-import { fetchCurrentUserInfo } from '@/shared/api/user.api';
+import { fetchCurrentUserInfo } from '@/modules/user/api/user.api';
 import { mapFrontUserInfo } from '@/shared/utils/user-mapper';
 import { replayPendingAction } from '@/shared/utils/pending-actions';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
-import { AUTH_LOGIN_SUCCESS_EVENT, type LoginSuccessEventDetail } from '@/utils/auth';
+import { AUTH_LOGIN_SUCCESS_EVENT, reset401Guard, type LoginSuccessEventDetail } from '@/utils/auth';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 
 const userStore = useUserStore();
@@ -289,6 +289,7 @@ async function finalizeLogin(token: LoginToken, successTitle: string): Promise<v
       // 用户资料接口失败不阻塞登录主流程，后续页面 onShow 再补拉。
     }
     const actions = await replayPendingActions();
+    reset401Guard();
     uni.$emit(AUTH_LOGIN_SUCCESS_EVENT, { actions } satisfies LoginSuccessEventDetail);
     showSuccessToast(successTitle);
     backToPreviousPage();

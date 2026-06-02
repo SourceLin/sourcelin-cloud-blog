@@ -9,6 +9,8 @@ export interface CommentItem {
   articleId: number;
   parentCommentId?: number;
   parentUserId?: number;
+  floorCommentId?: number;
+  parentNickname?: string;
   content: string;
   source?: CommentSource;
   likeCount?: number;
@@ -22,4 +24,5 @@ export interface CommentCreatePayload {
   source: CommentSource;
   parentCommentId?: number;
   parentUserId?: number;
+  floorCommentId?: number;
 }

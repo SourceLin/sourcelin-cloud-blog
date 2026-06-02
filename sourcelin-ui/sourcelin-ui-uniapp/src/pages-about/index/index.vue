@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { onLoad, onShow } from '@dcloudio/uni-app';
-import { useAboutPage } from '@/modules/site/composables/useAboutPage';
+import { useAboutPage } from '../modules/site/composables/useAboutPage';
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { DEFAULT_BRAND_LOGO } from '@/utils/url';
 import { useThemeStore } from '@/stores/theme';

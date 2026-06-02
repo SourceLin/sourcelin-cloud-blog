@@ -7,7 +7,7 @@
 //   4. 业务页面/composables 禁止直连 uni.request / uni.uploadFile
 
 import { resolveUrl } from '@/config/env';
-import { buildAuthHeader, clearToken, redirectToLogin, type PendingAction } from './auth';
+import { buildAuthHeader, handle401, type PendingAction } from './auth';
 import {
   BusinessError,
   NetworkError,
@@ -115,9 +115,8 @@ responseInterceptors.use(({ res, config }) => {
   const httpStatus = res.statusCode;
 
   if (httpStatus === 401) {
-    clearToken();
     if (!config.skipAuthRedirect) {
-      redirectToLogin(config.pendingAction);
+      handle401(config.pendingAction);
     }
     throw new BusinessError({ code: 401, message: '登录已失效', httpStatus });
   }
@@ -205,6 +204,7 @@ export function request<T = unknown>(config: RequestConfig): Promise<T> {
 
   let task: UniApp.RequestTask | null = null;
   let loadingShown = false;
+  let abortHandler: (() => void) | undefined;
 
   const promise = runRequestChain(config)
     .then((finalConfig) => {
@@ -239,7 +239,8 @@ export function request<T = unknown>(config: RequestConfig): Promise<T> {
         }) as unknown as UniApp.RequestTask;
 
         if (finalConfig.signal) {
-          finalConfig.signal.addEventListener?.('abort', () => task && task.abort());
+          abortHandler = () => task && task.abort();
+          finalConfig.signal.addEventListener?.('abort', abortHandler);
         }
       });
     })
@@ -250,6 +251,9 @@ export function request<T = unknown>(config: RequestConfig): Promise<T> {
       throw err;
     })
     .finally(() => {
+      if (abortHandler && config.signal) {
+        config.signal.removeEventListener?.('abort', abortHandler);
+      }
       if (loadingShown) uni.hideLoading();
     });
 
@@ -301,8 +305,7 @@ export function upload<T = unknown>(config: UploadConfig): Promise<T> {
         }
         const httpStatus = res.statusCode;
         if (httpStatus === 401) {
-          clearToken();
-          if (!config.skipAuthRedirect) redirectToLogin();
+          if (!config.skipAuthRedirect) handle401();
           return reject(new BusinessError({ code: 401, message: '登录已失效', httpStatus }));
         }
         if (httpStatus < 200 || httpStatus >= 300) {

@@ -195,12 +195,12 @@ import {
   updateArticle
 } from '@/modules/article/api/article.api';
 import type { ArticleDetail, CategoryItem, TagItem } from '@/modules/article/types/article';
-import { markArticleRefresh } from '@/modules/article/utils/publish';
-import { uploadPublicFile } from '@/shared/api/file.api';
+import { markArticleRefresh } from '../modules/article/utils/publish';
+import { uploadPublicFile } from '../modules/shared/api/file.api';
 import { reportAnalyticsEvent } from '@/shared/utils/analytics';
 import { useThemeStore } from '@/stores/theme';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
-import { pickSingleImagePath } from '@/utils/media';
+import { pickSingleImagePath } from '../modules/utils/media';
 import { normalizeAssetUrl } from '@/utils/url';
 
 type SubmitMode = 'draft' | 'review' | '';
@@ -772,29 +772,69 @@ async function removeArticleAction(): Promise<void> {
     width: 92rpx;
     height: 54rpx;
     border-radius: 999rpx;
-    background: rgba(148, 163, 184, 0.34);
-    transition: background-color 0.2s ease;
-  }
+    background: var(--sl-control-bg);
+    border: 1rpx solid var(--sl-control-border);
+    box-shadow:
+      inset 0 2rpx 4rpx rgba(0, 0, 0, 0.05),
+      0 1rpx 0 rgba(255, 255, 255, 0.9);
+    transition: all 0.24s cubic-bezier(0.25, 0.8, 0.25, 1);
 
-  &__switch::after {
-    content: '';
-    position: absolute;
-    top: 5rpx;
-    left: 5rpx;
-    width: 44rpx;
-    height: 44rpx;
-    border-radius: 50%;
-    background: var(--sl-control-bg-strong);
-    box-shadow: 0 6rpx 16rpx rgba(17, 24, 39, 0.12);
-    transition: left 0.2s ease, background-color 0.2s ease;
-  }
+    &::after {
+      content: '';
+      position: absolute;
+      top: 4rpx;
+      left: 4rpx;
+      width: 44rpx;
+      height: 44rpx;
+      border-radius: 50%;
+      background: var(--sl-control-bg-strong);
+      box-shadow:
+        0 4rpx 10rpx rgba(17, 24, 39, 0.12),
+        inset 0 1rpx 0 rgba(255, 255, 255, 0.9);
+      transition: all 0.24s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
 
-  &__switch--active {
-    background: rgba(59, 89, 255, 0.42);
-  }
+    &--active {
+      background: rgba(59, 89, 255, 0.16);
+      border-color: rgba(59, 89, 255, 0.32);
+      box-shadow:
+        inset 0 1rpx 0 rgba(255, 255, 255, 0.1),
+        0 8rpx 20rpx rgba(59, 89, 255, 0.12);
 
-  &__switch--active::after {
-    left: 43rpx;
+      &::after {
+        left: 42rpx;
+        background: var(--sl-color-primary);
+        box-shadow:
+          0 6rpx 16rpx rgba(59, 89, 255, 0.35),
+          inset 0 1rpx 0 rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    .sl-theme--dark & {
+      background: rgba(8, 13, 24, 0.26);
+      border-color: var(--sl-border-light);
+      box-shadow: inset 0 2rpx 4rpx rgba(0, 0, 0, 0.24);
+
+      &::after {
+        background: #a8b2c8;
+        box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.3);
+      }
+
+      &--active {
+        background: rgba(105, 129, 255, 0.16);
+        border-color: rgba(105, 129, 255, 0.32);
+        box-shadow:
+          inset 0 1rpx 0 rgba(255, 255, 255, 0.05),
+          0 8rpx 20rpx rgba(105, 129, 255, 0.15);
+
+        &::after {
+          background: var(--sl-color-primary-soft);
+          box-shadow:
+            0 6rpx 16rpx rgba(105, 129, 255, 0.4),
+            inset 0 1rpx 0 rgba(255, 255, 255, 0.3);
+        }
+      }
+    }
   }
 
   &__inline-field {

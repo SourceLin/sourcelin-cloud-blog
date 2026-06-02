@@ -57,17 +57,17 @@ page {
   --sl-text-sub: #4b5563;
   --sl-text-muted: #86909c;
   --sl-surface-bg: rgba(255, 255, 255, 0.74);
-  --sl-input-bg: rgba(255, 255, 255, 0.92);
-  --sl-input-border: rgba(209, 219, 232, 0.96);
+  --sl-input-bg: rgba(31, 41, 55, 0.04);
+  --sl-input-border: rgba(17, 24, 39, 0.08);
   --sl-input-shadow:
-    inset 0 1rpx 0 rgba(255, 255, 255, 0.92),
-    0 8rpx 18rpx rgba(17, 24, 39, 0.04);
+    inset 0 2rpx 6rpx rgba(31, 38, 135, 0.05),
+    0 1rpx 0 rgba(255, 255, 255, 0.9);
   --sl-border-focused: rgba(59, 89, 255, 0.22);
   --sl-panel-highlight: rgba(255, 255, 255, 0.56);
   --sl-panel-lowlight: rgba(255, 255, 255, 0.28);
   --sl-control-bg: rgba(255, 255, 255, 0.54);
   --sl-control-bg-strong: rgba(255, 255, 255, 0.82);
-  --sl-control-border: rgba(255, 255, 255, 0.84);
+  --sl-control-border: rgba(17, 24, 39, 0.08);
   --sl-primary-tint: rgba(59, 89, 255, 0.08);
   --sl-filter-tab-active-bg: rgba(31, 111, 235, 0.12);
   --sl-tab-group-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.96), 0 8rpx 20rpx rgba(17, 24, 39, 0.06);
@@ -126,11 +126,11 @@ uni-page-wrapper {
   --sl-text-sub: #4b5563;
   --sl-text-muted: #86909c;
   --sl-surface-bg: rgba(255, 255, 255, 0.74);
-  --sl-input-bg: rgba(255, 255, 255, 0.92);
-  --sl-input-border: rgba(209, 219, 232, 0.96);
+  --sl-input-bg: rgba(31, 41, 55, 0.04);
+  --sl-input-border: rgba(17, 24, 39, 0.08);
   --sl-input-shadow:
-    inset 0 1rpx 0 rgba(255, 255, 255, 0.92),
-    0 8rpx 18rpx rgba(17, 24, 39, 0.04);
+    inset 0 2rpx 6rpx rgba(31, 38, 135, 0.05),
+    0 1rpx 0 rgba(255, 255, 255, 0.9);
   --sl-border-focused: rgba(59, 89, 255, 0.22);
   --sl-color-primary: #3b59ff;
   --sl-color-primary-soft: #8f70ff;
@@ -138,7 +138,7 @@ uni-page-wrapper {
   --sl-panel-lowlight: rgba(255, 255, 255, 0.28);
   --sl-control-bg: rgba(255, 255, 255, 0.54);
   --sl-control-bg-strong: rgba(255, 255, 255, 0.82);
-  --sl-control-border: rgba(255, 255, 255, 0.84);
+  --sl-control-border: rgba(17, 24, 39, 0.08);
   --sl-primary-tint: rgba(59, 89, 255, 0.08);
   --sl-filter-tab-active-bg: rgba(31, 111, 235, 0.12);
   --sl-tab-group-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.96), 0 8rpx 20rpx rgba(17, 24, 39, 0.06);
@@ -156,7 +156,7 @@ uni-page-wrapper {
 .sl-theme--dark {
   --sl-page-bg: #080d18;
   --sl-surface-bg: #121b2e;
-  --sl-input-bg: #121b2e;
+  --sl-input-bg: rgba(18, 27, 46, 0.36);
   --sl-glow-a: rgba(89, 115, 255, 0.08);
   --sl-glow-b: rgba(143, 112, 255, 0.06);
   --sl-bg-glass-pure: rgba(18, 27, 46, 0.62);
@@ -168,8 +168,8 @@ uni-page-wrapper {
   --sl-border-focused: rgba(105, 129, 255, 0.32);
   --sl-glass-shadow: 0 22rpx 54rpx rgba(0, 0, 0, 0.18);
   --sl-input-shadow:
-    inset 0 2rpx 0 rgba(255, 255, 255, 0.06),
-    0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+    inset 0 2rpx 6rpx rgba(0, 0, 0, 0.3),
+    0 4rpx 12rpx rgba(0, 0, 0, 0.1);
   --sl-shadow-soft:
     inset 0 1rpx 0 rgba(255, 255, 255, 0.08),
     0 22rpx 54rpx rgba(0, 0, 0, 0.18);
@@ -554,20 +554,20 @@ button[class][disabled] {
   padding: 10rpx;
   border-radius: 46rpx;
   background:
-    linear-gradient(145deg, var(--sl-bg-glass-pure), var(--sl-panel-lowlight)),
-    var(--sl-bg-glass-tint);
-  border: 1rpx solid var(--sl-border-glass);
+    linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.72)),
+    rgba(255, 255, 255, 0.65);
+  border: 1rpx solid rgba(255, 255, 255, 0.82);
   box-shadow:
-    inset 0 1rpx 0 var(--sl-border-glass),
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.95),
     inset 0 -1rpx 0 rgba(59, 89, 255, 0.08),
-    var(--sl-glass-shadow);
+    0 22rpx 54rpx rgba(17, 24, 39, 0.06);
   overflow: hidden;
   pointer-events: auto;
   transition: background-color 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
 
-  /* #ifdef H5 || APP-PLUS */
-  backdrop-filter: blur(22rpx) saturate(1.4);
-  -webkit-backdrop-filter: blur(22rpx) saturate(1.4);
+  /* #ifdef H5 || APP-PLUS || MP-WEIXIN */
+  backdrop-filter: blur(26rpx) saturate(1.6);
+  -webkit-backdrop-filter: blur(26rpx) saturate(1.6);
   /* #endif */
 
   .sl-theme--dark & {
@@ -622,10 +622,10 @@ button[class][disabled] {
 .s-liquid-tabbar__item--active {
   color: var(--sl-color-primary);
   background:
-    linear-gradient(145deg, var(--sl-bg-glass-pure), rgba(255, 255, 255, 0.1)),
-    rgba(59, 89, 255, 0.06);
+    linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.4)),
+    rgba(59, 89, 255, 0.08);
   box-shadow:
-    inset 0 1rpx 0 var(--sl-border-glass),
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.9),
     0 10rpx 24rpx rgba(59, 89, 255, 0.08);
 
   .sl-theme--dark & {
@@ -661,8 +661,15 @@ button[class][disabled] {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-.s-placeholder {
-  color: var(--sl-text-muted);
+.s-placeholder,
+.input-placeholder,
+.textarea-placeholder {
+  color: var(--sl-text-muted) !important;
+}
+
+input,
+textarea {
+  color: var(--sl-text-main) !important;
 }
 
 .s-ellipsis {

@@ -43,7 +43,7 @@
       <view class="home__showcase">
         <view class="home__showcase-mosaic">
           <view class="home__showcase-tile home__showcase-tile--0" @tap="goDiscover">
-            <image class="home__showcase-slice" src="/static/backgrounds/showcase-bg.png" mode="aspectFill" />
+            <image class="home__showcase-slice" src="/static/backgrounds/showcase-bg.jpg" mode="aspectFill" />
             <view class="home__showcase-overlay" />
             <view class="home__showcase-meta">
               <text class="home__showcase-kicker">Discover</text>
@@ -52,7 +52,7 @@
             </view>
           </view>
           <view class="home__showcase-tile home__showcase-tile--1" @tap="goCommunity">
-            <image class="home__showcase-slice" src="/static/backgrounds/showcase-bg.png" mode="aspectFill" />
+            <image class="home__showcase-slice" src="/static/backgrounds/showcase-bg.jpg" mode="aspectFill" />
             <view class="home__showcase-overlay" />
             <view class="home__showcase-meta">
               <text class="home__showcase-kicker">Community</text>
@@ -61,14 +61,14 @@
             </view>
           </view>
           <view class="home__showcase-tile home__showcase-tile--2" @tap="goHotList">
-            <image class="home__showcase-slice" src="/static/backgrounds/showcase-bg.png" mode="aspectFill" />
+            <image class="home__showcase-slice" src="/static/backgrounds/showcase-bg.jpg" mode="aspectFill" />
             <view class="home__showcase-overlay" />
             <view class="home__showcase-meta home__showcase-meta--compact">
               <text class="home__showcase-title">热门榜单</text>
             </view>
           </view>
           <view class="home__showcase-tile home__showcase-tile--3" @tap="goAbout">
-            <image class="home__showcase-slice" src="/static/backgrounds/showcase-bg.png" mode="aspectFill" />
+            <image class="home__showcase-slice" src="/static/backgrounds/showcase-bg.jpg" mode="aspectFill" />
             <view class="home__showcase-overlay" />
             <view class="home__showcase-meta home__showcase-meta--compact">
               <text class="home__showcase-title">关于本站</text>
@@ -171,7 +171,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, shallowRef, triggerRef, watch } from 'vue';
 import { onPageScroll, onPullDownRefresh, onReachBottom, onShareAppMessage, onShow } from '@dcloudio/uni-app';
 import { useHomeFeed } from '@/modules/article/composables/useHomeFeed';
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
@@ -180,12 +180,13 @@ import { useAppStore } from '@/stores/app';
 import { reportAnalyticsEvent } from '@/shared/utils/analytics';
 import { hideNativeTabbar, liquidTabItems, switchLiquidTab } from '@/shared/utils/liquid-tabbar';
 import { normalizeAssetUrl } from '@/utils/url';
+import { useBackToTop } from '@/shared/composables/useBackToTop';
 
 const { loading, siteInfo, notices, featured, feedItems, finished, isEmpty, refresh, loadMore } = useHomeFeed();
 const themeStore = useThemeStore();
 const appStore = useAppStore();
-const backToTopVisible = ref(false);
-const brokenCoverArticleIds = ref<Set<number>>(new Set());
+const { backToTopVisible, handlePageScroll } = useBackToTop();
+const brokenCoverArticleIds = shallowRef<Set<number>>(new Set());
 const activeTabPath = 'pages/home/home';
 
 function resolveCapsuleMetrics() {
@@ -241,7 +242,8 @@ function imageUrl(value?: string): string {
 
 function onCoverError(articleId: number): void {
   if (!brokenCoverArticleIds.value.has(articleId)) {
-    brokenCoverArticleIds.value = new Set([...brokenCoverArticleIds.value, articleId]);
+    brokenCoverArticleIds.value.add(articleId);
+    triggerRef(brokenCoverArticleIds);
   }
 }
 
@@ -278,9 +280,7 @@ onReachBottom(() => {
   loadMore();
 });
 
-onPageScroll((event) => {
-  backToTopVisible.value = event.scrollTop > 360;
-});
+onPageScroll(handlePageScroll);
 
 onShow(() => {
   hideNativeTabbar();

@@ -5,8 +5,8 @@ import {
   fetchUnreadMessageCount,
   markAllMessagesRead,
   type MessagePageQuery
-} from '../api/message.api';
-import type { MessageItem } from '../types/message';
+} from '@/modules/message/api/message.api';
+import type { MessageItem } from '@/modules/message/types/message';
 import {
   MESSAGE_CHANNELS,
   getChannelConfig,

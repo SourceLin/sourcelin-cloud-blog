@@ -55,11 +55,11 @@ import { ref } from 'vue';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
 import { createSay } from '@/modules/community/api/community.api';
 import { markCommunityRefresh } from '@/modules/community/utils/publish';
-import { uploadPublicFile } from '@/shared/api/file.api';
+import { uploadPublicFile } from '../modules/shared/api/file.api';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
-import { pickImagePaths } from '@/utils/media';
+import { pickImagePaths } from '../modules/utils/media';
 import { getStorage, removeStorage, setStorage } from '@/utils/storage';
 
 const DRAFT_KEY = 'publish.say.draft';

@@ -82,6 +82,35 @@ export function clearToken(): void {
   clearPendingActionsCache();
 }
 
+let isRedirecting401 = false;
+
+export function handle401(pendingAction?: PendingAction): void {
+  if (isRedirecting401) return;
+  isRedirecting401 = true;
+  clearToken();
+  if (pendingAction) {
+    pushPendingActionCache(pendingAction);
+  }
+  if (isLoginPageActive()) {
+    showInfoToast('请先登录');
+    setTimeout(() => { isRedirecting401 = false; }, 1000);
+    return;
+  }
+  uni.navigateTo({
+    url: '/pages-user/login/login',
+    fail() {
+      showInfoToast('请先登录');
+    },
+    complete() {
+      setTimeout(() => { isRedirecting401 = false; }, 1000);
+    }
+  });
+}
+
+export function reset401Guard(): void {
+  isRedirecting401 = false;
+}
+
 export function buildAuthHeader(): AuthHeader | null {
   const token = getToken();
   if (!token) return null;
@@ -101,25 +130,42 @@ export function getUserInfoCache<T>(): T | null {
   return getStorage<T | null>(KEY_USER_INFO, null);
 }
 
+let pendingActionMemoryQueue: PendingAction[] | null = null;
+
+function getMemoryQueue(): PendingAction[] {
+  if (pendingActionMemoryQueue === null) {
+    pendingActionMemoryQueue = getStorage<PendingAction[]>(KEY_PENDING_ACTIONS, []);
+  }
+  return pendingActionMemoryQueue;
+}
+
+function syncQueueToStorage(): void {
+  if (pendingActionMemoryQueue !== null) {
+    setStorage(KEY_PENDING_ACTIONS, pendingActionMemoryQueue);
+  }
+}
+
 export function getPendingActionsCache(): PendingAction[] {
-  return getStorage<PendingAction[]>(KEY_PENDING_ACTIONS, []);
+  return [...getMemoryQueue()];
 }
 
 export function pushPendingActionCache(action: PendingAction): PendingAction[] {
-  if (!action || !action.type) return getPendingActionsCache();
-  const queue = getPendingActionsCache();
+  if (!action || !action.type) return getMemoryQueue();
+  const queue = getMemoryQueue();
   queue.push(action);
-  setStorage(KEY_PENDING_ACTIONS, queue);
-  return queue;
+  syncQueueToStorage();
+  return [...queue];
 }
 
 export function consumePendingActionsCache(): PendingAction[] {
-  const queue = getPendingActionsCache();
+  const queue = [...getMemoryQueue()];
+  pendingActionMemoryQueue = [];
   removeStorage(KEY_PENDING_ACTIONS);
   return queue;
 }
 
 export function clearPendingActionsCache(): void {
+  pendingActionMemoryQueue = [];
   removeStorage(KEY_PENDING_ACTIONS);
 }
 
@@ -129,21 +175,4 @@ function isLoginPageActive(): boolean {
   return currentPage?.route === 'pages-user/login/login';
 }
 
-/**
- * 引导到登录页（业务页面应使用此方法而不是直接 navigateTo）
- */
-export function redirectToLogin(pendingAction?: PendingAction): void {
-  if (pendingAction) {
-    pushPendingActionCache(pendingAction);
-  }
-  if (isLoginPageActive()) {
-    showInfoToast('请先登录');
-    return;
-  }
-  uni.navigateTo({
-    url: '/pages-user/login/login',
-    fail() {
-      showInfoToast('请先登录');
-    }
-  });
-}
+export { isLoginPageActive };

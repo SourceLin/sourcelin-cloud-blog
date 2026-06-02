@@ -1,7 +1,7 @@
 <template>
   <view class="policies s-container" :class="themeStore.themeClass">
     <view class="policies__hero s-card">
-      <view class="policies__chip">政策</view>
+      <!--      <view class="policies__chip">政策</view>-->
       <view class="policies__title">协议与政策</view>
       <view class="policies__subtitle">查看小程序当前使用的用户协议与隐私政策，登录与授权场景会统一引用这里的内容。</view>
     </view>
@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
-import { LEGAL_ARTICLES, type LegalArticleType } from '@/modules/site/constants/legal';
+import { LEGAL_ARTICLES, type LegalArticleType } from '../modules/site/constants/legal';
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { useThemeStore } from '@/stores/theme';
 
@@ -75,7 +75,6 @@ function openPolicy(type: LegalArticleType): void {
   }
 
   &__title {
-    margin-top: 18rpx;
     color: var(--sl-text-main);
     font-size: 40rpx;
     font-weight: 800;

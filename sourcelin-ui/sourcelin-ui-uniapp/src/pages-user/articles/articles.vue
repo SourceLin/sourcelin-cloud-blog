@@ -66,7 +66,7 @@
 import { ref } from 'vue';
 import { onLoad, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app';
 import { deleteArticle } from '@/modules/article/api/article.api';
-import { consumeArticleRefresh } from '@/modules/article/utils/publish';
+import { consumeArticleRefresh } from '../modules/article/utils/publish';
 import type { ArticleSummary } from '@/modules/article/types/article';
 import { fetchUserArticlePage } from '@/modules/user/api/user.api';
 import { useUserStore } from '@/stores/user';

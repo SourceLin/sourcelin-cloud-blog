@@ -237,20 +237,16 @@ mvn <goal>
 
 ## 9. Uniapp 移动端执行流程
 
-
 1. 读取 `rules/frontend-uniapp.md`、`skills/frontend-uniapp-dev/SKILL.md` 和 `sourcelin-ui/sourcelin-ui-uniapp/AGENTS.md`。
-
 2. Tab 页面放 `src/pages/<tab>/<tab>.vue`，分组页面放 `src/pages-article/**`、`src/pages-user/**`、`src/pages-messages/**`、`src/pages-about/**`、`src/pages-publish/**`。
-
-3. 业务域 API、types、composables、utils 放 `src/modules/<domain>/**`。
-
-4. 请求统一经过 `src/utils/request.ts`，移动端前台接口走 `/blog-api`，登录 `loginType` 固定为 `mini`。
-
-5. 新增页面必须同步 `src/pages.json`；新增 Tab 必须同步 `src/static/tabbar/**` 图标。
-
-6. 小程序分包 root 必须是真实目录，不满足条件时保持普通页面注册。
-
-7. 按改动范围执行 `npm run lint`、`npm run type-check`、`npm run build:mp-weixin`。
+3. 新增页面必须正确归入主包或分包：Tab 页入顶层 `pages`，业务页入对应 `subPackages`；主包仅 4 个 Tab 页面，体积 < 2MB。
+4. 业务域 API、types、composables、utils 放 `src/modules/<domain>/**`。
+5. 请求统一经过 `src/utils/request.ts`，移动端前台接口走 `/blog-api`，登录 `loginType` 固定为 `mini`。
+6. 401 处理统一通过 `handle401()`，登录成功后调用 `reset401Guard()`。
+7. `onPageScroll` 必须使用 `useThrottledPageScroll`，禁止逐像素写响应式状态。
+8. 新增页面必须同步 `src/pages.json`；新增 Tab 必须同步 `src/static/tabbar/**` 图标。
+9. 小程序分包 root 必须是真实目录，不满足条件时保持普通页面注册。
+10. 按改动范围执行 `npm run lint`、`npm run type-check`、`npm run build:mp-weixin`，并验证主包体积。
 
 
 ## 10. 管理后台执行流程

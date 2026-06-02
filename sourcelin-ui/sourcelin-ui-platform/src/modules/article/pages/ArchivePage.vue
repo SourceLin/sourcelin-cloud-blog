@@ -778,7 +778,11 @@ watch(
   overflow: hidden;
   padding: var(--timeline-shell-padding);
   border-radius: calc(var(--glass-radius) + 6px);
+  border: 1px solid var(--border-panel-subtle);
+  background: var(--surface-panel-soft);
   box-shadow: var(--highlight-panel-soft), var(--shadow-panel-soft);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
 }
 
 .archive-timeline-panel::before {
@@ -843,13 +847,13 @@ watch(
   gap: 16px;
   padding: 16px;
   border-radius: calc(var(--border-radius-xl) + 2px);
-  border: 1px solid var(--border-content-card);
-  background: var(--surface-content-card);
-  background-blend-mode: normal, normal, overlay;
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  border: 1px solid var(--border-panel-default);
+  background: 
+    var(--surface-panel-specular-soft),
+    var(--surface-panel-soft);
+  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-soft);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
   cursor: pointer;
   isolation: isolate;
   overflow: hidden;
@@ -863,9 +867,8 @@ watch(
 .article-card:hover {
   transform: translateY(-2px);
   border-color: var(--border-interactive-hover);
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card-hover);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter-hover);
-  backdrop-filter: var(--content-card-backdrop-filter-hover);
+  box-shadow: var(--highlight-panel-default), var(--shadow-panel-hover);
+  background: var(--surface-panel-default);
 }
 
 .article-card::before {

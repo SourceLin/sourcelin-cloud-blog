@@ -155,12 +155,60 @@
           暂无评论，来写第一条
         </view>
         <scroll-view v-else class="community__sheet-list" scroll-y>
-          <view v-for="item in commentList" :key="item.id" class="community__sheet-comment">
+          <view v-for="item in commentTree" :key="item.id" class="community__sheet-comment" @tap="handleCommentTap(item)">
             <view class="community__sheet-comment-head">
-              <text>{{ item.userNickname || item.nickname || '读者' }}</text>
-              <text>{{ formatDate(item.createTime) }}</text>
+              <text class="community__comment-nickname">{{ item.userNickname || item.nickname || '读者' }}</text>
+              <view class="community__comment-meta">
+                <text class="community__comment-time">{{ formatDate(item.createTime) }}</text>
+                <text class="community__comment-reply-btn" @tap.stop="handleCommentTap(item)">回复</text>
+                <text 
+                  v-if="userStore.isLoggedIn && currentUserId && currentUserId === item.userId" 
+                  class="community__comment-delete-btn" 
+                  @tap.stop="handleDeleteComment(item.id)"
+                >
+                  删除
+                </text>
+              </view>
             </view>
             <view class="community__sheet-comment-content">{{ item.content }}</view>
+
+            <!-- 二级回复区域 -->
+            <view v-if="item.replies.length > 0" class="community__reply-box" @tap.stop>
+              <view 
+                v-for="reply in (item.collapsed ? item.replies.slice(0, 2) : item.replies)" 
+                :key="reply.id" 
+                class="community__reply-item" 
+                @tap="handleCommentTap(reply)"
+              >
+                <view class="community__reply-head">
+                  <view class="community__reply-users">
+                    <text class="community__reply-author">{{ reply.userNickname || reply.nickname || '读者' }}</text>
+                    <text class="community__reply-arrow">▶</text>
+                    <text class="community__reply-target">{{ reply.parentNickname || '读者' }}</text>
+                  </view>
+                  <view class="community__reply-meta">
+                    <text class="community__reply-time">{{ formatDate(reply.createTime) }}</text>
+                    <text class="community__reply-btn" @tap.stop="handleCommentTap(reply)">回复</text>
+                    <text 
+                      v-if="userStore.isLoggedIn && currentUserId && currentUserId === reply.userId" 
+                      class="community__reply-delete-btn" 
+                      @tap.stop="handleDeleteComment(reply.id)"
+                    >
+                      删除
+                    </text>
+                  </view>
+                </view>
+                <view class="community__reply-content">{{ reply.content }}</view>
+              </view>
+
+              <!-- 折叠与展开控制条 -->
+              <view v-if="item.collapsed && item.replies.length > 2" class="community__reply-toggle" @tap.stop="item.collapsed = false">
+                <text class="community__reply-toggle-text">—— 展开 {{ item.replies.length }} 条回复 ∨</text>
+              </view>
+              <view v-else-if="!item.collapsed && item.replies.length > 2" class="community__reply-toggle" @tap.stop="item.collapsed = true">
+                <text class="community__reply-toggle-text">—— 收起回复 ∧</text>
+              </view>
+            </view>
           </view>
           <s-loading
             v-if="commentLoading"
@@ -171,11 +219,17 @@
           />
         </scroll-view>
 
+        <!-- 回复提示横条 -->
+        <view v-if="replyTarget" class="community__reply-indicator">
+          <text class="community__reply-indicator-text">正在回复 @{{ replyTarget.userNickname || replyTarget.nickname || '读者' }}</text>
+          <view class="community__reply-indicator-close" @tap="cancelReply">✕</view>
+        </view>
+
         <textarea
           v-model="commentContent"
           class="community__textarea"
-          placeholder="写下你的看法..."
-          placeholder-class="community__textarea-placeholder"
+          :placeholder="commentPlaceholder"
+          placeholder-class="textarea-placeholder"
           maxlength="300"
           auto-height
           fixed
@@ -203,8 +257,8 @@ import { computed, ref, watch } from 'vue';
 import { onHide, onLoad, onPageScroll, onPullDownRefresh, onReachBottom, onShareAppMessage, onShow, onUnload } from '@dcloudio/uni-app';
 import { fetchSayPage, fetchTreeholePage, deleteSay, deleteTreehole } from '@/modules/community/api/community.api';
 import type { SayItem, TreeholeItem } from '@/modules/community/types/community';
-import { createComment, fetchComments } from '@/modules/comment/api/comment.api';
-import type { CommentItem, CommentSource } from '@/modules/comment/types/comment';
+import { createComment, fetchComments, deleteComment } from '@/modules/comment/api/comment.api';
+import type { CommentItem, CommentSource, CommentCreatePayload } from '@/modules/comment/types/comment';
 import { collectTarget, likeTarget, uncollectTarget, unlikeTarget } from '@/modules/interaction/api/interaction.api';
 import { createContentReport } from '@/modules/report/api/report.api';
 import { useKeyboardInset } from '@/shared/composables/useBackToTop';
@@ -246,6 +300,76 @@ const commentLoading = ref(false);
 const commentSubmitting = ref(false);
 const commentContent = ref('');
 const commentList = ref<CommentItem[]>([]);
+const replyTarget = ref<CommentItem | null>(null);
+
+interface CommentNode extends CommentItem {
+  replies: CommentItem[];
+  collapsed: boolean;
+  visibleCount: number;
+}
+
+const commentTree = computed<CommentNode[]>(() => {
+  const rootComments: CommentNode[] = [];
+  const childComments: CommentItem[] = [];
+
+  // 1. 分流一级和子回复
+  commentList.value.forEach((item) => {
+    if (!item.parentCommentId) {
+      rootComments.push({
+        ...item,
+        replies: [],
+        collapsed: true,
+        visibleCount: 2
+      });
+    } else {
+      childComments.push(item);
+    }
+  });
+
+  // 2. 归并子回复到对应的 floorCommentId 楼层根评论下
+  childComments.forEach((child) => {
+    const root = rootComments.find((r) => r.id === child.floorCommentId);
+    if (root) {
+      root.replies.push(child);
+    } else {
+      // 容错：如果找不到根，作为一级评论呈现
+      rootComments.push({
+        ...child,
+        replies: [],
+        collapsed: true,
+        visibleCount: 2
+      });
+    }
+  });
+
+  // 3. 正序排序每栋楼子回复
+  rootComments.forEach((root) => {
+    root.replies.sort((a, b) => {
+      const aTime = a.createTime ? new Date(a.createTime).getTime() : 0;
+      const bTime = b.createTime ? new Date(b.createTime).getTime() : 0;
+      return aTime - bTime;
+    });
+  });
+
+  return rootComments;
+});
+
+const commentPlaceholder = computed(() => {
+  if (replyTarget.value) {
+    const targetNickname = replyTarget.value.userNickname || replyTarget.value.nickname || '读者';
+    return `回复 @${targetNickname}:`;
+  }
+  return '写下你的看法...';
+});
+
+function handleCommentTap(item: CommentItem): void {
+  replyTarget.value = item;
+}
+
+function cancelReply(): void {
+  replyTarget.value = null;
+}
+
 const activeCommentId = ref<number | null>(null);
 const activeCommentSource = ref<CommentSource>('say');
 const brokenUrls = ref<Set<string>>(new Set());
@@ -438,10 +562,11 @@ async function openCommentSheet(item: CommunityItem): Promise<void> {
   activeCommentSource.value = activeTab.value === 'says' ? 'say' : 'treehole';
   activeCommentLabel.value = activeTab.value === 'says' ? '说说评论区' : '树洞评论区';
   commentContent.value = '';
+  replyTarget.value = null;
   commentSheetVisible.value = true;
   commentLoading.value = true;
   try {
-    const result = await fetchComments(item.id, activeCommentSource.value, 1, 20);
+    const result = await fetchComments(item.id, activeCommentSource.value, 1, 100);
     commentList.value = result.items || [];
   } finally {
     commentLoading.value = false;
@@ -465,7 +590,7 @@ async function handleLoginSuccess(detail?: LoginSuccessEventDetail): Promise<voi
   if (commentSheetVisible.value && activeCommentId.value) {
     commentLoading.value = true;
     try {
-      const result = await fetchComments(activeCommentId.value, activeCommentSource.value, 1, 20);
+      const result = await fetchComments(activeCommentId.value, activeCommentSource.value, 1, 100);
       commentList.value = result.items || [];
     } finally {
       commentLoading.value = false;
@@ -475,6 +600,7 @@ async function handleLoginSuccess(detail?: LoginSuccessEventDetail): Promise<voi
 
 function closeCommentSheet(): void {
   commentSheetVisible.value = false;
+  replyTarget.value = null;
   uni.hideKeyboard();
 }
 
@@ -521,18 +647,47 @@ async function submitComment(): Promise<void> {
   }
   commentSubmitting.value = true;
   try {
-    await createComment({
+    const payload: CommentCreatePayload = {
       articleId: activeCommentId.value,
       source: activeCommentSource.value,
       content
-    });
+    };
+    if (replyTarget.value) {
+      payload.parentCommentId = replyTarget.value.id;
+      payload.parentUserId = replyTarget.value.userId;
+      payload.floorCommentId = replyTarget.value.floorCommentId || replyTarget.value.id;
+    }
+    await createComment(payload);
     commentContent.value = '';
+    replyTarget.value = null;
     updateCommentCount(activeCommentId.value, 1);
-    const result = await fetchComments(activeCommentId.value, activeCommentSource.value, 1, 20);
-    commentList.value = result.items || [];
-    showInfoToast('评论已提交');
+    showSuccessToast('发布成功');
+    closeCommentSheet();
   } finally {
     commentSubmitting.value = false;
+  }
+}
+
+async function handleDeleteComment(id: number): Promise<void> {
+  const confirmed = await new Promise<boolean>((resolve) => {
+    uni.showModal({
+      title: '提示',
+      content: '确认删除该评论吗？',
+      success: (res) => resolve(!!res.confirm),
+      fail: () => resolve(false)
+    });
+  });
+  if (!confirmed) return;
+  try {
+    await deleteComment(id);
+    showSuccessToast('评论已删除');
+    if (activeCommentId.value) {
+      updateCommentCount(activeCommentId.value, -1);
+      const result = await fetchComments(activeCommentId.value, activeCommentSource.value, 1, 100);
+      commentList.value = result.items || [];
+    }
+  } catch {
+    // 接口层已报错提示
   }
 }
 
@@ -1192,6 +1347,7 @@ refresh();
   }
 
   &__sheet {
+    position: relative;
     width: 100%;
     max-height: 78vh;
     padding: $space-lg $space-md $space-lg;
@@ -1231,8 +1387,7 @@ refresh();
   }
 
   &__sheet-list {
-    flex: 1;
-    min-height: 0;
+    height: 42vh;
     margin-top: $space-md;
     padding-right: 8rpx;
   }
@@ -1253,6 +1408,182 @@ refresh();
     line-height: 1.7;
   }
 
+  &__comment-nickname {
+    color: var(--sl-text-main, #111827);
+    font-weight: 700;
+    font-size: 26rpx;
+  }
+  &__comment-meta {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+  }
+  &__comment-time {
+    color: var(--sl-text-sub, rgba(75, 85, 99, 0.68));
+    font-size: 22rpx;
+  }
+  &__comment-reply-btn {
+    color: var(--community-primary, #3b59ff);
+    font-size: 22rpx;
+    font-weight: 600;
+    cursor: pointer;
+    &:active {
+      opacity: 0.7;
+    }
+  }
+
+  &__comment-delete-btn {
+    color: $color-danger;
+    font-size: 22rpx;
+    font-weight: 600;
+    cursor: pointer;
+    &:active {
+      opacity: 0.7;
+    }
+  }
+
+  &__reply-box {
+    margin-top: $space-sm;
+    margin-left: 20rpx;
+    padding: 16rpx 20rpx;
+    border-radius: $radius-md;
+    background: rgba(0, 0, 0, 0.024);
+    border: 1rpx solid rgba(17, 24, 39, 0.03);
+    
+    .sl-theme--dark & {
+      background: rgba(255, 255, 255, 0.025);
+      border-color: rgba(255, 255, 255, 0.04);
+    }
+  }
+
+  &__reply-item {
+    padding: 10rpx 0;
+    border-bottom: 1rpx dashed rgba(17, 24, 39, 0.04);
+    &:last-of-type {
+      border-bottom: none;
+    }
+    .sl-theme--dark & {
+      border-bottom-color: rgba(255, 255, 255, 0.04);
+    }
+  }
+
+  &__reply-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-xs;
+  }
+
+  &__reply-users {
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+    font-size: 24rpx;
+  }
+
+  &__reply-author {
+    color: var(--sl-text-main, #111827);
+    font-weight: 700;
+  }
+
+  &__reply-arrow {
+    font-size: 18rpx;
+    color: var(--sl-text-sub, rgba(75, 85, 99, 0.5));
+    margin: 0 4rpx;
+  }
+
+  &__reply-target {
+    color: var(--community-primary, #3b59ff);
+    font-weight: 600;
+  }
+
+  &__reply-meta {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+  }
+
+  &__reply-time {
+    color: var(--sl-text-sub, rgba(75, 85, 99, 0.5));
+    font-size: 20rpx;
+  }
+
+  &__reply-btn {
+    color: var(--community-primary, #3b59ff);
+    font-size: 20rpx;
+    font-weight: 600;
+    cursor: pointer;
+    &:active {
+      opacity: 0.7;
+    }
+  }
+
+  &__reply-delete-btn {
+    color: $color-danger;
+    font-size: 20rpx;
+    font-weight: 600;
+    cursor: pointer;
+    &:active {
+      opacity: 0.7;
+    }
+  }
+
+  &__reply-content {
+    margin-top: 6rpx;
+    color: var(--sl-text-main, #111827);
+    font-size: 24rpx;
+    line-height: 1.6;
+  }
+
+  &__reply-toggle {
+    display: flex;
+    align-items: center;
+    padding-top: 10rpx;
+    cursor: pointer;
+  }
+
+  &__reply-toggle-text {
+    font-size: 22rpx;
+    color: var(--community-primary, #3b59ff);
+    font-weight: 700;
+    opacity: 0.95;
+    &:active {
+      opacity: 0.7;
+    }
+  }
+
+  &__reply-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16rpx;
+    padding: 12rpx 20rpx;
+    border-radius: $radius-sm;
+    background: rgba(59, 89, 255, 0.08);
+    border: 1rpx solid rgba(59, 89, 255, 0.15);
+    
+    .sl-theme--dark & {
+      background: rgba(105, 129, 255, 0.12);
+      border-color: rgba(105, 129, 255, 0.2);
+    }
+  }
+
+  &__reply-indicator-text {
+    font-size: 24rpx;
+    color: var(--community-primary, #3b59ff);
+    font-weight: 600;
+  }
+
+  &__reply-indicator-close {
+    font-size: 26rpx;
+    color: var(--community-primary, #3b59ff);
+    padding: 0 8rpx;
+    cursor: pointer;
+    &:active {
+      transform: scale(0.9);
+    }
+  }
+
   &__sheet-empty,
   &__sheet-loading {
     padding: $space-lg 0;
@@ -1266,9 +1597,14 @@ refresh();
     padding: $space-md;
     box-sizing: border-box;
     border-radius: $radius-lg;
-    background: rgba(245, 247, 250, 0.92);
-    border: 1rpx solid rgba(229, 231, 235, 0.88);
+    background: rgba(31, 41, 55, 0.04);
+    border: 1rpx solid rgba(17, 24, 39, 0.08);
     font-size: 28rpx;
+    color: var(--sl-text-main) !important;
+  }
+
+  &__textarea-placeholder {
+    color: var(--sl-text-muted) !important;
   }
 
   &__sheet-actions {
