@@ -97,7 +97,7 @@
     linear-gradient(
       180deg,
       transparent 0%,
-      color-mix(in srgb, var(--glass-surface-strong) 18%, transparent) 100%
+      color-mix(in srgb, var(--surface-panel-soft) 76%, transparent) 72%
     );
   --text-shadow-glass: 0 1px 2px color-mix(in srgb, var(--text-color-light) 52%, transparent);
   --border-panel-subtle: color-mix(in srgb, var(--glass-border) 82%, var(--border-light));
@@ -393,7 +393,7 @@ html[data-theme='dark'] {
     linear-gradient(
       180deg,
       transparent 0%,
-      color-mix(in srgb, var(--background-color-deep) 36%, transparent) 100%
+      color-mix(in srgb, var(--background-color-deep) 62%, transparent) 72%
     );
   --text-shadow-glass: 0 1px 4px color-mix(in srgb, var(--background-color-deep) 82%, transparent);
   --border-panel-subtle: color-mix(in srgb, var(--glass-border) 68%, transparent);
@@ -410,15 +410,22 @@ html[data-theme='dark'] {
   --discover-filter-active-underline-shadow:
     0 0 12px color-mix(in srgb, var(--companion-color) 40%, transparent),
     0 0 24px color-mix(in srgb, var(--companion-color) 24%, transparent);
-  --highlight-panel-soft: inset 0 1px 0 color-mix(in srgb, var(--surface-white-18) 62%, transparent);
-  --highlight-panel-default: inset 0 1px 0 color-mix(in srgb, var(--surface-white-20) 70%, transparent);
-  --highlight-panel-strong: inset 0 1px 0 color-mix(in srgb, var(--surface-white-25) 74%, transparent);
+  --highlight-panel-soft:
+    inset 0 1px 1px color-mix(in srgb, var(--surface-white-18) 62%, transparent),
+    inset 0 -1px 1px color-mix(in srgb, var(--surface-white-08) 70%, transparent);
+  --highlight-panel-default:
+    inset 0 1px 1px color-mix(in srgb, var(--surface-white-20) 70%, transparent),
+    inset 0 -1px 1px color-mix(in srgb, var(--surface-white-10) 78%, transparent);
+  --highlight-panel-strong:
+    inset 0 1px 1px color-mix(in srgb, var(--surface-white-25) 78%, transparent),
+    inset 0 -1.5px 1.5px color-mix(in srgb, var(--surface-white-12) 86%, transparent);
+  --shadow-panel-soft: 0 8px 24px color-mix(in srgb, var(--background-color-deep) 42%, transparent);
+  --shadow-panel-default: 0 12px 32px color-mix(in srgb, var(--background-color-deep) 52%, transparent);
+  --shadow-panel-hover: 0 18px 48px color-mix(in srgb, var(--background-color-deep) 68%, transparent);
   --code-inline-bg: color-mix(in srgb, var(--glass-surface-strong) 92%, transparent);
   --code-block-bg: color-mix(in srgb, var(--background-color-deep) 88%, var(--glass-surface-strong));
   --code-block-text: color-mix(in srgb, var(--text-color-light) 92%, var(--info-color));
   --table-row-alt-bg: color-mix(in srgb, var(--text-color-light) 5%, transparent);
-
-  /* ========== 暗色主题光学变体覆盖 ========== */
 
   /* —— 冰晶玻璃（暗色） —— */
   --glass-ice-surface: color-mix(in srgb, var(--glass-surface-strong) 92%, var(--background-color-deep));

@@ -1,4 +1,4 @@
-﻿@import '@/shared/styles/responsive';
+@import '@/shared/styles/responsive';
 
 .about-page {
   --content-max-width: 1080px;
@@ -224,13 +224,13 @@
   gap: var(--spacing-sm);
   padding: var(--spacing-md) var(--spacing-lg);
   border-radius: calc(var(--border-radius-xl) + 2px);
-  border: 1px solid var(--border-content-card);
-  background: var(--surface-content-card);
-  background-blend-mode: normal, normal, overlay;
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  border: 1px solid var(--border-panel-default);
+  background: 
+    var(--surface-panel-specular-soft),
+    var(--surface-panel-soft);
+  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-soft);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
   isolation: isolate;
   overflow: hidden;
   transition:
@@ -260,9 +260,8 @@
 .contact-card:hover {
   transform: translateY(-2px);
   border-color: var(--border-interactive-hover);
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card-hover);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter-hover);
-  backdrop-filter: var(--content-card-backdrop-filter-hover);
+  box-shadow: var(--highlight-panel-default), var(--shadow-panel-hover);
+  background: var(--surface-panel-default);
 }
 
 .about-story-item:hover::before,

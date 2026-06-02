@@ -59,13 +59,13 @@ const emit = defineEmits<{ open: [id: number] }>()
   gap: 0.9rem;
   padding: 0.9rem;
   border-radius: calc(var(--border-radius-xl) + 2px);
-  border: 1px solid var(--border-content-card);
-  background: var(--surface-content-card);
-  background-blend-mode: normal, normal, overlay;
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  border: 1px solid var(--border-panel-default);
+  background: 
+    var(--surface-panel-specular-soft),
+    var(--surface-panel-soft);
+  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-soft);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
   cursor: pointer;
   isolation: isolate;
   transition:
@@ -79,22 +79,20 @@ const emit = defineEmits<{ open: [id: number] }>()
 .recommended-item:hover {
   transform: translateY(-2px);
   border-color: var(--border-interactive-hover);
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card-hover);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter-hover);
-  backdrop-filter: var(--content-card-backdrop-filter-hover);
+  box-shadow: var(--highlight-panel-default), var(--shadow-panel-hover), var(--shadow-panel-glow);
+  background: var(--surface-panel-default);
 }
 
 .recommended-item.is-featured {
   grid-template-columns: minmax(180px, 0.95fr) minmax(0, 1.05fr);
   gap: 1rem;
   padding: 1rem;
-  background: var(--surface-content-card-featured);
-  background-blend-mode: normal, normal, overlay;
-  background-repeat: no-repeat;
-  border-color: var(--border-content-card-featured);
+  background: var(--surface-panel-strong);
+  border-color: var(--border-panel-strong);
   box-shadow:
     var(--highlight-panel-strong),
-    var(--shadow-content-card-hover);
+    var(--shadow-panel-hover),
+    var(--shadow-panel-glow-strong);
 }
 
 .recommended-image {

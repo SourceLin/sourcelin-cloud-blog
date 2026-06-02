@@ -219,13 +219,14 @@ function asArticle(item: unknown): HomeArticle {
   gap: 1rem;
   padding: 1rem;
   border-radius: calc(var(--border-radius-xl) + 4px);
-  border: 1px solid var(--border-content-card-featured);
-  background: var(--surface-content-card-featured);
-  background-blend-mode: normal, normal, overlay;
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  border: 1px solid var(--border-panel-strong);
+  background: var(--surface-panel-strong);
+  box-shadow:
+    var(--highlight-panel-strong),
+    var(--shadow-panel-default),
+    var(--shadow-panel-glow);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
   cursor: pointer;
   isolation: isolate;
   transition:
@@ -239,9 +240,10 @@ function asArticle(item: unknown): HomeArticle {
 .featured-article:hover {
   transform: translateY(-2px);
   border-color: var(--border-interactive-hover);
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card-hover);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter-hover);
-  backdrop-filter: var(--content-card-backdrop-filter-hover);
+  box-shadow:
+    var(--highlight-panel-strong),
+    var(--shadow-panel-hover),
+    var(--shadow-panel-glow-strong);
 }
 
 .featured-image {
@@ -361,13 +363,13 @@ function asArticle(item: unknown): HomeArticle {
   gap: 0.72rem;
   padding: 0.95rem;
   border-radius: calc(var(--border-radius-xl) + 2px);
-  border: 1px solid var(--border-content-card);
-  background: var(--surface-content-card);
-  background-blend-mode: normal, normal, overlay;
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  border: 1px solid var(--border-panel-default);
+  background: 
+    var(--surface-panel-specular-soft),
+    var(--surface-panel-soft);
+  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-soft);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
   cursor: pointer;
   isolation: isolate;
   transition:
@@ -381,9 +383,8 @@ function asArticle(item: unknown): HomeArticle {
 .article-card:hover {
   transform: translateY(-2px);
   border-color: var(--border-interactive-hover);
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card-hover);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter-hover);
-  backdrop-filter: var(--content-card-backdrop-filter-hover);
+  box-shadow: var(--highlight-panel-default), var(--shadow-panel-hover), var(--shadow-panel-glow);
+  background: var(--surface-panel-default);
 }
 
 .article-card.short {

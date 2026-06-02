@@ -636,15 +636,15 @@ onMounted(async () => {
   display: grid;
   gap: var(--spacing-lg);
   padding: var(--spacing-xl);
-  border: 1px solid var(--border-content-card);
+  border: 1px solid var(--border-panel-default);
   border-radius: var(--context-shell-radius);
   background:
     var(--surface-panel-specular-soft),
-    var(--surface-content-card);
+    var(--surface-panel-soft);
   background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-soft);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
   overflow: hidden;
   transition:
     border-color var(--transition-base),
@@ -654,9 +654,7 @@ onMounted(async () => {
 
 .category-switch-shell:hover {
   border-color: var(--border-interactive-hover);
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card-hover);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter-hover);
-  backdrop-filter: var(--content-card-backdrop-filter-hover);
+  box-shadow: var(--highlight-panel-default), var(--shadow-panel-hover);
 }
 
 .category-switch-shell::before {
@@ -731,13 +729,13 @@ onMounted(async () => {
   min-height: clamp(6.9rem, 10vw, 7.8rem);
   padding: var(--spacing-lg);
   border-radius: var(--context-entry-radius);
-  border: 1px solid var(--border-content-card);
-  background: var(--surface-content-card);
-  background-blend-mode: normal, normal, overlay;
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  border: 1px solid var(--border-panel-default);
+  background: 
+    var(--surface-panel-specular-soft),
+    var(--surface-panel-soft);
+  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-soft);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
   cursor: pointer;
   isolation: isolate;
   text-align: left;
@@ -752,11 +750,8 @@ onMounted(async () => {
 .category-card:hover {
   transform: translateY(-2px);
   border-color: color-mix(in srgb, hsl(var(--icon-hue), 72%, 56%) 34%, var(--border-interactive-hover));
-  background: var(--surface-content-card-featured);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card-hover);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter-hover);
-  backdrop-filter: var(--content-card-backdrop-filter-hover);
+  background: var(--surface-panel-default);
+  box-shadow: var(--highlight-panel-default), var(--shadow-panel-hover);
 }
 
 .category-card::after {
@@ -796,12 +791,9 @@ onMounted(async () => {
 
 .category-card.is-armed {
   transform: translateY(-2px) scale(0.995);
-  border-color: color-mix(in srgb, hsl(var(--icon-hue), 72%, 56%) 34%, var(--border-panel-subtle));
-  background: var(--surface-content-card-featured);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card-hover);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter-hover);
-  backdrop-filter: var(--content-card-backdrop-filter-hover);
+  border-color: color-mix(in srgb, hsl(var(--icon-hue), 72%, 56%) 34%, var(--border-panel-strong));
+  background: var(--surface-panel-strong);
+  box-shadow: var(--highlight-panel-strong), var(--shadow-panel-hover), var(--shadow-panel-glow);
 }
 
 .category-icon {
@@ -886,13 +878,12 @@ onMounted(async () => {
   min-height: 6.8rem;
   padding: var(--spacing-md) var(--spacing-lg);
   overflow: hidden;
-  border: 1px solid var(--border-content-card-featured);
+  border: 1px solid var(--border-panel-strong);
   border-radius: var(--context-entry-radius);
-  background: var(--surface-content-card-featured);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  background: var(--surface-panel-strong);
+  box-shadow: var(--highlight-panel-strong), var(--shadow-panel-default);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
 }
 
 .context-focus-strip::before {
@@ -974,19 +965,12 @@ onMounted(async () => {
   display: grid;
   gap: 2px;
   padding: 0.8rem 0.95rem;
-  border: 1px solid var(--border-content-card);
+  border: 1px solid var(--border-panel-subtle);
   border-radius: var(--context-inset-radius);
-  background:
-    linear-gradient(
-      145deg,
-      color-mix(in srgb, hsl(var(--context-accent-hue, 245), 76%, 72%) 6%, transparent),
-      transparent 58%
-    ),
-    var(--surface-content-card);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-panel-inline);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  background: var(--surface-panel-inset);
+  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-inline);
+  -webkit-backdrop-filter: blur(var(--glass-nested-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-nested-blur)) saturate(var(--glass-saturate));
 }
 
 .context-focus-strip__metric-label {
@@ -1014,19 +998,12 @@ onMounted(async () => {
   font: inherit;
   line-height: 1;
   cursor: pointer;
-  border: 1px solid var(--border-content-card);
+  border: 1px solid var(--border-panel-default);
   border-radius: var(--context-inset-radius);
-  background:
-    linear-gradient(
-      145deg,
-      color-mix(in srgb, hsl(var(--context-accent-hue, 245), 76%, 72%) 6%, transparent),
-      transparent 58%
-    ),
-    var(--surface-content-card);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-panel-inline);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  background: var(--surface-panel-soft);
+  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-inline);
+  -webkit-backdrop-filter: blur(var(--glass-nested-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-nested-blur)) saturate(var(--glass-saturate));
   transition:
     border-color var(--transition-base),
     box-shadow var(--transition-base),
@@ -1037,11 +1014,8 @@ onMounted(async () => {
 .context-back-button:hover {
   transform: translateY(-1px);
   border-color: color-mix(in srgb, hsl(var(--context-accent-hue, 245), 72%, 56%) 26%, var(--border-interactive-hover));
-  background: var(--surface-content-card-featured);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card-hover);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter-hover);
-  backdrop-filter: var(--content-card-backdrop-filter-hover);
+  background: var(--surface-panel-default);
+  box-shadow: var(--highlight-panel-default), var(--shadow-panel-hover);
 }
 
 .context-state {
@@ -1087,13 +1061,14 @@ onMounted(async () => {
   gap: var(--spacing-lg);
   padding: var(--spacing-md);
   cursor: pointer;
-  border: 1px solid var(--border-content-card);
+  border: 1px solid var(--border-panel-default);
   border-radius: var(--context-entry-radius);
-  background: var(--surface-content-card);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter);
-  backdrop-filter: var(--content-card-backdrop-filter);
+  background: 
+    var(--surface-panel-specular-soft),
+    var(--surface-panel-soft);
+  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-soft);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px)) saturate(var(--glass-saturate));
   transition:
     border-color var(--transition-base),
     box-shadow var(--transition-base),
@@ -1104,11 +1079,8 @@ onMounted(async () => {
 .context-article-card:hover {
   transform: translateY(-2px);
   border-color: color-mix(in srgb, var(--primary-color) 24%, var(--border-interactive-hover));
-  background: var(--surface-content-card-featured);
-  background-repeat: no-repeat;
-  box-shadow: var(--highlight-content-card), var(--shadow-content-card-hover);
-  -webkit-backdrop-filter: var(--content-card-backdrop-filter-hover);
-  backdrop-filter: var(--content-card-backdrop-filter-hover);
+  background: var(--surface-panel-default);
+  box-shadow: var(--highlight-panel-default), var(--shadow-panel-hover);
 }
 
 .context-article-card__cover {
@@ -1123,7 +1095,7 @@ onMounted(async () => {
     var(--article-cover) center / cover no-repeat,
     radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--primary-color) 12%, transparent), transparent 42%),
     var(--surface-panel-inset);
-  border: 1px solid color-mix(in srgb, var(--border-content-card) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-panel-subtle) 88%, transparent);
 }
 
 .context-article-card__body {

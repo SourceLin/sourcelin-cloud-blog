@@ -187,7 +187,7 @@ export default defineConfig({
     port: 80,
     proxy: {
       '/blog-api': {
-        target: 'http://localhost:8080',
+        target: 'https://sourcelin.cn',
         changeOrigin: true,
         rewrite: (path) => {
           const normalized = path.replace(/^\/blog-api/, '')
@@ -198,11 +198,11 @@ export default defineConfig({
         }
       },
       '/blog': {
-        target: 'http://localhost:8080',
+        target: 'https://sourcelin.cn',
         changeOrigin: true
       },
       '/file': {
-        target: 'http://localhost:8080',
+        target: 'https://sourcelin.cn',
         changeOrigin: true,
       }
     }

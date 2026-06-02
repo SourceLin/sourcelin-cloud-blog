@@ -286,7 +286,7 @@ watch(
                 v-for="child in item.children"
                 :key="child.id"
                 type="button"
-                class="dropdown-item dropdown-button"
+                :class="['dropdown-item', 'dropdown-button', { active: isActive(child.path) }]"
                 @click="handleNavItemClick(child)"
               >
                 {{ child.label }}
@@ -372,10 +372,10 @@ watch(
                   </div>
                 </div>
                 <div class="menu-divider" />
-                <router-link to="/user" class="dropdown-item" @click="activeDropdown = null">个人主页</router-link>
+                <router-link to="/user" :class="['dropdown-item', { active: isActive('/user') }]" @click="activeDropdown = null">个人主页</router-link>
                 <router-link
                   to="/messages"
-                  class="dropdown-item dropdown-item--message"
+                  :class="['dropdown-item', 'dropdown-item--message', { active: isActive('/messages') }]"
                   @click="activeDropdown = null"
                 >
                   <span class="dropdown-item__label">消息通知</span>
@@ -584,20 +584,20 @@ watch(
   position: absolute;
   top: 100%;
   left: 50%;
-  transform: translateX(-50%);
+  transform-origin: top center;
+  --transform-base: translateX(-50%) translateY(0) scale(1);
+  transform: var(--transform-base);
   min-width: 180px;
   margin-top: 8px;
-  padding: 10px;
-  background: var(--dropdown-surface);
-  background-image: var(--glass-noise);
-  background-blend-mode: soft-light;
-  border: none;
-  outline: var(--glass-panel-outline);
-  border-radius: 18px;
+  padding: 6px;
+  background: color-mix(in srgb, var(--dropdown-surface) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-color) 8%, transparent);
+  border-radius: var(--border-radius-lg);
   box-shadow:
-    var(--highlight-panel-default),
-    var(--shadow-panel-default);
-  backdrop-filter: blur(calc(var(--glass-blur) - 2px)) saturate(var(--glass-saturate));
+    0 4px 12px color-mix(in srgb, var(--shadow-panel-default) 6%, transparent),
+    0 16px 36px -4px color-mix(in srgb, var(--shadow-panel-default) 22%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--text-color-light) 15%, transparent);
+  backdrop-filter: blur(20px) saturate(140%);
   z-index: 100;
 
   &::before {
@@ -612,16 +612,38 @@ watch(
 }
 
 .dropdown-item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 14px;
-  border-radius: var(--border-radius-sm);
-  font-size: 0.9rem;
+  padding: 10px 14px 10px 24px;
+  border-radius: var(--border-radius-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   color: var(--text-color);
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: 
+    transform var(--transition-fast),
+    background var(--transition-fast),
+    color var(--transition-fast);
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    width: 3.5px;
+    height: 0;
+    border-radius: 99px;
+    background: var(--primary-color);
+    opacity: 0;
+    transform: translateY(-50%);
+    top: 50%;
+    transition: 
+      height 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.22s ease;
+  }
 }
 
 .dropdown-button {
@@ -633,21 +655,49 @@ watch(
 }
 
 .dropdown-item:hover {
-  background: var(--toolbar-button-surface-hover);
+  background: color-mix(in srgb, var(--primary-color) 6%, transparent);
   color: var(--primary-color);
   transform: translateX(2px);
-  box-shadow: var(--shadow-panel-inline);
+
+  &::before {
+    height: 12px;
+    opacity: 1;
+  }
+}
+
+.dropdown-item.active {
+  background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+  color: var(--primary-color);
+  font-weight: 600;
+
+  &::before {
+    height: 12px;
+    opacity: 1;
+  }
+}
+
+.dropdown-item.active:hover {
+  background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+  transform: translateX(2px);
 }
 
 .dropdown-fade-enter-active,
 .dropdown-fade-leave-active {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    opacity 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.28s ease;
 }
 
-.dropdown-fade-enter,
+.dropdown-fade-enter-from,
 .dropdown-fade-leave-to {
   opacity: 0;
-  transform: translateX(-50%) translateY(-8px);
+  filter: blur(4px);
+  transform: translateX(-50%) translateY(-8px) scale(0.95);
+
+  &.user-menu {
+    transform: translateY(-8px) scale(0.95);
+  }
 }
 
 .nav-actions {
@@ -813,7 +863,9 @@ watch(
 .user-menu {
   right: 0;
   left: auto;
-  transform: none;
+  --transform-base: translateY(0) scale(1);
+  transform: var(--transform-base);
+  transform-origin: top right;
   min-width: 220px;
 }
 
@@ -865,7 +917,7 @@ watch(
 .register-link-btn {
   width: 100%;
   padding: 10px 20px;
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--border-radius-md);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
