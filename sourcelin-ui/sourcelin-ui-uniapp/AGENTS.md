@@ -37,14 +37,16 @@ Sourcelin Liquid Glass Mobile 设计语言
 ## 3. 目录约定
 
 ```text
-src/pages/**              # Tab 页面：首页、发现、社区、我的
-src/pages-article/**      # 文章详情、列表、搜索
-src/pages-user/**         # 登录、资料、收藏、关注、用户主页
-src/pages-messages/**     # 消息中心
-src/pages-about/**        # 关于、友链、导航
-src/pages-publish/**      # 发布说说、树洞
+src/pages/**              # Tab 页面：首页、发现、社区、我的（主包）
+src/pages-article/**      # 文章详情、列表、搜索（分包）
+src/pages-user/**         # 登录、资料、收藏、关注、用户主页（分包）
+src/pages-messages/**     # 消息中心（分包）
+src/pages-about/**        # 关于、友链、导航（分包）
+src/pages-publish/**      # 发布说说、树洞（分包）
 src/modules/**            # 业务域 API、types、composables、utils
 src/components/s-*/       # easycom 自动注册的通用组件
+src/shared/composables/   # 跨模块共享 composable（useThrottledPageScroll 等）
+src/shared/api/           # 跨模块共享 API（auth、file、http）
 src/stores/**             # Pinia 全局状态
 src/utils/**              # request、auth、storage、RSA 等基础能力
 src/config/env.ts         # 域名、API 前缀和运行环境
@@ -52,21 +54,44 @@ src/styles/**             # 设计 token、mixin、全局样式
 src/static/**             # tabbar、图片等静态资源
 ```
 
+## 4. 分包配置
+
+`src/pages.json` 已配置分包，主包仅保留 4 个 Tab 页面：
+
+| 包 | root | 页面数 | 说明 |
+|---|---|---|---|
+| 主包 | — | 4 | 首页、发现、社区、我的 |
+| pages-article | pages-article | 3 | 文章详情、列表、搜索 |
+| pages-user | pages-user | 8 | 登录、资料、设置、互动、收藏、关注、文章、用户主页 |
+| pages-messages | pages-messages | 2 | 消息中心、消息详情 |
+| pages-about | pages-about | 5 | 关于、协议、政策、友链、导航 |
+| pages-publish | pages-publish | 3 | 发布说说、树洞、写文章 |
+
+分包预加载规则（`preloadRule`）：
+- 首页 → 预加载 pages-article
+- 我的 → 预加载 pages-user
+- 发现 → 预加载 pages-about
+
+新增页面时必须判断归属：Tab 页入主包 `pages`，其余入对应 `subPackages`。新增分包 root 必须是 `src/` 下真实存在的目录。
+
 ## 4. API 规则
 
 - 移动端 API 基础地址由 `src/config/env.ts` 统一控制，当前远程域名为 `https://sourcelin.cn`。
 - 移动端前台接口前缀为 `/blog-api`。
 - 移动端登录使用 `/auth/captcha`、`/auth/login`，`loginType` 固定为 `mini`。
-- 当前用户资料使用 `/front/user/info`、`/front/user/profile`。
+- 当前用户资料使用 `/front/user/info`、`/front/user/profile`，从 `@/modules/user/api/user.api` 导入。
 - 页面和业务 composable 不得直接调用 `uni.request`，必须经过 `src/utils/request.ts`。
 - 禁止移动端调用 `/prod-api/**`、`/system/**`、`/blog/admin/**` 等管理域接口。
 - 禁止读取旧响应字段 `msg/rows/records/list/pageNum/limit` 或判断 `code === 200`。
+- 401 处理统一通过 `handle401()`（`src/utils/auth.ts`），禁止在请求层或页面自行调用 `clearToken` + 跳登录页。
+- 登录成功后必须调用 `reset401Guard()` 重置 401 去重标志位。
 
 ## 5. 页面与小程序配置
 
-- 新增页面必须同步维护 `src/pages.json`。
+- 新增页面必须同步维护 `src/pages.json`：Tab 页放入顶层 `pages`，业务页放入对应 `subPackages`。
 - 新增 Tab 必须同步提供普通和选中图标，放入 `src/static/tabbar/**`。
 - `subPackages[].root` 必须是真实目录；若页面不在分包 root 下，不得强行配置分包。
+- 主包仅保留 4 个 Tab 页面，其余页面必须归入分包以控制主包体积（微信限制 2MB）。
 - 小程序页面跳转只能使用 `uni.navigateTo`、`uni.redirectTo`、`uni.switchTab`、`uni.navigateBack`。
 - 禁止使用 Vue Router、浏览器 History API、`window`、`document`、`localStorage`。
 
@@ -100,6 +125,16 @@ npm run build:h5
 ```text
 sourcelin-ui/sourcelin-ui-uniapp/dist/build/mp-weixin
 ```
+
+构建后验证主包体积：主包必须 < 2MB，子包各 < 2MB。
+
+## 8. 性能约定
+
+- `onPageScroll` 必须使用 `useThrottledPageScroll`（`src/shared/composables/useThrottledPageScroll`），禁止直接在页面中逐像素写响应式状态。
+- 模板中避免对同一 item 重复调用解析函数（如 resolveImages/resolveAvatar），应预计算为 computed Map。
+- 用 `shallowRef` + `Set.add()` + `triggerRef()` 管理 brokenUrl/brokenId 等累积集合，禁止 `new Set([...old, val])` 重建。
+- 长列表按真机性能评估是否引入虚拟滚动，不以 Web 端表现为唯一依据。
+- `backdrop-filter` 仅在 H5/App 条件编译中使用，同屏不超过 1 个活跃 blur 层。
 
 ## 8. 禁止事项
 

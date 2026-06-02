@@ -30,6 +30,8 @@
 ## 3. 页面、路由与小程序配置
 
 - MUST：新增页面必须同步登记到 `src/pages.json`。
+- MUST：新增页面必须正确归入主包或分包：Tab 页放入顶层 `pages`，业务页放入对应 `subPackages`（pages-article/pages-user/pages-messages/pages-about/pages-publish）。
+- MUST：主包仅保留 4 个 Tab 页面（首页、发现、社区、我的），主包体积必须 < 2MB。
 - MUST：新增 Tab 时必须同时提供普通和选中态图标，路径放在 `src/static/tabbar/**`，尺寸和体积满足微信小程序要求。
 - MUST：微信小程序分包只允许使用真实存在的目录作为 `subPackages[].root`。
 - MUST：分包页面路径必须位于分包 root 目录下；不满足该条件时保持普通页面注册，避免微信开发者工具报 root 非目录。
@@ -37,7 +39,8 @@
 - MUST：下拉刷新、上拉加载和返回顶部等移动端交互使用 Uniapp 生命周期或页面事件实现。
 - MUST NOT：使用 Vue Router、浏览器 History API 或动态路由能力实现小程序页面跳转。
 - MUST NOT：在小程序端直接访问 `window`、`document`、`localStorage`、`sessionStorage`。
-- CHECK：路由、Tab、分包或 manifest 改动后执行 `npm run build:mp-weixin`，并检查输出 `dist/build/mp-weixin/app.json`。
+- MUST NOT：在 `pages.json` 顶层 `pages` 中注册非 Tab 页面，避免主包膨胀超 2MB。
+- CHECK：路由、Tab、分包或 manifest 改动后执行 `npm run build:mp-weixin`，并检查输出 `dist/build/mp-weixin/app.json` 和主包体积。
 
 ## 4. UI 与液态玻璃移动端规范
 
@@ -55,9 +58,14 @@
 
 - MUST：列表请求使用分页，分页参数使用 `page/pageSize`，返回读取 `items/total/page/pageSize/totalPages`。
 - MUST：首页、文章列表、搜索、社区流等高频列表保留下拉刷新、上拉加载、加载态和到底态。
+- MUST：`onPageScroll` 使用 `useThrottledPageScroll`（`src/shared/composables/useThrottledPageScroll`），禁止直接逐像素写响应式状态。
 - MUST：图片使用合适尺寸、懒加载或缩略图策略；Tab 图标和静态资源必须控制体积。
 - MUST：登录 Token、用户信息和轻量缓存通过 `src/utils/storage.ts` 或封装层访问。
 - MUST：需要平台差异能力时使用 Uniapp 条件编译，并保证微信小程序为优先验证平台。
 - MUST：微信正式小程序上线前必须确认 request 合法域名、隐私协议、授权弹窗和 HTTPS 要求。
+- MUST：401 处理统一通过 `handle401()`（`src/utils/auth.ts`），禁止页面或请求层自行重复调用 `clearToken` + 跳登录页。
+- MUST：登录成功后调用 `reset401Guard()` 重置 401 去重标志位。
+- MUST：模板中禁止对同一 item 重复调用解析函数（如 resolveImages/resolveAvatar），应预计算为 computed Map 后查表取值。
+- MUST：累积集合（brokenUrl/brokenId 等）使用 `shallowRef` + `Set.add()` + `triggerRef()`，禁止 `new Set([...old, val])` 全量重建。
 - MUST NOT：为了移动端首版引入 WebSocket、复杂推荐算法或大体积富文本组件，除非任务明确要求并评估包体积。
 - CHECK：发布前执行 `npm run lint`、`npm run type-check`、`npm run build:mp-weixin`；涉及 H5 输出时追加 `npm run build:h5`。

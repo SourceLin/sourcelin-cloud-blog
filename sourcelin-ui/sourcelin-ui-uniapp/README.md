@@ -13,7 +13,7 @@ sourcelin-ui-uniapp/
 ├── vite.config.ts
 ├── src/
 │   ├── App.vue            # 全局生命周期入口
-│   ├── pages.json         # 页面注册、tabBar、分包、easycom
+│   ├── pages.json         # 页面注册、tabBar、分包、easycom、preloadRule
 │   ├── manifest.json      # Uniapp / 微信小程序平台配置
 │   ├── main.ts            # createSSRApp + Pinia
 │   ├── env.d.ts           # 类型声明（含 @dcloudio/types）
@@ -23,22 +23,30 @@ sourcelin-ui-uniapp/
 │   ├── config/
 │   │   └── env.ts         # 多环境 baseURL（按 envVersion 切换）
 │   ├── utils/
-│   │   ├── request.ts     # 网络层：拦截器、错误归一、Token 注入、上传
-│   │   ├── auth.ts        # Token 与登录态
+│   │   ├── request.ts     # 网络层：拦截器、错误归一、Token 注入、上传、AbortSignal 清理
+│   │   ├── auth.ts        # Token、登录态、401 去重、待办动作内存队列
 │   │   ├── error.ts       # ApiResponse / PageResult / 错误类
 │   │   └── storage.ts     # uni.storage 封装
 │   ├── stores/
 │   │   ├── user.ts        # 登录态、待执行动作队列
-│   │   └── app.ts         # 系统信息、站点配置、未读数
+│   │   ├── app.ts         # 系统信息、站点配置、未读数
+│   │   └── theme.ts       # 主题模式（跟随系统/浅/暗）、Native 颜色同步
 │   ├── components/
-│   │   └── s-empty/       # 空状态占位（easycom 自动注册）
-│   ├── pages/
-│   │   ├── home/home.vue
-│   │   ├── discover/discover.vue
-│   │   ├── community/community.vue
-│   │   └── mine/mine.vue
+│   │   └── s-*/           # easycom 自动注册的通用组件（s-empty、s-loading、s-back-to-top 等）
+│   ├── shared/
+│   │   ├── api/           # 跨模块共享 API（auth、file、http）
+│   │   ├── composables/   # 跨模块共享 composable（useBackToTop、useKeyboardInset、useThrottledPageScroll）
+│   │   ├── types/         # 共享类型（ApiResponse、PageResult、ListResult）
+│   │   └── utils/         # 共享工具（analytics、pending-actions、seo、user-mapper）
+│   ├── modules/           # 业务域（article/auth/user/comment/community/interaction/message/site/subscription/report）
+│   ├── pages/             # 主包 Tab 页面（home、discover、community、mine）
+│   ├── pages-article/     # 分包：文章详情、列表、搜索
+│   ├── pages-user/        # 分包：登录、资料、设置、互动、收藏、关注、文章、用户主页
+│   ├── pages-messages/    # 分包：消息中心、消息详情
+│   ├── pages-about/       # 分包：关于、协议、政策、友链、导航
+│   ├── pages-publish/     # 分包：发布说说、树洞、写文章
 │   └── static/
-│       └── tabbar/        # tabBar 图标占位
+│       └── tabbar/        # tabBar 图标
 └── README.md
 ```
 
@@ -85,8 +93,29 @@ npm run dev:h5          # 浏览器调试
   - `PageResult<T> = { items, total, page, pageSize, totalPages }`。
   - 业务页面禁止消费 `msg/rows/records/list/pageNum/limit`，禁止判断 `code === 200`。
 - 业务页面禁止直连 `uni.request` / `uni.uploadFile`，必须经由 [`src/utils/request.ts`](src/utils/request.ts)。
-- 复杂列表分页、表单提交、登录引导封装到 `src/composables/**`（按业务域拆分）。
-- 组件使用 `S` 前缀（`s-empty`、`s-card`...），通过 `pages.json` 的 `easycom` 自动注册。
+- 401 处理统一通过 `handle401()`（[`src/utils/auth.ts`](src/utils/auth.ts)），禁止页面自行调用 `clearToken` + 跳登录页。
+- 登录成功后必须调用 `reset401Guard()` 重置 401 去重标志位。
+- 用户资料 API 从 `@/modules/user/api/user.api` 导入，认证 API 从 `@/shared/api/auth.api` 导入。
+- 复杂列表分页、表单提交、登录引导封装到 `src/modules/<domain>/composables/**`。
+- 组件使用 `S` 前缀（`s-empty`、`s-loading`、`s-back-to-top`...），通过 `pages.json` 的 `easycom` 自动注册。
+- `onPageScroll` 必须使用 `useThrottledPageScroll`，禁止直接逐像素写响应式状态。
+
+## 四、分包配置
+
+`src/pages.json` 已配置分包加载，主包仅保留 4 个 Tab 页面：
+
+| 包 | root | 页面数 | 预加载触发 |
+|---|---|---|---|
+| 主包 | — | 4 | — |
+| pages-article | pages-article | 3 | 首页 |
+| pages-user | pages-user | 8 | 我的 |
+| pages-messages | pages-messages | 2 | — |
+| pages-about | pages-about | 5 | 发现 |
+| pages-publish | pages-publish | 3 | — |
+
+- 新增页面时：Tab 页入主包 `pages`，业务页入对应 `subPackages`。
+- 主包体积限制 2MB，子包各限制 2MB。
+- 构建后验证：`npm run build:mp-weixin`，检查 `dist/build/mp-weixin/` 主包大小。
 
 ## 四、验证命令
 
@@ -100,5 +129,7 @@ npm run build:h5         # H5 生产构建
 ## 五、当前闭环范围
 
 - 已完成前置篇与产品文档 `5.1` 的 8 个阶段闭环，推文与发布口径统一以 `docs/promotion/wxapp/**` 为准。
-- `pages-article`、`pages-user`、`pages-messages`、`pages-about`、`pages-publish` 已承载真实页面，不再作为占位目录描述。
-- 后续增量以体验优化、运维发布和证据补录为主，不再回退到“初始化脚手架”口径。
+- `pages-article`、`pages-user`、`pages-messages`、`pages-about`、`pages-publish` 已配置为微信小程序分包，主包仅含 4 个 Tab 页面。
+- 请求层 401 已统一去重（`handle401`），待办动作已改为内存队列优先避免 TOCTOU 竞态。
+- `onPageScroll` 已全量替换为 `useThrottledPageScroll` rAF 节流。
+- 后续增量以体验优化、运维发布和证据补录为主，不再回退到”初始化脚手架”口径。
