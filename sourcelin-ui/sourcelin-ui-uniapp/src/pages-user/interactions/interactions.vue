@@ -49,48 +49,76 @@
 
       <view v-else class="interactions__list">
         <template v-if="activeTab !== 'comment'">
-          <view
-            v-for="item in targetItems"
-            :key="`${activeTab}-${item.id}`"
-            class="interactions__item s-card s-card--interactive"
-            @tap="openTarget(item)"
-          >
-            <view class="interactions__item-top">
-              <view class="interactions__badge" :class="`interactions__badge--${item.targetType}`">
-                {{ targetTextMap[item.targetType] }}
-              </view>
-              <view class="interactions__time">{{ formatTime(item.createTime) }}</view>
+          <uni-swipe-action>
+            <view
+              v-for="item in targetItems"
+              :key="`${activeTab}-${item.id}`"
+              class="interactions__swipe-row"
+            >
+              <uni-swipe-action-item class="interactions__swipe-item">
+                <view
+                  class="interactions__item s-card s-card--interactive"
+                  @click="openTarget(item)"
+                >
+                  <view class="interactions__item-top">
+                    <view class="interactions__badge" :class="`interactions__badge--${item.targetType}`">
+                      {{ targetTextMap[item.targetType] }}
+                    </view>
+                    <view class="interactions__time">{{ formatTime(item.createTime) }}</view>
+                  </view>
+                  <view class="interactions__item-title s-ellipsis-2">{{ getInteractionTitle(item) }}</view>
+                  <view class="interactions__item-summary s-ellipsis-2">{{ getInteractionSummary(item) }}</view>
+                  <view class="interactions__item-meta">
+                    <text>{{ getInteractionMeta(item) }}</text>
+                  </view>
+                </view>
+                <template #right>
+                  <view class="interactions__delete-action" @tap.stop="handleDeleteAction(item)">
+                    <uni-icons type="trash" size="18" color="#fff" />
+                    <text>删除</text>
+                  </view>
+                </template>
+              </uni-swipe-action-item>
             </view>
-            <view class="interactions__item-title s-ellipsis-2">{{ getInteractionTitle(item) }}</view>
-            <view class="interactions__item-summary s-ellipsis-2">{{ getInteractionSummary(item) }}</view>
-            <view class="interactions__item-meta">
-              <text>{{ getInteractionMeta(item) }}</text>
-            </view>
-          </view>
+          </uni-swipe-action>
         </template>
 
         <template v-else>
-          <view
-            v-for="item in commentItems"
-            :key="`comment-${item.id}`"
-            class="interactions__item s-card s-card--interactive"
-            @tap="openComment(item)"
-          >
-            <view class="interactions__item-top">
-              <view class="interactions__badge" :class="`interactions__badge--${item.targetType || 'article'}`">
-                {{ targetTextMap[(item.targetType || 'article') as InteractionTargetType] }}
-              </view>
-              <view class="interactions__status" :class="`interactions__status--${item.status ?? 0}`">
-                {{ getCommentStatusText(item.status) }}
-              </view>
+          <uni-swipe-action>
+            <view
+              v-for="item in commentItems"
+              :key="`comment-${item.id}`"
+              class="interactions__swipe-row"
+            >
+              <uni-swipe-action-item class="interactions__swipe-item">
+                <view
+                  class="interactions__item s-card s-card--interactive"
+                  @click="openComment(item)"
+                >
+                  <view class="interactions__item-top">
+                    <view class="interactions__badge" :class="`interactions__badge--${item.targetType || 'article'}`">
+                      {{ targetTextMap[(item.targetType || 'article') as InteractionTargetType] }}
+                    </view>
+                    <view class="interactions__status" :class="`interactions__status--${item.status ?? 0}`">
+                      {{ getCommentStatusText(item.status) }}
+                    </view>
+                  </view>
+                  <view class="interactions__item-title s-ellipsis-2">{{ item.targetTitle || '关联内容' }}</view>
+                  <view class="interactions__item-summary s-ellipsis-2">{{ item.content }}</view>
+                  <view class="interactions__item-meta">
+                    <text>{{ formatTime(item.createTime) }}</text>
+                    <text v-if="item.parentNickname">回复 {{ item.parentNickname }}</text>
+                  </view>
+                </view>
+                <template #right>
+                  <view class="interactions__delete-action" @tap.stop="handleDeleteAction(item)">
+                    <uni-icons type="trash" size="18" color="#fff" />
+                    <text>删除</text>
+                  </view>
+                </template>
+              </uni-swipe-action-item>
             </view>
-            <view class="interactions__item-title s-ellipsis-2">{{ item.targetTitle || '关联内容' }}</view>
-            <view class="interactions__item-summary s-ellipsis-2">{{ item.content }}</view>
-            <view class="interactions__item-meta">
-              <text>{{ formatTime(item.createTime) }}</text>
-              <text v-if="item.parentNickname">回复 {{ item.parentNickname }}</text>
-            </view>
-          </view>
+          </uni-swipe-action>
         </template>
 
         <s-loading v-if="loading && !isEmpty" :visible="true" :fullpage="false" compact text="正在加载更多..." />
@@ -104,14 +132,14 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { onLoad, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app';
+import { onLoad, onPageScroll, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app';
 import {
   getCommentStatusText,
   getInteractionMeta,
   getInteractionSummary,
   getInteractionTitle,
   useMyInteractions
-} from '@/modules/interaction/composables/useMyInteractions';
+} from '../modules/interaction/composables/useMyInteractions';
 import type {
   CollectItem,
   CollectTargetSummary,
@@ -124,10 +152,12 @@ import type {
 import { useBackToTop } from '@/shared/composables/useBackToTop';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
+import { uncollectTarget, unlikeTarget } from '@/modules/interaction/api/interaction.api';
+import { deleteComment } from '@/modules/comment/api/comment.api';
 
 const userStore = useUserStore();
 const themeStore = useThemeStore();
-const { backToTopVisible } = useBackToTop();
+const { backToTopVisible, handlePageScroll } = useBackToTop();
 
 const mainTabs: Array<{ label: string; value: InteractionTab }> = [
   { label: '收藏', value: 'collect' },
@@ -210,6 +240,8 @@ onReachBottom(() => {
   void loadMore();
 });
 
+onPageScroll(handlePageScroll);
+
 function goLogin(): void {
   uni.navigateTo({ url: '/pages-user/login/login' });
 }
@@ -246,6 +278,40 @@ function openComment(item: MyCommentItem): void {
 function formatTime(value?: string): string {
   if (!value) return '刚刚';
   return value.slice(0, 10);
+}
+
+async function handleDeleteAction(item: CollectItem<CollectTargetSummary> | LikeItem<CollectTargetSummary> | MyCommentItem): Promise<void> {
+  const confirmed = await new Promise<boolean>((resolve) => {
+    uni.showModal({
+      title: '提示',
+      content: activeTab.value === 'collect'
+        ? '确认取消收藏吗？'
+        : activeTab.value === 'like'
+          ? '确认取消点赞吗？'
+          : '确认删除该评论吗？',
+      success: (res) => resolve(!!res.confirm),
+      fail: () => resolve(false)
+    });
+  });
+  if (!confirmed) return;
+
+  try {
+    if (activeTab.value === 'collect') {
+      const collectItem = item as CollectItem<CollectTargetSummary>;
+      await uncollectTarget(collectItem.targetType, collectItem.targetId);
+      uni.showToast({ title: '取消收藏成功', icon: 'success' });
+    } else if (activeTab.value === 'like') {
+      const likeItem = item as LikeItem<CollectTargetSummary>;
+      await unlikeTarget(likeItem.targetType, likeItem.targetId);
+      uni.showToast({ title: '取消点赞成功', icon: 'success' });
+    } else {
+      await deleteComment(item.id);
+      uni.showToast({ title: '评论已删除', icon: 'success' });
+    }
+    await refresh();
+  } catch {
+    // 接口层已报错提示
+  }
 }
 </script>
 
@@ -321,7 +387,6 @@ function formatTime(value?: string): string {
   &__list {
     display: flex;
     flex-direction: column;
-    gap: $space-sm;
   }
 
   &__item {
@@ -405,6 +470,52 @@ function formatTime(value?: string): string {
     padding: $space-md 0 $space-lg;
     font-size: 24rpx;
     color: $color-text-tertiary;
+  }
+
+  &__swipe-row {
+    margin-bottom: $space-sm;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__swipe-item {
+    background: transparent;
+    border-radius: $glass-radius-main;
+    overflow: hidden;
+  }
+
+  &__delete-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8rpx;
+    width: 132rpx;
+    height: 100%;
+    min-height: 100%;
+    color: #ffffff;
+    font-size: 25rpx;
+    font-weight: 800;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03)),
+      rgba(245, 63, 63, 0.82);
+    border-left: 1rpx solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      inset 10rpx 0 30rpx rgba(255, 255, 255, 0.06),
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.16);
+
+    /* #ifdef H5 || APP-PLUS */
+    backdrop-filter: blur(12rpx) saturate(1.2);
+    -webkit-backdrop-filter: blur(12rpx) saturate(1.2);
+    /* #endif */
+
+    .sl-theme--dark & {
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+        rgba(244, 63, 94, 0.72);
+      border-left-color: rgba(255, 255, 255, 0.1);
+    }
   }
 }
 </style>

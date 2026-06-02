@@ -1,5 +1,5 @@
 import { getStorage, setStorage } from '@/utils/storage';
-import type { SubscribeAuthorizationStatus } from '@/modules/subscription/api/subscription.api';
+import type { SubscribeAuthorizationStatus } from '../api/subscription.api';
 
 const SUBSCRIPTION_STATUS_STORAGE_KEY = 'subscription.authorization.status';
 

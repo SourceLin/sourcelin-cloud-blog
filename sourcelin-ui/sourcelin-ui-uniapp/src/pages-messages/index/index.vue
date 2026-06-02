@@ -103,8 +103,8 @@ import { onLoad, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { showSuccessToast } from '@/utils/feedback';
-import { useMessageCenter } from '@/modules/message/composables/useMessageCenter';
-import type { MessageChannel } from '@/modules/message/config/channels';
+import { useMessageCenter } from '../modules/message/composables/useMessageCenter';
+import type { MessageChannel } from '../modules/message/config/channels';
 import type { MessageItem } from '@/modules/message/types/message';
 
 const userStore = useUserStore();

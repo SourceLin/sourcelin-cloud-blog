@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue';
-import { fetchAboutInfo, fetchSiteBrandInfo } from '@/modules/site/api/site.api';
+import { fetchAboutInfo, fetchSiteBrandInfo } from '../api/site.api';
 import type {
   AboutContactItem,
   AboutFactItem,

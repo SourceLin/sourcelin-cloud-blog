@@ -33,140 +33,133 @@
       "style": {
         "navigationStyle": "custom"
       }
-    },
-    {
-      "path": "pages-article/detail/detail",
-      "style": {
-        "navigationBarTitleText": "文章详情"
-      }
-    },
-    {
-      "path": "pages-article/list/list",
-      "style": {
-        "navigationBarTitleText": "文章列表",
-        "enablePullDownRefresh": true
-      }
-    },
-    {
-      "path": "pages-article/search/search",
-      "style": {
-        "navigationBarTitleText": "搜索"
-      }
-    },
-    {
-      "path": "pages-user/login/login",
-      "style": {
-        "navigationBarTitleText": "登录"
-      }
-    },
-    {
-      "path": "pages-user/profile/profile",
-      "style": {
-        "navigationBarTitleText": "个人资料"
-      }
-    },
-    {
-      "path": "pages-user/settings/settings",
-      "style": {
-        "navigationBarTitleText": "体验设置"
-      }
-    },
-    {
-      "path": "pages-user/interactions/interactions",
-      "style": {
-        "navigationBarTitleText": "我的互动",
-        "enablePullDownRefresh": true
-      }
-    },
-    {
-      "path": "pages-user/collects/collects",
-      "style": {
-        "navigationBarTitleText": "我的收藏",
-        "enablePullDownRefresh": true
-      }
-    },
-    {
-      "path": "pages-user/follows/follows",
-      "style": {
-        "navigationBarTitleText": "关注与粉丝",
-        "enablePullDownRefresh": true
-      }
-    },
-    {
-      "path": "pages-user/articles/articles",
-      "style": {
-        "navigationBarTitleText": "我的文章",
-        "enablePullDownRefresh": true
-      }
-    },
-    {
-      "path": "pages-user/home/home",
-      "style": {
-        "navigationBarTitleText": "用户主页"
-      }
-    },
-    {
-      "path": "pages-messages/index/index",
-      "style": {
-        "navigationBarTitleText": "消息中心",
-        "enablePullDownRefresh": true
-      }
-    },
-    {
-      "path": "pages-messages/detail/detail",
-      "style": {
-        "navigationBarTitleText": "消息详情"
-      }
-    },
-    {
-      "path": "pages-about/index/index",
-      "style": {
-        "navigationBarTitleText": "关于本站"
-      }
-    },
-    {
-      "path": "pages-about/policies/policies",
-      "style": {
-        "navigationBarTitleText": "协议与政策"
-      }
-    },
-    {
-      "path": "pages-about/policy/policy",
-      "style": {
-        "navigationBarTitleText": "政策详情"
-      }
-    },
-    {
-      "path": "pages-about/links/links",
-      "style": {
-        "navigationBarTitleText": "友情链接"
-      }
-    },
-    {
-      "path": "pages-about/navigation/navigation",
-      "style": {
-        "navigationBarTitleText": "网站导航"
-      }
-    },
-    {
-      "path": "pages-publish/say/say",
-      "style": {
-        "navigationBarTitleText": "发布说说"
-      }
-    },
-    {
-      "path": "pages-publish/treehole/treehole",
-      "style": {
-        "navigationBarTitleText": "树洞投递"
-      }
-    },
-    {
-      "path": "pages-publish/article/article",
-      "style": {
-        "navigationBarTitleText": "写文章"
-      }
     }
   ],
+  "subPackages": [
+    {
+      "root": "pages-article",
+      "pages": [
+        {
+          "path": "detail/detail",
+          "style": { "navigationBarTitleText": "文章详情" }
+        },
+        {
+          "path": "list/list",
+          "style": { "navigationBarTitleText": "文章列表", "enablePullDownRefresh": true }
+        },
+        {
+          "path": "search/search",
+          "style": { "navigationBarTitleText": "搜索" }
+        }
+      ]
+    },
+    {
+      "root": "pages-user",
+      "pages": [
+        {
+          "path": "login/login",
+          "style": { "navigationBarTitleText": "登录" }
+        },
+        {
+          "path": "profile/profile",
+          "style": { "navigationBarTitleText": "个人资料" }
+        },
+        {
+          "path": "settings/settings",
+          "style": { "navigationBarTitleText": "体验设置" }
+        },
+        {
+          "path": "interactions/interactions",
+          "style": { "navigationBarTitleText": "我的互动", "enablePullDownRefresh": true }
+        },
+        {
+          "path": "collects/collects",
+          "style": { "navigationBarTitleText": "我的收藏", "enablePullDownRefresh": true }
+        },
+        {
+          "path": "follows/follows",
+          "style": { "navigationBarTitleText": "关注与粉丝", "enablePullDownRefresh": true }
+        },
+        {
+          "path": "articles/articles",
+          "style": { "navigationBarTitleText": "我的文章", "enablePullDownRefresh": true }
+        },
+        {
+          "path": "home/home",
+          "style": { "navigationBarTitleText": "用户主页" }
+        }
+      ]
+    },
+    {
+      "root": "pages-messages",
+      "pages": [
+        {
+          "path": "index/index",
+          "style": { "navigationBarTitleText": "消息中心", "enablePullDownRefresh": true }
+        },
+        {
+          "path": "detail/detail",
+          "style": { "navigationBarTitleText": "消息详情" }
+        }
+      ]
+    },
+    {
+      "root": "pages-about",
+      "pages": [
+        {
+          "path": "index/index",
+          "style": { "navigationBarTitleText": "关于本站" }
+        },
+        {
+          "path": "policies/policies",
+          "style": { "navigationBarTitleText": "协议与政策" }
+        },
+        {
+          "path": "policy/policy",
+          "style": { "navigationBarTitleText": "政策详情" }
+        },
+        {
+          "path": "links/links",
+          "style": { "navigationBarTitleText": "友情链接" }
+        },
+        {
+          "path": "navigation/navigation",
+          "style": { "navigationBarTitleText": "网站导航" }
+        }
+      ]
+    },
+    {
+      "root": "pages-publish",
+      "pages": [
+        {
+          "path": "say/say",
+          "style": { "navigationBarTitleText": "发布说说" }
+        },
+        {
+          "path": "treehole/treehole",
+          "style": { "navigationBarTitleText": "树洞投递" }
+        },
+        {
+          "path": "article/article",
+          "style": { "navigationBarTitleText": "写文章" }
+        }
+      ]
+    }
+  ],
+  "preloadRule": {
+    "pages/home/home": {
+      "network": "all",
+      "packages": ["pages-article"]
+    },
+    "pages/mine/mine": {
+      "network": "all",
+      "packages": ["pages-user"]
+    },
+    "pages/discover/discover": {
+      "network": "all",
+      "packages": ["pages-about"]
+    }
+  },
   "globalStyle": {
     "navigationBarTextStyle": "@navigationBarTextStyle",
     "navigationBarTitleText": "Sourcelin",

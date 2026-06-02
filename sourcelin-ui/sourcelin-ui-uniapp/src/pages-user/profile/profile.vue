@@ -88,7 +88,7 @@ import { mapFrontUserInfo } from '@/shared/utils/user-mapper';
 import { useUserStore, type UserInfo } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
-import { pickSingleImagePath } from '@/utils/media';
+import { pickSingleImagePath } from '../modules/utils/media';
 import { normalizeAssetUrl } from '@/utils/url';
 
 const userStore = useUserStore();

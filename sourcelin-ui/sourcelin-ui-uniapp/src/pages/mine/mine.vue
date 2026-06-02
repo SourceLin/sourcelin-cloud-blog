@@ -228,21 +228,22 @@ import {
 } from '@/shared/api/auth.api';
 import type { CaptchaInfo, LoginToken } from '@/modules/auth/types/auth';
 import { fetchUnreadMessageCount } from '@/modules/message/api/message.api';
-import { fetchCurrentUserInfo } from '@/shared/api/user.api';
+import { fetchCurrentUserInfo } from '@/modules/user/api/user.api';
 import { hideNativeTabbar, liquidTabItems, switchLiquidTab } from '@/shared/utils/liquid-tabbar';
 import { replayPendingAction } from '@/shared/utils/pending-actions';
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { mapFrontUserInfo } from '@/shared/utils/user-mapper';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
-import { AUTH_LOGIN_SUCCESS_EVENT, type LoginSuccessEventDetail } from '@/utils/auth';
+import { AUTH_LOGIN_SUCCESS_EVENT, reset401Guard, type LoginSuccessEventDetail } from '@/utils/auth';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 import { normalizeAssetUrl } from '@/utils/url';
-import type { LegalArticleType } from '@/modules/site/constants/legal';
+import type { LegalArticleType } from '@/modules/site/types/legal';
+import { useBackToTop } from '@/shared/composables/useBackToTop';
 
 const userStore = useUserStore();
 const themeStore = useThemeStore();
-const backToTopVisible = ref(false);
+const { backToTopVisible, handlePageScroll } = useBackToTop();
 const activeTabPath = 'pages/mine/mine';
 const loginSheetVisible = ref(false);
 const agreementChecked = ref(false);
@@ -328,9 +329,7 @@ onShow(() => {
   refreshCurrentUser();
 });
 
-onPageScroll((event) => {
-  backToTopVisible.value = event.scrollTop > 360;
-});
+onPageScroll(handlePageScroll);
 
 async function refreshCurrentUser(): Promise<void> {
   if (!userStore.isLoggedIn) {
@@ -537,6 +536,7 @@ async function finalizeLogin(token: LoginToken, successTitle: string): Promise<v
   }
   const actions = userStore.consumePendingActions();
   await Promise.all(actions.map((action) => replayPendingAction(action).catch(() => undefined)));
+  reset401Guard();
   uni.$emit(AUTH_LOGIN_SUCCESS_EVENT, { actions } satisfies LoginSuccessEventDetail);
   const targetUrl = postLoginTargetUrl.value;
   postLoginTargetUrl.value = '';

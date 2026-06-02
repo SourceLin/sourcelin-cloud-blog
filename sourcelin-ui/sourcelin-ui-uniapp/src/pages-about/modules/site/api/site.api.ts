@@ -6,7 +6,7 @@ import type {
   FriendLinkItem,
   NavigationItem,
   SiteBrandInfo
-} from '../types/site';
+} from '@/modules/site/types/site';
 
 export function fetchAboutInfo(): Promise<AboutInfo> {
   return http.get<AboutInfo>('/front/config/about');

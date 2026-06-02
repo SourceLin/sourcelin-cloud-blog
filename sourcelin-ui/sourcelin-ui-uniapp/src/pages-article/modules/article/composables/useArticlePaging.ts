@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue';
 import type { PageResult } from '@/shared/types/api';
-import type { ArticleSummary } from '../types/article';
+import type { ArticleSummary } from '@/modules/article/types/article';
 
 export type ArticlePageFetcher = (
   page: number,

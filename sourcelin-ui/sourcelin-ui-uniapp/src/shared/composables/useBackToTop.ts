@@ -1,15 +1,19 @@
 import { computed, ref } from 'vue';
-import { onPageScroll } from '@dcloudio/uni-app';
+
+interface PageScrollEvent {
+  scrollTop: number;
+}
 
 export function useBackToTop(threshold = 360) {
   const backToTopVisible = ref(false);
 
-  onPageScroll((event) => {
+  function handlePageScroll(event: PageScrollEvent): void {
     backToTopVisible.value = event.scrollTop > threshold;
-  });
+  }
 
   return {
-    backToTopVisible
+    backToTopVisible,
+    handlePageScroll
   };
 }
 

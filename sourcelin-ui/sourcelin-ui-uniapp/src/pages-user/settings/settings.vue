@@ -92,9 +92,9 @@
 import { computed, reactive } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 import { env } from '@/config/env';
-import { createSubscribeAuthorization, type SubscribeAuthorizationStatus } from '@/modules/subscription/api/subscription.api';
-import { resolveSubscriptionTemplateMeta } from '@/modules/subscription/constants/templates';
-import { getSubscriptionStatusMap, saveSubscriptionStatus } from '@/modules/subscription/utils/subscription-status';
+import { createSubscribeAuthorization, type SubscribeAuthorizationStatus } from '../modules/subscription/api/subscription.api';
+import { resolveSubscriptionTemplateMeta } from '../modules/subscription/constants/templates';
+import { getSubscriptionStatusMap, saveSubscriptionStatus } from '../modules/subscription/utils/subscription-status';
 import { getUserPreferences, updateUserPreferences } from '@/shared/utils/preferences';
 import { useThemeStore, type ThemeMode } from '@/stores/theme';
 import { useUserStore } from '@/stores/user';
@@ -305,13 +305,29 @@ function resolveTemplateStatusLabel(templateId: string): string {
 
   &__segmented {
     display: flex;
-    background: rgba(148, 163, 184, 0.12);
-    border-radius: 20rpx;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.82)),
+      var(--sl-bg-glass-tint);
+    border: 1rpx solid rgba(255, 255, 255, 0.88);
+    box-shadow:
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.96),
+      0 8rpx 20rpx rgba(17, 24, 39, 0.04);
+    border-radius: 999rpx;
     padding: 8rpx;
     box-sizing: border-box;
 
+    /* #ifdef H5 || APP-PLUS */
+    backdrop-filter: blur(14rpx) saturate(1.2);
+    -webkit-backdrop-filter: blur(14rpx) saturate(1.2);
+    /* #endif */
+
     .sl-theme--dark & {
-      background: rgba(8, 13, 24, 0.36);
+      background:
+        linear-gradient(145deg, rgba(24, 27, 38, 0.92), rgba(18, 20, 28, 0.88));
+      border-color: var(--sl-border-light);
+      box-shadow:
+        inset 0 1rpx 0 rgba(255, 255, 255, 0.06),
+        0 8rpx 20rpx rgba(0, 0, 0, 0.24);
     }
   }
 
@@ -320,12 +336,13 @@ function resolveTemplateStatusLabel(templateId: string): string {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 72rpx;
-    border-radius: 14rpx;
+    height: 74rpx;
+    border-radius: 999rpx;
     font-size: 26rpx;
     font-weight: 700;
     color: var(--sl-text-sub);
-    transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.24s ease, color 0.24s ease, box-shadow 0.24s ease;
 
     &:active {
       transform: scale(0.97);
@@ -333,9 +350,22 @@ function resolveTemplateStatusLabel(templateId: string): string {
   }
 
   &__segmented-item--active {
-    background: linear-gradient(135deg, var(--sl-color-primary), var(--sl-color-primary-soft));
-    color: #fff;
-    box-shadow: 0 4rpx 12rpx rgba(59, 89, 255, 0.22);
+    color: var(--sl-color-primary);
+    background:
+      linear-gradient(135deg, var(--sl-control-bg-strong), var(--sl-control-bg)),
+      rgba(59, 89, 255, 0.08);
+    box-shadow:
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.92),
+      0 10rpx 28rpx rgba(59, 89, 255, 0.14);
+
+    .sl-theme--dark & {
+      color: var(--sl-color-primary-soft);
+      background: rgba(105, 129, 255, 0.08);
+      box-shadow:
+        inset 0 1rpx 0 rgba(255, 255, 255, 0.08),
+        inset 0 0 0 1rpx rgba(154, 176, 255, 0.1),
+        0 8rpx 18rpx rgba(105, 129, 255, 0.08);
+    }
   }
 
   &__mode-info {
@@ -376,30 +406,70 @@ function resolveTemplateStatusLabel(templateId: string): string {
     width: 92rpx;
     height: 54rpx;
     border-radius: 999rpx;
-    background: rgba(148, 163, 184, 0.34);
+    background: var(--sl-control-bg);
+    border: 1rpx solid var(--sl-control-border);
+    box-shadow:
+      inset 0 2rpx 4rpx rgba(0, 0, 0, 0.05),
+      0 1rpx 0 rgba(255, 255, 255, 0.9);
     flex-shrink: 0;
-    transition: background-color 0.2s ease;
-  }
+    transition: all 0.24s cubic-bezier(0.25, 0.8, 0.25, 1);
 
-  &__switch::after {
-    content: '';
-    position: absolute;
-    top: 5rpx;
-    left: 5rpx;
-    width: 44rpx;
-    height: 44rpx;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 6rpx 16rpx rgba(17, 24, 39, 0.12);
-    transition: left 0.2s ease, background-color 0.2s ease;
-  }
+    &::after {
+      content: '';
+      position: absolute;
+      top: 4rpx;
+      left: 4rpx;
+      width: 44rpx;
+      height: 44rpx;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow:
+        0 4rpx 10rpx rgba(17, 24, 39, 0.12),
+        inset 0 1rpx 0 rgba(255, 255, 255, 0.9);
+      transition: all 0.24s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
 
-  &__switch--active {
-    background: rgba(59, 89, 255, 0.42);
-  }
+    &--active {
+      background: rgba(59, 89, 255, 0.16);
+      border-color: rgba(59, 89, 255, 0.32);
+      box-shadow:
+        inset 0 1rpx 0 rgba(255, 255, 255, 0.1),
+        0 8rpx 20rpx rgba(59, 89, 255, 0.12);
 
-  &__switch--active::after {
-    left: 43rpx;
+      &::after {
+        left: 42rpx;
+        background: var(--sl-color-primary);
+        box-shadow:
+          0 6rpx 16rpx rgba(59, 89, 255, 0.35),
+          inset 0 1rpx 0 rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    .sl-theme--dark & {
+      background: rgba(8, 13, 24, 0.26);
+      border-color: var(--sl-border-light);
+      box-shadow: inset 0 2rpx 4rpx rgba(0, 0, 0, 0.24);
+
+      &::after {
+        background: #a8b2c8;
+        box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.3);
+      }
+
+      &--active {
+        background: rgba(105, 129, 255, 0.16);
+        border-color: rgba(105, 129, 255, 0.32);
+        box-shadow:
+          inset 0 1rpx 0 rgba(255, 255, 255, 0.05),
+          0 8rpx 20rpx rgba(105, 129, 255, 0.15);
+
+        &::after {
+          background: var(--sl-color-primary-soft);
+          box-shadow:
+            0 6rpx 16rpx rgba(105, 129, 255, 0.4),
+            inset 0 1rpx 0 rgba(255, 255, 255, 0.3);
+        }
+      }
+    }
   }
 
   &__action-chip {

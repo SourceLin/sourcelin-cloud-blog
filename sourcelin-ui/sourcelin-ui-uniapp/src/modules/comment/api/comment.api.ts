@@ -23,3 +23,7 @@ export function createComment(payload: CommentCreatePayload): Promise<void> {
 export function likeComment(id: number): Promise<void> {
   return http.post<void>(`/front/comments/like/${id}`);
 }
+
+export function deleteComment(id: number): Promise<void> {
+  return http.delete<void>(`/front/comments/${id}`);
+}

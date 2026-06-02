@@ -13,7 +13,6 @@
       <view class="discover__section discover__section--hot">
         <view class="discover__section-head">
           <view>
-            <text class="discover__section-kicker">Trending</text>
             <text class="discover__section-title">热门文章</text>
           </view>
           <view class="discover__more sl-button sl-button--ghost sl-button--sm" @tap="goHotList">查看全部</view>
@@ -43,9 +42,6 @@
               </view>
             </view>
           </view>
-          <view class="discover__featured-arrow">
-            <uni-icons type="right" size="16" color="rgba(255,255,255,0.8)" />
-          </view>
         </view>
 
         <!-- 第 2～5 名列表 -->
@@ -69,34 +65,42 @@
               </view>
             </view>
           </view>
-          <uni-icons class="discover__hot-arrow" type="right" size="15" color="currentColor" />
         </view>
       </view>
 
-      <!-- 核心分类板块 -->
+      <!-- 分类漫游板块 -->
       <view class="discover__section discover__section--categories">
         <view class="discover__section-head">
           <view>
-            <text class="discover__section-kicker">Categories</text>
-            <text class="discover__section-title">核心分类</text>
+            <text class="discover__section-title">分类漫游</text>
           </view>
           <view class="discover__more sl-button sl-button--ghost sl-button--sm" @tap="goSearch">搜索</view>
         </view>
-        <view v-if="categories.length > 0" class="discover__category-grid">
+        <view v-if="categories.length > 0" class="discover__category-mosaic">
+          <!-- 第 1 个分类：跨列大卡 -->
           <view
-            v-for="(item, idx) in categories"
+            v-if="categories[0]"
+            class="discover__category-hero discover__category-hero--0"
+            @tap="goCategory(categories[0].id)"
+          >
+            <view class="discover__category-hero-glow" />
+            <view class="discover__category-hero-body">
+              <view class="discover__category-hero-badge">
+                <uni-icons type="list" size="22" color="#fff" />
+              </view>
+              <text class="discover__category-hero-name">{{ categories[0].name }}</text>
+            </view>
+          </view>
+          <!-- 第 2～5 个分类：小卡 -->
+          <view
+            v-for="(item, idx) in categories.slice(1)"
             :key="item.id"
-            class="discover__category-card"
-            :class="`discover__category-card--${idx % 4}`"
+            class="discover__category-tile"
+            :class="`discover__category-tile--${idx % 4}`"
             @tap="goCategory(item.id)"
           >
-            <view class="discover__category-icon">
-              <uni-icons type="list" size="20" color="currentColor" />
-            </view>
-            <view class="discover__category-name">{{ item.name }}</view>
-            <view class="discover__category-arrow">
-              <uni-icons type="right" size="14" color="currentColor" />
-            </view>
+            <view class="discover__category-tile-dot" />
+            <text class="discover__category-tile-name">{{ item.name }}</text>
           </view>
         </view>
         <s-empty v-else-if="!loading" text="暂无分类" />
@@ -137,21 +141,22 @@ import { liquidTabItems, switchLiquidTab } from '@/shared/utils/liquid-tabbar';
 import { reportAnalyticsEvent, scoreCategoryInterest, sortItemsByInterest } from '@/shared/utils/analytics';
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { useThemeStore } from '@/stores/theme';
+import { useBackToTop } from '@/shared/composables/useBackToTop';
 
 const themeStore = useThemeStore();
 
 const loading = ref(false);
 const hotArticles = ref<ArticleSummary[]>([]);
 const categories = ref<CategoryItem[]>([]);
-const backToTopVisible = ref(false);
+const { backToTopVisible, handlePageScroll } = useBackToTop();
 const activeTabPath = 'pages/discover/discover';
 
 watch([hotArticles, categories], () => {
   applyH5Seo({
     title: buildSeoTitle('发现'),
     description: extractSeoSummary(
-      hotArticles.value[0]?.title ? `浏览热门文章、核心分类与内容趋势，当前热门：${hotArticles.value[0].title}` : '',
-      '浏览热门文章、核心分类与内容趋势。'
+      hotArticles.value[0]?.title ? `浏览热门文章、分类漫游与内容趋势，当前热门：${hotArticles.value[0].title}` : '',
+      '浏览热门文章、分类漫游与内容趋势。'
     ),
     keywords: ['发现', '热门文章', '分类', '标签', ...categories.value.map((item) => item.name)]
   });
@@ -168,9 +173,7 @@ onPullDownRefresh(() => {
   loadDiscover().finally(() => uni.stopPullDownRefresh());
 });
 
-onPageScroll((event) => {
-  backToTopVisible.value = event.scrollTop > 360;
-});
+onPageScroll(handlePageScroll);
 
 async function loadDiscover(): Promise<void> {
   loading.value = true;
@@ -247,6 +250,12 @@ onShareAppMessage(() => {
   --discover-glass-border: rgba(255, 255, 255, 0.72);
   --discover-glass-highlight: rgba(255, 255, 255, 0.86);
   --discover-shadow: rgba(17, 24, 39, 0.08);
+  --discover-accent-soft: rgba(59, 89, 255, 0.12);
+  --discover-accent-strong: rgba(59, 89, 255, 0.2);
+  --discover-surface: linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)), var(--discover-glass-pure);
+  --discover-surface-shadow:
+    inset 0 1rpx 0 var(--discover-glass-highlight),
+    0 12rpx 30rpx rgba(17, 24, 39, 0.06);
 
   min-height: 100vh;
   padding-bottom: calc(172rpx + env(safe-area-inset-bottom));
@@ -257,16 +266,19 @@ onShareAppMessage(() => {
     --discover-glass-border: var(--sl-border-light);
     --discover-glass-highlight: rgba(255, 255, 255, 0.08);
     --discover-shadow: rgba(0, 0, 0, 0.18);
-    background: var(--sl-page-bg, #09090b);
+    --discover-accent-soft: rgba(105, 129, 255, 0.16);
+    --discover-accent-strong: rgba(105, 129, 255, 0.24);
+    --discover-surface: var(--sl-card-glass-bg);
+    --discover-surface-shadow: var(--sl-shadow-soft);
+    background: var(--sl-page-bg, #080d18);
 
     .discover__search-bar {
       background:
-        linear-gradient(145deg, rgba(24, 27, 38, 0.92), rgba(18, 20, 28, 0.88));
+        linear-gradient(145deg, var(--sl-control-bg-strong), var(--sl-control-bg)),
+        var(--sl-bg-glass-pure);
       border-color: var(--sl-border-light);
       color: var(--sl-text-muted);
-      box-shadow:
-        inset 0 1rpx 0 rgba(255, 255, 255, 0.06),
-        0 8rpx 24rpx rgba(0, 0, 0, 0.24);
+      box-shadow: var(--sl-shadow-soft);
     }
 
     .discover__search-placeholder {
@@ -281,12 +293,9 @@ onShareAppMessage(() => {
     }
 
     .discover__featured {
-      background:
-        linear-gradient(135deg, rgba(99, 102, 241, 0.35) 0%, rgba(139, 92, 246, 0.2) 100%);
-      border-color: rgba(99, 102, 241, 0.3);
-      box-shadow:
-        inset 0 1rpx 0 rgba(255, 255, 255, 0.08),
-        0 20rpx 48rpx rgba(99, 102, 241, 0.2);
+      background: var(--sl-card-glass-bg);
+      border-color: var(--sl-border-light);
+      box-shadow: var(--sl-shadow-soft);
     }
 
     .discover__featured-title {
@@ -294,7 +303,9 @@ onShareAppMessage(() => {
     }
 
     .discover__hot:active {
-      background: rgba(39, 39, 42, 0.7);
+      background:
+        linear-gradient(145deg, rgba(18, 27, 46, 0.8), rgba(18, 27, 46, 0.52)),
+        rgba(18, 27, 46, 0.62);
     }
 
     .discover__section-title,
@@ -306,26 +317,30 @@ onShareAppMessage(() => {
       color: var(--sl-text-sub);
     }
 
-    .discover__hot-arrow {
-      color: var(--sl-text-muted);
-    }
-
-    .discover__category-card {
+    .discover__category-hero--0 {
       background: var(--sl-card-glass-bg);
       border-color: var(--sl-border-light);
       box-shadow: var(--sl-shadow-soft);
     }
 
-    .discover__category-card:active {
-      background: rgba(39, 39, 42, 0.7);
+    .discover__category-hero-name {
+      text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.4);
     }
 
-    .discover__category-name {
+    .discover__category-tile {
+      background: var(--sl-card-glass-bg);
+      border-color: var(--sl-border-light);
+      box-shadow: var(--sl-shadow-soft);
+    }
+
+    .discover__category-tile:active {
+      background:
+        linear-gradient(145deg, rgba(18, 27, 46, 0.8), rgba(18, 27, 46, 0.52)),
+        rgba(18, 27, 46, 0.62);
+    }
+
+    .discover__category-tile-name {
       color: var(--sl-text-main);
-    }
-
-    .discover__category-arrow {
-      color: var(--sl-text-muted);
     }
   }
 
@@ -379,13 +394,9 @@ onShareAppMessage(() => {
     margin-bottom: 28rpx;
     padding: 28rpx 24rpx;
     border-radius: 32rpx;
-    background:
-      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
-      var(--discover-glass-pure);
+    background: var(--discover-surface);
     border: 1rpx solid var(--discover-glass-border);
-    box-shadow:
-      inset 0 1rpx 0 var(--discover-glass-highlight),
-      var(--sl-glass-shadow);
+    box-shadow: var(--discover-surface-shadow);
 
     /* #ifdef H5 || APP-PLUS */
     backdrop-filter: blur(16rpx) saturate(1.2);
@@ -432,13 +443,11 @@ onShareAppMessage(() => {
     padding: 28rpx 24rpx;
     margin-bottom: 18rpx;
     border-radius: 28rpx;
-    background:
-      linear-gradient(135deg, rgba(59, 89, 255, 0.18) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(236, 72, 153, 0.06) 100%),
-      linear-gradient(180deg, var(--sl-panel-highlight), var(--sl-panel-lowlight));
-    border: 1rpx solid rgba(99, 102, 241, 0.2);
+    background: var(--discover-surface);
+    border: 1rpx solid var(--discover-glass-border);
     box-shadow:
       inset 0 1rpx 0 rgba(255, 255, 255, 0.9),
-      0 18rpx 42rpx rgba(99, 102, 241, 0.12);
+      0 18rpx 42rpx rgba(17, 24, 39, 0.08);
     overflow: hidden;
     transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease;
 
@@ -446,7 +455,7 @@ onShareAppMessage(() => {
       transform: scale(0.985);
       box-shadow:
         inset 0 1rpx 0 rgba(255, 255, 255, 0.88),
-        0 12rpx 28rpx rgba(99, 102, 241, 0.08);
+        0 12rpx 28rpx rgba(17, 24, 39, 0.06);
     }
   }
 
@@ -499,18 +508,6 @@ onShareAppMessage(() => {
     margin-top: 12rpx;
   }
 
-  &__featured-arrow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 52rpx;
-    height: 52rpx;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--discover-primary), var(--discover-primary-soft));
-    flex-shrink: 0;
-    box-shadow: 0 8rpx 20rpx rgba(99, 102, 241, 0.25);
-  }
-
   /* ─── 热门列表（2～5 名） ─── */
   &__hot {
     position: relative;
@@ -520,9 +517,7 @@ onShareAppMessage(() => {
     margin-bottom: 14rpx;
     padding: 22rpx 20rpx;
     border-radius: 24rpx;
-    background:
-      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
-      var(--discover-glass-pure);
+    background: var(--discover-surface);
     border: 1rpx solid var(--sl-border-glass);
     box-shadow:
       inset 0 1rpx 0 rgba(255, 255, 255, 0.8),
@@ -589,11 +584,6 @@ onShareAppMessage(() => {
     font-size: 21rpx;
   }
 
-  &__hot-arrow {
-    flex-shrink: 0;
-    color: rgba(75, 85, 99, 0.4);
-  }
-
   &__meta-chip {
     display: inline-flex;
     align-items: center;
@@ -610,76 +600,150 @@ onShareAppMessage(() => {
     color: var(--discover-primary);
   }
 
-  /* ─── 分类网格 ─── */
-  &__category-grid {
+  /* ─── 分类磁贴布局 ─── */
+  &__category-mosaic {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14rpx;
   }
 
-  &__category-card {
+  /* 大卡：跨 2 列，渐变叙事 */
+  &__category-hero {
+    grid-column: 1 / -1;
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 16rpx;
-    min-height: 100rpx;
-    padding: 20rpx 20rpx;
-    border-radius: 24rpx;
-    background:
-      linear-gradient(145deg, var(--sl-panel-highlight), var(--sl-panel-lowlight)),
-      var(--discover-glass-pure);
-    border: 1rpx solid var(--discover-glass-border);
-    box-shadow:
-      inset 0 1rpx 0 rgba(255, 255, 255, 0.88),
-      0 12rpx 28rpx rgba(17, 24, 39, 0.04);
+    gap: 20rpx;
+    padding: 32rpx 28rpx;
+    border-radius: 28rpx;
+    overflow: hidden;
     transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease;
+
+    &--0 {
+      background: var(--discover-surface);
+      border: 1rpx solid var(--discover-glass-border);
+      box-shadow:
+        inset 0 1rpx 0 rgba(255, 255, 255, 0.92),
+        0 18rpx 42rpx rgba(17, 24, 39, 0.08);
+    }
+
+    &:active {
+      transform: scale(0.985);
+      box-shadow:
+        inset 0 1rpx 0 rgba(255, 255, 255, 0.88),
+        0 12rpx 28rpx rgba(17, 24, 39, 0.06);
+    }
   }
 
-  &__category-card:active {
-    transform: scale(0.96);
+  &__category-hero-glow {
+    position: absolute;
+    top: -40%;
+    right: -10%;
+    width: 200rpx;
+    height: 200rpx;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59, 89, 255, 0.16) 0%, transparent 70%);
+    pointer-events: none;
   }
 
-  &__category-icon {
-    width: 52rpx;
-    height: 52rpx;
+  &__category-hero-body {
+    display: flex;
+    align-items: center;
+    gap: 18rpx;
+    position: relative;
+    z-index: 1;
+  }
+
+  &__category-hero-badge {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 16rpx;
+    width: 64rpx;
+    height: 64rpx;
+    border-radius: 20rpx;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    box-shadow:
+      0 8rpx 20rpx rgba(99, 102, 241, 0.35),
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.25);
     flex-shrink: 0;
   }
 
-  /* 四种色彩轮换 */
-  &__category-card--0 .discover__category-icon {
-    background: rgba(99, 102, 241, 0.12);
-    color: #6366f1;
+  &__category-hero-name {
+    color: var(--discover-text-main);
+    font-size: 34rpx;
+    font-weight: 800;
+    letter-spacing: -0.01em;
   }
 
-  &__category-card--1 .discover__category-icon {
-    background: rgba(236, 72, 153, 0.12);
-    color: #ec4899;
+  /* 小卡：色系渐变 + 弥散光点 */
+  &__category-tile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14rpx;
+    padding: 24rpx 22rpx;
+    border-radius: 24rpx;
+    overflow: hidden;
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease;
+
+    background: var(--discover-surface);
+    border: 1rpx solid var(--discover-glass-border);
+    box-shadow:
+      inset 0 1rpx 0 rgba(255, 255, 255, 0.88),
+      0 10rpx 24rpx rgba(17, 24, 39, 0.04);
+
+    &:active {
+      transform: scale(0.96);
+    }
+
+    &--0 {
+      border-color: rgba(236, 72, 153, 0.14);
+    }
+
+    &--1 {
+      border-color: rgba(34, 197, 94, 0.14);
+    }
+
+    &--2 {
+      border-color: rgba(245, 158, 11, 0.14);
+    }
+
+    &--3 {
+      border-color: rgba(99, 102, 241, 0.14);
+    }
   }
 
-  &__category-card--2 .discover__category-icon {
-    background: rgba(34, 197, 94, 0.12);
-    color: #22c55e;
+  &__category-tile-dot {
+    width: 12rpx;
+    height: 12rpx;
+    border-radius: 50%;
+    flex-shrink: 0;
   }
 
-  &__category-card--3 .discover__category-icon {
-    background: rgba(245, 158, 11, 0.12);
-    color: #f59e0b;
+  &__category-tile--0 &__category-tile-dot {
+    background: #ec4899;
+    box-shadow: 0 4rpx 12rpx rgba(236, 72, 153, 0.4);
   }
 
-  &__category-name {
-    flex: 1;
-    min-width: 0;
+  &__category-tile--1 &__category-tile-dot {
+    background: #22c55e;
+    box-shadow: 0 4rpx 12rpx rgba(34, 197, 94, 0.4);
+  }
+
+  &__category-tile--2 &__category-tile-dot {
+    background: #f59e0b;
+    box-shadow: 0 4rpx 12rpx rgba(245, 158, 11, 0.4);
+  }
+
+  &__category-tile--3 &__category-tile-dot {
+    background: #6366f1;
+    box-shadow: 0 4rpx 12rpx rgba(99, 102, 241, 0.4);
+  }
+
+  &__category-tile-name {
     color: var(--discover-text-main);
     font-size: 27rpx;
     font-weight: 700;
-  }
-
-  &__category-arrow {
-    flex-shrink: 0;
-    color: rgba(75, 85, 99, 0.4);
   }
 }
 </style>

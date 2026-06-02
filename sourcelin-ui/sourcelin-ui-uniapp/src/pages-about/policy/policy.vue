@@ -43,7 +43,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { onLoad, onShow } from '@dcloudio/uni-app';
-import { getLegalArticle, type LegalArticle } from '@/modules/site/constants/legal';
+import { getLegalArticle, type LegalArticle } from '../modules/site/constants/legal';
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { useThemeStore } from '@/stores/theme';
 

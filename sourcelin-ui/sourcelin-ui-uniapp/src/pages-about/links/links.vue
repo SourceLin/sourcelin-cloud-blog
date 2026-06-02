@@ -54,7 +54,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import { onLoad, onShow } from '@dcloudio/uni-app';
-import { applyFriendLink, fetchFriendLinks } from '@/modules/site/api/site.api';
+import { applyFriendLink, fetchFriendLinks } from '../modules/site/api/site.api';
 import type { FriendLinkItem } from '@/modules/site/types/site';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 import { normalizeAssetUrl } from '@/utils/url';

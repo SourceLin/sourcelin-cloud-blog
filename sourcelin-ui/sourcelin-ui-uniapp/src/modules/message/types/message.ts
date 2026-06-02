@@ -1,4 +1,4 @@
-import type { MessageChannel } from '../config/channels';
+export type MessageChannel = 'system' | 'interaction' | 'star' | 'follow';
 
 export interface MessageItem {
   id: number;

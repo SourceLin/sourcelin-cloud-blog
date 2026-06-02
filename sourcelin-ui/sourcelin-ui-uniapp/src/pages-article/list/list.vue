@@ -27,12 +27,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { onLoad, onPageScroll, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app';
 import { fetchArticlePage, fetchTagArticles } from '@/modules/article/api/article.api';
-import { useArticlePaging } from '@/modules/article/composables/useArticlePaging';
+import { useArticlePaging } from '../modules/article/composables/useArticlePaging';
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { useThemeStore } from '@/stores/theme';
+import { useBackToTop } from '@/shared/composables/useBackToTop';
 
 const query = {
   categoryId: undefined as number | undefined,
@@ -50,7 +51,7 @@ const { items, loading, finished, isEmpty, refresh, loadMore } = useArticlePagin
         orderBy: query.orderBy
       })
 );
-const backToTopVisible = ref(false);
+const { backToTopVisible, handlePageScroll } = useBackToTop();
 const themeStore = useThemeStore();
 const pageTitle = computed(() => {
   if (query.tagId) return '标签文章';
@@ -100,9 +101,7 @@ onReachBottom(() => {
   loadMore();
 });
 
-onPageScroll((event) => {
-  backToTopVisible.value = event.scrollTop > 360;
-});
+onPageScroll(handlePageScroll);
 </script>
 
 <style lang="scss" scoped>

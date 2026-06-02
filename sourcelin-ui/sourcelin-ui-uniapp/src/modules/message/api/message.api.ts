@@ -1,7 +1,6 @@
 import { http } from '@/utils/request';
 import type { PageResult } from '@/shared/types/api';
-import type { MessageChannel } from '../config/channels';
-import type { MessageItem, MessageUnreadStat } from '../types/message';
+import type { MessageChannel, MessageItem, MessageUnreadStat } from '../types/message';
 
 export interface MessagePageQuery {
   page?: number;

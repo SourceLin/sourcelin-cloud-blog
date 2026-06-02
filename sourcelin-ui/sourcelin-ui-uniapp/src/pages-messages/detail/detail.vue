@@ -62,7 +62,7 @@ import { ref, computed } from 'vue';
 import { onLoad, onShow } from '@dcloudio/uni-app';
 import { fetchMessageDetail, markMessageRead } from '@/modules/message/api/message.api';
 import type { MessageItem } from '@/modules/message/types/message';
-import { getChannelConfig, type MessageChannel } from '@/modules/message/config/channels';
+import { getChannelConfig, type MessageChannel } from '../modules/message/config/channels';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { showInfoToast } from '@/utils/feedback';

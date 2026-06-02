@@ -16,14 +16,10 @@ export interface ChannelConfig {
   id: MessageChannel;
   name: string;
   icon: ChannelIconName;
-  /** 频道色值，用于图标和标签着色 */
   color: string;
   description: string;
-  /** 后端是否已支持 */
   available: boolean;
-  /** 空态标题 */
   emptyTitle: string;
-  /** 空态描述 */
   emptyDescription: string;
 }
 
@@ -74,7 +70,6 @@ export function getChannelConfig(id: MessageChannel): ChannelConfig {
   return MESSAGE_CHANNELS.find((c) => c.id === id) ?? MESSAGE_CHANNELS[0];
 }
 
-/** 从 URL query 参数解析频道，无效时回退到 system */
 export function parseChannelFromQuery(value: unknown): MessageChannel {
   return isMessageChannel(value) ? value : 'system';
 }
