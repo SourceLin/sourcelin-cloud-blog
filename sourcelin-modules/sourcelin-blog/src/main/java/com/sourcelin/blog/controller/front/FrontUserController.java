@@ -22,7 +22,6 @@ import com.sourcelin.common.core.web.controller.BaseController;
 import com.sourcelin.common.core.web.domain.response.ApiResponse;
 import com.sourcelin.common.core.web.domain.response.PageResult;
 import com.sourcelin.common.security.accessor.BlogLoginAccessor;
-import com.sourcelin.common.security.stp.StpBlogUtil;
 import com.sourcelin.file.api.domain.SysFile;
 import com.sourcelin.file.api.service.RemoteFileService;
 import lombok.Data;
@@ -37,12 +36,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.sourcelin.common.security.utils.SecurityUtils;
 import org.springframework.web.multipart.MultipartFile;
+import com.sourcelin.blog.constant.UserTypeEnum;
+import com.sourcelin.system.api.domain.SysDictData;
+import com.sourcelin.system.api.service.RemoteSysDictDataService;
+import com.sourcelin.common.core.constant.SecurityConstants;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/front")
 public class FrontUserController extends BaseController
@@ -57,18 +62,20 @@ public class FrontUserController extends BaseController
     private BlogLoginAccessor blogLoginAccessor;
     @Autowired
     private RemoteFileService remoteFileService;
+    @Autowired
+    private RemoteSysDictDataService remoteSysDictDataService;
 
     @GetMapping("/user/info")
     public FrontCurrentUserInfoVO getCurrentUserInfo()
     {
         try
         {
-            if (!StpBlogUtil.stpLogic.isLogin())
+            if (!blogLoginAccessor.isLogin())
             {
                 throw new BusinessException(ResultCode.UNAUTHORIZED, "请先登录");
             }
 
-            Long userId = StpBlogUtil.stpLogic.getLoginIdAsLong();
+            Long userId = blogLoginAccessor.getCurrentUserId();
             User user = userService.selectUserById(userId);
             if (user == null)
             {
@@ -78,8 +85,29 @@ public class FrontUserController extends BaseController
             user.setArticleCount((long) articleService.countArticleByUserId(userId));
             user.setFollowerCount((long) followService.countFansByTargetUserId(userId));
             FrontCurrentUserInfoVO payload = buildCurrentUserPayload(user);
-            payload.setRoles(Collections.<String>emptyList());
-            payload.setPermissions(Collections.<String>emptyList());
+            List<String> roles = new ArrayList<>();
+            List<String> permissions = new ArrayList<>();
+            
+            // 动态字典匹配博主角色
+            String bloggerValue = getBloggerDictValue();
+            boolean isBlogger = false;
+            if (user.getUserType() != null)
+            {
+                String userTypeStr = String.valueOf(user.getUserType());
+                if (userTypeStr.equals(bloggerValue))
+                {
+                    isBlogger = true;
+                }
+            }
+
+            if (isBlogger)
+            {
+                roles.add("blogger");
+                permissions.add("mini:blogger");
+                permissions.add("blog:article:write");
+            }
+            payload.setRoles(roles);
+            payload.setPermissions(permissions);
             return payload;
         }
         catch (Exception e)
@@ -144,7 +172,7 @@ public class FrontUserController extends BaseController
     @PutMapping("/user/updatePwd")
     public Void updatePwd(@RequestParam String oldPassword, @RequestParam String newPassword)
     {
-        if (!StpBlogUtil.stpLogic.isLogin())
+        if (!blogLoginAccessor.isLogin())
         {
             throw new BusinessException(ResultCode.UNAUTHORIZED, "请先登录");
         }
@@ -156,7 +184,7 @@ public class FrontUserController extends BaseController
         {
             throw new BusinessException(ResultCode.VALIDATION_ERROR, "新密码长度必须在 6-20 位之间");
         }
-        Long userId = StpBlogUtil.stpLogic.getLoginIdAsLong();
+        Long userId = blogLoginAccessor.getCurrentUserId();
         User user = userService.selectUserById(userId);
         if (user == null)
         {
@@ -338,6 +366,63 @@ public class FrontUserController extends BaseController
         payload.setAvatarFileId(user.getAvatarFileId());
         payload.setArticleCount(user.getArticleCount());
         payload.setFollowerCount(user.getFollowerCount());
+        payload.setUserType(user.getUserType());
+        payload.setUserTypeLabel(getUserTypeLabel(user.getUserType()));
+    }
+
+    private String getBloggerDictValue()
+    {
+        try
+        {
+            ApiResponse<List<SysDictData>> response = remoteSysDictDataService.listByType("blog_user_type", "front-platform");
+            if (response != null && response.getCode() == 0 && response.getData() != null)
+            {
+                for (SysDictData dictData : response.getData())
+                {
+                    if ("博主".equals(dictData.getDictLabel()) && "0".equals(dictData.getStatus()))
+                    {
+                        return dictData.getDictValue();
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            log.error("Feign query blog_user_type dict failed, fallback to local default value. Error: {}", e.getMessage());
+        }
+        return String.valueOf(UserTypeEnum.BLOGGER.getCode());
+    }
+
+    private String getUserTypeLabel(Integer userType)
+    {
+        if (userType == null)
+        {
+            return "";
+        }
+        try
+        {
+            ApiResponse<List<SysDictData>> response = remoteSysDictDataService.listByType("blog_user_type", "front-platform");
+            if (response != null && response.getCode() == 0 && response.getData() != null)
+            {
+                String userTypeStr = String.valueOf(userType);
+                for (SysDictData dictData : response.getData())
+                {
+                    if (userTypeStr.equals(dictData.getDictValue()) && "0".equals(dictData.getStatus()))
+                    {
+                        return dictData.getDictLabel();
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            log.error("Feign query blog_user_type dict failed for label mapping. Error: {}", e.getMessage());
+        }
+        if (userType == UserTypeEnum.BLOGGER.getCode())
+        {
+            return UserTypeEnum.BLOGGER.getDesc();
+        }
+        return UserTypeEnum.NORMAL.getDesc();
     }
 
     private List<FrontFollowRelationVO> normalizeFollowRows(List<Follow> rows, boolean followers)

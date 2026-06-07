@@ -17,8 +17,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.sourcelin.system.api.service.RemoteSysDictDataService;
+import com.sourcelin.system.api.domain.SysDictData;
+import com.sourcelin.common.core.web.domain.response.ApiResponse;
+import com.sourcelin.blog.vo.FrontCurrentUserInfoVO;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -47,6 +53,9 @@ class FrontUserControllerTest
 
     @Mock
     private RemoteFileService remoteFileService;
+
+    @Mock
+    private RemoteSysDictDataService remoteSysDictDataService;
 
     @Test
     void shouldUpdateProfileFromTypedBody()
@@ -116,5 +125,115 @@ class FrontUserControllerTest
 
         assertEquals(ResultCode.VALIDATION_ERROR, ex.getResultCode());
         assertEquals("筛选参数不合法", ex.getMessage());
+    }
+
+    @Test
+    void shouldGetUserInfoForNormalUser()
+    {
+        User user = new User();
+        user.setId(7L);
+        user.setUsername("normalUser");
+        user.setNickname("普通用户");
+        user.setUserType(1);
+
+        List<SysDictData> dictDataList = new ArrayList<>();
+        SysDictData normalDict = new SysDictData();
+        normalDict.setDictLabel("普通用户");
+        normalDict.setDictValue("1");
+        normalDict.setStatus("0");
+        SysDictData bloggerDict = new SysDictData();
+        bloggerDict.setDictLabel("博主");
+        bloggerDict.setDictValue("2");
+        bloggerDict.setStatus("0");
+        dictDataList.add(normalDict);
+        dictDataList.add(bloggerDict);
+
+        when(blogLoginAccessor.isLogin()).thenReturn(true);
+        when(blogLoginAccessor.getCurrentUserId()).thenReturn(7L);
+        when(userService.selectUserById(7L)).thenReturn(user);
+        when(articleService.countArticleByUserId(7L)).thenReturn(5);
+        when(followService.countFansByTargetUserId(7L)).thenReturn(10);
+        when(remoteSysDictDataService.listByType("blog_user_type", "front-platform"))
+            .thenReturn(ApiResponse.success(dictDataList));
+
+        FrontCurrentUserInfoVO info = controller.getCurrentUserInfo();
+
+        assertEquals(7L, info.getId());
+        assertEquals("normalUser", info.getUserName());
+        assertEquals("普通用户", info.getNickName());
+        assertEquals(Integer.valueOf(1), info.getUserType());
+        assertEquals("普通用户", info.getUserTypeLabel());
+        assertEquals(0, info.getRoles().size());
+        assertEquals(0, info.getPermissions().size());
+    }
+
+    @Test
+    void shouldGetUserInfoForBloggerWithDictSuccess()
+    {
+        User user = new User();
+        user.setId(8L);
+        user.setUsername("bloggerUser");
+        user.setNickname("博主昵称");
+        user.setUserType(2);
+
+        List<SysDictData> dictDataList = new ArrayList<>();
+        SysDictData normalDict = new SysDictData();
+        normalDict.setDictLabel("普通用户");
+        normalDict.setDictValue("1");
+        normalDict.setStatus("0");
+        SysDictData bloggerDict = new SysDictData();
+        bloggerDict.setDictLabel("博主");
+        bloggerDict.setDictValue("2");
+        bloggerDict.setStatus("0");
+        dictDataList.add(normalDict);
+        dictDataList.add(bloggerDict);
+
+        when(blogLoginAccessor.isLogin()).thenReturn(true);
+        when(blogLoginAccessor.getCurrentUserId()).thenReturn(8L);
+        when(userService.selectUserById(8L)).thenReturn(user);
+        when(articleService.countArticleByUserId(8L)).thenReturn(15);
+        when(followService.countFansByTargetUserId(8L)).thenReturn(20);
+        when(remoteSysDictDataService.listByType("blog_user_type", "front-platform"))
+            .thenReturn(ApiResponse.success(dictDataList));
+
+        FrontCurrentUserInfoVO info = controller.getCurrentUserInfo();
+
+        assertEquals(8L, info.getId());
+        assertEquals(Integer.valueOf(2), info.getUserType());
+        assertEquals("博主", info.getUserTypeLabel());
+        assertEquals(1, info.getRoles().size());
+        assertEquals("blogger", info.getRoles().get(0));
+        assertEquals(2, info.getPermissions().size());
+        org.junit.jupiter.api.Assertions.assertTrue(info.getPermissions().contains("mini:blogger"));
+        org.junit.jupiter.api.Assertions.assertTrue(info.getPermissions().contains("blog:article:write"));
+    }
+
+    @Test
+    void shouldGetUserInfoForBloggerWithDictFallback()
+    {
+        User user = new User();
+        user.setId(8L);
+        user.setUsername("bloggerUser");
+        user.setNickname("博主昵称");
+        user.setUserType(2);
+
+        when(blogLoginAccessor.isLogin()).thenReturn(true);
+        when(blogLoginAccessor.getCurrentUserId()).thenReturn(8L);
+        when(userService.selectUserById(8L)).thenReturn(user);
+        when(articleService.countArticleByUserId(8L)).thenReturn(15);
+        when(followService.countFansByTargetUserId(8L)).thenReturn(20);
+
+        // 模拟 Feign 报错以触发熔断降级
+        when(remoteSysDictDataService.listByType("blog_user_type", "front-platform"))
+            .thenThrow(new RuntimeException("Feign connection timeout"));
+
+        FrontCurrentUserInfoVO info = controller.getCurrentUserInfo();
+
+        assertEquals(8L, info.getId());
+        assertEquals(Integer.valueOf(2), info.getUserType());
+        // 兜底应该依然正确返回“博主”
+        assertEquals("博主", info.getUserTypeLabel());
+        assertEquals(1, info.getRoles().size());
+        assertEquals("blogger", info.getRoles().get(0));
     }
 }

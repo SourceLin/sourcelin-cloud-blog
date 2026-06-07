@@ -20,4 +20,6 @@ public class FrontUserInfoVO implements Serializable
     private Long avatarFileId;
     private Long articleCount;
     private Long followerCount;
+    private Integer userType;
+    private String userTypeLabel;
 }

@@ -33,6 +33,8 @@ export interface FrontUserDetailVO {
   avatarFileId?: number | null
   articleCount?: number
   followerCount?: number
+  userType?: number
+  userTypeLabel?: string
 }
 
 /** 前台用户资料 VO — 对齐后端 /front/user/profile 响应 */

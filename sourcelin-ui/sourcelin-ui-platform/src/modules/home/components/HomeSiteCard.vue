@@ -146,7 +146,12 @@ const displayDescription = computed(() => {
 })
 
 const roleLabel = computed(() => userStore.roles[0] || '')
-const secondaryLabel = computed(() => copyByState.value.identityHint)
+const secondaryLabel = computed(() => {
+  if (isLoggedIn.value && currentUser.value.userTypeLabel) {
+    return currentUser.value.userTypeLabel
+  }
+  return copyByState.value.identityHint
+})
 
 const loginStateLabel = computed(() => copyByState.value.metaState)
 const loginStateValue = computed(() => copyByState.value.stateValue)
