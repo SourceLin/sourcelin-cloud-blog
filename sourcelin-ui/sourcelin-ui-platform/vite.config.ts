@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { resolve } from 'path'
-import { writeFileSync } from 'fs'
+import { mkdirSync, writeFileSync } from 'fs'
 
 function manualChunks(id: string) {
   const normalizedId = id.replace(/\\/g, '/')
@@ -148,6 +148,7 @@ function sitemapPlugin(): Plugin {
       }
 
       const xml = buildSitemapXml(siteOrigin, urlEntries)
+      mkdirSync(outDir, { recursive: true })
       writeFileSync(`${outDir}/sitemap.xml`, xml, 'utf-8')
       console.info(`[sitemap] 已生成 ${outDir}/sitemap.xml，共 ${urlEntries.length} 条记录`)
     }
