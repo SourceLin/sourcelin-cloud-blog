@@ -26,6 +26,7 @@ import { useCssVar } from "@vueuse/core";
 import BlogStatsAPI from "@/api/blog/stats";
 import type { BlogStatsTrend } from "@/types/api";
 import { resolveThemeColor, withAlpha } from "@/utils/theme";
+import { useSettingsStore } from "@/store/modules/settings";
 
 defineOptions({
   name: "BlogStatsTrendChart",
@@ -64,6 +65,7 @@ const textSecondaryColor = useCssVar("--el-text-color-secondary");
 const borderLightColor = useCssVar("--el-border-color-lighter");
 const fillLightColor = useCssVar("--el-fill-color-light");
 
+const settingsStore = useSettingsStore();
 const loading = ref(false);
 const innerDays = ref(props.defaultDays);
 const trend = ref<BlogStatsTrend>({});
@@ -87,6 +89,7 @@ const options = computed(() => {
   const borderLight = resolveThemeColor(borderLightColor.value, "#e4e7ed");
   const fillLight = resolveThemeColor(fillLightColor.value, "#ffffff");
   return {
+    _theme: settingsStore.resolvedTheme,
     color: [primary, success, warning, danger],
     tooltip: {
       trigger: "axis",
@@ -123,22 +126,46 @@ const options = computed(() => {
         color: textSecondary,
       },
     },
-    yAxis: {
-      type: "value",
-      splitLine: {
-        lineStyle: {
-          color: borderLight,
-          type: "dashed",
+    yAxis: [
+      {
+        type: "value",
+        name: "评论/树洞 (左)",
+        minInterval: 1,
+        splitLine: {
+          lineStyle: {
+            color: borderLight,
+            type: "dashed",
+          },
+        },
+        axisLabel: {
+          color: textSecondary,
+        },
+        nameTextStyle: {
+          color: textSecondary,
+          fontSize: 11,
         },
       },
-      axisLabel: {
-        color: textSecondary,
+      {
+        type: "value",
+        name: "文章/用户 (右)",
+        minInterval: 1,
+        splitLine: {
+          show: false, // 不显示右轴多余分割线，保持图面清爽
+        },
+        axisLabel: {
+          color: textSecondary,
+        },
+        nameTextStyle: {
+          color: textSecondary,
+          fontSize: 11,
+        },
       },
-    },
+    ],
     series: [
       {
         name: "文章",
         type: "line",
+        yAxisIndex: 1,
         smooth: true,
         symbolSize: 6,
         lineStyle: { width: 3 },
@@ -148,6 +175,7 @@ const options = computed(() => {
       {
         name: "评论",
         type: "line",
+        yAxisIndex: 0,
         smooth: true,
         symbolSize: 6,
         lineStyle: { width: 3 },
@@ -157,6 +185,7 @@ const options = computed(() => {
       {
         name: "用户",
         type: "line",
+        yAxisIndex: 1,
         smooth: true,
         symbolSize: 6,
         lineStyle: { width: 3 },
@@ -166,6 +195,7 @@ const options = computed(() => {
       {
         name: "树洞",
         type: "line",
+        yAxisIndex: 0,
         smooth: true,
         symbolSize: 6,
         lineStyle: { width: 3 },

@@ -12,6 +12,7 @@
 import { useCssVar } from "@vueuse/core";
 import type { BlogStatsSummary } from "@/types/api";
 import { resolveThemeColor } from "@/utils/theme";
+import { useSettingsStore } from "@/store/modules/settings";
 
 defineOptions({
   name: "BlogCommentStatusBar",
@@ -39,6 +40,8 @@ const textSecondaryColor = useCssVar("--el-text-color-secondary");
 const borderLightColor = useCssVar("--el-border-color-lighter");
 const fillLightColor = useCssVar("--el-fill-color-light");
 
+const settingsStore = useSettingsStore();
+
 function num(value?: number) {
   const parsed = Number(value ?? 0);
   return Number.isFinite(parsed) ? parsed : 0;
@@ -50,6 +53,7 @@ const options = computed(() => {
   const rejected = num(props.summary.commentRejectedCount);
   const other = num(props.summary.commentOtherStatusCount);
   return {
+    _theme: settingsStore.resolvedTheme,
     color: [
       resolveThemeColor(warningColor.value, "#E6A23C"),
       resolveThemeColor(successColor.value, "#67C23A"),

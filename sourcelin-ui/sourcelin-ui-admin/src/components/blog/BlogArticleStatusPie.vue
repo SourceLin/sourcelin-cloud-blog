@@ -12,6 +12,7 @@
 import { useCssVar } from "@vueuse/core";
 import type { BlogStatsSummary } from "@/types/api";
 import { resolveThemeColor } from "@/utils/theme";
+import { useSettingsStore } from "@/store/modules/settings";
 
 defineOptions({
   name: "BlogArticleStatusPie",
@@ -38,6 +39,8 @@ const borderLightColor = useCssVar("--el-bg-color-page");
 const fillLightColor = useCssVar("--el-fill-color-light");
 const textPrimaryColor = useCssVar("--el-text-color-primary");
 
+const settingsStore = useSettingsStore();
+
 function num(value?: number) {
   const parsed = Number(value ?? 0);
   return Number.isFinite(parsed) ? parsed : 0;
@@ -57,6 +60,7 @@ const options = computed(() => {
     data.push({ name: "其它", value: other });
   }
   return {
+    _theme: settingsStore.resolvedTheme,
     color: [
       resolveThemeColor(warningColor.value, "#E6A23C"),
       resolveThemeColor(successColor.value, "#67C23A"),

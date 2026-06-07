@@ -1,4 +1,4 @@
-﻿.dashboard-shell {
+.dashboard-shell {
   --dashboard-primary-soft: color-mix(in srgb, var(--el-color-primary) 10%, transparent);
   --dashboard-primary-soft-strong: color-mix(in srgb, var(--el-color-primary) 16%, transparent);
   --dashboard-primary-soft-hover: color-mix(in srgb, var(--el-color-primary) 12%, transparent);
@@ -33,6 +33,7 @@
   position: relative;
   padding: 24px;
   overflow: hidden;
+  background-color: var(--el-bg-color);
 }
 
 html.dark .dashboard-shell {

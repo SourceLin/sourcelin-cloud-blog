@@ -1,4 +1,4 @@
-﻿import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { dayjs } from "element-plus";
 import { useCssVar, useTransition } from "@vueuse/core";
@@ -10,10 +10,12 @@ import { useRecentMenus } from "@/composables";
 import { formatGrowthRate } from "@/utils";
 import { isElementPlusIconName } from "@/utils/element-icons";
 import { resolveThemeColor, withAlpha } from "@/utils/theme";
+import { useSettingsStore } from "@/store/modules/settings";
 
 export function useDashboard() {
   const router = useRouter();
   const userStore = useUserStore();
+  const settingsStore = useSettingsStore();
   const { recentMenus, clearRecentMenus } = useRecentMenus();
   const unreadNoticeCount = ref(0);
 
@@ -131,6 +133,7 @@ export function useDashboard() {
     const borderLight = resolveThemeColor(borderLightColor.value, "#e4e7ed");
     const fillLight = resolveThemeColor(fillLightColor.value, "#ffffff");
     return {
+      _theme: settingsStore.resolvedTheme,
       color: [primary, success],
       tooltip: {
         trigger: "axis",
