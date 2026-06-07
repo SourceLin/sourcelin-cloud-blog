@@ -2,25 +2,25 @@
   <view class="interactions s-container" :class="themeStore.themeClass">
     <s-loading :visible="userStore.isLoggedIn && loading && isEmpty" />
     <view class="interactions__header s-card">
-      <view class="interactions__eyebrow">My Interactions</view>
-      <view class="interactions__title">我的互动</view>
-      <view class="interactions__desc">集中查看你发出的收藏、点赞与评论记录。</view>
+      <view class="interactions__eyebrow">{{ reviewSafeCollectOnly ? 'My Favorites' : 'My Interactions' }}</view>
+      <view class="interactions__title">{{ reviewSafeCollectOnly ? '我的收藏' : '我的互动' }}</view>
+      <view class="interactions__desc">{{ reviewSafeCollectOnly ? '集中回看你收藏过的文章内容。' : '集中查看你发出的收藏、点赞与评论记录。' }}</view>
     </view>
 
     <s-empty
       v-if="!userStore.isLoggedIn"
       scene="login"
-      title="登录后查看互动记录"
-      text="登录后可同步收藏、点赞与评论等个人互动数据。"
+      :title="reviewSafeCollectOnly ? '登录后查看收藏记录' : '登录后查看互动记录'"
+      :text="reviewSafeCollectOnly ? '登录后可同步收藏的文章内容。' : '登录后可同步收藏、点赞与评论等个人互动数据。'"
     >
       <button class="interactions__login sl-button sl-button--primary" @tap="goLogin">立即登录</button>
     </s-empty>
 
     <template v-else>
-      <view class="interactions__tab-group">
+      <view v-if="availableMainTabs.length > 1" class="interactions__tab-group">
         <view class="interactions__tab-group-track">
           <view
-            v-for="tab in mainTabs"
+            v-for="tab in availableMainTabs"
             :key="tab.value"
             class="interactions__tab-group-item"
             :class="{ 'interactions__tab-group-item--active': activeTab === tab.value }"
@@ -31,7 +31,7 @@
         </view>
       </view>
 
-      <scroll-view class="interactions__filter-tabs" scroll-x show-scrollbar="false">
+      <scroll-view v-if="showSubTabs" class="interactions__filter-tabs" scroll-x show-scrollbar="false">
         <view class="interactions__filter-tabs-inner">
           <view
             v-for="tab in subTabs"
@@ -131,7 +131,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { onLoad, onPageScroll, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app';
 import {
   getCommentStatusText,
@@ -150,12 +150,13 @@ import type {
   MyCommentSource
 } from '@/modules/interaction/types/interaction';
 import { useBackToTop } from '@/shared/composables/useBackToTop';
-import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { uncollectTarget, unlikeTarget } from '@/modules/interaction/api/interaction.api';
 import { deleteComment } from '@/modules/comment/api/comment.api';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
+import { showInfoToast } from '@/utils/feedback';
 
-const userStore = useUserStore();
+const { userStore, can } = useMiniAccess();
 const themeStore = useThemeStore();
 const { backToTopVisible, handlePageScroll } = useBackToTop();
 
@@ -189,13 +190,22 @@ const {
   switchSubTab
 } = useMyInteractions('collect');
 
+const reviewSafeCollectOnly = computed(() => !userStore.isBlogger && !can('interactionCenterEnabled'));
+const availableMainTabs = computed(() => reviewSafeCollectOnly.value ? [mainTabs[0]] : mainTabs);
+
 const activeSubTab = computed(() => {
   if (activeTab.value === 'collect') return activeCollectTab.value;
   if (activeTab.value === 'like') return activeLikeTab.value;
   return activeCommentTab.value;
 });
 
-const subTabs = computed(() => subTabOptions);
+const subTabs = computed(() => {
+  if (reviewSafeCollectOnly.value) {
+    return [{ label: '文章', value: 'article' as const }];
+  }
+  return subTabOptions;
+});
+const showSubTabs = computed(() => subTabs.value.length > 1);
 
 const targetItems = computed(() => {
   if (activeTab.value === 'collect') return collectItems.value;
@@ -242,6 +252,16 @@ onReachBottom(() => {
 
 onPageScroll(handlePageScroll);
 
+watch(reviewSafeCollectOnly, (value) => {
+  if (!value) return;
+  if (activeTab.value !== 'collect') {
+    void switchMainTab('collect');
+  }
+  if (activeCollectTab.value !== 'article') {
+    void switchSubTab('article');
+  }
+}, { immediate: true });
+
 function goLogin(): void {
   uni.navigateTo({ url: '/pages-user/login/login' });
 }
@@ -259,10 +279,15 @@ function openTarget(item: CollectItem<CollectTargetSummary> | LikeItem<CollectTa
     uni.navigateTo({ url: `/pages-article/detail/detail?id=${item.targetId}` });
     return;
   }
+  if (!can('communityEnabled')) {
+    showInfoToast('当前版本仅支持回访文章内容');
+    return;
+  }
   uni.switchTab({ url: '/pages/community/community' });
 }
 
 function openComment(item: MyCommentItem): void {
+  if (reviewSafeCollectOnly.value) return;
   const targetType = item.targetType || 'article';
   const targetId = item.targetId;
   if (!targetId) {
@@ -270,6 +295,10 @@ function openComment(item: MyCommentItem): void {
   }
   if (targetType === 'article') {
     uni.navigateTo({ url: `/pages-article/detail/detail?id=${targetId}` });
+    return;
+  }
+  if (!can('communityEnabled')) {
+    showInfoToast('当前版本暂不开放该内容入口');
     return;
   }
   uni.switchTab({ url: '/pages/community/community' });

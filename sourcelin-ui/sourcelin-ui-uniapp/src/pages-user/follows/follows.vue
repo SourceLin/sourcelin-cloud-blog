@@ -85,9 +85,9 @@ import { onLoad, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-
 import type { FollowItem, FollowUser } from '@/modules/interaction/types/interaction';
 import { fetchUserFollowerPage, fetchUserFollowingPage } from '@/modules/user/api/user.api';
 import { useBackToTop } from '@/shared/composables/useBackToTop';
-import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { normalizeAssetUrl } from '@/utils/url';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 type FollowTab = 'followings' | 'followers';
 
@@ -96,7 +96,7 @@ const tabs: Array<{ label: string; value: FollowTab }> = [
   { label: '我的粉丝', value: 'followers' }
 ];
 
-const userStore = useUserStore();
+const { userStore, guard } = useMiniAccess();
 const themeStore = useThemeStore();
 const { backToTopVisible } = useBackToTop();
 const activeTab = ref<FollowTab>('followings');
@@ -107,6 +107,9 @@ const page = ref(1);
 const pageSize = 10;
 
 onLoad((options) => {
+  if (!guard('followEnabled')) {
+    return;
+  }
   if (options?.tab === 'followers') {
     activeTab.value = 'followers';
   }

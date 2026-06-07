@@ -11,5 +11,8 @@ export interface AnalyticsEventPayload {
 }
 
 export function createAnalyticsEvent(payload: AnalyticsEventPayload): Promise<void> {
-  return http.post<void>('/front/analytics/events', payload, { skipErrorToast: true });
+  return http.post<void>('/front/analytics/events', payload, {
+    skipAuthRedirect: true,
+    skipErrorToast: true
+  });
 }

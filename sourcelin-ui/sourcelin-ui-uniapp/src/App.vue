@@ -7,11 +7,15 @@ import { onLaunch, onShow, onError } from '@dcloudio/uni-app';
 import { useUserStore } from '@/stores/user';
 import { useAppStore } from '@/stores/app';
 import { useThemeStore } from '@/stores/theme';
+import { useCapabilityStore } from '@/stores/capability';
 const userStore = useUserStore();
 const appStore = useAppStore();
 const themeStore = useThemeStore();
+const capabilityStore = useCapabilityStore();
 
 onLaunch((options) => {
+  // 尽早加载多端能力配置，作为过审/安全兜底
+  capabilityStore.loadCapabilities();
   // 系统信息收集（自定义导航栏需要）
   appStore.collectSystemInfo();
   // 全局明暗外观主题恢复与适配

@@ -90,7 +90,7 @@
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { onShow } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import { env } from '@/config/env';
 import { createSubscribeAuthorization, type SubscribeAuthorizationStatus } from '../modules/subscription/api/subscription.api';
 import { resolveSubscriptionTemplateMeta } from '../modules/subscription/constants/templates';
@@ -99,10 +99,12 @@ import { getUserPreferences, updateUserPreferences } from '@/shared/utils/prefer
 import { useThemeStore, type ThemeMode } from '@/stores/theme';
 import { useUserStore } from '@/stores/user';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 const preferences = reactive(getUserPreferences());
 const themeStore = useThemeStore();
 const userStore = useUserStore();
+const { guard } = useMiniAccess();
 const subscriptionStatusMap = reactive(getSubscriptionStatusMap());
 const subscribeTemplates = computed(() =>
   env.subscribeMessageTemplateIds
@@ -112,6 +114,9 @@ const subscribeTemplates = computed(() =>
 
 onShow(() => {
   themeStore.syncNativeArea();
+});
+onLoad(() => {
+  guard('settingsEnabled');
 });
 
 function sync(next = getUserPreferences()): void {

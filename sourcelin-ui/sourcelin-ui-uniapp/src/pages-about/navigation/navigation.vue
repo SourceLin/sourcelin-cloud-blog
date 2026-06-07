@@ -54,9 +54,11 @@ import { computed, ref } from 'vue';
 import { onLoad, onShow } from '@dcloudio/uni-app';
 import { fetchNavigationList, reportNavigationClick } from '../modules/site/api/site.api';
 import type { NavigationItem } from '@/modules/site/types/site';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 import { useThemeStore } from '@/stores/theme';
 
 const themeStore = useThemeStore();
+const { guard } = useMiniAccess();
 const loading = ref(false);
 const items = ref<NavigationItem[]>([]);
 const allItems = ref<NavigationItem[]>([]);
@@ -76,6 +78,9 @@ const categories = computed(() => [
 ]);
 
 onLoad(() => {
+  if (!guard('navigationEnabled')) {
+    return;
+  }
   loadNavigation();
 });
 

@@ -3,7 +3,7 @@
     <s-loading :visible="loading && items.length === 0" text="正在加载友链..." />
     <view class="links__header s-card">
       <view class="links__title">友情链接</view>
-      <view class="links__desc">收录值得访问的伙伴站点，也支持从移动端提交申请。</view>
+      <view class="links__desc">收录值得访问的伙伴站点，便于在移动端快速回访优秀内容。</view>
     </view>
 
     <s-empty
@@ -25,58 +25,31 @@
         <view class="links__desc-text s-ellipsis-2">{{ item.description || '伙伴站点简介。' }}</view>
       </view>
     </view>
-
-    <view class="links__apply s-card">
-      <view class="links__apply-title">申请友链</view>
-      <view class="links__field">
-        <input v-model.trim="form.name" class="links__input" maxlength="50" placeholder="网站名称" placeholder-class="s-placeholder">
-      </view>
-      <view class="links__field">
-        <input v-model.trim="form.url" class="links__input" maxlength="90" placeholder="网站地址（支持直接粘贴域名）" placeholder-class="s-placeholder">
-      </view>
-      <view class="links__field">
-        <input v-model.trim="form.email" class="links__input" maxlength="75" placeholder="联系邮箱" placeholder-class="s-placeholder">
-      </view>
-      <view class="links__field">
-        <input v-model.trim="form.avatar" class="links__input" maxlength="255" placeholder="头像链接（可选）" placeholder-class="s-placeholder">
-      </view>
-      <view class="links__field links__field--textarea">
-        <textarea v-model.trim="form.description" class="links__textarea" maxlength="255" auto-height placeholder="站点描述（可选）" placeholder-class="s-placeholder" />
-      </view>
-      <button class="links__submit sl-button sl-button--primary" :disabled="submitting" @tap="submitApply">
-        <s-inline-loading v-if="submitting" text="提交中" light />
-        <text v-else>提交申请</text>
-      </button>
-    </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
 import { onLoad, onShow } from '@dcloudio/uni-app';
-import { applyFriendLink, fetchFriendLinks } from '../modules/site/api/site.api';
+import { fetchFriendLinks } from '../modules/site/api/site.api';
 import type { FriendLinkItem } from '@/modules/site/types/site';
-import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 import { normalizeAssetUrl } from '@/utils/url';
 import { useThemeStore } from '@/stores/theme';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 const themeStore = useThemeStore();
+const { guard } = useMiniAccess();
 const items = ref<FriendLinkItem[]>([]);
 const loading = ref(false);
-const submitting = ref(false);
 
 onShow(() => {
   themeStore.syncNativeArea();
 });
-const form = reactive({
-  name: '',
-  url: '',
-  email: '',
-  avatar: '',
-  description: ''
-});
 
 onLoad(() => {
+  if (!guard('friendLinkEnabled')) {
+    return;
+  }
   loadLinks();
 });
 
@@ -86,30 +59,6 @@ async function loadLinks(): Promise<void> {
     items.value = await fetchFriendLinks();
   } finally {
     loading.value = false;
-  }
-}
-
-function validateApply(): boolean {
-  if (!form.name || !form.url || !form.email) {
-    showInfoToast('请补全网站名称、网址和联系邮箱');
-    return false;
-  }
-  return true;
-}
-
-async function submitApply(): Promise<void> {
-  if (submitting.value || !validateApply()) return;
-  submitting.value = true;
-  try {
-    await applyFriendLink({ ...form });
-    form.name = '';
-    form.url = '';
-    form.email = '';
-    form.avatar = '';
-    form.description = '';
-    showSuccessToast('友链申请已提交');
-  } finally {
-    submitting.value = false;
   }
 }
 </script>

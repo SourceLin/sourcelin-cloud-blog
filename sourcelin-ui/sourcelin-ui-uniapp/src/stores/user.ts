@@ -3,6 +3,7 @@
 
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { isBloggerIdentity } from '@/shared/utils/mini-access';
 import {
   getToken,
   setToken,
@@ -92,11 +93,14 @@ export const useUserStore = defineStore('user', () => {
     return queue;
   }
 
+  const isBlogger = computed(() => isBloggerIdentity(userInfo.value));
+
   return {
     token,
     userInfo,
     pendingActions,
     isLoggedIn,
+    isBlogger,
     restoreFromStorage,
     loginWithToken,
     updateUserInfo,

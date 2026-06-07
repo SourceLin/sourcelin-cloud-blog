@@ -46,8 +46,10 @@ import { onLoad, onShow } from '@dcloudio/uni-app';
 import { getLegalArticle, type LegalArticle } from '../modules/site/constants/legal';
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { useThemeStore } from '@/stores/theme';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 const themeStore = useThemeStore();
+const { guard } = useMiniAccess();
 const article = ref<LegalArticle | null>(null);
 
 watch(article, (currentArticle) => {
@@ -63,6 +65,9 @@ onShow(() => {
 });
 
 onLoad((options) => {
+  if (!guard('policyEnabled')) {
+    return;
+  }
   article.value = getLegalArticle(typeof options?.type === 'string' ? options.type : '');
 });
 </script>

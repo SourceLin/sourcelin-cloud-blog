@@ -4,6 +4,11 @@ import type { FrontUserInfo } from '../types/user';
 import type { ArticleSummary } from '@/modules/article/types/article';
 import type { FollowItem } from '@/modules/interaction/types/interaction';
 
+const PUBLIC_READ_OPTIONS = {
+  skipAuthRedirect: true,
+  skipErrorToast: true
+} as const;
+
 export function fetchCurrentUserInfo(): Promise<FrontUserInfo> {
   return http.get<FrontUserInfo>('/front/user/info');
 }
@@ -30,7 +35,7 @@ export function uploadUserAvatar(filePath: string): Promise<{ avatar: string; av
 }
 
 export function fetchUserDetail(userId: number): Promise<FrontUserInfo> {
-  return http.get<FrontUserInfo>(`/front/users/${userId}`);
+  return http.get<FrontUserInfo>(`/front/users/${userId}`, undefined, PUBLIC_READ_OPTIONS);
 }
 
 export function fetchUserArticlePage(
@@ -43,7 +48,7 @@ export function fetchUserArticlePage(
     page,
     pageSize,
     status
-  });
+  }, PUBLIC_READ_OPTIONS);
 }
 
 export function fetchUserFollowerPage(
@@ -56,7 +61,7 @@ export function fetchUserFollowerPage(
     page,
     pageSize,
     state
-  });
+  }, PUBLIC_READ_OPTIONS);
 }
 
 export function fetchUserFollowingPage(
@@ -69,5 +74,5 @@ export function fetchUserFollowingPage(
     page,
     pageSize,
     state
-  });
+  }, PUBLIC_READ_OPTIONS);
 }

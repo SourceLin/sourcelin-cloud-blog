@@ -198,13 +198,17 @@ import type { ArticleDetail, CategoryItem, TagItem } from '@/modules/article/typ
 import { markArticleRefresh } from '../modules/article/utils/publish';
 import { uploadPublicFile } from '../modules/shared/api/file.api';
 import { reportAnalyticsEvent } from '@/shared/utils/analytics';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 import { useThemeStore } from '@/stores/theme';
+import { useUserStore } from '@/stores/user';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 import { pickSingleImagePath } from '../modules/utils/media';
 import { normalizeAssetUrl } from '@/utils/url';
 
 type SubmitMode = 'draft' | 'review' | '';
 const themeStore = useThemeStore();
+const userStore = useUserStore();
+const { guard } = useMiniAccess();
 
 onShow(() => {
   themeStore.syncNativeArea();
@@ -285,6 +289,13 @@ const statusTip = computed(() => {
 });
 
 onLoad(async (options) => {
+  if (!guard('articlePublishEnabled')) {
+    return;
+  }
+  if (!userStore.isBlogger) {
+    uni.switchTab({ url: '/pages/home/home' });
+    return;
+  }
   bootLoading.value = true;
   try {
     await Promise.all([loadCategories(), loadTags()]);

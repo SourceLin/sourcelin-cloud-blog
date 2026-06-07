@@ -351,3 +351,41 @@ export interface KeywordSaveBody {
   block?: string[];
   suspect?: string[];
 }
+
+export interface MobileCapability {
+  id?: number;
+  client: "mini" | "h5" | "app" | string;
+  reviewSafeMode: boolean;
+
+  // 基础与阅读
+  articleReadEnabled: boolean;
+  searchEnabled: boolean;
+  profileEnabled: boolean;
+  favoriteEnabled: boolean;
+  readingHistoryEnabled: boolean;
+
+  // 设置与服务
+  settingsEnabled: boolean;
+  policyEnabled: boolean;
+  aboutEnabled: boolean;
+  friendLinkEnabled: boolean;
+  navigationEnabled: boolean;
+
+  // 创作
+  articlePublishEnabled: boolean;
+  articlePublishRole: string;
+  userUploadEnabled: boolean;
+
+  // 社交互动
+  commentEnabled: boolean;
+  communityEnabled: boolean;
+  sayPublishEnabled: boolean;
+  treeholeEnabled: boolean;
+  interactionCenterEnabled: boolean;
+  followEnabled: boolean;
+  messageCenterEnabled: boolean;
+  userHomeEnabled: boolean;
+
+  createTime?: string;
+  updateTime?: string;
+}

@@ -31,18 +31,29 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { onShow } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import { createTreehole } from '@/modules/community/api/community.api';
 import { markCommunityRefresh } from '@/modules/community/utils/publish';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 import { useThemeStore } from '@/stores/theme';
 import { useUserStore } from '@/stores/user';
 
 const themeStore = useThemeStore();
 const userStore = useUserStore();
+const { guard } = useMiniAccess();
 const content = ref('');
 const submitting = ref(false);
 const isLoggedIn = computed(() => userStore.isLoggedIn);
+
+onLoad(() => {
+  if (!guard('communityEnabled')) {
+    return;
+  }
+  if (!userStore.isBlogger) {
+    uni.switchTab({ url: '/pages/home/home' });
+  }
+});
 
 onShow(() => {
   themeStore.syncNativeArea();

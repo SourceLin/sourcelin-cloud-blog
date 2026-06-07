@@ -2,12 +2,17 @@ import { http } from '@/utils/request';
 import type { PageResult } from '@/shared/types/api';
 import type { SayItem, TreeholeItem } from '../types/community';
 
+const PUBLIC_READ_OPTIONS = {
+  skipAuthRedirect: true,
+  skipErrorToast: true
+} as const;
+
 export function fetchSayPage(page = 1, pageSize = 10): Promise<PageResult<SayItem>> {
-  return http.get<PageResult<SayItem>>('/front/says', { page, pageSize });
+  return http.get<PageResult<SayItem>>('/front/says', { page, pageSize }, PUBLIC_READ_OPTIONS);
 }
 
 export function fetchTreeholePage(page = 1, pageSize = 10): Promise<PageResult<TreeholeItem>> {
-  return http.get<PageResult<TreeholeItem>>('/front/treeholes', { page, pageSize });
+  return http.get<PageResult<TreeholeItem>>('/front/treeholes', { page, pageSize }, PUBLIC_READ_OPTIONS);
 }
 
 export function createSay(payload: {

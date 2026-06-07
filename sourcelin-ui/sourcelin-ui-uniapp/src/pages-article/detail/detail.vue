@@ -43,7 +43,7 @@
             </view>
           </view>
         </view>
-        <button class="detail__follow sl-button sl-button--primary sl-button--sm" size="mini" @tap.stop="toggleFollow">
+        <button v-if="showFollowAction" class="detail__follow sl-button sl-button--primary sl-button--sm" size="mini" @tap.stop="toggleFollow">
           {{ article.isFollowed ? '已关注' : '关注' }}
         </button>
       </view>
@@ -63,10 +63,10 @@
         </s-empty>
       </view>
 
-      <view class="detail__comments s-card">
+      <view v-if="showCommentsSection" class="detail__comments s-card">
         <view class="detail__section-head">
           <text class="detail__section-title">评论</text>
-          <text class="detail__comment-action" @tap="handleWriteCommentTap">写评论</text>
+          <text v-if="canUseComments" class="detail__comment-action" @tap="handleWriteCommentTap">写评论</text>
         </view>
         <s-loading
           v-if="commentLoading && comments.length === 0"
@@ -77,15 +77,15 @@
         />
         <s-empty
           v-else-if="comments.length === 0"
-          title="还没有评论"
-          text="来写第一条留言，开启这篇文章的讨论。"
+          :title="canUseComments ? '还没有评论' : '暂无公开评论'"
+          :text="canUseComments ? '来写第一条留言，开启这篇文章的讨论。' : '当前版本未开放评论发布，欢迎先收藏回访。'"
         />
         <view v-for="item in commentTree" :key="item.id" class="detail__comment" @tap="handleCommentTap(item)">
           <view class="detail__comment-head">
             <text class="detail__comment-nickname">{{ item.userNickname || item.nickname || '读者' }}</text>
             <view class="detail__comment-meta">
               <text class="detail__comment-time">{{ formatDate(item.createTime) }}</text>
-              <text class="detail__comment-reply-btn" @tap.stop="handleCommentTap(item)">回复</text>
+              <text v-if="canUseComments" class="detail__comment-reply-btn" @tap.stop="handleCommentTap(item)">回复</text>
               <text 
                 v-if="userStore.isLoggedIn && userStore.userInfo && Number(userStore.userInfo.id) === item.userId" 
                 class="detail__comment-delete-btn" 
@@ -113,7 +113,7 @@
                 </view>
                 <view class="detail__reply-meta">
                   <text class="detail__reply-time">{{ formatDate(reply.createTime) }}</text>
-                  <text class="detail__reply-btn" @tap.stop="handleCommentTap(reply)">回复</text>
+                  <text v-if="canUseComments" class="detail__reply-btn" @tap.stop="handleCommentTap(reply)">回复</text>
                   <text 
                     v-if="userStore.isLoggedIn && userStore.userInfo && Number(userStore.userInfo.id) === reply.userId" 
                     class="detail__reply-delete-btn" 
@@ -154,7 +154,7 @@
       <view class="detail__action" :class="{ 'detail__action--active': article.isCollected }" @tap="toggleCollect">
         收藏 {{ article.collectCount || 0 }}
       </view>
-      <view class="detail__action" @tap="handleWriteCommentTap">
+      <view v-if="canUseComments" class="detail__action" @tap="handleWriteCommentTap">
         评论 {{ article.commentCount || 0 }}
       </view>
       <button class="detail__share sl-button sl-button--secondary" open-type="share">分享</button>
@@ -215,16 +215,16 @@ import type { CommentItem, CommentCreatePayload } from '@/modules/comment/types/
 import { collectTarget, followUser, likeTarget, uncollectTarget, unfollowById, unlikeTarget } from '@/modules/interaction/api/interaction.api';
 import { createContentReport } from '@/modules/report/api/report.api';
 import { useKeyboardInset, useBackToTop } from '@/shared/composables/useBackToTop';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 import { reportAnalyticsEvent, trackArticleInterest } from '@/shared/utils/analytics';
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
-import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { AUTH_LOGIN_SUCCESS_EVENT, type LoginSuccessEventDetail } from '@/utils/auth';
 import { showInfoToast } from '@/utils/feedback';
 import { normalizeAssetUrl } from '@/utils/url';
 import SThemeSheet from '../components/s-theme-sheet/s-theme-sheet.vue';
 
-const userStore = useUserStore();
+const { userStore, can } = useMiniAccess();
 const themeStore = useThemeStore();
 const articleId = ref(0);
 const article = ref<ArticleDetail | null>(null);
@@ -293,6 +293,7 @@ const commentPlaceholder = computed(() => {
 });
 
 function handleCommentTap(item: CommentItem): void {
+  if (!canUseComments.value) return;
   replyTarget.value = item;
   openCommentSheet();
 }
@@ -318,6 +319,10 @@ const {
 } = useKeyboardInset();
 
 const coverUrl = computed(() => normalizeAssetUrl(article.value?.avatar));
+const canUseComments = computed(() => can('commentEnabled'));
+const canOpenUserHome = computed(() => can('userHomeEnabled'));
+const showFollowAction = computed(() => can('followEnabled'));
+const showCommentsSection = computed(() => canUseComments.value || comments.value.length > 0);
 
 watch(article, (currentArticle) => {
   applyH5Seo({
@@ -414,6 +419,7 @@ async function toggleCollect(): Promise<void> {
 }
 
 async function toggleFollow(): Promise<void> {
+  if (!showFollowAction.value) return;
   if (!article.value?.userId) return;
   if (!requireLogin('user:follow', { targetUserId: article.value.userId })) return;
   try {
@@ -432,11 +438,13 @@ async function toggleFollow(): Promise<void> {
 }
 
 function handleWriteCommentTap(): void {
+  if (!canUseComments.value) return;
   replyTarget.value = null;
   openCommentSheet();
 }
 
 function openCommentSheet(): void {
+  if (!canUseComments.value) return;
   commentSheetVisible.value = true;
 }
 
@@ -447,6 +455,7 @@ function closeCommentSheet(): void {
 }
 
 async function submitComment(): Promise<void> {
+  if (!canUseComments.value) return;
   const content = commentContent.value.trim();
   if (!article.value || !content) {
     showInfoToast('请输入评论内容');
@@ -539,6 +548,7 @@ function goLogin(): void {
 }
 
 function openAuthorHome(): void {
+  if (!canOpenUserHome.value) return;
   if (!article.value?.userId) return;
   uni.navigateTo({ url: `/pages-user/home/home?id=${article.value.userId}` });
 }

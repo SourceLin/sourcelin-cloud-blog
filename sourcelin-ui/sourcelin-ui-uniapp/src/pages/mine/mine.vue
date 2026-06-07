@@ -16,7 +16,7 @@
         <view class="mine__profile-text">
           <view class="mine__nickname">{{ greetingText }}</view>
           <view class="mine__hint">{{ hintText }}</view>
-          <view v-if="userStore.isLoggedIn" class="mine__quick-stats">
+          <view v-if="userStore.isLoggedIn && userStore.isBlogger" class="mine__quick-stats">
             <text>{{ userStore.userInfo?.articleCount || 0 }} 篇文章</text>
             <text>{{ userStore.userInfo?.followerCount || 0 }} 位关注者</text>
           </view>
@@ -29,8 +29,8 @@
       <view class="mine__banner">
         <image class="mine__banner-bg" src="/static/backgrounds/home-bg.jpg" mode="aspectFill" />
         <view class="mine__banner-mask" />
-        <view class="mine__banner-title">欢迎来到 圆圈 Town</view>
-        <view class="mine__banner-desc">收藏灵感，追更作者，回访每一篇值得重读的内容。</view>
+        <view class="mine__banner-title">欢迎来到 圆圈博客</view>
+        <view class="mine__banner-desc">收藏好文、整理资料，在移动端轻松回访每一篇值得重读的内容。</view>
       </view>
 
       <view class="mine__section mine__section--assets">
@@ -101,7 +101,7 @@
         <view class="mine-login__handle" />
         <image class="mine-login__logo" src="/static/logo/logo.png" mode="aspectFit" />
         <view class="mine-login__title">欢迎加入 圆圈博客</view>
-        <view class="mine-login__desc">登录后同步收藏、关注和互动记录。</view>
+        <view class="mine-login__desc">登录后同步收藏、资料与阅读偏好。</view>
 
         <button class="mine-login__primary sl-button sl-button--primary" :disabled="wechatSubmitting" @tap="loginWithWechat">
           <s-inline-loading v-if="wechatSubmitting" text="微信登录中" light />
@@ -194,7 +194,7 @@
     <view class="s-liquid-tabbar">
       <view class="s-liquid-tabbar__shell">
         <view
-          v-for="item in liquidTabItems"
+          v-for="item in visibleLiquidTabItems"
           :key="item.path"
           class="s-liquid-tabbar__item"
           :class="{ 's-liquid-tabbar__item--active': item.path === activeTabPath }"
@@ -235,16 +235,21 @@ import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo
 import { mapFrontUserInfo } from '@/shared/utils/user-mapper';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
+import { useCapabilityStore } from '@/stores/capability';
 import { AUTH_LOGIN_SUCCESS_EVENT, reset401Guard, type LoginSuccessEventDetail } from '@/utils/auth';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 import { normalizeAssetUrl } from '@/utils/url';
 import type { LegalArticleType } from '@/modules/site/types/legal';
 import { useBackToTop } from '@/shared/composables/useBackToTop';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 const userStore = useUserStore();
 const themeStore = useThemeStore();
+const capabilityStore = useCapabilityStore();
+const { can, resolveLiquidTabs } = useMiniAccess();
 const { backToTopVisible, handlePageScroll } = useBackToTop();
 const activeTabPath = 'pages/mine/mine';
+const visibleLiquidTabItems = computed(() => resolveLiquidTabs(liquidTabItems));
 const loginSheetVisible = ref(false);
 const agreementChecked = ref(false);
 const submitting = ref(false);
@@ -275,7 +280,9 @@ const greetingText = computed(() =>
 );
 
 const hintText = computed(() =>
-  userStore.isLoggedIn ? '管理资料与内容回访入口' : '登录后同步收藏、关注与互动记录'
+  userStore.isLoggedIn
+    ? (userStore.isBlogger ? '管理资料、文章与移动端创作入口' : '同步收藏、资料与基础阅读设置')
+    : '登录后同步收藏、资料与阅读偏好'
 );
 
 const avatarUrl = computed(() => normalizeAssetUrl(userStore.userInfo?.avatar) || '/static/header/avatar.jpg');
@@ -290,10 +297,12 @@ watch([displayName, hintText], () => {
     title: buildSeoTitle('我的'),
     description: extractSeoSummary(
       userStore.isLoggedIn
-        ? `${displayName.value} 的移动端主页，管理资料、内容回访、收藏、关注与消息中心。`
-        : '登录后同步收藏、关注、消息与互动记录。'
+        ? (userStore.isBlogger
+          ? `${displayName.value} 的移动端主页，管理资料、文章内容与站点维护入口。`
+          : `${displayName.value} 的移动端主页，管理资料、收藏与阅读偏好。`)
+        : '登录后同步收藏、资料与阅读偏好。'
     ),
-    keywords: ['我的', '用户中心', '收藏', '关注', '消息中心', userStore.isLoggedIn ? displayName.value : '登录']
+    keywords: ['我的', '用户中心', '收藏', '资料', userStore.isLoggedIn ? displayName.value : '登录']
   });
 }, { immediate: true });
 
@@ -307,7 +316,7 @@ interface Entry {
 }
 
 const entries: Entry[] = [
-  { key: 'interactions', text: '我的互动', desc: '收藏、点赞与评论记录', url: '/pages-user/interactions/interactions', icon: 'star-filled', iconColor: '#FFB800' },
+  { key: 'interactions', text: '我的收藏', desc: '回看收藏过的文章与内容', url: '/pages-user/interactions/interactions?tab=collect', icon: 'star-filled', iconColor: '#FFB800' },
   { key: 'follows', text: '关注/粉丝', desc: '管理关注与回访', url: '/pages-user/follows/follows', icon: 'heart-filled', iconColor: '#FF5B75' },
   { key: 'profile', text: '个人资料', desc: '编辑昵称、头像与简介', url: '/pages-user/profile/profile', icon: 'person-filled', iconColor: '#3B59FF' },
   { key: 'settings', text: '体验设置', desc: '外观、推荐与订阅消息', url: '/pages-user/settings/settings', icon: 'gear-filled', iconColor: '#7C4DFF' },
@@ -319,9 +328,48 @@ const entries: Entry[] = [
   { key: 'messages', text: '消息中心', desc: '查看回复、点赞与系统通知', url: '/pages-messages/index/index', icon: 'chat-filled', iconColor: '#00D2D3' }
 ];
 const coreEntryKeys: Entry['key'][] = ['interactions', 'articles', 'follows', 'messages'];
-const coreEntries = computed(() => entries.filter((entry) => coreEntryKeys.includes(entry.key)));
-const secondaryEntries = computed(() => entries.filter((entry) => !coreEntryKeys.includes(entry.key)));
-const loginRequiredKeys: Entry['key'][] = ['interactions', 'follows', 'profile', 'articles', 'messages'];
+const coreEntries = computed(() => {
+  return entries.filter((entry) => {
+    if (!coreEntryKeys.includes(entry.key)) return false;
+
+    if (entry.key === 'interactions') {
+      return capabilityStore.capabilities.favoriteEnabled || userStore.isBlogger;
+    }
+    if (entry.key === 'articles') {
+      return userStore.isBlogger && can('articlePublishEnabled');
+    }
+    if (entry.key === 'follows') {
+      return userStore.isBlogger && can('followEnabled');
+    }
+    if (entry.key === 'messages') {
+      return userStore.isBlogger && can('messageCenterEnabled');
+    }
+    return true;
+  });
+});
+
+const secondaryEntries = computed(() => {
+  const caps = capabilityStore.capabilities;
+  return entries.filter((entry) => {
+    if (coreEntryKeys.includes(entry.key)) return false;
+    
+    if (entry.key === 'profile') return caps.profileEnabled;
+    if (entry.key === 'settings') return caps.settingsEnabled;
+    if (entry.key === 'policies') return caps.policyEnabled;
+    if (entry.key === 'about') return caps.aboutEnabled;
+    if (entry.key === 'links') return caps.friendLinkEnabled;
+    if (entry.key === 'navigation') return caps.navigationEnabled;
+    return true;
+  });
+});
+
+const loginRequiredKeys = computed<Entry['key'][]>(() => {
+  const keys: Entry['key'][] = ['profile', 'interactions'];
+  if (userStore.isBlogger) {
+    keys.push('follows', 'articles', 'messages');
+  }
+  return keys;
+});
 
 onShow(() => {
   hideNativeTabbar();
@@ -359,11 +407,28 @@ function onTapProfile(): void {
 function onTapEntry(key: Entry['key']): void {
   const entry = entries.find((item) => item.key === key);
   if (!entry) return;
-  if (!userStore.isLoggedIn && loginRequiredKeys.includes(key)) {
+  if (!isEntryVisible(key)) return;
+  if (!userStore.isLoggedIn && loginRequiredKeys.value.includes(key)) {
     openLoginSheet(entry.url);
     return;
   }
   uni.navigateTo({ url: entry.url });
+}
+
+function isEntryVisible(key: Entry['key']): boolean {
+  if (key === 'interactions') {
+    return capabilityStore.capabilities.favoriteEnabled || userStore.isBlogger;
+  }
+  if (key === 'articles') return userStore.isBlogger && can('articlePublishEnabled');
+  if (key === 'follows') return userStore.isBlogger && can('followEnabled');
+  if (key === 'messages') return userStore.isBlogger && can('messageCenterEnabled');
+  if (key === 'profile') return can('profileEnabled');
+  if (key === 'settings') return can('settingsEnabled');
+  if (key === 'policies') return can('policyEnabled');
+  if (key === 'about') return can('aboutEnabled');
+  if (key === 'links') return can('friendLinkEnabled');
+  if (key === 'navigation') return can('navigationEnabled');
+  return true;
 }
 
 function openLoginSheet(targetUrl = ''): void {

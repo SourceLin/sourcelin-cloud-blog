@@ -30,12 +30,14 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { onShow } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import { LEGAL_ARTICLES, type LegalArticleType } from '../modules/site/constants/legal';
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { useThemeStore } from '@/stores/theme';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 const themeStore = useThemeStore();
+const { guard } = useMiniAccess();
 const articles = computed(() => LEGAL_ARTICLES);
 
 applyH5Seo({
@@ -46,6 +48,10 @@ applyH5Seo({
 
 onShow(() => {
   themeStore.syncNativeArea();
+});
+
+onLoad(() => {
+  guard('policyEnabled');
 });
 
 function openPolicy(type: LegalArticleType): void {

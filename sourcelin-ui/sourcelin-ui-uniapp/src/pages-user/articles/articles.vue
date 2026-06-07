@@ -69,9 +69,9 @@ import { deleteArticle } from '@/modules/article/api/article.api';
 import { consumeArticleRefresh } from '../modules/article/utils/publish';
 import type { ArticleSummary } from '@/modules/article/types/article';
 import { fetchUserArticlePage } from '@/modules/user/api/user.api';
-import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { showSuccessToast } from '@/utils/feedback';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 type StatusValue = 'all' | 1 | 0;
 
@@ -81,7 +81,7 @@ const tabs: Array<{ label: string; value: StatusValue }> = [
   { label: '未发布', value: 0 }
 ];
 
-const userStore = useUserStore();
+const { userStore, guard } = useMiniAccess();
 const themeStore = useThemeStore();
 const activeTab = ref<StatusValue>('all');
 const items = ref<ArticleSummary[]>([]);
@@ -93,6 +93,9 @@ const pageSize = 10;
 onLoad(() => {
   if (!userStore.isLoggedIn || !userStore.userInfo?.id) {
     uni.redirectTo({ url: '/pages-user/login/login' });
+    return;
+  }
+  if (!guard('articlePublishEnabled')) {
     return;
   }
   refresh();

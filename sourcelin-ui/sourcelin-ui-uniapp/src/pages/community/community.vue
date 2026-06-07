@@ -16,6 +16,7 @@
         </view>
       </view>
       <view
+        v-if="canPublishCommunity"
         class="community__fab"
         :aria-label="activeTab === 'says' ? '发说说' : '写树洞'"
         @tap="goPublish"
@@ -54,7 +55,7 @@
                 <view class="community__time">{{ formatDate(item.createTime) }}</view>
               </view>
             </view>
-            <view class="community__more" @tap="openItemAction(item)">···</view>
+            <view v-if="showCommunityActions" class="community__more" @tap="openItemAction(item)">···</view>
           </view>
           <view class="community__content" :class="{ 'community__content--treehole': activeTab === 'treeholes' }">
             <text>{{ item.content }}</text>
@@ -82,7 +83,7 @@
             </view>
           </view>
 
-          <view class="community__actions">
+          <view v-if="showCommunityActions" class="community__actions">
             <view
               class="community__action"
               :class="{ 'community__action--active': isLiked(item) }"
@@ -116,7 +117,7 @@
     <view class="s-liquid-tabbar">
       <view class="s-liquid-tabbar__shell">
         <view
-          v-for="item in liquidTabItems"
+          v-for="item in visibleLiquidTabItems"
           :key="item.path"
           class="s-liquid-tabbar__item"
           :class="{ 's-liquid-tabbar__item--active': item.path === activeTabPath }"
@@ -160,7 +161,7 @@
               <text class="community__comment-nickname">{{ item.userNickname || item.nickname || '读者' }}</text>
               <view class="community__comment-meta">
                 <text class="community__comment-time">{{ formatDate(item.createTime) }}</text>
-                <text class="community__comment-reply-btn" @tap.stop="handleCommentTap(item)">回复</text>
+                <text v-if="canUseComments" class="community__comment-reply-btn" @tap.stop="handleCommentTap(item)">回复</text>
                 <text 
                   v-if="userStore.isLoggedIn && currentUserId && currentUserId === item.userId" 
                   class="community__comment-delete-btn" 
@@ -188,7 +189,7 @@
                   </view>
                   <view class="community__reply-meta">
                     <text class="community__reply-time">{{ formatDate(reply.createTime) }}</text>
-                    <text class="community__reply-btn" @tap.stop="handleCommentTap(reply)">回复</text>
+                    <text v-if="canUseComments" class="community__reply-btn" @tap.stop="handleCommentTap(reply)">回复</text>
                     <text 
                       v-if="userStore.isLoggedIn && currentUserId && currentUserId === reply.userId" 
                       class="community__reply-delete-btn" 
@@ -225,27 +226,32 @@
           <view class="community__reply-indicator-close" @tap="cancelReply">✕</view>
         </view>
 
-        <textarea
-          v-model="commentContent"
-          class="community__textarea"
-          :placeholder="commentPlaceholder"
-          placeholder-class="textarea-placeholder"
-          maxlength="300"
-          auto-height
-          fixed
-          :adjust-position="false"
-          :cursor-spacing="keyboardCursorSpacing"
-        />
-        <view class="community__sheet-actions">
-          <button class="community__sheet-button community__sheet-button--ghost sl-button sl-button--secondary" @tap="closeCommentSheet">取消</button>
-          <button
-            class="community__sheet-button community__sheet-button--primary sl-button sl-button--primary"
-            :disabled="commentSubmitting"
-            @tap="submitComment"
-          >
-            <s-inline-loading v-if="commentSubmitting" text="发布中" light />
-            <text v-else>发布</text>
-          </button>
+        <template v-if="canUseComments">
+          <textarea
+            v-model="commentContent"
+            class="community__textarea"
+            :placeholder="commentPlaceholder"
+            placeholder-class="textarea-placeholder"
+            maxlength="300"
+            auto-height
+            fixed
+            :adjust-position="false"
+            :cursor-spacing="keyboardCursorSpacing"
+          />
+          <view class="community__sheet-actions">
+            <button class="community__sheet-button community__sheet-button--ghost sl-button sl-button--secondary" @tap="closeCommentSheet">取消</button>
+            <button
+              class="community__sheet-button community__sheet-button--primary sl-button sl-button--primary"
+              :disabled="commentSubmitting"
+              @tap="submitComment"
+            >
+              <s-inline-loading v-if="commentSubmitting" text="发布中" light />
+              <text v-else>发布</text>
+            </button>
+          </view>
+        </template>
+        <view v-else class="community__sheet-actions" style="margin-top: 20rpx;">
+          <button class="community__sheet-button community__sheet-button--ghost sl-button sl-button--secondary" style="width: 100%" @tap="closeCommentSheet">返回</button>
         </view>
       </view>
     </view>
@@ -262,17 +268,20 @@ import type { CommentItem, CommentSource, CommentCreatePayload } from '@/modules
 import { collectTarget, likeTarget, uncollectTarget, unlikeTarget } from '@/modules/interaction/api/interaction.api';
 import { createContentReport } from '@/modules/report/api/report.api';
 import { useKeyboardInset } from '@/shared/composables/useBackToTop';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 import { reportAnalyticsEvent } from '@/shared/utils/analytics';
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import type { InteractionTargetType } from '@/modules/interaction/types/interaction';
 import { env } from '@/config/env';
 import { consumeCommunityRefresh } from '@/modules/community/utils/publish';
 import { liquidTabItems, switchLiquidTab } from '@/shared/utils/liquid-tabbar';
-import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { AUTH_LOGIN_SUCCESS_EVENT, type LoginSuccessEventDetail } from '@/utils/auth';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 import { normalizeAssetUrl } from '@/utils/url';
+
+const { userStore, can, guard, resolveLiquidTabs } = useMiniAccess();
+const themeStore = useThemeStore();
 
 type TabKey = 'says' | 'treeholes';
 type CommunityItem = SayItem | TreeholeItem;
@@ -287,8 +296,6 @@ const tabs: Tab[] = [
   { key: 'treeholes', text: '树洞' }
 ];
 
-const userStore = useUserStore();
-const themeStore = useThemeStore();
 const activeTab = ref<TabKey>('says');
 const says = ref<SayItem[]>([]);
 const treeholes = ref<TreeholeItem[]>([]);
@@ -361,8 +368,17 @@ const commentPlaceholder = computed(() => {
   }
   return '写下你的看法...';
 });
+const visibleLiquidTabItems = computed(() => resolveLiquidTabs(liquidTabItems));
+const canUseComments = computed(() => can('commentEnabled'));
+const canUseUserHome = computed(() => can('userHomeEnabled'));
+const canUseCommunityTab = computed(() => can('communityEnabled'));
+const canPublishCommunity = computed(() =>
+  activeTab.value === 'says' ? can('sayPublishEnabled') : can('treeholeEnabled')
+);
+const showCommunityActions = computed(() => canUseComments.value);
 
 function handleCommentTap(item: CommentItem): void {
+  if (!canUseComments.value) return;
   replyTarget.value = item;
 }
 
@@ -413,6 +429,9 @@ watch([activeTab, currentItems], () => {
 }, { immediate: true });
 
 onLoad((options) => {
+  if (!guard('communityEnabled')) {
+    return;
+  }
   if (options?.tab === 'treeholes') {
     activeTab.value = 'treeholes';
   }
@@ -483,11 +502,13 @@ function previewImages(images: string[], index: number): void {
 }
 
 function goPublish(): void {
+  if (!canPublishCommunity.value) return;
   const url = activeTab.value === 'says' ? '/pages-publish/say/say' : '/pages-publish/treehole/treehole';
   uni.navigateTo({ url });
 }
 
 function openUserHome(item: CommunityItem): void {
+  if (!canUseUserHome.value) return;
   if (activeTab.value !== 'says') return;
   const say = item as SayItem;
   const userId = say.user?.id || say.userId;
@@ -552,12 +573,14 @@ function loadMore(): void {
 }
 
 function switchTab(key: TabKey): void {
+  if (!canUseCommunityTab.value) return;
   if (activeTab.value === key) return;
   activeTab.value = key;
   if (currentItems.value.length === 0) refresh();
 }
 
 async function openCommentSheet(item: CommunityItem): Promise<void> {
+  if (!canUseComments.value) return;
   activeCommentId.value = item.id;
   activeCommentSource.value = activeTab.value === 'says' ? 'say' : 'treehole';
   activeCommentLabel.value = activeTab.value === 'says' ? '说说评论区' : '树洞评论区';
@@ -605,6 +628,7 @@ function closeCommentSheet(): void {
 }
 
 async function toggleLike(item: CommunityItem): Promise<void> {
+  if (!showCommunityActions.value) return;
   if (!requireLogin('interaction:like', { targetType: targetType.value, targetId: item.id })) return;
   const next = !isLiked(item);
   item.likedByMe = next;
@@ -619,6 +643,7 @@ async function toggleLike(item: CommunityItem): Promise<void> {
 }
 
 async function toggleCollect(item: CommunityItem): Promise<void> {
+  if (!showCommunityActions.value) return;
   if (!requireLogin('interaction:collect', { targetType: targetType.value, targetId: item.id })) return;
   const next = !isCollected(item);
   setCollected(item, next);
@@ -633,6 +658,7 @@ async function toggleCollect(item: CommunityItem): Promise<void> {
 }
 
 async function submitComment(): Promise<void> {
+  if (!canUseComments.value) return;
   const content = commentContent.value.trim();
   if (!activeCommentId.value || !content) {
     showInfoToast('请输入评论内容');
@@ -669,6 +695,7 @@ async function submitComment(): Promise<void> {
 }
 
 async function handleDeleteComment(id: number): Promise<void> {
+  if (!canUseComments.value) return;
   const confirmed = await new Promise<boolean>((resolve) => {
     uni.showModal({
       title: '提示',
@@ -700,6 +727,7 @@ function canDelete(item: CommunityItem): boolean {
 }
 
 async function openItemAction(item: CommunityItem): Promise<void> {
+  if (!showCommunityActions.value) return;
   if (canDelete(item)) {
     await handleDelete(item);
     return;
@@ -779,6 +807,9 @@ onPageScroll((event) => {
 });
 
 onShow(() => {
+  if (!guard('communityEnabled')) {
+    return;
+  }
   themeStore.syncNativeArea();
   const refreshTab = consumeCommunityRefresh();
   if (!refreshTab) return;

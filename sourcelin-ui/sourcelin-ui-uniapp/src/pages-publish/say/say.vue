@@ -56,6 +56,7 @@ import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
 import { createSay } from '@/modules/community/api/community.api';
 import { markCommunityRefresh } from '@/modules/community/utils/publish';
 import { uploadPublicFile } from '../modules/shared/api/file.api';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
@@ -76,6 +77,7 @@ interface SelectedImage {
 
 const userStore = useUserStore();
 const themeStore = useThemeStore();
+const { guard } = useMiniAccess();
 const content = ref('');
 const submitting = ref(false);
 const images = ref<SelectedImage[]>([]);
@@ -85,6 +87,13 @@ onShow(() => {
 });
 
 onLoad(() => {
+  if (!guard('communityEnabled')) {
+    return;
+  }
+  if (!userStore.isBlogger) {
+    uni.switchTab({ url: '/pages/home/home' });
+    return;
+  }
   if (!userStore.isLoggedIn) {
     uni.redirectTo({ url: '/pages-user/login/login' });
     return;

@@ -11,12 +11,17 @@ import type {
 } from '../types/article';
 import type { ListResult } from '@/shared/types/api';
 
+const PUBLIC_READ_OPTIONS = {
+  skipAuthRedirect: true,
+  skipErrorToast: true
+} as const;
+
 export function fetchHome(query: HomePageQuery = {}): Promise<FrontHome> {
   return http.get<FrontHome>('/front/home', {
     page: query.page ?? 1,
     pageSize: query.pageSize ?? 10,
     categoryId: query.categoryId
-  });
+  }, PUBLIC_READ_OPTIONS);
 }
 
 export function fetchArticlePage(query: ArticlePageQuery = {}): Promise<PageResult<ArticleSummary>> {
@@ -25,11 +30,11 @@ export function fetchArticlePage(query: ArticlePageQuery = {}): Promise<PageResu
     pageSize: query.pageSize ?? 10,
     categoryId: query.categoryId,
     orderBy: query.orderBy
-  });
+  }, PUBLIC_READ_OPTIONS);
 }
 
 export function fetchArticleDetail(id: number | string): Promise<ArticleDetail> {
-  return http.get<ArticleDetail>(`/front/articles/${id}`);
+  return http.get<ArticleDetail>(`/front/articles/${id}`, undefined, PUBLIC_READ_OPTIONS);
 }
 
 export function createArticle(payload: {
@@ -82,7 +87,7 @@ export function searchArticles(
     keyword,
     page,
     pageSize
-  });
+  }, PUBLIC_READ_OPTIONS);
 }
 
 export function searchCategories(
@@ -94,7 +99,7 @@ export function searchCategories(
     keyword,
     page,
     pageSize
-  });
+  }, PUBLIC_READ_OPTIONS);
 }
 
 export function searchTags(
@@ -106,21 +111,21 @@ export function searchTags(
     keyword,
     page,
     pageSize
-  });
+  }, PUBLIC_READ_OPTIONS);
 }
 
 export async function fetchTagList(): Promise<TagItem[]> {
-  const result = await http.get<ListResult<TagItem>>('/front/tags');
+  const result = await http.get<ListResult<TagItem>>('/front/tags', undefined, PUBLIC_READ_OPTIONS);
   return result.items || [];
 }
 
 export async function fetchSearchHotKeywords(): Promise<string[]> {
-  const result = await http.get<ListResult<string>>('/front/search/hot');
+  const result = await http.get<ListResult<string>>('/front/search/hot', undefined, PUBLIC_READ_OPTIONS);
   return result.items || [];
 }
 
 export async function fetchSearchSuggestions(keyword: string): Promise<string[]> {
-  const result = await http.get<ListResult<string>>('/front/search/suggestions', { keyword });
+  const result = await http.get<ListResult<string>>('/front/search/suggestions', { keyword }, PUBLIC_READ_OPTIONS);
   return result.items || [];
 }
 
@@ -132,18 +137,18 @@ export function fetchTagArticles(
   return http.get<PageResult<ArticleSummary>>(`/front/tags/articles/${tagId}`, {
     page,
     pageSize
-  });
+  }, PUBLIC_READ_OPTIONS);
 }
 
 export function reportArticleView(id: number | string): Promise<void> {
-  return http.post<void>(`/front/articles/view/${id}`, undefined, { skipErrorToast: true });
+  return http.post<void>(`/front/articles/view/${id}`, undefined, PUBLIC_READ_OPTIONS);
 }
 
 export function fetchHotArticles(page = 1, pageSize = 5): Promise<PageResult<ArticleSummary>> {
-  return http.get<PageResult<ArticleSummary>>('/front/hot/articles', { page, pageSize });
+  return http.get<PageResult<ArticleSummary>>('/front/hot/articles', { page, pageSize }, PUBLIC_READ_OPTIONS);
 }
 
 export async function fetchCategoryList(): Promise<CategoryItem[]> {
-  const result = await http.get<ListResult<CategoryItem>>('/front/categories');
+  const result = await http.get<ListResult<CategoryItem>>('/front/categories', undefined, PUBLIC_READ_OPTIONS);
   return result.items || [];
 }

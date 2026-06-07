@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.MobileCapabilityMapper">
+    
+    <resultMap type="MobileCapability" id="MobileCapabilityResult">
+        <result property="id"    column="id"    />
+        <result property="client"    column="client"    />
+        <result property="reviewSafeMode"    column="review_safe_mode"    />
+        <result property="articleReadEnabled"    column="article_read_enabled"    />
+        <result property="searchEnabled"    column="search_enabled"    />
+        <result property="profileEnabled"    column="profile_enabled"    />
+        <result property="favoriteEnabled"    column="favorite_enabled"    />
+        <result property="readingHistoryEnabled"    column="reading_history_enabled"    />
+        <result property="settingsEnabled"    column="settings_enabled"    />
+        <result property="policyEnabled"    column="policy_enabled"    />
+        <result property="aboutEnabled"    column="about_enabled"    />
+        <result property="friendLinkEnabled"    column="friend_link_enabled"    />
+        <result property="navigationEnabled"    column="navigation_enabled"    />
+        <result property="articlePublishEnabled"    column="article_publish_enabled"    />
+        <result property="articlePublishRole"    column="article_publish_role"    />
+        <result property="commentEnabled"    column="comment_enabled"    />
+        <result property="communityEnabled"    column="community_enabled"    />
+        <result property="sayPublishEnabled"    column="say_publish_enabled"    />
+        <result property="treeholeEnabled"    column="treehole_enabled"    />
+        <result property="interactionCenterEnabled"    column="interaction_center_enabled"    />
+        <result property="followEnabled"    column="follow_enabled"    />
+        <result property="messageCenterEnabled"    column="message_center_enabled"    />
+        <result property="userHomeEnabled"    column="user_home_enabled"    />
+        <result property="userUploadEnabled"    column="user_upload_enabled"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectMobileCapabilityVo">
+        select id, client, review_safe_mode, article_read_enabled, search_enabled, profile_enabled, favorite_enabled, reading_history_enabled, settings_enabled, policy_enabled, about_enabled, friend_link_enabled, navigation_enabled, article_publish_enabled, article_publish_role, comment_enabled, community_enabled, say_publish_enabled, treehole_enabled, interaction_center_enabled, follow_enabled, message_center_enabled, user_home_enabled, user_upload_enabled, create_time, update_time from b_mobile_capability
+    </sql>
+
+    <select id="selectMobileCapabilityList" parameterType="MobileCapability" resultMap="MobileCapabilityResult">
+        <include refid="selectMobileCapabilityVo"/>
+        <where>  
+            <if test="client != null  and client != ''"> and client = #{client}</if>
+        </where>
+    </select>
+    
+    <select id="selectMobileCapabilityById" parameterType="Long" resultMap="MobileCapabilityResult">
+        <include refid="selectMobileCapabilityVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectMobileCapabilityByClient" parameterType="String" resultMap="MobileCapabilityResult">
+        <include refid="selectMobileCapabilityVo"/>
+        where client = #{client}
+        limit 1
+    </select>
+        
+    <insert id="insertMobileCapability" parameterType="MobileCapability" useGeneratedKeys="true" keyProperty="id">
+        insert into b_mobile_capability
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="client != null">client,</if>
+            <if test="reviewSafeMode != null">review_safe_mode,</if>
+            <if test="articleReadEnabled != null">article_read_enabled,</if>
+            <if test="searchEnabled != null">search_enabled,</if>
+            <if test="profileEnabled != null">profile_enabled,</if>
+            <if test="favoriteEnabled != null">favorite_enabled,</if>
+            <if test="readingHistoryEnabled != null">reading_history_enabled,</if>
+            <if test="settingsEnabled != null">settings_enabled,</if>
+            <if test="policyEnabled != null">policy_enabled,</if>
+            <if test="aboutEnabled != null">about_enabled,</if>
+            <if test="friendLinkEnabled != null">friend_link_enabled,</if>
+            <if test="navigationEnabled != null">navigation_enabled,</if>
+            <if test="articlePublishEnabled != null">article_publish_enabled,</if>
+            <if test="articlePublishRole != null">article_publish_role,</if>
+            <if test="commentEnabled != null">comment_enabled,</if>
+            <if test="communityEnabled != null">community_enabled,</if>
+            <if test="sayPublishEnabled != null">say_publish_enabled,</if>
+            <if test="treeholeEnabled != null">treehole_enabled,</if>
+            <if test="interactionCenterEnabled != null">interaction_center_enabled,</if>
+            <if test="followEnabled != null">follow_enabled,</if>
+            <if test="messageCenterEnabled != null">message_center_enabled,</if>
+            <if test="userHomeEnabled != null">user_home_enabled,</if>
+            <if test="userUploadEnabled != null">user_upload_enabled,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="client != null">#{client},</if>
+            <if test="reviewSafeMode != null">#{reviewSafeMode},</if>
+            <if test="articleReadEnabled != null">#{articleReadEnabled},</if>
+            <if test="searchEnabled != null">#{searchEnabled},</if>
+            <if test="profileEnabled != null">#{profileEnabled},</if>
+            <if test="favoriteEnabled != null">#{favoriteEnabled},</if>
+            <if test="readingHistoryEnabled != null">#{readingHistoryEnabled},</if>
+            <if test="settingsEnabled != null">#{settingsEnabled},</if>
+            <if test="policyEnabled != null">#{policyEnabled},</if>
+            <if test="aboutEnabled != null">#{aboutEnabled},</if>
+            <if test="friendLinkEnabled != null">#{friendLinkEnabled},</if>
+            <if test="navigationEnabled != null">#{navigationEnabled},</if>
+            <if test="articlePublishEnabled != null">#{articlePublishEnabled},</if>
+            <if test="articlePublishRole != null">#{articlePublishRole},</if>
+            <if test="commentEnabled != null">#{commentEnabled},</if>
+            <if test="communityEnabled != null">#{communityEnabled},</if>
+            <if test="sayPublishEnabled != null">#{sayPublishEnabled},</if>
+            <if test="treeholeEnabled != null">#{treeholeEnabled},</if>
+            <if test="interactionCenterEnabled != null">#{interactionCenterEnabled},</if>
+            <if test="followEnabled != null">#{followEnabled},</if>
+            <if test="messageCenterEnabled != null">#{messageCenterEnabled},</if>
+            <if test="userHomeEnabled != null">#{userHomeEnabled},</if>
+            <if test="userUploadEnabled != null">#{userUploadEnabled},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMobileCapability" parameterType="MobileCapability">
+        update b_mobile_capability
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="client != null">client = #{client},</if>
+            <if test="reviewSafeMode != null">review_safe_mode = #{reviewSafeMode},</if>
+            <if test="articleReadEnabled != null">article_read_enabled = #{articleReadEnabled},</if>
+            <if test="searchEnabled != null">search_enabled = #{searchEnabled},</if>
+            <if test="profileEnabled != null">profile_enabled = #{profileEnabled},</if>
+            <if test="favoriteEnabled != null">favorite_enabled = #{favoriteEnabled},</if>
+            <if test="readingHistoryEnabled != null">reading_history_enabled = #{readingHistoryEnabled},</if>
+            <if test="settingsEnabled != null">settings_enabled = #{settingsEnabled},</if>
+            <if test="policyEnabled != null">policy_enabled = #{policyEnabled},</if>
+            <if test="aboutEnabled != null">about_enabled = #{aboutEnabled},</if>
+            <if test="friendLinkEnabled != null">friend_link_enabled = #{friendLinkEnabled},</if>
+            <if test="navigationEnabled != null">navigation_enabled = #{navigationEnabled},</if>
+            <if test="articlePublishEnabled != null">article_publish_enabled = #{articlePublishEnabled},</if>
+            <if test="articlePublishRole != null">article_publish_role = #{articlePublishRole},</if>
+            <if test="commentEnabled != null">comment_enabled = #{commentEnabled},</if>
+            <if test="communityEnabled != null">community_enabled = #{communityEnabled},</if>
+            <if test="sayPublishEnabled != null">say_publish_enabled = #{sayPublishEnabled},</if>
+            <if test="treeholeEnabled != null">treehole_enabled = #{treeholeEnabled},</if>
+            <if test="interactionCenterEnabled != null">interaction_center_enabled = #{interactionCenterEnabled},</if>
+            <if test="followEnabled != null">follow_enabled = #{followEnabled},</if>
+            <if test="messageCenterEnabled != null">message_center_enabled = #{messageCenterEnabled},</if>
+            <if test="userHomeEnabled != null">user_home_enabled = #{userHomeEnabled},</if>
+            <if test="userUploadEnabled != null">user_upload_enabled = #{userUploadEnabled},</if>
+        </trim>
+        where id = #{id}
+    </update>
+</mapper>

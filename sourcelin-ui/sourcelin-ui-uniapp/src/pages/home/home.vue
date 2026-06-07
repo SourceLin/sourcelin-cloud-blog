@@ -51,13 +51,13 @@
               <text class="home__showcase-desc">趋势文章与核心分类</text>
             </view>
           </view>
-          <view class="home__showcase-tile home__showcase-tile--1" @tap="goCommunity">
+          <view class="home__showcase-tile home__showcase-tile--1" @tap="goSecondaryShowcase">
             <image class="home__showcase-slice" src="/static/backgrounds/showcase-bg.jpg" mode="aspectFill" />
             <view class="home__showcase-overlay" />
             <view class="home__showcase-meta">
-              <text class="home__showcase-kicker">Community</text>
-              <text class="home__showcase-title">轻社区</text>
-              <text class="home__showcase-desc">说说互动与树洞</text>
+              <text class="home__showcase-kicker">{{ showCommunityEntrance ? 'Community' : 'Category' }}</text>
+              <text class="home__showcase-title">{{ showCommunityEntrance ? '轻社区' : '内容分类' }}</text>
+              <text class="home__showcase-desc">{{ showCommunityEntrance ? '说说互动与树洞' : '按分类快速找到想读内容' }}</text>
             </view>
           </view>
           <view class="home__showcase-tile home__showcase-tile--2" @tap="goHotList">
@@ -150,7 +150,7 @@
     <view class="s-liquid-tabbar">
       <view class="s-liquid-tabbar__shell">
         <view
-          v-for="item in liquidTabItems"
+          v-for="item in visibleLiquidTabItems"
           :key="item.path"
           class="s-liquid-tabbar__item"
           :class="{ 's-liquid-tabbar__item--active': item.path === activeTabPath }"
@@ -181,13 +181,17 @@ import { reportAnalyticsEvent } from '@/shared/utils/analytics';
 import { hideNativeTabbar, liquidTabItems, switchLiquidTab } from '@/shared/utils/liquid-tabbar';
 import { normalizeAssetUrl } from '@/utils/url';
 import { useBackToTop } from '@/shared/composables/useBackToTop';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 const { loading, siteInfo, notices, featured, feedItems, finished, isEmpty, refresh, loadMore } = useHomeFeed();
 const themeStore = useThemeStore();
 const appStore = useAppStore();
 const { backToTopVisible, handlePageScroll } = useBackToTop();
+const { can, resolveLiquidTabs } = useMiniAccess();
 const brokenCoverArticleIds = shallowRef<Set<number>>(new Set());
 const activeTabPath = 'pages/home/home';
+const visibleLiquidTabItems = computed(() => resolveLiquidTabs(liquidTabItems));
+const showCommunityEntrance = computed(() => can('communityEnabled'));
 
 function resolveCapsuleMetrics() {
   const windowInfo = appStore.systemInfo?.windowInfo ?? appStore.systemInfo?.legacy;
@@ -257,6 +261,14 @@ function goDiscover(): void {
 
 function goCommunity(): void {
   uni.switchTab({ url: '/pages/community/community' });
+}
+
+function goSecondaryShowcase(): void {
+  if (showCommunityEntrance.value) {
+    goCommunity();
+    return;
+  }
+  goDiscover();
 }
 
 function goHotList(): void {

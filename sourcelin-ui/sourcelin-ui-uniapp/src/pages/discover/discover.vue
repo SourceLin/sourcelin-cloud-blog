@@ -112,7 +112,7 @@
     <view class="s-liquid-tabbar">
       <view class="s-liquid-tabbar__shell">
         <view
-          v-for="item in liquidTabItems"
+          v-for="item in visibleLiquidTabItems"
           :key="item.path"
           class="s-liquid-tabbar__item"
           :class="{ 's-liquid-tabbar__item--active': item.path === activeTabPath }"
@@ -133,7 +133,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { onPageScroll, onPullDownRefresh, onShareAppMessage, onShow } from '@dcloudio/uni-app';
 import { fetchCategoryList, fetchHotArticles } from '@/modules/article/api/article.api';
 import type { ArticleSummary, CategoryItem } from '@/modules/article/types/article';
@@ -142,14 +142,17 @@ import { reportAnalyticsEvent, scoreCategoryInterest, sortItemsByInterest } from
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { useThemeStore } from '@/stores/theme';
 import { useBackToTop } from '@/shared/composables/useBackToTop';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 const themeStore = useThemeStore();
+const { resolveLiquidTabs } = useMiniAccess();
 
 const loading = ref(false);
 const hotArticles = ref<ArticleSummary[]>([]);
 const categories = ref<CategoryItem[]>([]);
 const { backToTopVisible, handlePageScroll } = useBackToTop();
 const activeTabPath = 'pages/discover/discover';
+const visibleLiquidTabItems = computed(() => resolveLiquidTabs(liquidTabItems));
 
 watch([hotArticles, categories], () => {
   applyH5Seo({

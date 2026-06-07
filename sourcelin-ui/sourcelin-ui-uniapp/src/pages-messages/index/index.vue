@@ -106,9 +106,11 @@ import { showSuccessToast } from '@/utils/feedback';
 import { useMessageCenter } from '../modules/message/composables/useMessageCenter';
 import type { MessageChannel } from '../modules/message/config/channels';
 import type { MessageItem } from '@/modules/message/types/message';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 const userStore = useUserStore();
 const themeStore = useThemeStore();
+const { guard } = useMiniAccess();
 
 const {
   channels,
@@ -127,6 +129,9 @@ const {
 } = useMessageCenter();
 
 onLoad(() => {
+  if (!guard('messageCenterEnabled')) {
+    return;
+  }
   if (userStore.isLoggedIn) {
     void refresh();
   }

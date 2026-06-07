@@ -2,6 +2,11 @@ import { http } from '@/utils/request';
 import type { PageResult } from '@/shared/types/api';
 import type { CommentCreatePayload, CommentItem, CommentSource } from '../types/comment';
 
+const PUBLIC_READ_OPTIONS = {
+  skipAuthRedirect: true,
+  skipErrorToast: true
+} as const;
+
 export function fetchComments(
   targetId: number,
   source: CommentSource = 'article',
@@ -13,7 +18,7 @@ export function fetchComments(
     source,
     page,
     pageSize
-  });
+  }, PUBLIC_READ_OPTIONS);
 }
 
 export function createComment(payload: CommentCreatePayload): Promise<void> {

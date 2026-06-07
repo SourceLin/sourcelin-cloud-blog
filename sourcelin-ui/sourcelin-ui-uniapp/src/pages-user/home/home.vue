@@ -82,6 +82,7 @@ import { reportAnalyticsEvent } from '@/shared/utils/analytics';
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { useThemeStore } from '@/stores/theme';
 import { normalizeAssetUrl } from '@/utils/url';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 type TabKey = 'articles' | 'followers' | 'followings';
 
@@ -93,6 +94,7 @@ const tabs: Array<{ key: TabKey; label: string }> = [
 
 const loading = ref(false);
 const themeStore = useThemeStore();
+const { guard } = useMiniAccess();
 const userId = ref(0);
 const user = ref<FrontUserInfo | null>(null);
 const activeTab = ref<TabKey>('articles');
@@ -125,6 +127,9 @@ onShow(() => {
 });
 
 onLoad((options) => {
+  if (!guard('userHomeEnabled')) {
+    return;
+  }
   const id = Number(options?.id);
   if (!Number.isFinite(id) || id <= 0) {
     return;
@@ -136,16 +141,15 @@ onLoad((options) => {
 async function loadAll(): Promise<void> {
   loading.value = true;
   try {
-    const [detail, articlePage, followerPage, followingPage] = await Promise.all([
-      fetchUserDetail(userId.value),
+    user.value = await fetchUserDetail(userId.value);
+    const [articlePage, followerPage, followingPage] = await Promise.allSettled([
       fetchUserArticlePage(userId.value, 1, 20),
       fetchUserFollowerPage(userId.value, 1, 20),
       fetchUserFollowingPage(userId.value, 1, 20)
     ]);
-    user.value = detail;
-    articles.value = articlePage.items || [];
-    followers.value = followerPage.items || [];
-    followings.value = followingPage.items || [];
+    articles.value = articlePage.status === 'fulfilled' ? articlePage.value.items || [] : [];
+    followers.value = followerPage.status === 'fulfilled' ? followerPage.value.items || [] : [];
+    followings.value = followingPage.status === 'fulfilled' ? followingPage.value.items || [] : [];
   } finally {
     loading.value = false;
   }

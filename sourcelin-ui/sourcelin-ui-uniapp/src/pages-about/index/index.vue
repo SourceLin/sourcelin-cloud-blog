@@ -43,8 +43,10 @@ import { useAboutPage } from '../modules/site/composables/useAboutPage';
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { DEFAULT_BRAND_LOGO } from '@/utils/url';
 import { useThemeStore } from '@/stores/theme';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 const themeStore = useThemeStore();
+const { guard } = useMiniAccess();
 const {
   about,
   loading,
@@ -90,6 +92,9 @@ onShow(() => {
 });
 
 onLoad(() => {
+  if (!guard('aboutEnabled')) {
+    return;
+  }
   void loadAboutPage();
 });
 </script>

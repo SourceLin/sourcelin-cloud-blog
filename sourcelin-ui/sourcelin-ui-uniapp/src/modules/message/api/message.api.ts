@@ -2,6 +2,11 @@ import { http } from '@/utils/request';
 import type { PageResult } from '@/shared/types/api';
 import type { MessageChannel, MessageItem, MessageUnreadStat } from '../types/message';
 
+const PUBLIC_SYSTEM_MESSAGE_OPTIONS = {
+  skipAuthRedirect: true,
+  skipErrorToast: true
+} as const;
+
 export interface MessagePageQuery {
   page?: number;
   pageSize?: number;
@@ -14,7 +19,11 @@ export function fetchMessagePage(query: MessagePageQuery = {}): Promise<PageResu
   if (channel) {
     params.channel = channel;
   }
-  return http.get<PageResult<MessageItem>>('/front/messages', params);
+  return http.get<PageResult<MessageItem>>(
+    '/front/messages',
+    params,
+    channel === 'system' ? PUBLIC_SYSTEM_MESSAGE_OPTIONS : undefined
+  );
 }
 
 export function fetchMessageDetail(id: number): Promise<MessageItem> {

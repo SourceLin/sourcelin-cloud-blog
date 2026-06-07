@@ -90,9 +90,11 @@ import { useThemeStore } from '@/stores/theme';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 import { pickSingleImagePath } from '../modules/utils/media';
 import { normalizeAssetUrl } from '@/utils/url';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 const userStore = useUserStore();
 const themeStore = useThemeStore();
+const { guard } = useMiniAccess();
 const profile = ref<UserInfo | null>(userStore.userInfo);
 const loading = ref(false);
 const submitting = ref(false);
@@ -123,6 +125,9 @@ const avatarText = computed(() => displayName.value.slice(0, 1).toUpperCase());
 const avatarUrl = computed(() => normalizeAssetUrl(profile.value?.avatar));
 
 onLoad(() => {
+  if (!guard('profileEnabled')) {
+    return;
+  }
   if (!userStore.isLoggedIn) {
     uni.redirectTo({ url: '/pages-user/login/login' });
     return;
