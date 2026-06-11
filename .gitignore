@@ -63,6 +63,7 @@ docs/internal/
 .env.*
 !.env.example
 !.env.*.example
+!sourcelin-ui/sourcelin-ui-platform/.env.development
 
 *.pem
 *.key
