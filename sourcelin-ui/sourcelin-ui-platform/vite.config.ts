@@ -1,4 +1,4 @@
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig, loadEnv, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
@@ -155,63 +155,70 @@ function sitemapPlugin(): Plugin {
   }
 }
 
-export default defineConfig({
-  plugins: [
-    vue(),
-    AutoImport({
-      imports: ['vue', 'vue-router', 'pinia', '@vueuse/core'],
-      dts: 'src/auto-imports.d.ts'
-    }),
-    Components({
-      dirs: ['src/shared/components', 'src/modules'],
-      dts: 'src/components.d.ts'
-    }),
-    sitemapPlugin()
-  ],
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src')
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const blogApiBase = env.VITE_APP_BASE_API || '/blog-api'
+  const blogApiTarget = env.VITE_APP_API_URL || 'http://localhost:8080'
+  const fileApiBase = env.VITE_FILE_BASE_API || '/file'
+
+  return {
+    plugins: [
+      vue(),
+      AutoImport({
+        imports: ['vue', 'vue-router', 'pinia', '@vueuse/core'],
+        dts: 'src/auto-imports.d.ts'
+      }),
+      Components({
+        dirs: ['src/shared/components', 'src/modules'],
+        dts: 'src/components.d.ts'
+      }),
+      sitemapPlugin()
+    ],
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, 'src')
+      },
+      // 优先解析 TS，避免同名 .js/.ts 并存时命中历史 JS 文件
+      extensions: ['.mjs', '.ts', '.js', '.mts', '.jsx', '.tsx', '.json']
     },
-    // 优先解析 TS，避免同名 .js/.ts 并存时命中历史 JS 文件
-    extensions: ['.mjs', '.ts', '.js', '.mts', '.jsx', '.tsx', '.json']
-  },
-  build: {
-    outDir: 'sourcelin-ui-platform',
-    rollupOptions: {
-      output: {
-        manualChunks
-      }
-    }
-  },
-  server: {
-    host: '0.0.0.0',
-    port: 80,
-    proxy: {
-      '/blog-api': {
-        target: 'https://sourcelin.cn',
-        changeOrigin: true,
-        rewrite: (path) => {
-          const normalized = path.replace(/^\/blog-api/, '')
-          if (normalized.startsWith('/front') || normalized.startsWith('/app')) {
-            return `/blog${normalized}`
-          }
-          return normalized
+    build: {
+      outDir: 'sourcelin-ui-platform',
+      rollupOptions: {
+        output: {
+          manualChunks
         }
-      },
-      '/blog': {
-        target: 'https://sourcelin.cn',
-        changeOrigin: true
-      },
-      '/file': {
-        target: 'https://sourcelin.cn',
-        changeOrigin: true,
       }
-    }
-  },
-  css: {
-    preprocessorOptions: {
-      scss: {
-        silenceDeprecations: ['import', 'legacy-js-api']
+    },
+    server: {
+      host: '0.0.0.0',
+      port: 80,
+      proxy: {
+        [blogApiBase]: {
+          target: blogApiTarget,
+          changeOrigin: true,
+          rewrite: (path) => {
+            const normalized = path.replace(new RegExp(`^${blogApiBase}`), '')
+            if (normalized.startsWith('/front') || normalized.startsWith('/app')) {
+              return `/blog${normalized}`
+            }
+            return normalized
+          }
+        },
+        '/blog': {
+          target: blogApiTarget,
+          changeOrigin: true
+        },
+        [fileApiBase]: {
+          target: 'https://sourcelin.cn',
+          changeOrigin: true
+        }
+      }
+    },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          silenceDeprecations: ['import', 'legacy-js-api']
+        }
       }
     }
   }

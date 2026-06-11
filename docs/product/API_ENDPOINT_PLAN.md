@@ -58,7 +58,7 @@
 
 | 项目 | 配置文件 | 当前配置 |
 |---|---|---|
-| 博客前台 | `sourcelin-ui/sourcelin-ui-platform/.env.production` | `VITE_APP_BASE_API=/blog-api`，`VITE_FILE_BASE_API=/file` |
+| 博客前台 | `sourcelin-ui/sourcelin-ui-platform/.env.production` / `.env.development` | 生产：`VITE_APP_BASE_API=/blog-api`，`VITE_FILE_BASE_API=/file`；开发默认额外配置 `VITE_APP_API_URL=http://localhost:8080` |
 | Uniapp 移动端 | `sourcelin-ui/sourcelin-ui-uniapp/src/config/env.ts` | `baseURL=https://sourcelin.cn`，`apiPrefix=/blog-api` |
 | 管理后台 | `sourcelin-ui/sourcelin-ui-admin/.env.production` | `VITE_APP_BASE_API=/prod-api` |
 | 认证中心微信配置 | Nacos `application-*.yml` 或环境变量 | `sourcelin.mini-program.app-id`、`sourcelin.mini-program.app-secret` |

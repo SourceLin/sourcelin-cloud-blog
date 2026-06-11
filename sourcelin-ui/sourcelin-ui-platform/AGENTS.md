@@ -10,6 +10,7 @@
 - **技术栈**：Vue 3 + TypeScript + Vite + Pinia + Naive UI
 - **开发端口**：`80`
 - **前端 API 基础路径**：开发环境 `VITE_APP_BASE_API=/blog-api`
+- **开发代理目标**：默认 `VITE_APP_API_URL=http://localhost:8080`，需要联调线上时显式改为目标域名
 
 ## 常用命令
 
@@ -126,6 +127,7 @@ Design Tokens
 
 - `src/modules/*/api/*.api.ts` 统一调用 `src/shared/api/http.ts`
 - `baseURL` 来自 `VITE_APP_BASE_API`（dev 下为 `/blog-api`）
+- 开发态博客接口代理目标来自 `VITE_APP_API_URL`，默认指向本地网关 `http://localhost:8080`
 - URL 规则：
   - `/front/**`、`/app/**`：作为业务路径发送，由 Vite 代理 `/blog-api/front/**` 到网关 `/blog/front/**`，再转发至博客服务
   - `/auth/**`、`/system/**`、`/code`：作为业务路径发送，由 Vite 代理 `/blog-api/auth/**`、`/blog-api/code` 到网关 `/auth/**`、`/code`
