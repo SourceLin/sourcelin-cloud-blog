@@ -6,6 +6,7 @@ import {
   getVisibleLiquidTabItems,
   guardFeatureAccess,
   hasFeatureAccess,
+  userMeetsRole,
   type CapabilityFeature
 } from '@/shared/utils/mini-access';
 
@@ -15,15 +16,30 @@ export function useMiniAccess() {
 
   const context = computed(() => ({
     capabilities: capabilityStore.capabilities,
-    isBlogger: userStore.isBlogger
+    isBlogger: userStore.isBlogger,
+    articlePublishRole: capabilityStore.capabilities.articlePublishRole
   }));
 
   function can(feature: CapabilityFeature): boolean {
-    return hasFeatureAccess(context.value, feature);
+    const ctx = context.value;
+    // articlePublishEnabled: 如果 DB 配置了最小角色要求，校验角色等级
+    if (feature === 'articlePublishEnabled' && ctx.articlePublishRole) {
+      if (!userMeetsRole(userStore.userInfo, ctx.articlePublishRole)) {
+        return false;
+      }
+    }
+    return hasFeatureAccess(ctx, feature);
   }
 
   function guard(feature: CapabilityFeature): boolean {
-    return guardFeatureAccess(context.value, feature);
+    const ctx = context.value;
+    // articlePublishEnabled: 如果 DB 配置了最小角色要求，校验角色等级
+    if (feature === 'articlePublishEnabled' && ctx.articlePublishRole) {
+      if (!userMeetsRole(userStore.userInfo, ctx.articlePublishRole)) {
+        return guardFeatureAccess(ctx, feature); // 会触发重定向
+      }
+    }
+    return guardFeatureAccess(ctx, feature);
   }
 
   function resolveLiquidTabs(items: LiquidTabItem[]): LiquidTabItem[] {

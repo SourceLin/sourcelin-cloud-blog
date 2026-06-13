@@ -82,4 +82,16 @@ public class MobileCapabilityServiceImpl implements IMobileCapabilityService
         mobileCapability.setUpdateTime(DateUtils.getNowDate());
         return mobileCapabilityMapper.updateMobileCapability(mobileCapability);
     }
+
+    /**
+     * 删除能力配置
+     *
+     * @param id 主键
+     * @return 结果
+     */
+    @Override
+    public int deleteMobileCapability(Long id)
+    {
+        return mobileCapabilityMapper.deleteMobileCapability(id);
+    }
 }

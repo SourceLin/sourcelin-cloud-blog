@@ -238,6 +238,7 @@ import { useThemeStore } from '@/stores/theme';
 import { useCapabilityStore } from '@/stores/capability';
 import { AUTH_LOGIN_SUCCESS_EVENT, reset401Guard, type LoginSuccessEventDetail } from '@/utils/auth';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
+import { BusinessError } from '@/utils/error';
 import { normalizeAssetUrl } from '@/utils/url';
 import type { LegalArticleType } from '@/modules/site/types/legal';
 import { useBackToTop } from '@/shared/composables/useBackToTop';
@@ -325,7 +326,8 @@ const entries: Entry[] = [
   { key: 'about', text: '关于本站', desc: '查看站点介绍与作者信息', url: '/pages-about/index/index', icon: 'info-filled', iconColor: '#00B42A' },
   // { key: 'navigation', text: '网站导航', desc: '快速进入常用站点入口', url: '/pages-about/navigation/navigation', icon: 'location-filled', iconColor: '#FF7D00' },
   { key: 'links', text: '友情链接', desc: '浏览合作站点与推荐链接', url: '/pages-about/links/links', icon: 'link', iconColor: '#1DD1A1' },
-  { key: 'messages', text: '消息中心', desc: '查看回复、点赞与系统通知', url: '/pages-messages/index/index', icon: 'chat-filled', iconColor: '#00D2D3' }
+  { key: 'messages', text: '消息中心', desc: '查看回复、点赞与系统通知', url: '/pages-messages/index/index', icon: 'chat-filled', iconColor: '#00D2D3' },
+  { key: 'history', text: '阅读历史', desc: '回顾最近浏览过的文章', url: '/pages-user/history/history', icon: 'eye-filled', iconColor: '#00D2D3' }
 ];
 const coreEntryKeys: Entry['key'][] = ['interactions', 'articles', 'follows', 'messages'];
 const coreEntries = computed(() => {
@@ -359,6 +361,7 @@ const secondaryEntries = computed(() => {
     if (entry.key === 'about') return caps.aboutEnabled;
     if (entry.key === 'links') return caps.friendLinkEnabled;
     if (entry.key === 'navigation') return caps.navigationEnabled;
+    if (entry.key === 'history') return caps.readingHistoryEnabled;
     return true;
   });
 });
@@ -371,7 +374,8 @@ const loginRequiredKeys = computed<Entry['key'][]>(() => {
   return keys;
 });
 
-onShow(() => {
+onShow(async () => {
+  await capabilityStore.waitUntilReady();
   hideNativeTabbar();
   themeStore.syncNativeArea();
   refreshCurrentUser();
@@ -385,14 +389,24 @@ async function refreshCurrentUser(): Promise<void> {
     return;
   }
   try {
-    const [currentUser, unread] = await Promise.all([
-      fetchCurrentUserInfo(),
-      fetchUnreadMessageCount()
-    ]);
+    // skipAuthRedirect: 避免 401 时自动跳到登录页，改为本地静默清除
+    const currentUser = await fetchCurrentUserInfo({ skipAuthRedirect: true, skipErrorToast: true });
     userStore.updateUserInfo(mapFrontUserInfo(currentUser));
-    unreadMessageCount.value = unread.total || 0;
-  } catch {
-    // 统一请求层已处理 401 与错误提示，这里避免重复打扰用户。
+    // 用户信息拉取成功后 token 必然有效，此时再拉未读数
+    try {
+      const unread = await fetchUnreadMessageCount();
+      unreadMessageCount.value = unread.total || 0;
+    } catch {
+      // 未读数拉取失败不阻塞用户信息刷新
+    }
+  } catch (err) {
+    // 401 时静默清除登录态，不触发自动跳转（避免在 mine 页反复跳登录）
+    if (err instanceof BusinessError && err.httpStatus === 401) {
+      userStore.logout();
+      unreadMessageCount.value = 0;
+      return;
+    }
+    // 网络异常等其他错误静默忽略
   }
 }
 
@@ -428,6 +442,7 @@ function isEntryVisible(key: Entry['key']): boolean {
   if (key === 'about') return can('aboutEnabled');
   if (key === 'links') return can('friendLinkEnabled');
   if (key === 'navigation') return can('navigationEnabled');
+  if (key === 'history') return can('readingHistoryEnabled');
   return true;
 }
 

@@ -9,8 +9,8 @@ const PUBLIC_READ_OPTIONS = {
   skipErrorToast: true
 } as const;
 
-export function fetchCurrentUserInfo(): Promise<FrontUserInfo> {
-  return http.get<FrontUserInfo>('/front/user/info');
+export function fetchCurrentUserInfo(options?: { skipAuthRedirect?: boolean; skipErrorToast?: boolean }): Promise<FrontUserInfo> {
+  return http.get<FrontUserInfo>('/front/user/info', undefined, options);
 }
 
 export function fetchUserProfile(): Promise<FrontUserInfo> {

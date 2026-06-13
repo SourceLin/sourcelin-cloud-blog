@@ -14,6 +14,8 @@ export interface MobileCapabilities {
   friendLinkEnabled: boolean;
   navigationEnabled: boolean;
   articlePublishEnabled: boolean;
+  /** 允许写文章的最小角色, e.g. "blogger" / "admin" / "super_admin" */
+  articlePublishRole: string;
   commentEnabled: boolean;
   communityEnabled: boolean;
   sayPublishEnabled: boolean;

@@ -47,10 +47,10 @@ ON DUPLICATE KEY UPDATE `update_time` = NOW();
 -- ----------------------------
 -- Sys Menu Injection
 -- ----------------------------
--- 插入“小程序权限管理”菜单，挂到“网站管理”(menu_id = 1061)
+-- 插入“移动端权限管理”菜单，挂到“网站管理”(menu_id = 1061)
 INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `route_name`, `is_frame`, `is_cache`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`)
 VALUES 
-(2001, '小程序权限管理', 1061, 17, 'mobile-capability', 'blog/mobile/index', NULL, 'MobileCapability', 1, 0, 'C', '0', '0', 'blog:mobile:list', 'phone', 'admin', NOW(), '', NULL, '管理小程序端能力配置')
+(2001, '移动端权限管理', 1061, 17, 'mobile-capability', 'blog/mobile/index', NULL, 'MobileCapability', 1, 0, 'C', '0', '0', 'blog:mobile:list', 'Iphone', 'admin', NOW(), '', NULL, '管理小程序端能力配置')
 ON DUPLICATE KEY UPDATE
 `menu_name` = VALUES(`menu_name`),
 `parent_id` = VALUES(`parent_id`),
@@ -71,7 +71,7 @@ ON DUPLICATE KEY UPDATE
 -- 插入“查询能力配置”按钮级权限
 INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `route_name`, `is_frame`, `is_cache`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`)
 VALUES 
-(2002, '小程序权限查询', 2001, 1, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'blog:mobile:query', '#', 'admin', NOW(), '', NULL, '查询小程序能力配置按钮')
+(2002, '移动端权限查询', 2001, 1, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'blog:mobile:query', '#', 'admin', NOW(), '', NULL, '查询小程序能力配置按钮')
 ON DUPLICATE KEY UPDATE
 `menu_name` = VALUES(`menu_name`),
 `parent_id` = VALUES(`parent_id`),
@@ -92,7 +92,7 @@ ON DUPLICATE KEY UPDATE
 -- 插入“修改能力配置”按钮级权限
 INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `route_name`, `is_frame`, `is_cache`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`)
 VALUES 
-(2003, '小程序权限修改', 2001, 2, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'blog:mobile:edit', '#', 'admin', NOW(), '', NULL, '修改小程序能力配置按钮')
+(2003, '移动端权限修改', 2001, 2, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'blog:mobile:edit', '#', 'admin', NOW(), '', NULL, '修改小程序能力配置按钮')
 ON DUPLICATE KEY UPDATE
 `menu_name` = VALUES(`menu_name`),
 `parent_id` = VALUES(`parent_id`),
@@ -115,3 +115,50 @@ VALUES
 (1, 2001),
 (1, 2002),
 (1, 2003);
+
+-- 插入"新增能力配置"按钮级权限
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `route_name`, `is_frame`, `is_cache`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`)
+VALUES
+(2004, '移动端权限新增', 2001, 3, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'blog:mobile:add', '#', 'admin', NOW(), '', NULL, '新增小程序能力配置按钮')
+ON DUPLICATE KEY UPDATE
+`menu_name` = VALUES(`menu_name`),
+`parent_id` = VALUES(`parent_id`),
+`order_num` = VALUES(`order_num`),
+`path` = VALUES(`path`),
+`component` = VALUES(`component`),
+`query` = VALUES(`query`),
+`route_name` = VALUES(`route_name`),
+`is_frame` = VALUES(`is_frame`),
+`is_cache` = VALUES(`is_cache`),
+`menu_type` = VALUES(`menu_type`),
+`visible` = VALUES(`visible`),
+`status` = VALUES(`status`),
+`perms` = VALUES(`perms`),
+`icon` = VALUES(`icon`),
+`remark` = VALUES(`remark`);
+
+-- 插入"删除能力配置"按钮级权限
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `route_name`, `is_frame`, `is_cache`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`)
+VALUES
+(2005, '移动端权限删除', 2001, 4, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'blog:mobile:remove', '#', 'admin', NOW(), '', NULL, '删除小程序能力配置按钮')
+ON DUPLICATE KEY UPDATE
+`menu_name` = VALUES(`menu_name`),
+`parent_id` = VALUES(`parent_id`),
+`order_num` = VALUES(`order_num`),
+`path` = VALUES(`path`),
+`component` = VALUES(`component`),
+`query` = VALUES(`query`),
+`route_name` = VALUES(`route_name`),
+`is_frame` = VALUES(`is_frame`),
+`is_cache` = VALUES(`is_cache`),
+`menu_type` = VALUES(`menu_type`),
+`visible` = VALUES(`visible`),
+`status` = VALUES(`status`),
+`perms` = VALUES(`perms`),
+`icon` = VALUES(`icon`),
+`remark` = VALUES(`remark`);
+
+INSERT IGNORE INTO `sys_role_menu` (`role_id`, `menu_id`)
+VALUES
+(1, 2004),
+(1, 2005);

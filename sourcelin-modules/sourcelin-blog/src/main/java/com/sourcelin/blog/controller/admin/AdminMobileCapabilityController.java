@@ -54,6 +54,21 @@ public class AdminMobileCapabilityController extends BaseController
     }
 
     /**
+     * 新增能力配置
+     */
+    @SaCheckPermission(type = "admin", value = "blog:mobile:add")
+    @Log(title = "移动端配置新增", businessType = BusinessType.INSERT)
+    @PostMapping
+    public Void add(@RequestBody MobileCapability mobileCapability)
+    {
+        if (mobileCapabilityService.insertMobileCapability(mobileCapability) <= 0)
+        {
+            throw new BusinessException(ResultCode.SYSTEM_ERROR, "新增能力配置失败");
+        }
+        return null;
+    }
+
+    /**
      * 修改能力配置
      */
     @SaCheckPermission(type = "admin", value = "blog:mobile:edit")
@@ -64,6 +79,21 @@ public class AdminMobileCapabilityController extends BaseController
         if (mobileCapabilityService.updateMobileCapability(mobileCapability) <= 0)
         {
             throw new BusinessException(ResultCode.SYSTEM_ERROR, "修改能力配置失败");
+        }
+        return null;
+    }
+
+    /**
+     * 删除能力配置
+     */
+    @SaCheckPermission(type = "admin", value = "blog:mobile:remove")
+    @Log(title = "移动端配置删除", businessType = BusinessType.DELETE)
+    @DeleteMapping(value = "/{id}")
+    public Void remove(@PathVariable("id") Long id)
+    {
+        if (mobileCapabilityService.deleteMobileCapability(id) <= 0)
+        {
+            throw new BusinessException(ResultCode.SYSTEM_ERROR, "删除能力配置失败");
         }
         return null;
     }

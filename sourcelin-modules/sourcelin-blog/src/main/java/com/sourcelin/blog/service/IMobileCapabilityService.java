@@ -45,9 +45,17 @@ public interface IMobileCapabilityService
 
     /**
      * 修改能力配置
-     * 
+     *
      * @param mobileCapability 能力配置
      * @return 结果
      */
     public int updateMobileCapability(MobileCapability mobileCapability);
+
+    /**
+     * 删除能力配置
+     *
+     * @param id 主键
+     * @return 结果
+     */
+    public int deleteMobileCapability(Long id);
 }

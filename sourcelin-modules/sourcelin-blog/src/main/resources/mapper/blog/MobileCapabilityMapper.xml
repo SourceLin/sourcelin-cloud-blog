@@ -138,4 +138,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </trim>
         where id = #{id}
     </update>
+
+    <delete id="deleteMobileCapability" parameterType="Long">
+        delete from b_mobile_capability where id = #{id}
+    </delete>
 </mapper>

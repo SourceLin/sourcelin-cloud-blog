@@ -119,6 +119,11 @@ const showPasswordLogin = ref(false);
 
 onShow(() => {
   themeStore.syncNativeArea();
+  // 已登录用户不应看到登录页，直接返回
+  if (userStore.isLoggedIn) {
+    backToPreviousPage();
+    return;
+  }
 });
 
 const form = reactive({

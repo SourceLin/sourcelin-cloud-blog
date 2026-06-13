@@ -17,6 +17,7 @@ const DEFAULT_SAFE_CAPABILITIES: MobileCapabilities = {
   friendLinkEnabled: true,
   navigationEnabled: true,
   articlePublishEnabled: true,
+  articlePublishRole: 'blogger',
   commentEnabled: false,
   communityEnabled: false,
   sayPublishEnabled: false,
