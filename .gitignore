@@ -1,4 +1,4 @@
-######################################################################
+﻿######################################################################
 # Build Tools
 
 .gradle
@@ -64,7 +64,10 @@ docs/internal/
 !.env.example
 !.env.*.example
 !sourcelin-ui/sourcelin-ui-admin/.env.development
+
 !sourcelin-ui/sourcelin-ui-platform/.env.development
+
+
 
 *.pem
 *.key
