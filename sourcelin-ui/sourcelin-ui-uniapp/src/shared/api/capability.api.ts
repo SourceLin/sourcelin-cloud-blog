@@ -31,6 +31,6 @@ export function fetchMobileCapabilities(client: string): Promise<MobileCapabilit
   return http.get<MobileCapabilities>(
     '/front/mobile/capabilities',
     { client },
-    { isToken: false }
+    { isToken: false, skipAuthRedirect: true, skipErrorToast: true }
   );
 }

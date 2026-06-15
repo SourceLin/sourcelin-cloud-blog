@@ -65,10 +65,12 @@ import type { MessageItem } from '@/modules/message/types/message';
 import { getChannelConfig, type MessageChannel } from '../modules/message/config/channels';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 import { showInfoToast } from '@/utils/feedback';
 
 const userStore = useUserStore();
 const themeStore = useThemeStore();
+const { guard } = useMiniAccess();
 const detail = ref<MessageItem | null>(null);
 const loading = ref(false);
 
@@ -82,6 +84,7 @@ onShow(() => {
 });
 
 onLoad((options) => {
+  if (!guard('messageCenterEnabled')) return;
   if (!userStore.isLoggedIn) {
     uni.redirectTo({ url: '/pages-user/login/login' });
     return;

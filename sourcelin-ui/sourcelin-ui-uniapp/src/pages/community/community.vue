@@ -419,12 +419,12 @@ watch([activeTab, currentItems], () => {
   const isTreehole = activeTab.value === 'treeholes';
   const firstItem = currentItems.value[0];
   applyH5Seo({
-    title: buildSeoTitle(isTreehole ? '树洞广场' : '轻社区'),
+    title: buildSeoTitle(isTreehole ? '树洞广场' : '轻圈子'),
     description: extractSeoSummary(
       firstItem?.content ? `浏览${isTreehole ? '匿名树洞' : '说说互动'}：${firstItem.content}` : '',
-      isTreehole ? '浏览匿名树洞、轻讨论与互动内容。' : '浏览说说动态、轻互动与作者社区内容。'
+      isTreehole ? '浏览匿名树洞、轻讨论与互动内容。' : '浏览说说动态、轻互动与作者圈子内容。'
     ),
-    keywords: [isTreehole ? '树洞' : '社区', '说说', '互动', '评论', '轻社区']
+    keywords: [isTreehole ? '树洞' : '圈子', '说说', '互动', '评论', '轻圈子']
   });
 }, { immediate: true });
 
@@ -435,6 +435,7 @@ onLoad((options) => {
   if (options?.tab === 'treeholes') {
     activeTab.value = 'treeholes';
   }
+  refresh();
 });
 
 function formatDate(value?: string): string {
@@ -856,7 +857,7 @@ onShareAppMessage(() => {
     }
   });
   return {
-    title: isTreehole ? '来树洞看看匿名故事 - 圆圈博客' : '来社区看看最新说说 - 圆圈博客',
+    title: isTreehole ? '来树洞看看匿名故事 - 圆圈博客' : '来圈子看看最新说说 - 圆圈博客',
     path: `/pages/community/community?tab=${activeTab.value}`
   };
 });
@@ -864,7 +865,6 @@ onShareAppMessage(() => {
 uni.$off(AUTH_LOGIN_SUCCESS_EVENT, handleLoginSuccess);
 uni.$on(AUTH_LOGIN_SUCCESS_EVENT, handleLoginSuccess);
 
-refresh();
 </script>
 
 <style lang="scss" scoped>

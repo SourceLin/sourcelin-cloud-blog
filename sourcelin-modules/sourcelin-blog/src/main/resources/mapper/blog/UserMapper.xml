@@ -37,10 +37,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, username, nickname, user_type, email, phone, password, sex, avatar, avatar_file_id, birthday, introduction, praise, follow, del_flag, login_ip, login_date, create_by, create_time, update_by, update_time, user_status, remark, bind_wechat_id, open_id, session_key from b_user
     </sql>
 
-    <select id="selectUserList" parameterType="User" resultMap="UserResult">
-        <include refid="selectUserVo"/>
-        <where>  
-            <if test="username != null  and username != ''"> and username like concat('%', #{username}, '%')</if>
+   <select id="selectUserList" parameterType="User" resultMap="UserResult">
+       <include refid="selectUserVo"/>
+       <where>  
+           del_flag = '0'
+           <if test="username != null  and username != ''"> and username like concat('%', #{username}, '%')</if>
             <if test="nickname != null  and nickname != ''"> and nickname like concat('%', #{nickname}, '%')</if>
             <if test="userType != null "> and user_type = #{userType}</if>
             <if test="phone != null  and phone != ''"> and phone = #{phone}</if>

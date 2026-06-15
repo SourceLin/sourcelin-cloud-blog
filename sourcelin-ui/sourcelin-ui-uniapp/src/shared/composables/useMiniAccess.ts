@@ -6,6 +6,7 @@ import {
   getVisibleLiquidTabItems,
   guardFeatureAccess,
   hasFeatureAccess,
+  redirectToHomeSilently,
   userMeetsRole,
   type CapabilityFeature
 } from '@/shared/utils/mini-access';
@@ -36,7 +37,8 @@ export function useMiniAccess() {
     // articlePublishEnabled: 如果 DB 配置了最小角色要求，校验角色等级
     if (feature === 'articlePublishEnabled' && ctx.articlePublishRole) {
       if (!userMeetsRole(userStore.userInfo, ctx.articlePublishRole)) {
-        return guardFeatureAccess(ctx, feature); // 会触发重定向
+        redirectToHomeSilently();
+        return false;
       }
     }
     return guardFeatureAccess(ctx, feature);

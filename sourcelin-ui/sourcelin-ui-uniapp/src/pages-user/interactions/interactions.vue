@@ -283,7 +283,7 @@ function openTarget(item: CollectItem<CollectTargetSummary> | LikeItem<CollectTa
     showInfoToast('当前版本仅支持回访文章内容');
     return;
   }
-  uni.switchTab({ url: '/pages/community/community' });
+  uni.navigateTo({ url: '/pages/community/community' });
 }
 
 function openComment(item: MyCommentItem): void {
@@ -301,7 +301,7 @@ function openComment(item: MyCommentItem): void {
     showInfoToast('当前版本暂不开放该内容入口');
     return;
   }
-  uni.switchTab({ url: '/pages/community/community' });
+  uni.navigateTo({ url: '/pages/community/community' });
 }
 
 function formatTime(value?: string): string {

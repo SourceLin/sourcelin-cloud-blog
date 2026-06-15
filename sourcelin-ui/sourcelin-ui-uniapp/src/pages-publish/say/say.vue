@@ -1,5 +1,5 @@
 <template>
-  <view class="publish-say s-container" :class="themeStore.themeClass">
+  <view v-if="ready" class="publish-say s-container" :class="themeStore.themeClass">
     <view class="publish-say__header s-card">
       <view class="publish-say__title">发布说说</view>
       <view class="publish-say__desc">支持轻量文字与多图发布，适合记录即时灵感、近况与现场感。</view>
@@ -79,6 +79,7 @@ const userStore = useUserStore();
 const themeStore = useThemeStore();
 const { guard } = useMiniAccess();
 const content = ref('');
+const ready = ref(false);
 const submitting = ref(false);
 const images = ref<SelectedImage[]>([]);
 
@@ -98,6 +99,7 @@ onLoad(() => {
     uni.redirectTo({ url: '/pages-user/login/login' });
     return;
   }
+  ready.value = true;
   const draft = getStorage<SayDraft | string>(DRAFT_KEY, '');
   if (typeof draft === 'string') {
     content.value = draft;

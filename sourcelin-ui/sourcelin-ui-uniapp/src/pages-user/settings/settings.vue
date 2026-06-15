@@ -53,37 +53,37 @@
       <view class="settings__row" @tap="toggleAnalytics">
         <view>
           <view class="settings__row-title">行为统计</view>
-          <view class="settings__row-desc">帮助站点统计阅读、搜索、发布与互动情况，用于后续优化体验。</view>
+          <view class="settings__row-desc">{{ analyticsDesc }}</view>
         </view>
         <view class="settings__switch" :class="{ 'settings__switch--active': preferences.analyticsEnabled }" />
       </view>
 
-      <view class="settings__row" @tap="requestSubscribeAuthorization">
-        <view>
-          <view class="settings__row-title">订阅消息</view>
-          <view class="settings__row-desc">授权后可接收评论回复等小程序服务通知，当前模板和最近授权状态会保存在本地，便于后续召回能力使用。</view>
+        <view class="settings__row" @tap="requestSubscribeAuthorization">
+          <view>
+            <view class="settings__row-title">订阅消息</view>
+            <view class="settings__row-desc">{{ subscriptionDesc }}</view>
+          </view>
+          <view class="settings__action-chip">授权</view>
         </view>
-        <view class="settings__action-chip">授权</view>
-      </view>
 
-      <view v-if="subscribeTemplates.length > 0" class="settings__subscription-panel">
-        <view
-          v-for="template in subscribeTemplates"
-          :key="template.id"
-          class="settings__subscription-item"
-        >
-          <view class="settings__subscription-head">
-            <view class="settings__subscription-name">{{ template.name }}</view>
-            <view class="settings__subscription-status" :class="`settings__subscription-status--${resolveTemplateStatus(template.id)}`">
-              {{ resolveTemplateStatusLabel(template.id) }}
+        <view v-if="showSubscriptionDetail && subscribeTemplates.length > 0" class="settings__subscription-panel">
+          <view
+            v-for="template in subscribeTemplates"
+            :key="template.id"
+            class="settings__subscription-item"
+          >
+            <view class="settings__subscription-head">
+              <view class="settings__subscription-name">{{ template.name }}</view>
+              <view class="settings__subscription-status" :class="`settings__subscription-status--${resolveTemplateStatus(template.id)}`">
+                {{ resolveTemplateStatusLabel(template.id) }}
+              </view>
+            </view>
+            <view class="settings__subscription-scene">{{ template.scene }}</view>
+            <view v-if="template.keywords.length > 0" class="settings__subscription-keywords">
+              {{ template.keywords.join(' / ') }}
             </view>
           </view>
-          <view class="settings__subscription-scene">{{ template.scene }}</view>
-          <view v-if="template.keywords.length > 0" class="settings__subscription-keywords">
-            {{ template.keywords.join(' / ') }}
-          </view>
         </view>
-      </view>
     </view>
   </view>
 </template>
@@ -100,16 +100,32 @@ import { useThemeStore, type ThemeMode } from '@/stores/theme';
 import { useUserStore } from '@/stores/user';
 import { showInfoToast, showSuccessToast } from '@/utils/feedback';
 import { useMiniAccess } from '@/shared/composables/useMiniAccess';
+import { useCapabilityStore } from '@/stores/capability';
 
 const preferences = reactive(getUserPreferences());
 const themeStore = useThemeStore();
 const userStore = useUserStore();
-const { guard } = useMiniAccess();
+const { guard, can } = useMiniAccess();
+const capabilityStore = useCapabilityStore();
 const subscriptionStatusMap = reactive(getSubscriptionStatusMap());
 const subscribeTemplates = computed(() =>
   env.subscribeMessageTemplateIds
     .filter(Boolean)
-    .map((templateId) => resolveSubscriptionTemplateMeta(templateId))
+    .map((templateId) => resolveSubscriptionTemplateMeta(templateId, capabilityStore.capabilities.reviewSafeMode))
+);
+const showSubscriptionDetail = computed(() => !capabilityStore.capabilities.reviewSafeMode && can('commentEnabled'));
+
+const analyticsDesc = computed(() =>
+  capabilityStore.capabilities.reviewSafeMode
+    ? '帮助站点统计阅读与搜索情况，用于后续优化体验。'
+    : '帮助站点统计阅读、搜索、发布与互动情况，用于后续优化体验。'
+);
+const subscriptionDesc = computed(() =>
+  capabilityStore.capabilities.reviewSafeMode
+    ? '授权后可接收小程序服务通知，便于后续功能开放时及时提醒。'
+    : showSubscriptionDetail.value
+    ? '授权后可接收评论回复等小程序服务通知，当前模板和最近授权状态会保存在本地，便于后续召回能力使用。'
+    : '授权后可接收小程序服务通知，便于后续功能开放时及时提醒。'
 );
 
 onShow(() => {

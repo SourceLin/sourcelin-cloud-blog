@@ -54,7 +54,7 @@ export function getInteractionMeta(
   if (item.targetType === 'article') {
     return target?.categoryName || '默认分类';
   }
-  return '社区内容';
+  return '圈子内容';
 }
 
 export function getCommentStatusText(status?: number): string {

@@ -34,6 +34,7 @@ import { useArticlePaging } from '../modules/article/composables/useArticlePagin
 import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
 import { useThemeStore } from '@/stores/theme';
 import { useBackToTop } from '@/shared/composables/useBackToTop';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 const query = {
   categoryId: undefined as number | undefined,
@@ -53,6 +54,7 @@ const { items, loading, finished, isEmpty, refresh, loadMore } = useArticlePagin
 );
 const { backToTopVisible, handlePageScroll } = useBackToTop();
 const themeStore = useThemeStore();
+const { guard } = useMiniAccess();
 const pageTitle = computed(() => {
   if (query.tagId) return '标签文章';
   if (query.categoryId) return '分类文章';
@@ -83,6 +85,7 @@ function goDetail(id?: number): void {
 }
 
 onLoad((options) => {
+  if (!guard('articleReadEnabled')) return;
   query.categoryId = parseNumber(options?.categoryId);
   query.tagId = parseNumber(options?.tagId);
   query.orderBy = options?.orderBy === 'view_count' ? 'view_count' : undefined;

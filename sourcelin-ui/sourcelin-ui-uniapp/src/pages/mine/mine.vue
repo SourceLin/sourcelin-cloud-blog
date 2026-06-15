@@ -35,7 +35,7 @@
 
       <view class="mine__section mine__section--assets">
         <view class="mine__section-head">
-          <view class="mine__section-title">互动与创作</view>
+          <view class="mine__section-title">{{ assetsSectionTitle }}</view>
         </view>
         <view class="mine__asset-grid">
           <view
@@ -287,6 +287,11 @@ const hintText = computed(() =>
 );
 
 const avatarUrl = computed(() => normalizeAssetUrl(userStore.userInfo?.avatar) || '/static/header/avatar.jpg');
+
+
+const assetsSectionTitle = computed(() =>
+  capabilityStore.capabilities.reviewSafeMode ? '我的功能' : '互动与创作'
+);
 const showPasswordForm = computed(() => showPasswordLogin.value);
 const captchaImage = computed(() => {
   if (!captcha.img) return '';
@@ -327,7 +332,6 @@ const entries: Entry[] = [
   // { key: 'navigation', text: '网站导航', desc: '快速进入常用站点入口', url: '/pages-about/navigation/navigation', icon: 'location-filled', iconColor: '#FF7D00' },
   { key: 'links', text: '友情链接', desc: '浏览合作站点与推荐链接', url: '/pages-about/links/links', icon: 'link', iconColor: '#1DD1A1' },
   { key: 'messages', text: '消息中心', desc: '查看回复、点赞与系统通知', url: '/pages-messages/index/index', icon: 'chat-filled', iconColor: '#00D2D3' },
-  { key: 'history', text: '阅读历史', desc: '回顾最近浏览过的文章', url: '/pages-user/history/history', icon: 'eye-filled', iconColor: '#00D2D3' }
 ];
 const coreEntryKeys: Entry['key'][] = ['interactions', 'articles', 'follows', 'messages'];
 const coreEntries = computed(() => {
@@ -335,7 +339,7 @@ const coreEntries = computed(() => {
     if (!coreEntryKeys.includes(entry.key)) return false;
 
     if (entry.key === 'interactions') {
-      return capabilityStore.capabilities.favoriteEnabled || userStore.isBlogger;
+      return can('favoriteEnabled');
     }
     if (entry.key === 'articles') {
       return userStore.isBlogger && can('articlePublishEnabled');
@@ -351,17 +355,15 @@ const coreEntries = computed(() => {
 });
 
 const secondaryEntries = computed(() => {
-  const caps = capabilityStore.capabilities;
   return entries.filter((entry) => {
     if (coreEntryKeys.includes(entry.key)) return false;
     
-    if (entry.key === 'profile') return caps.profileEnabled;
-    if (entry.key === 'settings') return caps.settingsEnabled;
-    if (entry.key === 'policies') return caps.policyEnabled;
-    if (entry.key === 'about') return caps.aboutEnabled;
-    if (entry.key === 'links') return caps.friendLinkEnabled;
-    if (entry.key === 'navigation') return caps.navigationEnabled;
-    if (entry.key === 'history') return caps.readingHistoryEnabled;
+    if (entry.key === 'profile') return can('profileEnabled');
+    if (entry.key === 'settings') return can('settingsEnabled');
+    if (entry.key === 'policies') return can('policyEnabled');
+    if (entry.key === 'about') return can('aboutEnabled');
+    if (entry.key === 'links') return can('friendLinkEnabled');
+    if (entry.key === 'navigation') return can('navigationEnabled');
     return true;
   });
 });
@@ -431,7 +433,7 @@ function onTapEntry(key: Entry['key']): void {
 
 function isEntryVisible(key: Entry['key']): boolean {
   if (key === 'interactions') {
-    return capabilityStore.capabilities.favoriteEnabled || userStore.isBlogger;
+    return can('favoriteEnabled');
   }
   if (key === 'articles') return userStore.isBlogger && can('articlePublishEnabled');
   if (key === 'follows') return userStore.isBlogger && can('followEnabled');
@@ -442,7 +444,6 @@ function isEntryVisible(key: Entry['key']): boolean {
   if (key === 'about') return can('aboutEnabled');
   if (key === 'links') return can('friendLinkEnabled');
   if (key === 'navigation') return can('navigationEnabled');
-  if (key === 'history') return can('readingHistoryEnabled');
   return true;
 }
 
@@ -1289,7 +1290,7 @@ function openPolicyPage(type: LegalArticleType): void {
   }
 
   &__placeholder {
-    color: rgba(134, 144, 156, 0.82);
+      color: $color-text-secondary;
   }
 
   &__captcha {

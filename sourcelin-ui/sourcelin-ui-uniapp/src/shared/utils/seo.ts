@@ -5,7 +5,7 @@ export interface H5SeoPayload {
 }
 
 const DEFAULT_SITE_NAME = '圆圈博客';
-const DEFAULT_DESCRIPTION = 'Sourcelin Blog 移动端聚焦阅读、互动、回访与轻社区体验。';
+const DEFAULT_DESCRIPTION = 'Sourcelin Blog 移动端聚焦阅读、互动、回访与轻圈子体验。';
 
 function normalizeText(value?: string | null, maxLength = 120): string {
   const plainText = (value || '')

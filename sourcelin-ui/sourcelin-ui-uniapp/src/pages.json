@@ -24,7 +24,7 @@
     {
       "path": "pages/community/community",
       "style": {
-        "navigationBarTitleText": "社区",
+        "navigationBarTitleText": "圈子",
         "enablePullDownRefresh": true
       }
     },
@@ -188,12 +188,6 @@
         "text": "发现",
         "iconPath": "static/tabbar/discover.png",
         "selectedIconPath": "static/tabbar/discover-active.png"
-      },
-      {
-        "pagePath": "pages/community/community",
-        "text": "社区",
-        "iconPath": "static/tabbar/community.png",
-        "selectedIconPath": "static/tabbar/community-active.png"
       },
       {
         "pagePath": "pages/mine/mine",

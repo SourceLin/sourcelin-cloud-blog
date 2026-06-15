@@ -1,5 +1,5 @@
 <template>
-  <view class="publish-treehole s-container" :class="themeStore.themeClass">
+  <view v-if="ready" class="publish-treehole s-container" :class="themeStore.themeClass">
     <view class="publish-treehole__header s-card">
       <view class="publish-treehole__title">树洞投递</view>
       <view class="publish-treehole__desc">
@@ -43,6 +43,7 @@ const themeStore = useThemeStore();
 const userStore = useUserStore();
 const { guard } = useMiniAccess();
 const content = ref('');
+const ready = ref(false);
 const submitting = ref(false);
 const isLoggedIn = computed(() => userStore.isLoggedIn);
 
@@ -52,7 +53,9 @@ onLoad(() => {
   }
   if (!userStore.isBlogger) {
     uni.switchTab({ url: '/pages/home/home' });
+    return;
   }
+  ready.value = true;
 });
 
 onShow(() => {

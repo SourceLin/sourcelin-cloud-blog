@@ -45,7 +45,7 @@ export function useAboutPage() {
   const authorTitle = computed(() => pickText(about.value?.authorInfo, siteBrand.value?.authorInfo));
 
   const siteBio = computed(() =>
-    pickText(about.value?.bio, siteBrand.value?.bio, siteBrand.value?.footer, '记录内容、灵感与轻社区互动。')
+    pickText(about.value?.bio, siteBrand.value?.bio, siteBrand.value?.footer, '记录内容、灵感与轻互动。')
   );
 
   const siteSummary = computed(() =>

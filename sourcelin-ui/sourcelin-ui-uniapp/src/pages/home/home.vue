@@ -56,7 +56,7 @@
             <view class="home__showcase-overlay" />
             <view class="home__showcase-meta">
               <text class="home__showcase-kicker">{{ showCommunityEntrance ? 'Community' : 'Category' }}</text>
-              <text class="home__showcase-title">{{ showCommunityEntrance ? '轻社区' : '内容分类' }}</text>
+              <text class="home__showcase-title">{{ showCommunityEntrance ? '轻圈子' : '内容分类' }}</text>
               <text class="home__showcase-desc">{{ showCommunityEntrance ? '说说互动与树洞' : '按分类快速找到想读内容' }}</text>
             </view>
           </view>
@@ -260,7 +260,7 @@ function goDiscover(): void {
 }
 
 function goCommunity(): void {
-  uni.switchTab({ url: '/pages/community/community' });
+  uni.navigateTo({ url: '/pages/community/community' });
 }
 
 function goSecondaryShowcase(): void {

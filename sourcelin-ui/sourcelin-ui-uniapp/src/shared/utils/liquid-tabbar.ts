@@ -20,7 +20,7 @@ export const liquidTabItems: LiquidTabItem[] = [
   },
   {
     path: 'pages/community/community',
-    text: '社区',
+    text: '圈子',
     icon: '/static/tabbar/community.png',
     activeIcon: '/static/tabbar/community-active.png'
   },
@@ -32,11 +32,18 @@ export const liquidTabItems: LiquidTabItem[] = [
   }
 ];
 
+/** 原生 tabBar 中的页面路径，switchTab 只对这些有效 */
+const NATIVE_TAB_PATHS = new Set(['pages/home/home', 'pages/discover/discover', 'pages/mine/mine']);
+
 export function hideNativeTabbar(): void {
   uni.hideTabBar({ animation: false, fail: () => undefined });
 }
 
 export function switchLiquidTab(path: string, currentPath: string): void {
   if (path === currentPath) return;
-  uni.switchTab({ url: `/${path}` });
+  if (NATIVE_TAB_PATHS.has(path)) {
+    uni.switchTab({ url: `/${path}` });
+  } else {
+    uni.navigateTo({ url: `/${path}` });
+  }
 }

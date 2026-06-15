@@ -3,7 +3,7 @@
     <s-loading :visible="userStore.isLoggedIn && loading && items.length === 0" />
     <view class="collects__header s-card">
       <view class="collects__eyebrow">Collection Library</view>
-      <view class="collects__title">我的收藏</view>
+      <view class="collects__title">我的功能</view>
       <view class="collects__desc">回看文章、说说和树洞，形成内容回访闭环。</view>
     </view>
 
@@ -171,7 +171,7 @@ function openCollect(item: CollectItem<CollectTargetSummary>): void {
     uni.navigateTo({ url: `/pages-article/detail/detail?id=${item.targetId}` });
     return;
   }
-  uni.switchTab({ url: '/pages/community/community' });
+  uni.navigateTo({ url: '/pages/community/community' });
 }
 
 function getCollectData(item: CollectItem<CollectTargetSummary>): CollectTargetSummary | undefined {
@@ -200,7 +200,7 @@ function getCollectCategory(item: CollectItem<CollectTargetSummary>): string {
   if (item.targetType === 'article') {
     return target?.categoryName || '默认分类';
   }
-  return '社区内容';
+  return '圈子内容';
 }
 
 function formatTime(value?: string): string {

@@ -43,5 +43,5 @@ export function markAllMessagesRead(channel?: MessageChannel): Promise<boolean> 
 }
 
 export function fetchUnreadMessageCount(): Promise<MessageUnreadStat> {
-  return http.get<MessageUnreadStat>('/front/messages/unread-count');
+  return http.get<MessageUnreadStat>('/front/messages/unread-count', undefined, PUBLIC_SYSTEM_MESSAGE_OPTIONS);
 }

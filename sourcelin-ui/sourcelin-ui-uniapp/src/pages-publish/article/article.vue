@@ -1,5 +1,5 @@
 <template>
-  <view class="publish-article s-container" :class="themeStore.themeClass">
+  <view v-if="ready" class="publish-article s-container" :class="themeStore.themeClass">
     <s-loading :visible="bootLoading" text="正在准备编辑器..." />
 
     <view class="publish-article__hero s-card">
@@ -234,6 +234,7 @@ const MAX_TAG_COUNT = 5;
 const collapsedCategoryCount = 8;
 const collapsedTagCount = 10;
 
+const ready = ref(false);
 const bootLoading = ref(false);
 const submitting = ref(false);
 const submitMode = ref<SubmitMode>('');
@@ -297,6 +298,7 @@ onLoad(async (options) => {
     return;
   }
   bootLoading.value = true;
+  ready.value = true;
   try {
     await Promise.all([loadCategories(), loadTags()]);
     const id = Number(options?.id);

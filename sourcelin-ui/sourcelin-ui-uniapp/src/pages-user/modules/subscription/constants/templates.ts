@@ -14,7 +14,15 @@ export const SUBSCRIPTION_TEMPLATE_META_MAP: Record<string, SubscriptionTemplate
   }
 };
 
-export function resolveSubscriptionTemplateMeta(templateId: string): SubscriptionTemplateMeta {
+export function resolveSubscriptionTemplateMeta(templateId: string, reviewSafeMode = false): SubscriptionTemplateMeta {
+  if (reviewSafeMode) {
+    return {
+      id: templateId,
+      name: '服务通知',
+      scene: '站内消息提醒',
+      keywords: []
+    };
+  }
   return SUBSCRIPTION_TEMPLATE_META_MAP[templateId] || {
     id: templateId,
     name: '订阅消息模板',

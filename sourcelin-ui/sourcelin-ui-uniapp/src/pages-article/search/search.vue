@@ -160,6 +160,7 @@ import { useThemeStore } from '@/stores/theme';
 import { showInfoToast } from '@/utils/feedback';
 import { getStorage, removeStorage, setStorage } from '@/utils/storage';
 import { useBackToTop } from '@/shared/composables/useBackToTop';
+import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 const SEARCH_HISTORY_KEY = 'article.search.history';
 const SEARCH_HISTORY_LIMIT = 8;
@@ -179,6 +180,7 @@ const { items, loading, finished, refresh, loadMore } = useArticlePaging((page, 
   searchArticles(keyword.value.trim(), page, pageSize)
 );
 const { backToTopVisible, handlePageScroll } = useBackToTop();
+const { guard } = useMiniAccess();
 const hasResults = computed(() => items.value.length > 0 || categoryMatches.value.length > 0 || tagMatches.value.length > 0);
 const showLoading = computed(() => searched.value && (loading.value || facetLoading.value) && !hasResults.value);
 const showSearchDiscovery = computed(() => searchHistory.value.length > 0 || hotKeywords.value.length > 0 || suggestions.value.length > 0);
@@ -315,6 +317,7 @@ function goTag(id?: number): void {
 }
 
 onLoad((options) => {
+  if (!guard('searchEnabled')) return;
   loadSearchHistory();
   loadHotKeywords();
   const value = typeof options?.keyword === 'string' ? decodeURIComponent(options.keyword) : '';

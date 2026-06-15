@@ -70,14 +70,9 @@ export function userMeetsRole(userInfo: UserInfo | null | undefined, requiredRol
 export function hasFeatureAccess(context: MiniAccessContext, feature: CapabilityFeature): boolean {
   // articlePublishEnabled 需要额外校验角色等级
   if (feature === 'articlePublishEnabled') {
-    // 如果 DB 配置了最小角色要求，检查用户是否满足
-    if (context.articlePublishRole) {
-      // 这里需要通过外部注入 userInfo，暂时回退到 isBlogger 判断
-      // 实际逻辑在 useMiniAccess 中覆盖
-    }
-    // 博主白名单（无 role 限制时）
-    if (context.isBlogger) return true;
-    return Boolean(context.capabilities[feature]);
+    // 角色校验由 useMiniAccess.can()/guard() 在调用前完成，
+    // 此处仅作为兜底：非博主一律拒绝写文章权限
+    return context.isBlogger;
   }
 
   if (context.isBlogger) {
