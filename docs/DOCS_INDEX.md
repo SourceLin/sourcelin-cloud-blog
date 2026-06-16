@@ -1,4 +1,4 @@
-# 文档索引
+﻿# 文档索引
 
 本索引只保留当前仍适合作为实现依据的长期文档入口。一次性计划、过程审计、迁移中间稿、临时远程操作说明和已被 `rules/`、`skills/` 取代的 AI 提示文档不再维护。
 
@@ -59,7 +59,17 @@
 |------|------|
 | [product/PROJECT_ANALYSIS.md](./product/PROJECT_ANALYSIS.md) | 项目分析与阶段性建议 |
 | [product/REQUIREMENTS.md](./product/REQUIREMENTS.md) | 需求与接口设计说明 |
+| [product/UNIAPP_MINI_PROGRAM_PRODUCT_DESIGN.md](./product/UNIAPP_MINI_PROGRAM_PRODUCT_DESIGN.md) | 移动端小程序产品设计与功能定义 |
 
+
+
+## AI 协作与开发报告
+
+| 文档 | 说明 |
+|------|------|
+| [openai-application.md](./openai-application.md) | OpenAI 开源支持申请文档，含 AI 参与度、Vibe Coding 工作流与治理资产 |
+| [ai-development-report.md](./ai-development-report.md) | AI 开发量化证据报告，含提交统计、文件规模、贡献拆解与重构案例 |
+| [vibe-coding-report.md](./vibe-coding-report.md) | Vibe Coding 方法论与实践报告，含真实开发会话、Prompt 模式与治理体系 |
 
 ## 数据库脚本
 
