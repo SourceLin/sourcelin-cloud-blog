@@ -23,6 +23,68 @@ Repository:
 
 ---
 
+
+---
+
+## Planned AI Architecture
+
+The project has a comprehensive AI integration blueprint designed across three phases:
+
+### Three-Phase AI Roadmap
+
+```
+Phase 1: Lightweight AI Adapter
+  Blog → sourcelin-ai (adapter) → Dify / DirectLLM
+  - 5 core capabilities: title, summary, tags, polish, safety audit
+  - Sync + SSE streaming + async task modes
+  - Unified call logging and task management
+  - AI is optional: blog core functions work without it
+
+Phase 2: Enhanced AI Capabilities
+  - RAG knowledge base Q&A (FastGPT integration)
+  - AI content assistant (outline, cover image, batch SEO)
+  - Comment reply suggestions
+  - AI material library and usage statistics
+
+Phase 3: Unified AI Service
+  - Multi-tenant, multi-system AI service
+  - Cross-system Agent and Workflow orchestration
+  - Unified cost tracking, quotas, and auditing
+```
+
+### Planned AI Capabilities
+
+| Capability | Mode | Description |
+|---|---|---|
+| Article title generation | Sync | Generate SEO-optimized titles from content |
+| Article summary | Sync | Auto-generate concise summaries |
+| Article tag recommendation | Sync | Suggest relevant tags from content |
+| Article polish | SSE Stream | Real-time text refinement |
+| SEO metadata generation | Sync | Generate title/description/keywords |
+| Comment safety audit | Sync | AI-powered risk detection |
+| Knowledge base Q&A | SSE Stream | RAG-based blog knowledge assistant |
+| AI agent chat | SSE Stream | Multi-turn conversation assistant |
+
+### Supporting Infrastructure (Planned)
+
+| System | Technology | Purpose |
+|---|---|---|
+| AI Adapter Service | Spring Boot microservice | Unified protocol, provider routing, logging |
+| AI Platform | Dify (self-hosted) | Prompt, Workflow, Knowledge Base, Model access |
+| Direct LLM | OpenAI-compatible API | Direct model invocation for simple tasks |
+| Message Center | Redis Pub/Sub + SSE | Distributed real-time push |
+| SSE Auth | One-time ticket (Redis) | Secure EventSource connections |
+| File Relay | URL-to-OSS upload | Archive temporary AI media to permanent storage |
+| Config Hot-Reload | Nacos + @RefreshScope | Runtime provider switching |
+
+### Design Principles
+
+- **AI is optional**: `blog.ai.enabled=false` keeps all blog core functions fully operational
+- **Non-destructive**: AI results saved as drafts; user must explicitly adopt before writing to production
+- **Provider-agnostic**: business code references `abilityCode` only; provider differences encapsulated
+- **Three config modes**: DirectLLM (zero dependency), Dify (full platform), or disabled (open-source default)
+
+---
 ## Technical Architecture
 
 ### Frontend

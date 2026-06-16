@@ -122,6 +122,48 @@ In this project, Vibe Coding means:
 
 **Result:** 673 lines of shared shell logic extracted. All admin list pages now share consistent UX and behavior.
 
+
+### Session 5: Designing the AI Microservice Architecture
+
+**Intent:** "Design an independent AI adapter microservice that can call both Dify and direct LLM APIs, with unified logging, task management, and runtime provider switching."
+
+**AI Workflow:**
+
+1. **Architecture design:** AI proposed a three-tier architecture — Blog (business) → sourcelin-ai (adapter) → Dify/DirectLLM (platform) — with clear boundary rules: the adapter handles protocol, routing, and logging; the platform handles Prompt, Workflow, and models; the business layer handles adoption and persistence
+2. **Multi-provider abstraction:** AI designed `AiProviderClient` interface with separate implementations for Dify and DirectLLM, using `abilityCode`-based routing so business code never touches provider-specific logic
+3. **SSE streaming design:** AI designed a unified SSE event contract (`processing` → `completed`/`error`) that normalizes different provider stream formats into a single frontend-consumable protocol
+4. **Config hot-switch:** AI designed a three-mode Nacos configuration system (DirectLLM / Dify / Disabled) with `@RefreshScope` for zero-downtime provider switching
+5. **Documentation:** AI produced 8 design documents covering the full AI integration blueprint
+
+**Result:** A complete AI architecture blueprint ready for implementation, with clear phase 1-2-3 roadmap.
+
+### Session 5b: Designing the Distributed Message Push Center
+
+**Intent:** "Design a distributed SSE message center that can push real-time notifications to online users across multiple service instances, with secure authentication for EventSource connections."
+
+**AI Workflow:**
+
+1. **Cross-instance routing:** AI designed Redis Pub/Sub for broadcasting messages across service instances, with local `ConcurrentHashMap` for per-instance session management
+2. **SSE authentication:** AI designed a one-time ticket mechanism — frontend requests a short-lived ticket (10s TTL) via authenticated REST API, then passes it as URL parameter to EventSource (solving the limitation that browser EventSource cannot carry custom HTTP headers)
+3. **Dual-channel separation:** AI designed separate channels for AI streaming (point-to-point, high-frequency) vs. system notifications (broadcast, low-frequency), preventing mutual interference
+4. **Resilience:** AI designed heartbeat keep-alive (20s interval), exponential backoff reconnection with jitter, and OOM prevention through lifecycle-bound session cleanup
+5. **Cross-platform client:** AI designed `SseClientManager` with dual strategies — browser `EventSource` for H5, `uni.request` with `enableChunked` for mini-program
+
+**Result:** A production-grade distributed message center design covering auth, routing, resilience, and cross-platform support.
+
+### Session 6: AI Configuration Architecture Design
+
+**Intent:** "Design a configuration system where switching between DirectLLM and Dify doesn't require code changes or restarts, and misconfiguration fails safely."
+
+**AI Workflow:**
+
+1. **Problem analysis:** AI identified that mixing Nacos and database configs without explicit mode switching causes cross-contamination (DirectLLM mode accidentally reading Dify database fields)
+2. **Three-mode design:** AI designed a clean separation — DirectLLM mode clears all database fields and reads from Nacos; Dify mode clears Nacos defaults and reads from database; empty/disabled mode returns clear error
+3. **Hot-reload:** AI designed `@RefreshScope` on config classes so provider switching takes effect without restart
+4. **Minimal surface:** AI identified that only the router and properties classes need changes; all provider clients and service orchestration remain untouched
+
+**Result:** A configuration architecture that supports runtime provider switching, safe misconfiguration handling, and minimal change surface.
+
 ### Session 4: Cross-Cutting Security — Internal API Path Isolation
 
 **Intent:** "Some internal Feign endpoints are accidentally exposed on public paths. Move them behind `/inner/` and add `@InnerAuth`."

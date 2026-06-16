@@ -133,6 +133,86 @@ AI-assisted development resulted in measurable engineering outcomes:
 
 ---
 
+
+---
+
+## 5b. AI Integration Blueprint
+
+The project has a detailed AI integration plan designed across three phases, documented in 8 design specifications covering architecture, implementation, SSE streaming, Dify platform setup, message push center, and configuration management.
+
+### Planned AI Service Architecture
+
+```
+Blog Frontend / Admin Panel
+        ↓
+  sourcelin-blog (Business Layer)
+  - AI capability entry points
+  - AI result adoption workflow (pending → adopted / discarded)
+  - Comment safety audit pipeline
+        ↓ Feign
+  sourcelin-ai (AI Adapter Microservice)
+  - Unified protocol: abilityCode-based routing
+  - Multi-provider: DirectLLM + Dify Platform
+  - Sync + SSE streaming + async task modes
+  - Call logging, task management
+  - Runtime config hot-switch via Nacos
+        ↓
+  Dify Platform / Direct LLM
+  - Prompt management, Workflow, Knowledge Base, Agent
+```
+
+### Planned AI Capabilities (Phase 1)
+
+| abilityCode | Capability | Invoke Mode | Provider |
+|---|---|---|---|
+| `article_title_generate` | Article title generation | Sync | DirectLLM |
+| `article_summary` | Article summary generation | Sync | DirectLLM |
+| `article_tags` | Article tag recommendation | Sync | DirectLLM |
+| `article_polish` | Article polish/refinement | SSE | DirectLLM |
+| `seo_meta_generate` | SEO metadata generation | Sync | DirectLLM |
+| `comment_risk_check` | Comment safety audit | Sync | DirectLLM |
+| `blog_knowledge_qa` | Knowledge base Q&A | SSE | Dify |
+| `ai_agent_chat` | AI agent conversation | SSE | Dify |
+
+### Planned Module Structure
+
+| Module | Purpose |
+|---|---|
+| `sourcelin-api-ai` | Feign interfaces and cross-service DTOs |
+| `sourcelin-modules/sourcelin-ai` | AI adapter microservice |
+| `sourcelin-api-message` | Feign interface for message push |
+| `sourcelin-modules/sourcelin-message` | SSE real-time messaging center |
+| Blog AI integration | Controllers, services, AI records, moderation pipeline |
+
+### Planned Infrastructure
+
+| Component | Technology | Purpose |
+|---|---|---|
+| AI Platform | Dify (self-hosted, Docker Compose) | Prompt, Workflow, KB, Model access |
+| Direct LLM | DeepSeek / OpenAI-compatible | Direct invocation with Nacos prompts |
+| SSE Streaming | SseEmitter + OkHttp SSE | Real-time token streaming |
+| Message Center | Redis Pub/Sub + SSE | Cross-instance message routing |
+| Ticket Auth | Redis short-lived ticket (10s TTL) | SSE connection authentication |
+| File Relay | URL-to-OSS upload | Archive AI-generated media |
+| Config Hot-Reload | Nacos + @RefreshScope | Runtime provider switching |
+
+### Configuration Modes (Planned)
+
+| Mode | Config Source | Use Case |
+|---|---|---|
+| Direct LLM | Nacos (prompts, endpoint, model) | Quick start, no Dify needed |
+| Dify Platform | Database (`ai_ability_config`) | Production with Workflow/KB/Agent |
+| Disabled | N/A | Open-source default, AI is optional |
+
+### Phase 2-3 Expansion
+
+- RAG knowledge base with FastGPT
+- AI content assistant (outline, cover image, batch SEO)
+- Multi-turn conversation with Dify Chat API + `conversation_id`
+- Multi-tenant unified AI service
+- Cross-system Agent and Workflow orchestration
+
+
 ## 6. Prompt Engineering Evidence
 
 Examples of prompts used in development:
