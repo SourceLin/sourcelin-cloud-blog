@@ -389,3 +389,24 @@ export interface MobileCapability {
   createTime?: string;
   updateTime?: string;
 }
+
+export interface BloggerApplyItem extends BlogBaseEntity {
+  id: number;
+  userId?: number;
+  reason?: string;
+  contact?: string;
+  status?: number; // 0=待审核, 1=已通过, 2=已拒绝
+  auditOpinion?: string;
+  auditTime?: string;
+  auditBy?: string;
+  deleted?: number;
+  username?: string;
+  nickname?: string;
+}
+
+export interface BloggerApplyQueryParams extends BlogQueryParams {
+  userId?: number;
+  username?: string;
+  nickname?: string;
+}
+

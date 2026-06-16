@@ -17,6 +17,8 @@ import com.sourcelin.blog.service.IArticleService;
 import com.sourcelin.blog.service.ICollectService;
 import com.sourcelin.blog.service.ICommentService;
 import com.sourcelin.blog.service.IFollowService;
+import com.sourcelin.blog.service.IUserService;
+import com.sourcelin.blog.api.domain.User;
 import com.sourcelin.blog.vo.ArticleVO;
 import com.sourcelin.blog.vo.FrontArticleDetailVO;
 import com.sourcelin.common.core.enums.ResultCode;
@@ -47,6 +49,8 @@ public class FrontArticleController extends BaseController
 {
     @Autowired
     private IArticleService articleService;
+    @Autowired
+    private IUserService userService;
 
     @Autowired
     private ICollectService collectService;
@@ -168,6 +172,11 @@ public class FrontArticleController extends BaseController
         {
             throw new BusinessException(ResultCode.UNAUTHORIZED, "请先登录");
         }
+        User user = userService.selectUserById(userId);
+        if (user == null || user.getUserType() == null || user.getUserType() != 2)
+        {
+            throw new BusinessException(ResultCode.FORBIDDEN, "只有博主才能发布文章");
+        }
         dto.setUserId(userId);
         if (dto.getStatus() == null || dto.getStatus() <= 0)
         {
@@ -208,6 +217,11 @@ public class FrontArticleController extends BaseController
         if (userId == null)
         {
             throw new BusinessException(ResultCode.UNAUTHORIZED, "请先登录");
+        }
+        User user = userService.selectUserById(userId);
+        if (user == null || user.getUserType() == null || user.getUserType() != 2)
+        {
+            throw new BusinessException(ResultCode.FORBIDDEN, "只有博主才能编辑文章");
         }
         Article existing = articleService.selectArticleById(id);
         if (existing == null || isDeleted(existing))

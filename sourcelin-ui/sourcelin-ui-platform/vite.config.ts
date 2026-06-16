@@ -209,7 +209,7 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true
         },
         [fileApiBase]: {
-          target: 'https://sourcelin.cn',
+          target: blogApiTarget,
           changeOrigin: true
         }
       }

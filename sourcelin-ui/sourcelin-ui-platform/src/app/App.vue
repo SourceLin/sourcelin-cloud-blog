@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { darkTheme, NConfigProvider, NDialogProvider } from 'naive-ui'
 import { useRoute } from 'vue-router'
 import { useHead } from '@unhead/vue'
 import { useThemeStore } from '@/stores/theme.store'
 import { useUiStore } from '@/stores/ui.store'
 import { useSiteStore } from '@/stores/site.store'
+import { getSiteInfo } from '@/modules/about/api/site.api'
 import SearchDialog from '@/shared/components/feedback/SearchDialog.vue'
 import StartupLoadingOverlay from '@/shared/components/feedback/StartupLoadingOverlay.vue'
 import AppFooter from '@/shared/components/layout/AppFooter.vue'
@@ -112,6 +113,33 @@ const themeOverrides = computed(() => {
     Dialog: {
       borderRadius: readCssVariable('--glass-radius', '18px')
     }
+  }
+})
+
+onMounted(async () => {
+  try {
+    const info = await getSiteInfo()
+    if (info) {
+      siteStore.setSiteInfo({
+        webName: info.webName || info.siteName || siteStore.siteInfo.webName || 'SourceLin',
+        webTitle: info.webTitle || siteStore.siteInfo.webTitle || [],
+        notices: info.notices || siteStore.siteInfo.notices || [],
+        footer: info.footer || siteStore.siteInfo.footer || '',
+        backgroundImage: info.backgroundImage || siteStore.siteInfo.backgroundImage || '',
+        logo: info.logo || siteStore.siteInfo.logo || '',
+        avatar: info.avatar || siteStore.siteInfo.avatar || '',
+        recordNum: info.recordNum || siteStore.siteInfo.recordNum || '',
+        showList: info.showList || siteStore.siteInfo.showList || [],
+        author: info.author || siteStore.siteInfo.author,
+        siteName: info.siteName || info.webName || siteStore.siteInfo.siteName,
+        github: info.github || siteStore.siteInfo.github,
+        gitee: info.gitee || siteStore.siteInfo.gitee,
+        qqNumber: info.qqNumber || siteStore.siteInfo.qqNumber,
+        email: info.email || siteStore.siteInfo.email
+      })
+    }
+  } catch (error) {
+    console.error('全局初始化站点配置失败:', error)
   }
 })
 </script>

@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.sourcelin.common.security.utils.SecurityUtils;
+import com.sourcelin.common.redis.service.RedisService;
 import org.springframework.web.multipart.MultipartFile;
 import com.sourcelin.blog.constant.UserTypeEnum;
 import com.sourcelin.system.api.domain.SysDictData;
@@ -54,6 +55,8 @@ public class FrontUserController extends BaseController
 {
     @Autowired
     private IUserService userService;
+    @Autowired
+    private RedisService redisService;
     @Autowired
     private IArticleService articleService;
     @Autowired
@@ -156,8 +159,31 @@ public class FrontUserController extends BaseController
             throw new BusinessException(ResultCode.NOT_FOUND, "用户不存在");
         }
 
+        String newEmail = StringUtils.trim(body.getEmail());
+        String oldEmail = currentUser.getEmail();
+        if (StringUtils.isNotEmpty(newEmail) && !newEmail.equalsIgnoreCase(oldEmail))
+        {
+            String emailCode = StringUtils.trim(body.getEmailCode());
+            if (StringUtils.isEmpty(emailCode))
+            {
+                throw new BusinessException(ResultCode.VALIDATION_ERROR, "请填写邮箱验证码");
+            }
+            String codeKey = "email:code:" + newEmail;
+            Object cachedObj = redisService.getCacheObject(codeKey);
+            if (cachedObj == null)
+            {
+                throw new BusinessException(ResultCode.VALIDATION_ERROR, "验证码已过期，请重新获取");
+            }
+            String cachedCode = String.valueOf(cachedObj);
+            if (!cachedCode.equals(emailCode))
+            {
+                throw new BusinessException(ResultCode.VALIDATION_ERROR, "邮箱验证码不正确");
+            }
+            redisService.deleteObject(codeKey);
+        }
+
         currentUser.setNickname(StringUtils.trim(body.getNickName()));
-        currentUser.setEmail(StringUtils.trim(body.getEmail()));
+        currentUser.setEmail(newEmail);
         currentUser.setPhone(StringUtils.trim(body.getPhonenumber()));
         currentUser.setSex(body.getSex());
         currentUser.setIntroduction(StringUtils.trim(body.getIntroduction()));
@@ -456,6 +482,7 @@ public class FrontUserController extends BaseController
         private String phonenumber;
         private Integer sex;
         private String introduction;
+        private String emailCode;
     }
 
     @Data

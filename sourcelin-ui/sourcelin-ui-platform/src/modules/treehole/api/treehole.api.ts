@@ -1,6 +1,7 @@
 import { requestData } from '@/shared/api/http'
 import type { PageResult } from '@/shared/types/api'
 import { collectTarget, uncollectTarget } from '@/shared/api/interaction.api'
+import type { TreeholeBarrageItem } from '../model/treehole.types'
 
 export interface Treehole {
   id: number
@@ -21,6 +22,15 @@ export function getTreeholes(params?: { page?: number; pageSize?: number }) {
     url: '/front/treeholes',
     method: 'get',
     params
+  })
+}
+
+
+
+export function getTreeholeBarrageList() {
+  return requestData<TreeholeBarrageItem[]>({
+    url: '/front/treeholes/barrage',
+    method: 'get'
   })
 }
 

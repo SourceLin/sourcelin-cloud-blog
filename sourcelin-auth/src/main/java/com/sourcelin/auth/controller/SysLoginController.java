@@ -155,7 +155,9 @@ public class SysLoginController {
 
     @PostMapping("/email/code")
     public Boolean sendEmailCode(@Valid @RequestBody EmailCodeRequestDTO request) {
-        shearCaptchaService.verifyCaptchaWithoutConsume(request.getCaptchaCode(), request.getCaptchaUuid(), LOGIN_TYPE_BLOG);
+        if (!StpBlogUtil.isLogin()) {
+            shearCaptchaService.verifyCaptchaWithoutConsume(request.getCaptchaCode(), request.getCaptchaUuid(), LOGIN_TYPE_BLOG);
+        }
         emailCodeService.sendEmailCode(request.getEmail());
         return true;
     }

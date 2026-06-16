@@ -16,3 +16,5 @@ export { default as BlogConfigAPI } from "./config";
 export { default as BlogStatsAPI } from "./stats";
 export { default as BlogUserAPI } from "./user";
 export { default as MobileCapabilityAPI } from "./mobile";
+export { default as BloggerApplyAPI } from "./bloggerApply";
+

@@ -1,5 +1,5 @@
 import { computed, ref, watch } from 'vue'
-import { collectTreehole, createTreehole, deleteTreehole, getTreeholes, uncollectTreehole } from '@/modules/treehole/api/treehole.api'
+import { collectTreehole, createTreehole, deleteTreehole, getTreeholes, uncollectTreehole, getTreeholeBarrageList } from '@/modules/treehole/api/treehole.api'
 import type { TreeholeBarrageItem, TreeholeCardItem } from '@/modules/treehole/model/treehole.types'
 import { likeTarget, unlikeTarget } from '@/shared/api/interaction.api'
 import { useContentComments } from '@/shared/composables/useContentComments'
@@ -106,16 +106,26 @@ export function useTreeholePage() {
     time: Math.floor(Math.random() * 5 + 5)
   })
 
-  const refreshBarrage = (items: TreeholeCardItem[]) => {
-    const fb = barrageNicknameFallback()
-    const nextBarrage = items
-      .filter((item) => item.content)
-      .slice(0, 30)
-      .map(createBarrageItem)
-    barrageList.value = nextBarrage.length ? nextBarrage : [
-      { id: 'default-1', msg: '欢迎来到树洞', avatar: defaultAvatar, nickname: fb, time: 8 },
-      { id: 'default-2', msg: '留下你的片刻低语', avatar: defaultAvatar, nickname: fb, time: 9 }
-    ]
+  const loadBarrages = async () => {
+    try {
+      const response = await getTreeholeBarrageList()
+      if (Array.isArray(response)) {
+        barrageList.value = response.map((item) => ({
+          id: item.id,
+          msg: item.msg,
+          avatar: item.avatar || defaultAvatar,
+          nickname: item.nickname || barrageNicknameFallback(),
+          time: Math.floor(Math.random() * 5 + 5)
+        }))
+      }
+    } catch (error) {
+      console.error('加载弹幕失败:', error)
+      const fb = barrageNicknameFallback()
+      barrageList.value = [
+        { id: 'default-1', msg: '欢迎来到树洞', avatar: defaultAvatar, nickname: fb, time: 8 },
+        { id: 'default-2', msg: '留下你的片刻低语', avatar: defaultAvatar, nickname: fb, time: 9 }
+      ]
+    }
   }
 
   const loadTreeholes = async (pageToLoad = treeholePage.value) => {
@@ -125,7 +135,6 @@ export function useTreeholePage() {
       treeholePage.value = pageToLoad
       treeholeTotal.value = Number(response.total ?? 0)
       treeholes.value = response.items.map((item) => normalizeTreehole(item as TreeholeResponseItem))
-      refreshBarrage(treeholes.value)
     } catch (error) {
       console.error('加载树洞失败:', error)
       treeholes.value = []
@@ -156,7 +165,18 @@ export function useTreeholePage() {
 
     submitting.value = true
     try {
-      await createTreehole({ content })
+      const newId = await createTreehole({ content })
+
+      // 本地迅速插播一条优先弹幕，给用户以即时反馈
+      const localBarrageItem: TreeholeBarrageItem = {
+        id: `local-${newId || Date.now()}`,
+        msg: content,
+        avatar: currentUserAvatar.value,
+        nickname: isLoggedIn.value ? '你' : '匿名洞友',
+        time: 5
+      }
+      barrageList.value = [localBarrageItem, ...barrageList.value]
+
       draft.value = ''
       await loadTreeholes()
       message.success('树洞已投递')
@@ -254,9 +274,7 @@ export function useTreeholePage() {
   watch(commentApi.commentTotal, syncCommentCount)
 
   watch(isLoggedIn, () => {
-    if (treeholes.value.length) {
-      refreshBarrage(treeholes.value)
-    }
+    void loadBarrages()
   })
 
   return {
@@ -286,6 +304,7 @@ export function useTreeholePage() {
     enableReply: commentApi.enableReply,
     commentAnonymousLabel,
     loadTreeholes,
+    loadBarrages,
     submitTreehole,
     handleTreeholeLike,
     handleTreeholeCollect,

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <el-card shadow="hover" class="table-section">
     <div class="table-section__toolbar">
       <div class="table-section__toolbar--actions">
@@ -91,6 +91,7 @@
             :row-actions="rowActions"
             :resolve-button-type="resolveButtonType"
             :is-row-action-visible="isRowActionVisible"
+            :edit-text="editText"
             @edit="emit('edit', $event)"
             @delete="emit('delete', $event)"
             @row-action="emit('rowAction', $event, row)"
@@ -140,6 +141,7 @@ const props = defineProps<{
   resolveTagLabel: (column: TableColumn, value: unknown) => string;
   resolveButtonType: (type?: string) => ElButtonType;
   isRowActionVisible: (action: RowAction, row: Record<string, any>) => boolean;
+  editText?: string;
 }>();
 
 const emit = defineEmits<{

@@ -31,6 +31,7 @@ declare module 'vue' {
     AuthPanelFrame: typeof import('./modules/auth/components/AuthPanelFrame.vue')['default']
     AuthScene: typeof import('./modules/auth/components/AuthScene.vue')['default']
     AuthVisualShowcase: typeof import('./modules/auth/components/AuthVisualShowcase.vue')['default']
+    AvatarCropperModal: typeof import('./modules/user/components/AvatarCropperModal.vue')['default']
     CategoryPage: typeof import('./modules/article/pages/CategoryPage.vue')['default']
     ChannelComingSoon: typeof import('./modules/notice/components/ChannelComingSoon.vue')['default']
     CommentComposer: typeof import('./shared/components/comments/CommentComposer.vue')['default']

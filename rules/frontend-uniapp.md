@@ -31,8 +31,8 @@
 
 - MUST：新增页面必须同步登记到 `src/pages.json`。
 - MUST：新增页面必须正确归入主包或分包：Tab 页放入顶层 `pages`，业务页放入对应 `subPackages`（pages-article/pages-user/pages-messages/pages-about/pages-publish）。
-- MUST：主包仅保留 4 个 Tab 页面（首页、发现、社区、我的），主包体积必须 < 2MB。
-- MUST：新增 Tab 时必须同时提供普通和选中态图标，路径放在 `src/static/tabbar/**`，尺寸和体积满足微信小程序要求。
+- MUST：主包仅保留 4 个页面（首页、发现、圈子、我的），其中 3 个为原生 TabBar（首页、发现、我的），圈子通过自定义液态 TabBar + `navigateTo` 承载；主包体积必须 < 2MB。
+- MUST：新增 Tab 时必须同时提供普通和选中态图标，路径放在 `src/static/tabbar/**`，尺寸和体积满足微信小程序要求。圈子 Tab 图标同样需要提供，虽非原生 Tab 但液态 TabBar 依赖这些图标。
 - MUST：微信小程序分包只允许使用真实存在的目录作为 `subPackages[].root`。
 - MUST：分包页面路径必须位于分包 root 目录下；不满足该条件时保持普通页面注册，避免微信开发者工具报 root 非目录。
 - MUST：页面跳转使用 `uni.navigateTo`、`uni.redirectTo`、`uni.switchTab`、`uni.navigateBack`，并根据页面栈选择返回策略。
@@ -58,7 +58,7 @@
 
 - MUST：列表请求使用分页，分页参数使用 `page/pageSize`，返回读取 `items/total/page/pageSize/totalPages`。
 - MUST：首页、文章列表、搜索、社区流等高频列表保留下拉刷新、上拉加载、加载态和到底态。
-- MUST：`onPageScroll` 使用 `useThrottledPageScroll`（`src/shared/composables/useThrottledPageScroll`），禁止直接逐像素写响应式状态。
+- MUST：`onPageScroll` 使用 `useBackToTop`（`src/shared/composables/useBackToTop`）的 `handlePageScroll`，禁止直接逐像素写响应式状态。
 - MUST：图片使用合适尺寸、懒加载或缩略图策略；Tab 图标和静态资源必须控制体积。
 - MUST：登录 Token、用户信息和轻量缓存通过 `src/utils/storage.ts` 或封装层访问。
 - MUST：需要平台差异能力时使用 Uniapp 条件编译，并保证微信小程序为优先验证平台。

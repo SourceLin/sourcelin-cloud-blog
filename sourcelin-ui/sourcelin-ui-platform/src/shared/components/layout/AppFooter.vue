@@ -33,6 +33,11 @@ let timer: ReturnType<typeof setInterval> | null = null
 const currentYear = new Date().getFullYear()
 const launchDateText = '2026.02.01'
 
+const copyrightYearText = computed(() => {
+  const startYear = 2026
+  return startYear === currentYear ? `${startYear}` : `${startYear}-${currentYear}`
+})
+
 const siteName = computed(() => siteInfo.value.siteName || siteInfo.value.webName || 'SourceLin')
 const siteLogo = computed(() => siteInfo.value.logo || localLogo)
 const siteSlogan = computed(() => siteInfo.value.footer || '分享美好，记录生活，收藏每一份心动。')
@@ -204,7 +209,20 @@ onUnmounted(() => {
     </div>
 
     <div class="footer-copy-bar">
-      <p class="footer-copy-bar__copyright">Copyright © 2026-{{ currentYear }} SourceLin</p>
+      <p class="footer-copy-bar__copyright">
+        <span>Copyright © {{ copyrightYearText }} SourceLin. All Rights Reserved.</span>
+        <template v-if="siteInfo.recordNum">
+          <span class="footer-copy-bar__divider">|</span>
+          <a
+            href="https://beian.miit.gov.cn"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="footer-copy-bar__link"
+          >
+            {{ siteInfo.recordNum }}
+          </a>
+        </template>
+      </p>
     </div>
   </footer>
 </template>
@@ -460,6 +478,27 @@ onUnmounted(() => {
 
 .footer-copy-bar__copyright {
   margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.footer-copy-bar__divider {
+  margin: 0 6px;
+  color: var(--text-secondary);
+  opacity: 0.36;
+}
+
+.footer-copy-bar__link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-base);
+}
+
+.footer-copy-bar__link:hover {
+  color: var(--primary-color);
 }
 
 .footer-nav-hub,

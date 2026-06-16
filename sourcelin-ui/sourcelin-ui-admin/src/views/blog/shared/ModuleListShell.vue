@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="app-container">
     <ModuleQueryForm
       :query-params="queryParams"
@@ -29,6 +29,7 @@
       :resolve-tag-label="resolveTagLabel"
       :resolve-button-type="resolveButtonType"
       :is-row-action-visible="isRowActionVisible"
+      :edit-text="editText"
       @create="openCreate"
       @delete="handleDelete"
       @selection-change="handleSelectionChange"
@@ -204,6 +205,7 @@ const props = withDefaults(
     serializeForm?: (form: Record<string, any>) => Record<string, any>;
     deserializeForm?: (row: Record<string, any>) => Record<string, any>;
     treeConfig?: TreeConfig;
+    editText?: string;
   }>(),
   {
     description: "",
@@ -389,7 +391,7 @@ function openEdit(row: Record<string, any>) {
     return;
   }
   dialog.visible = true;
-  dialog.title = `编辑${props.title}`;
+  dialog.title = `${props.editText || "编辑"}${props.title}`;
   dialog.mode = "edit";
   editingId.value = id;
   if (props.moduleApi.getFormData) {

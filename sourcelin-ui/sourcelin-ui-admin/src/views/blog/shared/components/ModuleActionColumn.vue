@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <el-button
     v-if="enableEdit && hasEditPermission"
     type="primary"
@@ -7,7 +7,7 @@
     :icon="Edit"
     @click="emit('edit', row)"
   >
-    编辑
+    {{ editText || "编辑" }}
   </el-button>
   <el-button
     v-if="enableDelete && hasDeletePermission"
@@ -59,6 +59,7 @@ defineProps<{
   rowActions: RowAction[];
   resolveButtonType: (type?: string) => ElButtonType;
   isRowActionVisible: (action: RowAction, row: Record<string, any>) => boolean;
+  editText?: string;
 }>();
 
 const emit = defineEmits<{

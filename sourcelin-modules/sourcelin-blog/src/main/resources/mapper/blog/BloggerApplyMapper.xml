@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.BloggerApplyMapper">
+    
+    <resultMap type="BloggerApply" id="BloggerApplyResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="reason"    column="reason"    />
+        <result property="contact"    column="contact"    />
+        <result property="status"    column="status"    />
+        <result property="auditOpinion"    column="audit_opinion"    />
+        <result property="auditTime"    column="audit_time"    />
+        <result property="auditBy"    column="audit_by"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="username"    column="username"    />
+        <result property="nickname"    column="nickname"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateBy"    column="update_by"    />
+    </resultMap>
+
+    <sql id="selectBloggerApplyVo">
+        select a.id, a.user_id, a.reason, a.contact, a.status, a.audit_opinion, a.audit_time, a.audit_by, 
+               a.create_time, a.update_time, a.remark, a.deleted, a.create_by, a.update_by,
+               u.username, u.nickname
+        from b_blogger_apply a
+        left join b_user u on a.user_id = u.id
+    </sql>
+
+    <select id="selectBloggerApplyList" parameterType="BloggerApply" resultMap="BloggerApplyResult">
+        <include refid="selectBloggerApplyVo"/>
+        <where>
+            a.deleted = 0
+            <if test="userId != null"> and a.user_id = #{userId}</if>
+            <if test="status != null"> and a.status = #{status}</if>
+            <if test="username != null and username != ''"> and u.username like concat('%', #{username}, '%')</if>
+            <if test="nickname != null and nickname != ''"> and u.nickname like concat('%', #{nickname}, '%')</if>
+        </where>
+        order by a.create_time desc
+    </select>
+    
+    <select id="selectBloggerApplyById" parameterType="Long" resultMap="BloggerApplyResult">
+        <include refid="selectBloggerApplyVo"/>
+        where a.id = #{id} and a.deleted = 0
+    </select>
+
+    <select id="selectLatestByUserId" parameterType="Long" resultMap="BloggerApplyResult">
+        <include refid="selectBloggerApplyVo"/>
+        where a.user_id = #{userId} and a.deleted = 0
+        order by a.create_time desc, a.id desc
+        limit 1
+    </select>
+
+    <select id="countPendingByUserId" parameterType="Long" resultType="int">
+        select count(1) from b_blogger_apply
+        where user_id = #{userId} and status = 0 and deleted = 0
+    </select>
+        
+    <insert id="insertBloggerApply" parameterType="BloggerApply" useGeneratedKeys="true" keyProperty="id">
+        insert into b_blogger_apply
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="reason != null and reason != ''">reason,</if>
+            <if test="contact != null">contact,</if>
+            <if test="status != null">status,</if>
+            <if test="auditOpinion != null">audit_opinion,</if>
+            <if test="auditTime != null">audit_time,</if>
+            <if test="auditBy != null">audit_by,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+         </trim>
+         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="reason != null and reason != ''">#{reason},</if>
+            <if test="contact != null">#{contact},</if>
+            <if test="status != null">#{status},</if>
+            <if test="auditOpinion != null">#{auditOpinion},</if>
+            <if test="auditTime != null">#{auditTime},</if>
+            <if test="auditBy != null">#{auditBy},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBloggerApply" parameterType="BloggerApply">
+        update b_blogger_apply
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="contact != null">contact = #{contact},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="auditOpinion != null">audit_opinion = #{auditOpinion},</if>
+            <if test="auditTime != null">audit_time = #{auditTime},</if>
+            <if test="auditBy != null">audit_by = #{auditBy},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+</mapper>

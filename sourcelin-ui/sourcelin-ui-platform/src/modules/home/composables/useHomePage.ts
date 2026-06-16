@@ -143,6 +143,30 @@ export function useHomePage() {
         logo: toString(info.logo) || siteInfo.value.logo,
         description: toString(info.description) || toString(info.summary) || toString(info.footer) || siteInfo.value.description
       }
+      
+      // 同步刷入全局 siteStore，使得如页脚等公共组件能够动态展示配置（包含 recordNum）
+      const notices = Array.isArray(info.notices) && info.notices.length 
+        ? info.notices.filter(Boolean) 
+        : splitTextList(info.notice)
+
+      siteStore.setSiteInfo({
+        webName: toString(info.webName) || toString(info.siteName) || toString(info.name) || siteStore.siteInfo.webName || 'SourceLin',
+        webTitle: info.notices || siteStore.siteInfo.webTitle || [],
+        notices: notices,
+        footer: toString(info.footer) || toString(info.description) || toString(info.summary) || siteStore.siteInfo.footer || '',
+        backgroundImage: toString(info.backgroundImage) || siteStore.siteInfo.backgroundImage || '',
+        logo: toString(info.logo) || siteStore.siteInfo.logo || '',
+        avatar: siteStore.siteInfo.avatar || '',
+        recordNum: info.recordNum || siteStore.siteInfo.recordNum || '',
+        showList: Array.isArray(info.showList) ? info.showList : siteStore.siteInfo.showList || [],
+        author: toString(info.author) || siteStore.siteInfo.author,
+        siteName: toString(info.siteName) || toString(info.webName) || siteStore.siteInfo.siteName,
+        github: toString(info.github) || siteStore.siteInfo.github,
+        gitee: toString(info.gitee) || siteStore.siteInfo.gitee,
+        qqNumber: toString(info.qqNumber) || siteStore.siteInfo.qqNumber,
+        email: toString(info.email) || siteStore.siteInfo.email
+      })
+
       carouselItems.value = normalizeHomeArticles(data.carousel)
       recommendedArticles.value = normalizeHomeArticles(data.recommend)
       categories.value = normalizeHomeCategories(data.categories)

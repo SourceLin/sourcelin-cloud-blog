@@ -47,6 +47,7 @@ const {
   enableReply,
   commentAnonymousLabel,
   loadTreeholes,
+  loadBarrages,
   handleTreeholePageChange,
   submitTreehole,
   handleTreeholeLike,
@@ -143,6 +144,7 @@ async function handleTreeholeListPageUpdate(page: number) {
 
 onMounted(() => {
   void loadTreeholes()
+  void loadBarrages()
 })
 </script>
 
@@ -431,13 +433,81 @@ onMounted(() => {
 .barrage-container { position: absolute; inset: 0; overflow: hidden; z-index: 1; pointer-events: none; }
 .message-in { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); color: var(--text-color-light); text-align: center; width: min(560px, calc(100% - 32px)); z-index: 10; }
 .message-title { display: inline-flex; align-items: center; justify-content: center; padding: 0.58rem 1.4rem; margin-bottom: 1rem; border-radius: 999px; color: var(--text-color-light); font-size: clamp(1.8rem, 4vw, 2.5rem); background: color-mix(in srgb, var(--surface-panel-chip-accent) 52%, transparent); border: 1px solid color-mix(in srgb, var(--border-panel-badge-accent) 78%, transparent); box-shadow: var(--highlight-panel-chip), var(--shadow-panel-soft); backdrop-filter: blur(calc(var(--glass-blur) - 2px)) saturate(calc(var(--glass-saturate) + 4%)); }
-.input-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0.42rem; padding: 0.34rem; border-radius: calc(var(--glass-radius) + 2px); border: none; background: transparent; box-shadow: none; backdrop-filter: none; }
-.message-input { flex: 1; --input-background: var(--surface-panel-default); --input-background-focus: var(--surface-panel-default); --input-border: color-mix(in srgb, var(--border-panel-subtle) 82%, transparent); --input-border-hover: color-mix(in srgb, var(--border-panel-default) 86%, transparent); --input-border-focus: color-mix(in srgb, var(--primary-color) 14%, var(--border-panel-default)); --input-focus-ring: 0 0 0 1px color-mix(in srgb, var(--primary-color) 10%, transparent); --s-input-wrapper-padding: 0.08rem 0.18rem; --s-input-min-height: 42px; --s-input-border-radius: calc(var(--glass-radius) - 1px); --s-input-padding-x: 0.78rem; --s-input-font-size: 0.9rem; }
-.send-btn { min-width: 76px; height: 42px; padding: 0 0.82rem; border-radius: calc(var(--glass-radius) - 1px); border: 1px solid color-mix(in srgb, var(--border-panel-badge-accent) 74%, transparent); background:
-  linear-gradient(180deg, color-mix(in srgb, var(--surface-white-12) 12%, transparent), transparent),
-  var(--surface-panel-chip-accent); color: var(--primary-active); font-size: 0.84rem; font-weight: 700; cursor: pointer; transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base), background var(--transition-base); box-shadow: var(--highlight-panel-chip), var(--shadow-panel-inline); }
-.send-btn:hover { transform: translateY(-1px); box-shadow: var(--highlight-panel-chip), var(--shadow-panel-hover), var(--button-glow-strong); border-color: var(--border-interactive-hover); }
-.send-btn:disabled { opacity: 0.72; cursor: progress; transform: none; }
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.25rem 0.25rem 0.25rem 0.78rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-panel-subtle);
+  background: var(--surface-panel-soft);
+  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-soft);
+  backdrop-filter: blur(calc(var(--glass-blur) + 4px)) saturate(var(--glass-saturate));
+  transition: border-color var(--transition-base), box-shadow var(--transition-base), background var(--transition-base);
+}
+.input-row:focus-within {
+  border-color: var(--primary-color);
+  background: var(--surface-panel-default);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 16%, transparent), var(--shadow-panel-hover);
+}
+.message-input {
+  flex: 1;
+  --s-input-min-height: 38px;
+  --s-input-border-radius: 999px;
+}
+.message-input :deep(.n-input-wrapper) {
+  padding: 0 !important;
+  min-height: 38px !important;
+}
+.message-input,
+.message-input:hover,
+.message-input:focus,
+.message-input.n-input--focus,
+.message-input :deep(.n-input),
+.message-input :deep(.n-input:hover),
+.message-input :deep(.n-input:focus),
+.message-input :deep(.n-input-wrapper),
+.message-input :deep(.n-input-wrapper:hover),
+.message-input :deep(.n-input-wrapper:focus),
+.message-input :deep(.n-input-wrapper.n-input-wrapper--focus),
+.message-input :deep(.n-input-wrapper.n-input-wrapper--active),
+.message-input :deep(.n-input__border),
+.message-input :deep(.n-input__state-border) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.message-input :deep(.n-input__input-el) {
+  color: var(--text-color) !important;
+}
+.message-input :deep(.n-input__placeholder) {
+  color: var(--text-color-muted) !important;
+  opacity: 0.62;
+}
+.send-btn {
+  min-width: 76px;
+  height: 38px;
+  padding: 0 1rem;
+  border-radius: 999px;
+  border: none !important;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+  color: #FFFFFF !important;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25) !important;
+  transition: transform var(--transition-base), box-shadow var(--transition-base), background var(--transition-base);
+}
+.send-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4) !important;
+}
+.send-btn:disabled {
+  opacity: 0.72;
+  cursor: progress;
+  transform: none;
+}
 .treehole-main {
   position: relative;
   z-index: 1;
@@ -447,9 +517,9 @@ onMounted(() => {
     linear-gradient(
       180deg,
       color-mix(in srgb, var(--surface-white-18) 20%, transparent) 0%,
-      color-mix(in srgb, var(--surface-page-content) 52%, transparent) 14%,
-      color-mix(in srgb, var(--surface-page-content) 76%, transparent) 38%,
-      color-mix(in srgb, var(--surface-page-content) 88%, transparent) 100%
+      color-mix(in srgb, var(--background-color) 52%, transparent) 14%,
+      color-mix(in srgb, var(--background-color) 76%, transparent) 38%,
+      color-mix(in srgb, var(--background-color) 88%, transparent) 100%
     );
   -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 2px)) saturate(calc(var(--glass-saturate) - 6%));
   backdrop-filter: blur(calc(var(--glass-blur) + 2px)) saturate(calc(var(--glass-saturate) - 6%));
@@ -694,6 +764,27 @@ onMounted(() => {
   background: none;
 }
 
+:global(html[data-theme='dark']) .input-row {
+  background: rgba(15, 23, 42, 0.55) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+:global(html[data-theme='dark']) .input-row:focus-within {
+  background: rgba(15, 23, 42, 0.75) !important;
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25), 0 8px 32px rgba(0, 0, 0, 0.32) !important;
+}
+
+:global(html[data-theme='dark']) .message-input :deep(.n-input__placeholder) {
+  color: rgba(255, 255, 255, 0.44) !important;
+}
+
+:global(html[data-theme='dark']) .message-input :deep(.n-input__input-el) {
+  color: #FFFFFF !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
 @include sourcelin-down(md) {
   .treehole-main {
     margin-top: 0;
@@ -708,7 +799,15 @@ onMounted(() => {
     padding: var(--spacing-md);
     border-radius: 28px;
   }
-  .input-row { grid-template-columns: 1fr; }
+  .input-row {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.6rem;
+    border-radius: calc(var(--glass-radius) + 6px);
+  }
+  .message-input :deep(.n-input-wrapper) {
+    padding: 0 0.25rem !important;
+  }
   .send-btn,
   .submit-btn { width: 100%; justify-content: center; }
   .card-footer { flex-direction: column; gap: 12px; align-items: stretch; }
