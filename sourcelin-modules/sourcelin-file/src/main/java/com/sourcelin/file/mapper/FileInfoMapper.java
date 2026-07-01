@@ -1,5 +1,6 @@
 package com.sourcelin.file.mapper;
 
+import java.util.List;
 import com.sourcelin.file.domain.FileInfo;
 
 public interface FileInfoMapper
@@ -9,4 +10,6 @@ public interface FileInfoMapper
     FileInfo selectFileInfoById(Long fileId);
 
     int updateFileInfo(FileInfo fileInfo);
+
+    List<FileInfo> selectFileInfoList(FileInfo fileInfo);
 }

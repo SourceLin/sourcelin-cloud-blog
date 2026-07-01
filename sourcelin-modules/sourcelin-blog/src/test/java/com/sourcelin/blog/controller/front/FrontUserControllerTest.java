@@ -62,6 +62,7 @@ class FrontUserControllerTest
     {
         User currentUser = new User();
         currentUser.setId(7L);
+        currentUser.setEmail("demo@example.com");
 
         FrontUserController.ProfileUpdateBody body = new FrontUserController.ProfileUpdateBody();
         body.setNickName("  新昵称  ");

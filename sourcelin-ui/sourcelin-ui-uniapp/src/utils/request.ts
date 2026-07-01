@@ -148,6 +148,18 @@ responseInterceptors.use(({ res, config }) => {
         config
       };
     }
+    if (apiResp.code === 401) {
+      if (!config.skipAuthRedirect) {
+        handle401(config.pendingAction);
+      }
+      throw new BusinessError({
+        code: 401,
+        message: apiResp.message || '登录已失效',
+        requestId: apiResp.requestId,
+        data: apiResp.data,
+        httpStatus
+      });
+    }
     throw new BusinessError({
       code: apiResp.code,
       message: apiResp.message,
@@ -320,6 +332,18 @@ export function upload<T = unknown>(config: UploadConfig): Promise<T> {
         }
         if (body && typeof body === 'object' && typeof body.code !== 'undefined') {
           if (body.code === SUCCESS_CODE) return resolve((body.data ?? null) as T);
+          if (body.code === 401) {
+            if (!config.skipAuthRedirect) handle401();
+            return reject(
+              new BusinessError({
+                code: 401,
+                message: body.message || '登录已失效',
+                requestId: body.requestId,
+                data: body.data,
+                httpStatus
+              })
+            );
+          }
           return reject(
             new BusinessError({
               code: body.code,

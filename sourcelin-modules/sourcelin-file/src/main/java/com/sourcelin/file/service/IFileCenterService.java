@@ -23,4 +23,6 @@ public interface IFileCenterService
      * 解析本地磁盘文件供下载/预览。兼容 storage_path 误存为完整 URL 的历史数据。
      */
     File resolvePhysicalFileForDownload(FileInfo fileInfo);
+
+    java.util.List<FileInfo> selectFileInfoList(FileInfo fileInfo);
 }

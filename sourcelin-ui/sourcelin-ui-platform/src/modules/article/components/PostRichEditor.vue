@@ -6,14 +6,12 @@
     </div>
 
     <div class="editor-frame">
-      <QuillEditor
+      <SEditor
         ref="editorRef"
+        v-model="modelValue"
         class="rich-editor"
-        theme="snow"
-        content-type="html"
+        placeholder="写下这篇文章的正文..."
         :options="editorOptions"
-        @ready="handleReady"
-        @textChange="handleTextChange"
       />
 
       <SUpload
@@ -36,9 +34,8 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue'
-import { QuillEditor } from '@vueup/vue-quill'
-import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import { ref } from 'vue'
+import SEditor from '@/shared/components/ui/SEditor.vue'
 import { uploadArticleFile } from '@/modules/article/api/article.api'
 import SUpload from '@/shared/components/ui/SUpload.vue'
 import { resolveUploadedFileDisplayUrl } from '@/shared/composables/useFileUrl'
@@ -49,31 +46,11 @@ interface UploadPayload {
   url?: string
 }
 
-interface QuillRange {
-  index: number
-  length: number
-}
-
-interface QuillInstance {
-  getSelection: (focus?: boolean) => QuillRange | null
-  insertEmbed: (index: number, type: string, value: string, source?: string) => void
-  setSelection: (index: number, length?: number, source?: string) => void
-}
-
-interface QuillEditorExpose {
-  getQuill: () => QuillInstance
-  getHTML: () => string
-  setHTML: (html: string) => void
-  focus: () => void
-}
-
 const modelValue = defineModel<string>({ required: true })
 
 const message = useSMessage()
-const editorRef = ref<QuillEditorExpose | null>(null)
+const editorRef = ref<InstanceType<typeof SEditor> | null>(null)
 const imageUploadTriggerRef = ref<HTMLButtonElement | null>(null)
-const ready = ref(false)
-const syncingFromEditor = ref(false)
 
 interface UploadRequestFile {
   file?: File | null
@@ -87,18 +64,8 @@ interface UploadRequestOptions {
 }
 
 const editorOptions = {
-  placeholder: '写下这篇文章的正文...',
   modules: {
     toolbar: {
-      container: [
-        ['bold', 'italic', 'underline', 'strike'],
-        [{ header: [1, 2, 3, 4, false] }],
-        [{ list: 'ordered' }, { list: 'bullet' }],
-        [{ align: [] }],
-        ['blockquote', 'code-block'],
-        ['link', 'image'],
-        ['clean']
-      ],
       handlers: {
         image: () => {
           imageUploadTriggerRef.value?.click()
@@ -107,61 +74,6 @@ const editorOptions = {
     }
   }
 }
-
-function normalizeHtml(html: string): string {
-  const trimmed = html.trim()
-  return trimmed === '<p><br></p>' ? '' : trimmed
-}
-
-function getEditorHtml(): string {
-  return normalizeHtml(editorRef.value?.getHTML() ?? '')
-}
-
-function setEditorHtml(html: string) {
-  if (!editorRef.value) {
-    return
-  }
-  editorRef.value.setHTML(html || '<p><br></p>')
-}
-
-function syncModelFromEditor() {
-  const html = getEditorHtml()
-  if (html === modelValue.value) {
-    return
-  }
-  syncingFromEditor.value = true
-  modelValue.value = html
-  void nextTick(() => {
-    syncingFromEditor.value = false
-  })
-}
-
-function handleReady() {
-  ready.value = true
-  setEditorHtml(modelValue.value)
-  syncModelFromEditor()
-}
-
-function handleTextChange() {
-  if (!ready.value) {
-    return
-  }
-  syncModelFromEditor()
-}
-
-watch(
-  () => modelValue.value,
-  (value) => {
-    if (!ready.value || syncingFromEditor.value) {
-      return
-    }
-    const nextHtml = normalizeHtml(value)
-    if (nextHtml === getEditorHtml()) {
-      return
-    }
-    setEditorHtml(nextHtml)
-  }
-)
 
 function validateImage(file: File): boolean {
   const isImage = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type)
@@ -221,7 +133,6 @@ async function handleEditorImageUpload({ file, onFinish, onError }: UploadReques
     const index = selection?.index ?? 0
     quill.insertEmbed(index, 'image', displayUrl, 'user')
     quill.setSelection(index + 1, 0, 'user')
-    syncModelFromEditor()
     onFinish()
   } catch (error) {
     console.error('上传正文图片失败', error)
@@ -231,7 +142,7 @@ async function handleEditorImageUpload({ file, onFinish, onError }: UploadReques
 }
 
 function getHtml() {
-  return getEditorHtml()
+  return editorRef.value?.getHtml() ?? modelValue.value
 }
 
 defineExpose({
@@ -285,12 +196,6 @@ defineExpose({
 .editor-frame:focus-within {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 32%, transparent);
-}
-
-:global(.post-rich-editor .editor-frame .ql-toolbar.ql-snow) {
-  border: none;
-  border-bottom: 1px solid var(--border-color);
-  background: color-mix(in srgb, var(--card-bg-color) 82%, var(--bg-page));
 }
 
 :global(.post-rich-editor .editor-frame .ql-container.ql-snow),

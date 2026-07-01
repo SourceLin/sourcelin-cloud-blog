@@ -87,4 +87,33 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </set>
         where file_id = #{fileId}
     </update>
+
+    <select id="selectFileInfoList" parameterType="com.sourcelin.file.domain.FileInfo" resultMap="FileInfoResult">
+        select file_id, file_name, original_name, file_ext, content_type, file_size, file_hash,
+               storage_type, bucket_name, storage_path, access_url, access_scope,
+               biz_type, biz_id, owner_type, owner_id, status, ref_count, expire_time,
+               last_access_time, delete_time, remark, create_by, create_time, update_by, update_time
+        from file_info
+        <where>
+            <if test="fileName != null and fileName != ''">
+                and (
+                    file_name like concat('%', #{fileName}, '%')
+                    or original_name like concat('%', #{fileName}, '%')
+                )
+            </if>
+            <if test="fileExt != null and fileExt != ''">
+                and file_ext = #{fileExt}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+            <if test="ownerType != null and ownerType != ''">
+                and owner_type = #{ownerType}
+            </if>
+            <if test="bizType != null and bizType != ''">
+                and biz_type = #{bizType}
+            </if>
+        </where>
+        order by file_id desc
+    </select>
 </mapper>

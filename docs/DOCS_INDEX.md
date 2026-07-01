@@ -1,4 +1,4 @@
-﻿# 文档索引
+# 文档索引
 
 本索引只保留当前仍适合作为实现依据的长期文档入口。一次性计划、过程审计、迁移中间稿、临时远程操作说明和已被 `rules/`、`skills/` 取代的 AI 提示文档不再维护。
 
@@ -23,6 +23,7 @@
 |------|------|
 | [architecture/api-contract.md](./architecture/api-contract.md) | API 响应体、分页、ID 响应、前端消费与验收说明 |
 | [architecture/backend-architecture.md](./architecture/backend-architecture.md) | 后端模块边界、WebMVC 异常处理与模块化演进 |
+| [architecture/governance-service-management-closed-loop-review.md](./architecture/governance-service-management-closed-loop-review.md) | 治理与服务管理闭环检查、缺口和优化路线图 |
 | [architecture/frontend-platform-architecture.md](./architecture/frontend-platform-architecture.md) | 博客前台模块、组件、composable 与设计系统边界 |
 | [architecture/frontend-admin-architecture.md](./architecture/frontend-admin-architecture.md) | 管理后台模块化、共享壳和验证方式 |
 | [../rules/README.md](../rules/README.md) | AI 编程规则入口 |

@@ -5,7 +5,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.sourcelin.blog.mapper.ArticleMapper">
     
     <resultMap type="Article" id="ArticleResult">
-        <result property="id"    column="id"    />
+        <id property="id"    column="id"    />
         <result property="userId"    column="user_id"    />
         <result property="categoryId"    column="category_id"    />
         <result property="title"    column="title"    />
