@@ -1,79 +1,93 @@
 <template>
   <div class="app-container">
-    <div class="filter-section">
-      <el-form ref="queryFormRef" :model="queryParams" :inline="true" label-width="auto">
-        <el-form-item prop="keywords" label="关键字">
-          <el-input
-            v-model="queryParams.keywords"
-            placeholder="IP/操作人"
-            clearable
-            @keyup.enter="handleQuery"
+    <el-tabs v-model="activeTab" class="log-tabs">
+      <el-tab-pane label="日志审计列表" name="list">
+        <div class="filter-section" style="margin-top: 12px">
+          <el-form ref="queryFormRef" :model="queryParams" :inline="true" label-width="auto">
+            <el-form-item prop="keywords" label="关键字">
+              <el-input
+                v-model="queryParams.keywords"
+                placeholder="IP/操作人"
+                clearable
+                @keyup.enter="handleQuery"
+              />
+            </el-form-item>
+
+            <el-form-item prop="createTime" label="操作时间">
+              <el-date-picker
+                v-model="queryParams.createTime"
+                :editable="false"
+                type="daterange"
+                range-separator="~"
+                start-placeholder="开始时间"
+                end-placeholder="截止时间"
+                value-format="YYYY-MM-DD"
+                style="width: 260px"
+              />
+            </el-form-item>
+
+            <el-form-item class="search-buttons">
+              <el-button type="primary" :icon="Search" @click="handleQuery">搜索</el-button>
+              <el-button :icon="Refresh" @click="handleResetQuery">重置</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+
+        <el-card shadow="hover" class="data-table">
+          <el-table
+            v-loading="loading"
+            :data="pageData"
+            highlight-current-row
+            border
+            class="data-table__content"
+          >
+            <el-table-column label="操作标题" prop="title" min-width="180" show-overflow-tooltip />
+            <el-table-column label="状态" prop="status" width="80" align="center">
+              <template #default="{ row }">
+                <el-tag :type="row.status === 1 ? 'success' : 'danger'" size="small">
+                  {{ row.status === 1 ? "成功" : "失败" }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="IP地址" prop="ip" width="140" />
+            <el-table-column
+              label="请求路径"
+              prop="requestUri"
+              min-width="180"
+              show-overflow-tooltip
+            />
+            <el-table-column label="请求方法" prop="requestMethod" width="100" align="center">
+              <template #default="{ row }">
+                <el-tag :type="getMethodTagType(row.requestMethod)" size="small" effect="plain">
+                  {{ row.requestMethod }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="执行时间(ms)" prop="executionTime" width="120" align="center" />
+            <el-table-column label="操作人" prop="operatorName" width="120" />
+            <el-table-column label="操作时间" prop="createTime" width="180" />
+            <el-table-column label="操作" width="80" align="center" fixed="right">
+              <template #default="{ row }">
+                <el-button type="primary" link size="small" @click="handleDetail(row)">
+                  详情
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <pagination
+            v-if="total > 0"
+            v-model:total="total"
+            v-model:page="queryParams.page"
+            v-model:page-size="queryParams.pageSize"
+            @pagination="fetchData"
           />
-        </el-form-item>
-
-        <el-form-item prop="createTime" label="操作时间">
-          <el-date-picker
-            v-model="queryParams.createTime"
-            :editable="false"
-            type="daterange"
-            range-separator="~"
-            start-placeholder="开始时间"
-            end-placeholder="截止时间"
-            value-format="YYYY-MM-DD"
-            style="width: 260px"
-          />
-        </el-form-item>
-
-        <el-form-item class="search-buttons">
-          <el-button type="primary" :icon="Search" @click="handleQuery">搜索</el-button>
-          <el-button :icon="Refresh" @click="handleResetQuery">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </div>
-
-    <el-card shadow="hover" class="data-table">
-      <el-table
-        v-loading="loading"
-        :data="pageData"
-        highlight-current-row
-        border
-        class="data-table__content"
-      >
-        <el-table-column label="操作标题" prop="title" min-width="180" show-overflow-tooltip />
-        <el-table-column label="状态" prop="status" width="80" align="center">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'danger'" size="small">
-              {{ row.status === 1 ? "成功" : "失败" }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="IP地址" prop="ip" width="140" />
-        <el-table-column label="请求路径" prop="requestUri" min-width="180" show-overflow-tooltip />
-        <el-table-column label="请求方法" prop="requestMethod" width="100" align="center">
-          <template #default="{ row }">
-            <el-tag :type="getMethodTagType(row.requestMethod)" size="small" effect="plain">
-              {{ row.requestMethod }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="执行时间(ms)" prop="executionTime" width="120" align="center" />
-        <el-table-column label="操作人" prop="operatorName" width="120" />
-        <el-table-column label="操作时间" prop="createTime" width="180" />
-        <el-table-column label="操作" width="80" align="center" fixed="right">
-          <template #default="{ row }">
-            <el-button type="primary" link size="small" @click="handleDetail(row)">详情</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <pagination
-        v-if="total > 0"
-        v-model:total="total"
-        v-model:page="queryParams.page"
-        v-model:page-size="queryParams.pageSize"
-        @pagination="fetchData"
-      />
-    </el-card>
+        </el-card>
+      </el-tab-pane>
+      <el-tab-pane label="可视化图表分析" name="analytics" lazy>
+        <LogAnalytics />
+      </el-tab-pane>
+    </el-tabs>
 
     <!-- 详情弹窗 -->
     <el-dialog v-model="detailVisible" title="日志详情" width="720px">
@@ -116,10 +130,14 @@ defineOptions({
   inheritAttrs: false,
 });
 
+import { onMounted, reactive, ref } from "vue";
 import LogAPI from "@/api/system/log";
 import type { LogItem, LogQueryParams } from "@/types/api";
 import type { FormInstance, TagProps } from "element-plus";
 import { Refresh, Search } from "@element-plus/icons-vue";
+import LogAnalytics from "./LogAnalytics.vue";
+
+const activeTab = ref("list");
 
 function getMethodTagType(method: string): TagProps["type"] {
   const map: Record<string, TagProps["type"]> = {

@@ -56,6 +56,13 @@ docs/internal/
 !*/build/*.xml
 .opencode
 .worktrees
+.claude/settings.local.json
+
+sourcelin-ui/sourcelin-ui-admin/sourcelin-ui-admin/
+sourcelin-ui/sourcelin-ui-platform/sourcelin-ui-platform/
+sourcelin-ui/sourcelin-ui-admin/*-dist.tar.gz
+sourcelin-ui/sourcelin-ui-platform/*-dist.tar.gz
+sourcelin-ui/sourcelin-ui-uniapp/*-dist.tar.gz
 
 ######################################################################
 # Sensitive local config / credentials

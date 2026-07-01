@@ -30,13 +30,17 @@ import com.sourcelin.file.service.IFileCenterService;
 import com.sourcelin.file.service.ISysFileService;
 import com.sourcelin.file.api.domain.SysFile;
 
+import java.util.List;
+import com.sourcelin.common.core.web.controller.BaseController;
+import com.sourcelin.common.core.web.domain.response.PageResult;
+
 /**
  * 文件请求处理
  * 
  * @author sourcelin
  */
 @RestController
-public class FileCenterController
+public class FileCenterController extends BaseController
 {
     private static final Logger log = LoggerFactory.getLogger(FileCenterController.class);
     private static final String OCTET_STREAM = "application/octet-stream";
@@ -58,6 +62,17 @@ public class FileCenterController
 
     @Autowired
     private IFileCenterService fileCenterService;
+
+    /**
+     * 分页查询文件列表
+     */
+    @GetMapping("list")
+    public PageResult<FileInfo> list(FileInfo fileInfo)
+    {
+        startPage();
+        List<FileInfo> list = fileCenterService.selectFileInfoList(fileInfo);
+        return toPageResult(list);
+    }
 
     /**
      * 文件上传请求

@@ -361,4 +361,10 @@ public class FileCenterServiceImpl implements IFileCenterService
         Path out = p.normalize();
         return out.startsWith(base) ? out : null;
     }
+
+    @Override
+    public java.util.List<FileInfo> selectFileInfoList(FileInfo fileInfo)
+    {
+        return fileInfoMapper.selectFileInfoList(fileInfo);
+    }
 }

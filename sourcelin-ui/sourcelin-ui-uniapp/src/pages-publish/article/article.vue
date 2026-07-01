@@ -873,10 +873,21 @@ async function removeArticleAction(): Promise<void> {
       inset 0 1rpx 0 rgba(255, 255, 255, 0.92),
       0 18rpx 42rpx rgba(17, 24, 39, 0.08);
 
-    /* #ifdef H5 || APP-PLUS */
-    backdrop-filter: blur(18rpx) saturate(1.25);
-    -webkit-backdrop-filter: blur(18rpx) saturate(1.25);
+    /* #ifdef H5 || APP-PLUS || MP-WEIXIN */
+    backdrop-filter: blur(26rpx) saturate(1.6);
+    -webkit-backdrop-filter: blur(26rpx) saturate(1.6);
     /* #endif */
+
+    .sl-theme--dark & {
+      background:
+        linear-gradient(145deg, rgba(10, 18, 32, 0.9), rgba(13, 22, 38, 0.76)),
+        rgba(8, 13, 24, 0.78);
+      border-color: rgba(154, 176, 255, 0.1);
+      box-shadow:
+        inset 0 1rpx 0 rgba(255, 255, 255, 0.06),
+        inset 0 -1rpx 0 rgba(105, 129, 255, 0.04),
+        0 12rpx 30rpx rgba(0, 0, 0, 0.16);
+    }
   }
 
   &__toolbar-button {

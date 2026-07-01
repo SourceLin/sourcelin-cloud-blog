@@ -1,5 +1,5 @@
-﻿<p align="center">
-  <a href="./README_en.md">English</a>
+<p align="center">
+  <span>中文</span>
 </p>
 
 <p align="center">
@@ -9,7 +9,7 @@
 <h1 align="center">Sourcelin Blog</h1>
 
 <p align="center">
-  基于 Spring Cloud Alibaba + Vue 3 的全栈微服务博客系统，面向个人写作、毕业设计演示与小团队内容运营，同时沉淀了可直接复用的 AI 协作开发资产。
+  基于 Spring Cloud Alibaba + Vue 3 + Uniapp 的三端全栈微服务博客系统，面向个人写作、毕业设计演示与小团队内容运营，同时沉淀了可直接复用的 AI 协作开发资产。
 </p>
 <p align="center">
   <a href="https://github.com/SourceLin/sourcelin-cloud-blog"><img src="https://img.shields.io/github/stars/SourceLin/sourcelin-cloud-blog?style=flat-square&logo=github&logoColor=white" alt="GitHub Stars"></a>
@@ -18,6 +18,7 @@
   <img src="https://img.shields.io/badge/Spring%20Boot-2.7.18-brightgreen.svg" alt="Spring Boot">
   <img src="https://img.shields.io/badge/Spring%20Cloud-2021.0.9-brightgreen.svg" alt="Spring Cloud">
   <img src="https://img.shields.io/badge/Vue-3.x-42b883.svg" alt="Vue">
+  <img src="https://img.shields.io/badge/Uniapp-Vue3-2b9939.svg" alt="Uniapp">
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License"></a>
 </p>
 
@@ -33,7 +34,7 @@
 
 ## 项目定位
 
-Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内容展示和小团队内容运营的现代博客平台，采用前后端分离微服务架构，提供博客前台、管理后台、统一 API 契约、权限体系和完整工程化规范。
+Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内容展示和小团队内容运营的现代博客平台，采用三端前端 + 微服务后端的前后端分离架构，提供博客前台、管理后台、移动端小程序、统一 API 契约、权限体系和完整工程化规范。
 
 它不是单纯的博客 Demo，而是一套可继续二开、可部署上线、可用于毕设展示、也适合做 AI 协作开发实践的全栈项目基线。
 
@@ -42,7 +43,7 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 ## 为什么值得关注
 
 - 微服务全栈架构：基于 Spring Cloud Alibaba，包含网关、认证、系统、博客、文件、监控等完整服务边界。
-- 前后台完整交付：同时提供 Vue 3 博客前台和 Vue 3 管理后台，不是只做后端接口或只做单页前端。
+- 三端完整交付：同时提供 Vue 3 博客前台、Vue 3 管理后台和 Uniapp 移动端小程序，不是只做后端接口或只做单页前端。
 - AI Coding 友好：项目编码、文档整理与规则沉淀以 Codex 为主完成，仓库内同步沉淀了 `AGENTS.md`、`rules/`、`skills/`，适合继续做 AI Coding 与 vibe coding 协作开发。
 - 工程规则明确：统一 API 响应体、分页协议、模块边界和验证要求，适合长期维护和多人协作。
 - 场景覆盖完整：适合作为个人博客、内容站、课程项目、毕业设计、二次开发基线。
@@ -69,9 +70,6 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 
 ![个人中心](./docs/screenshot/个人中心.png)
 
-<details>
-<summary>查看更多博客前台截图</summary>
-
 #### 分类与标签
 
 | 分类 | 标签 |
@@ -96,8 +94,6 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 |---|---|
 | ![关于本站](./docs/screenshot/关于本站.png) | ![登录](./docs/screenshot/登录.png) |
 
-</details>
-
 ### 后台管理
 
 #### 首页与登录
@@ -112,7 +108,7 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 |---|---|
 | ![后台管理系统管理](./docs/screenshot/后台管理-系统管理.png) | ![后台管理博客管理](./docs/screenshot/后台管理-博客管理.png) |
 
-| 网站管理 | 系统监控 |
+| 网站管理 | system监控 |
 |---|---|
 | ![后台管理网站管理](./docs/screenshot/后台管理-网站管理.png) | ![后台管理系统监控](./docs/screenshot/后台管理-系统监控.png) |
 
@@ -136,28 +132,44 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 |---|---|---|---|
 | ![小程序首页](./docs/screenshot/1.首页.png) | ![小程序发现页](./docs/screenshot/2.发现.png) | ![小程序社区说说](./docs/screenshot/3.社区-说说.png) | ![小程序我的](./docs/screenshot/4.我的-已登录.png) |
 
-<details>
-<summary>查看更多小程序截图</summary>
+## 项目结构
 
-#### 文章详情与主题切换
+```text
+sourcelin-cloud-blog/
+├── sourcelin-api/                         # Feign 接口与跨服务 DTO
+├── sourcelin-common/                      # 公共能力
+├── sourcelin-gateway/                     # 网关
+├── sourcelin-auth/                        # 认证中心
+├── sourcelin-modules/
+│   ├── sourcelin-system/                  # 系统管理
+│   ├── sourcelin-blog/                    # 博客业务
+│   ├── sourcelin-file/                    # 文件服务
+│   └── sourcelin-job/                     # 定时任务
+├── sourcelin-visual/                      # 监控等可视化服务
+├── sourcelin-ui/
+│   ├── sourcelin-ui-platform/             # 博客前台
+│   ├── sourcelin-ui-admin/                # 管理后台
+│   └── sourcelin-ui-uniapp/               # 移动端小程序 / H5 / App
+├── docs/                                  # 项目文档
+├── rules/                                 # 仓库规则
+├── skills/                                # AI 协作技能
+└── AGENTS.md                              # 仓库执行入口
+```
 
-| 文章详情 | 暗色主题 | 评论交互 |
-|---|---|---|
-| ![详情](./docs/screenshot/2-1.文章详情页.png) | ![暗色主题](./docs/screenshot/2-3.文章详情页-夜间.png) | ![评论](./docs/screenshot/2-4.文章详情页-提交评论.png) |
+## 微服务架构图
 
-#### 说说树洞与发布
+![Sourcelin Blog 微服务架构图](./docs/screenshot/architecture-sourcelin-blog.png)
 
-| 树洞 | 说说发布 | 树洞发布 |
-|---|---|---|
-| ![树洞](./docs/screenshot/3.社区-树洞.png) | ![说说发布](./docs/screenshot/3.社区-说说-发布.png) | ![树洞发布](./docs/screenshot/3.社区-树洞-发布.png) |
+### 架构分层说明
 
-#### 个人中心与体验
+- 访问层：博客前台、管理后台和移动端统一走网关入口，生产部署通常由 Nginx 承载静态资源并转发 `/blog-api`、`/admin` 等路径。
+- 网关层：`sourcelin-gateway` 作为统一 HTTP 入口，负责路由、Sa-Token Reactor 鉴权边界、Sentinel 网关流控和服务发现。
+- 业务层：认证、系统、博客、文件和定时任务各自独立启动，业务能力主要沉淀在 `sourcelin-modules/*`。
+- 治理层：Nacos、Sentinel、Seata 和 Spring Boot Admin 分别提供注册配置、流控、事务协调和服务观测。
+- 公共层：`sourcelin-common` 承载响应包装、异常处理、安全、Redis、Seata、数据源和 Swagger 等横切能力；`sourcelin-api` 承载 Feign 接口与跨服务 DTO。
+- 数据层：MySQL 保存业务数据与基础配置，Redis 承载缓存和登录态，MinIO 承载对象文件。
 
-| 关于本站 | 友情链接 | 消息中心 | 网站导航 |
-|---|---|---|---|
-| ![关于本站](./docs/screenshot/4-1.我的-关于本站.png) | ![友情链接](./docs/screenshot/4-1.我的-友情链接.png) | ![消息中心](./docs/screenshot/4-1.我的-消息中心.png) | ![网站导航](./docs/screenshot/4-1.我的-网站导航.png) |
 
-</details>
 
 ## 核心能力
 
@@ -182,7 +194,7 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 - 系统管理：用户、角色、菜单、部门、岗位、字典、参数、通知
 - 博客管理：文章、分类、标签、评论、友链、用户、导航、配置
 - 系统监控：在线用户、定时任务
-- 系统工具：代码生成、表单构建
+- system工具：代码生成、表单构建
 - 文件管理和博客统计
 
 ### 后端基础能力
@@ -213,13 +225,11 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 ### 可协作的 AI 工具
 
 - Codex
+- Claude Code
 - Cursor
 - OpenCode
-- Claude Code
 - Qoder
 - Trae
-- 通义灵码
-- 豆包 MarsCode
 - GitHub Copilot
 - 其他支持仓库规则读取的 AI 编程工具
 
@@ -268,23 +278,34 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 | Spring Cloud | 2021.0.9 |
 | Spring Cloud Alibaba | 2021.0.6.1 |
 | Nacos | 注册中心 / 配置中心 |
-| Sentinel | 流量控制 |
+| Sentinel | 网关与服务流量控制 |
 | Seata | 分布式事务 |
-| MySQL | 8.0+ |
-| Redis | 缓存 |
-| Druid | 数据源 |
-| PageHelper | 分页 |
-| MinIO | 文件存储 |
-| Hutool | 工具库 |
-| FastJSON2 | JSON 处理 |
-| Sa-Token | 认证鉴权 |
+| MySQL | 5.7+ / 8.0+ |
+| Redis | 缓存 / Token 存储 |
+| Druid + dynamic-datasource | 数据源与多数据源管理 |
+| MyBatis + PageHelper | ORM 与分页 |
+| MinIO / FastDFS Client | 对象存储与文件服务适配 |
+| Spring Boot Admin | 服务监控 |
+| Springdoc OpenAPI | 接口文档 |
+| Hutool / FastJSON2 / Jsoup | 工具库、JSON 处理、内容解析 |
+| Sa-Token | Servlet / Reactor 双栈认证鉴权 |
 
 ### 前端
 
-| 端 | 技术栈 |
+| 端 | 目录 | 技术栈 |
+|---|---|---|
+| 博客前台 | `sourcelin-ui/sourcelin-ui-platform` | Vue 3.5 + TypeScript 5.9 + Vite 8 + Pinia 3 + Vue Router 4 + Naive UI 2 + `S*` UI 抽象层 |
+| 管理后台 | `sourcelin-ui/sourcelin-ui-admin` | Vue 3.5 + TypeScript 5.9 + Vite 8 + Pinia 3 + Element Plus 2 + vxe-table + wangEditor |
+| 移动端小程序 | `sourcelin-ui/sourcelin-ui-uniapp` | Uniapp 3 + Vue 3.5 + TypeScript 5.6 + Vite 5 + Pinia 2 + 自定义 `s-*` 组件体系 |
+
+### 工程治理
+
+| 能力 | 说明 |
 |---|---|
-| 博客前台 | Vue 3 + TypeScript + Naive UI + Vite |
-| 管理后台 | Vue 3 + TypeScript + Element Plus |
+| API 契约 | 对外 HTTP JSON 统一 `ApiResponse<T>`，分页统一 `PageResult<T>` |
+| 模块边界 | 后端按 gateway / auth / modules / common / api 拆分，前端按平台、后台、移动端独立工程维护 |
+| AI 协作入口 | `AGENTS.md`、`rules/`、`skills/` 约束 AI 编程工具的读取顺序、目录边界和验证命令 |
+| 验证脚本 | 前台 `typecheck/style:guard/test:architecture`，移动端 `lint/type-check/build:mp-weixin`，后台 `type-check/lint`，后端按 Maven 模块验证 |
 
 ## 设计系统与主题
 
@@ -317,6 +338,15 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 - **主题色自定义**：通过系统配置页面中的 Color Picker 实时调整主品牌色，全局同步生效
 - **双轨变量**：CSS 变量负责运行时主题切换，SCSS 变量负责编译时布局尺寸，兼顾动态性与性能
 
+### 移动端 — Liquid Glass Mobile
+
+移动端小程序使用 Uniapp + 自定义 `s-*` 组件体系承载 Sourcelin Liquid Glass Mobile 设计语言：
+
+- **跨端目标**：当前重点支持微信小程序，同时保留 H5 和 App 构建能力。
+- **页面分包**：首页、发现、圈子、我的保留在主包，其余文章、用户、消息、关于、发布能力进入分包控制体积。
+- **移动端体验**：优先考虑单手触达、弱网反馈、下拉刷新、上拉加载、到底态、登录引导和小程序端性能。
+- **样式策略**：小程序端玻璃态以半透明底色、渐变边框、轻阴影和弥散光为主，H5 / App 可按条件编译增强 `backdrop-filter`。
+
 ## 适用场景
 
 - 个人博客和内容沉淀
@@ -346,7 +376,7 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内
 | Maven | 3.6+ | 3.8.x |
 | MySQL | 5.7+ | 8.0 |
 | Redis | 5.0+ | 6.0+ |
-| Node.js | 14+ | 18 LTS |
+| Node.js | 18+ | 20 LTS / 22 LTS |
 | Nacos | 2.0+ | 2.0.x |
 | Docker | 20+ | 24.x |
 
@@ -384,18 +414,28 @@ mvn clean package -DskipTests
 
 java -jar sourcelin-gateway/target/sourcelin-gateway.jar
 java -jar sourcelin-auth/target/sourcelin-auth.jar
-java -jar sourcelin-modules/sourcelin-system/target/sourcelin-system.jar
-java -jar sourcelin-modules/sourcelin-blog/target/sourcelin-blog.jar
+java -jar sourcelin-modules/sourcelin-system/target/sourcelin-modules-system.jar
+java -jar sourcelin-modules/sourcelin-blog/target/sourcelin-modules-blog.jar
 ```
 
 如需完整能力，可再启动：
 
 ```bash
-java -jar sourcelin-modules/sourcelin-file/target/sourcelin-file.jar
-java -jar sourcelin-visual/sourcelin-visual-monitor/target/sourcelin-visual-monitor.jar
+java -jar sourcelin-modules/sourcelin-file/target/sourcelin-modules-file.jar
+java -jar sourcelin-visual/sourcelin-monitor/target/sourcelin-visual-monitor.jar
 ```
 
 #### 6. 启动前端
+
+博客前台：
+
+```bash
+cd sourcelin-ui/sourcelin-ui-platform
+npm install
+npm run dev
+```
+
+管理后台：
 
 ```bash
 cd sourcelin-ui/sourcelin-ui-admin
@@ -403,10 +443,14 @@ pnpm install
 pnpm run dev
 ```
 
+移动端小程序 / H5：
+
 ```bash
-cd sourcelin-ui/sourcelin-ui-platform
+cd sourcelin-ui/sourcelin-ui-uniapp
 npm install
-npm run dev
+npm run dev:mp-weixin
+# 或启动 H5 调试
+npm run dev:h5
 ```
 
 ### Docker 部署
@@ -439,30 +483,7 @@ docker compose -f docker-compose.example.yml up -d
 - `docs/sql/sourcelin-config.sql` 不是业务表，它用于初始化 Nacos 配置，缺它时服务可能能启动但配置不完整。
 - 管理后台部署到 `/admin/` 时，前端构建需要带 `--base=/admin/`。
 - 如果只是本地调试博客能力，优先启动 `gateway`、`auth`、`system`、`blog` 四个核心服务即可。
-- Docker 部署前先阅读 [`docs/guides/QUICK_START.md`](./docs/guides/QUICK_START.md) 和 [`docs/deployment/NGINX_CONFIG.md`](./docs/deployment/NGINX_CONFIG.md)，确认目录、端口和网关入口是否符合你的环境。
-
-## 项目结构
-
-```text
-sourcelin-cloud-blog/
-├── sourcelin-api/                         # Feign 接口与跨服务 DTO
-├── sourcelin-common/                      # 公共能力
-├── sourcelin-gateway/                     # 网关
-├── sourcelin-auth/                        # 认证中心
-├── sourcelin-modules/
-│   ├── sourcelin-system/                  # 系统管理
-│   ├── sourcelin-blog/                    # 博客业务
-│   ├── sourcelin-file/                    # 文件服务
-│   └── sourcelin-job/                     # 定时任务
-├── sourcelin-visual/                      # 监控等可视化服务
-├── sourcelin-ui/
-│   ├── sourcelin-ui-platform/             # 博客前台
-│   ├── sourcelin-ui-admin/                # 管理后台
-├── docs/                                  # 项目文档
-├── rules/                                 # 仓库规则
-├── skills/                                # AI 协作技能
-└── AGENTS.md                              # 仓库执行入口
-```
+- Docker 部署前先阅读 [`docs/guides/QUICK_START.md`](./docs/guides/QUICK_START.md) 和 [`docs/deployment/NGINX_CONFIG.md`](./docs/deployment/NGINX_CONFIG.md), 确认目录、端口和网关入口是否符合你的环境。
 
 ## API 契约
 

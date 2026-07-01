@@ -1,12 +1,21 @@
 import request from "@/utils/request";
-import type { FileInfo } from "@/types/api";
+import type { FileInfo, FileInfoDetail, FileInfoPageQuery } from "@/types/api";
 
 const FILE_BASE_URL = "/file";
 
 const FileAPI = {
+  /** 分页查询文件列表 */
+  list(params: FileInfoPageQuery) {
+    return request<unknown, PageResult<FileInfoDetail>>({
+      url: `${FILE_BASE_URL}/list`,
+      method: "get",
+      params,
+    });
+  },
+
   /** 上传文件 （传入 FormData，上传进度回调） */
   upload(formData: FormData, onProgress?: (percent: number) => void) {
-    return request<any, FileInfo>({
+    return request<unknown, FileInfo>({
       url: `${FILE_BASE_URL}/upload`,
       method: "post",
       data: formData,
@@ -24,7 +33,7 @@ const FileAPI = {
   uploadFile(file: File) {
     const formData = new FormData();
     formData.append("file", file);
-    return request<any, FileInfo>({
+    return request<unknown, FileInfo>({
       url: `${FILE_BASE_URL}/upload`,
       method: "post",
       data: formData,
