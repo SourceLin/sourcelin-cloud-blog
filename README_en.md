@@ -30,6 +30,17 @@
   <a href="https://github.com/SourceLin/sourcelin-cloud-blog/issues">Issues</a>
 </p>
 
+## Choose a Version
+
+| Version | Deployment and customization | Java baseline |
+| --- | --- | --- |
+| **No-AI edition (`v1`)** | Available now. Includes the blog frontend, admin panel, and Uniapp mini program. Use this as a baseline for projects without AI or SSE notifications. [Gitee](https://gitee.com/my_lyq/sourcelin-cloud-blog/tree/v1) · [GitHub](https://github.com/SourceLin/sourcelin-cloud-blog/tree/v1) · [GitCode](https://gitcode.com/SourceLin/sourcelin-cloud-blog/tree/v1) | JDK 8 |
+| **Main codebase (optional AI)** | The AI edition is pending release. The core blog runs without model credentials. AI writing assistance, chat, comment moderation, Dify knowledge base sync, and SSE notifications can be enabled as needed. | JDK 8 currently |
+
+Clone the no-AI edition with `--branch v1`. The quick-start guide is available on [Gitee](https://gitee.com/my_lyq/sourcelin-cloud-blog/blob/v1/docs/guides/QUICK_START.md) · [GitHub](https://github.com/SourceLin/sourcelin-cloud-blog/blob/v1/docs/guides/QUICK_START.md) · [GitCode](https://gitcode.com/SourceLin/sourcelin-cloud-blog/blob/v1/docs/guides/QUICK_START.md).
+
+AI and real-time messaging are off by default on the main codebase. The deployment and architecture guides will be available with the AI release.
+
 ## What is Sourcelin Blog?
 
 Sourcelin Blog is a modern blogging platform for personal writing, life journaling, content showcase, and small-team content operations. It adopts a front-end/back-end separated microservice architecture, delivering a blog frontend, admin panel, unified API contract, permission system, and complete engineering conventions.
@@ -340,10 +351,7 @@ See [`rules/api-contract.md`](./rules/api-contract.md) and [`docs/architecture/a
 ## Roadmap
 
 - App / Mini-program capabilities
-- AI content assistant
-- AI moderation upgrade
 - Enhanced message center
-- SSE real-time push
 - Python content republishing
 - SEO / traffic growth
 - Operations dashboard

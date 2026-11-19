@@ -32,6 +32,17 @@
   <a href="https://gitee.com/my_lyq/sourcelin-cloud-blog/issues">提交 Issue</a>
 </p>
 
+## 版本选择
+
+| 版本 | 部署与二次开发 | Java 基线 |
+| --- | --- | --- |
+| **无 AI 版（`v1`）** | 已公开。包含博客前台、管理后台和 Uniapp 小程序，适合作为不集成 AI 与 SSE 实时消息的项目基线。 [Gitee](https://gitee.com/my_lyq/sourcelin-cloud-blog/tree/v1) · [GitHub](https://github.com/SourceLin/sourcelin-cloud-blog/tree/v1) · [GitCode](https://gitcode.com/SourceLin/sourcelin-cloud-blog/tree/v1) | JDK 8 |
+| **项目主线（含可选 AI）** | AI 版尚未正式发布。基础博客无需模型密钥即可运行。AI 创作、聊天、评论审核、Dify 知识库同步及 SSE 实时消息可按需启用。 | 当前为 JDK 8 |
+
+克隆无 AI 版时请指定 `--branch v1`。快速启动指南见 [Gitee](https://gitee.com/my_lyq/sourcelin-cloud-blog/blob/v1/docs/guides/QUICK_START.md) · [GitHub](https://github.com/SourceLin/sourcelin-cloud-blog/blob/v1/docs/guides/QUICK_START.md) · [GitCode](https://gitcode.com/SourceLin/sourcelin-cloud-blog/blob/v1/docs/guides/QUICK_START.md)。
+
+主线的 AI 和实时消息默认关闭，部署与架构文档将随 AI 版发布。
+
 ## 项目定位
 
 Sourcelin Blog（圆圈博客）是一套面向个人写作、生活记录、内容展示和小团队内容运营的现代博客平台，采用三端前端 + 微服务后端的前后端分离架构，提供博客前台、管理后台、移动端小程序、统一 API 契约、权限体系和完整工程化规范。
@@ -513,10 +524,7 @@ docker compose -f docker-compose.example.yml up -d
 ## Roadmap
 
 - App / 小程序端能力完善
-- AI 内容助手
-- AI 审核升级
 - 消息中心增强
-- SSE 实时推送
 - Python 转载系统
 - SEO / 流量增长
 - 运营看板
