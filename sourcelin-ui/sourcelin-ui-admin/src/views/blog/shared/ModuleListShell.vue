@@ -144,6 +144,7 @@
                 v-model:model-value="formState[field.prop]"
                 height="320px"
               />
+              <AiFieldAssistant v-if="field.aiAbility" :field="field" :form="formState" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -159,6 +160,7 @@
 </template>
 
 <script setup lang="ts">
+import AiFieldAssistant from "./components/AiFieldAssistant.vue";
 import type { FormInstance, FormRules } from "element-plus";
 import { useUserStore } from "@/store";
 import IconSelect from "@/components/IconSelect/index.vue";
@@ -689,6 +691,7 @@ onMounted(() => {
   initQueryParams();
   fetchData();
 });
+defineExpose({ refresh: fetchData });
 </script>
 
 <style scoped lang="scss">

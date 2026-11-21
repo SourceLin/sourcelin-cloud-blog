@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import com.sourcelin.common.core.utils.DateUtils;
@@ -92,6 +93,28 @@ public class FileCenterController extends BaseController
             }
             log.error("上传文件失败", e);
             throw new BusinessException(ResultCode.SYSTEM_ERROR, "上传文件失败");
+        }
+    }
+
+    /**
+     * 根据 URL 上传并转存文件（用于大模型临时媒体链接归档）
+     */
+    @com.sourcelin.common.security.annotation.InnerAuth
+    @PostMapping("upload/url")
+    public SysFile uploadByUrl(@RequestParam("url") String url)
+    {
+        try
+        {
+            return fileCenterService.uploadByUrl(url);
+        }
+        catch (Exception e)
+        {
+            if (e instanceof BusinessException)
+            {
+                throw (BusinessException) e;
+            }
+            log.error("链接上传文件失败", e);
+            throw new BusinessException(ResultCode.SYSTEM_ERROR, "链接上传文件失败");
         }
     }
 

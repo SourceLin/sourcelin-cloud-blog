@@ -8,6 +8,7 @@ import com.sourcelin.common.core.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.List;
 
 @Service
@@ -18,6 +19,9 @@ public class AnnouncementServiceImpl implements IAnnouncementService
 
     @Autowired
     private AnnouncementReadMapper announcementReadMapper;
+
+    @Autowired
+    private com.sourcelin.blog.shared.support.RealtimeMessageSupport realtimeMessageSupport;
 
     @Override
     public List<Announcement> selectFrontAnnouncementList(Long userId)
@@ -49,7 +53,8 @@ public class AnnouncementServiceImpl implements IAnnouncementService
         {
             return false;
         }
-        return announcementReadMapper.insertIgnoreRead(id, userId) >= 0;
+        boolean result = announcementReadMapper.insertIgnoreRead(id, userId) >= 0;
+        realtimeMessageSupport.invalidate(userId); return result;
     }
 
     @Override
@@ -60,6 +65,7 @@ public class AnnouncementServiceImpl implements IAnnouncementService
             return false;
         }
         announcementReadMapper.insertReadAllVisible(userId);
+        realtimeMessageSupport.invalidate(userId);
         return true;
     }
 
@@ -79,14 +85,25 @@ public class AnnouncementServiceImpl implements IAnnouncementService
     public int insertAnnouncement(Announcement announcement)
     {
         announcement.setCreateTime(DateUtils.getNowDate());
-        return announcementMapper.insertAnnouncement(announcement);
+        if ("1".equals(announcement.getPublishStatus()) && announcement.getPublishTime() == null)
+        {
+            // DATETIME 保存到秒，避免毫秒被进位到下一秒，导致 SSE 刷新时公告还不可见。
+            announcement.setPublishTime(DateUtils.truncate(announcement.getCreateTime(), Calendar.SECOND));
+        }
+        int rows = announcementMapper.insertAnnouncement(announcement);
+        if (rows > 0 && "1".equals(announcement.getPublishStatus()))
+        {
+            realtimeMessageSupport.invalidate(null);
+        }
+        return rows;
     }
 
     @Override
     public int updateAnnouncement(Announcement announcement)
     {
         announcement.setUpdateTime(DateUtils.getNowDate());
-        return announcementMapper.updateAnnouncement(announcement);
+        int rows = announcementMapper.updateAnnouncement(announcement);
+        if(rows > 0) realtimeMessageSupport.invalidate(null); return rows;
     }
 
     @Override
@@ -96,9 +113,10 @@ public class AnnouncementServiceImpl implements IAnnouncementService
         update.setId(id);
         update.setPublishStatus("1");
         update.setUpdateBy(updateBy);
-        update.setPublishTime(DateUtils.getNowDate());
+        update.setPublishTime(DateUtils.truncate(DateUtils.getNowDate(), Calendar.SECOND));
         update.setUpdateTime(DateUtils.getNowDate());
-        return announcementMapper.updateAnnouncement(update);
+        int rows = announcementMapper.updateAnnouncement(update);
+        if(rows > 0) realtimeMessageSupport.invalidate(null); return rows;
     }
 
     @Override
@@ -109,12 +127,14 @@ public class AnnouncementServiceImpl implements IAnnouncementService
         update.setPublishStatus("2");
         update.setUpdateBy(updateBy);
         update.setUpdateTime(DateUtils.getNowDate());
-        return announcementMapper.updateAnnouncement(update);
+        int rows = announcementMapper.updateAnnouncement(update);
+        if(rows > 0) realtimeMessageSupport.invalidate(null); return rows;
     }
 
     @Override
     public int deleteAnnouncementByIds(Long[] ids, String updateBy)
     {
-        return announcementMapper.deleteAnnouncementByIds(ids, updateBy);
+        int rows = announcementMapper.deleteAnnouncementByIds(ids, updateBy);
+        if(rows > 0) realtimeMessageSupport.invalidate(null); return rows;
     }
 }

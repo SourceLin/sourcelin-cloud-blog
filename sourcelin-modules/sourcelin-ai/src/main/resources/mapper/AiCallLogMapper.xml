@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.ai.mapper.AiCallLogMapper">
+
+    <resultMap type="com.sourcelin.ai.domain.AiCallLog" id="AiCallLogResult">
+        <result property="id" column="id" />
+        <result property="requestId" column="request_id" />
+        <result property="appCode" column="app_code" />
+        <result property="domainCode" column="domain_code" />
+        <result property="abilityCode" column="ability_code" />
+        <result property="bizId" column="biz_id" />
+        <result property="userId" column="user_id" />
+        <result property="tenantId" column="tenant_id" />
+        <result property="providerType" column="provider_type" />
+        <result property="providerTraceId" column="provider_trace_id" />
+        <result property="invokeMode" column="invoke_mode" />
+        <result property="requestSummary" column="request_summary" />
+        <result property="responseSummary" column="response_summary" />
+        <result property="status" column="status" />
+        <result property="errorCode" column="error_code" />
+        <result property="errorMessage" column="error_message" />
+        <result property="latencyMs" column="latency_ms" />
+        <result property="tokenUsage" column="token_usage" />
+        <result property="costAmount" column="cost_amount" />
+        <result property="createTime" column="create_time" />
+    </resultMap>
+
+    <sql id="selectAiCallLogVo">
+        select id, request_id, app_code, domain_code, ability_code, biz_id, user_id, tenant_id,
+               provider_type, provider_trace_id, invoke_mode, request_summary, response_summary,
+               status, error_code, error_message, latency_ms, token_usage, cost_amount, create_time
+        from ai_call_log
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="AiCallLogResult">
+        <include refid="selectAiCallLogVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="com.sourcelin.ai.domain.AiCallLog" resultMap="AiCallLogResult">
+        <include refid="selectAiCallLogVo"/>
+        <where>
+            <if test="requestId != null and requestId != ''"> and request_id = #{requestId}</if>
+            <if test="abilityCode != null and abilityCode != ''"> and ability_code = #{abilityCode}</if>
+            <if test="bizId != null and bizId != ''"> and biz_id = #{bizId}</if>
+            <if test="userId != null and userId != ''"> and user_id = #{userId}</if>
+            <if test="status != null and status != ''"> and status = #{status}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.sourcelin.ai.domain.AiCallLog" useGeneratedKeys="true" keyProperty="id">
+        insert into ai_call_log (
+            request_id,
+            <if test="appCode != null and appCode != ''">app_code,</if>
+            <if test="domainCode != null and domainCode != ''">domain_code,</if>
+            ability_code,
+            biz_id,
+            user_id,
+            <if test="tenantId != null and tenantId != ''">tenant_id,</if>
+            provider_type,
+            <if test="providerTraceId != null and providerTraceId != ''">provider_trace_id,</if>
+            invoke_mode,
+            <if test="requestSummary != null and requestSummary != ''">request_summary,</if>
+            <if test="responseSummary != null and responseSummary != ''">response_summary,</if>
+            status,
+            <if test="errorCode != null and errorCode != ''">error_code,</if>
+            <if test="errorMessage != null and errorMessage != ''">error_message,</if>
+            <if test="latencyMs != null">latency_ms,</if>
+            <if test="tokenUsage != null">token_usage,</if>
+            <if test="costAmount != null">cost_amount,</if>
+            create_time
+        ) values (
+            #{requestId},
+            <if test="appCode != null and appCode != ''">#{appCode},</if>
+            <if test="domainCode != null and domainCode != ''">#{domainCode},</if>
+            #{abilityCode},
+            #{bizId},
+            #{userId},
+            <if test="tenantId != null and tenantId != ''">#{tenantId},</if>
+            #{providerType},
+            <if test="providerTraceId != null and providerTraceId != ''">#{providerTraceId},</if>
+            #{invokeMode},
+            <if test="requestSummary != null and requestSummary != ''">#{requestSummary},</if>
+            <if test="responseSummary != null and responseSummary != ''">#{responseSummary},</if>
+            #{status},
+            <if test="errorCode != null and errorCode != ''">#{errorCode},</if>
+            <if test="errorMessage != null and errorMessage != ''">#{errorMessage},</if>
+            <if test="latencyMs != null">#{latencyMs},</if>
+            <if test="tokenUsage != null">#{tokenUsage},</if>
+            <if test="costAmount != null">#{costAmount},</if>
+            sysdate()
+        )
+    </insert>
+</mapper>

@@ -37,11 +37,9 @@
 | 版本 | 部署与二次开发 | Java 基线 |
 | --- | --- | --- |
 | **无 AI 版（`v1`）** | 已公开。包含博客前台、管理后台和 Uniapp 小程序，适合作为不集成 AI 与 SSE 实时消息的项目基线。 [Gitee](https://gitee.com/my_lyq/sourcelin-cloud-blog/tree/v1) · [GitHub](https://github.com/SourceLin/sourcelin-cloud-blog/tree/v1) · [GitCode](https://gitcode.com/SourceLin/sourcelin-cloud-blog/tree/v1) | JDK 8 |
-| **项目主线（含可选 AI）** | AI 版尚未正式发布。基础博客无需模型密钥即可运行。AI 创作、聊天、评论审核、Dify 知识库同步及 SSE 实时消息可按需启用。 | 当前为 JDK 8 |
+| **项目主线（含可选 AI）** | 基础博客无需模型密钥即可运行。AI 创作、聊天、评论审核、Dify 知识库同步及 SSE 实时消息可按需启用。 | JDK 8 |
 
-克隆无 AI 版时请指定 `--branch v1`。快速启动指南见 [Gitee](https://gitee.com/my_lyq/sourcelin-cloud-blog/blob/v1/docs/guides/QUICK_START.md) · [GitHub](https://github.com/SourceLin/sourcelin-cloud-blog/blob/v1/docs/guides/QUICK_START.md) · [GitCode](https://gitcode.com/SourceLin/sourcelin-cloud-blog/blob/v1/docs/guides/QUICK_START.md)。
-
-主线的 AI 和实时消息默认关闭，部署与架构文档将随 AI 版发布。
+克隆 `v1` 时指定 `--branch v1`。部署主线请参考[快速启动](docs/guides/QUICK_START.md)和[AI 与实时消息部署](docs/guides/AI_MESSAGE_SETUP.md)，两个可选功能默认关闭。
 
 ## 项目定位
 
@@ -416,7 +414,7 @@ mysql -u root -p < docs/sql/sourcelin-seata.sql
 
 #### 4. 按需调整配置
 
-修改各模块 `bootstrap.yml` 中的 MySQL、Redis、Nacos 连接信息。
+配置 MySQL、Nacos 连接，并通过 Nacos 的 `BLOG_GROUP / application-dev.yml` 为各服务指定同一个 Redis 实例和库编号。
 
 #### 5. 启动后端服务
 

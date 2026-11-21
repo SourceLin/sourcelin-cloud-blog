@@ -77,7 +77,7 @@ interface SelectedImage {
 
 const userStore = useUserStore();
 const themeStore = useThemeStore();
-const { guard } = useMiniAccess();
+const { guard, can } = useMiniAccess();
 const content = ref('');
 const ready = ref(false);
 const submitting = ref(false);
@@ -127,6 +127,10 @@ function persistDraft(): void {
 }
 
 async function chooseImages(): Promise<void> {
+  if (!userStore.isBlogger && !can('userUploadEnabled')) {
+    showInfoToast('当前不支持上传文件');
+    return;
+  }
   const remainCount = MAX_IMAGE_COUNT - images.value.length;
   if (remainCount <= 0) return;
   const paths = await pickImagePaths({

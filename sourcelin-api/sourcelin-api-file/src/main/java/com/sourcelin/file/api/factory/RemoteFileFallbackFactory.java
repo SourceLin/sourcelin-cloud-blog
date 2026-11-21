@@ -34,6 +34,12 @@ public class RemoteFileFallbackFactory implements FallbackFactory<RemoteFileServ
             }
 
             @Override
+            public ApiResponse<SysFile> uploadByUrl(String url, String source)
+            {
+                return ApiResponse.fail(ResultCode.REMOTE_SERVICE_ERROR, "链接转存文件失败:" + throwable.getMessage());
+            }
+
+            @Override
             public ApiResponse<Void> confirmFile(Long fileId, FileConfirmRequest request)
             {
                 return ApiResponse.fail(ResultCode.REMOTE_SERVICE_ERROR, "确认文件失败:" + throwable.getMessage());

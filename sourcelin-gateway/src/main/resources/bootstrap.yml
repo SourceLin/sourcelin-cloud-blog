@@ -10,6 +10,10 @@ spring:
   profiles:
     # 环境配置
     active: dev
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
   cloud:
     nacos:
       discovery:
@@ -28,6 +32,49 @@ spring:
         shared-configs:
           - data-id: application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
             group: ${spring.cloud.nacos.config.group}
+    gateway:
+      discovery:
+        locator:
+          lowerCaseServiceId: true
+          enabled: true
+      routes:
+        - id: sourcelin-auth
+          uri: lb://sourcelin-auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - CacheRequestFilter
+            - StripPrefix=1
+        - id: sourcelin-system
+          uri: lb://sourcelin-system
+          predicates:
+            - Path=/system/**
+          filters:
+            - StripPrefix=1
+        - id: sourcelin-blog
+          uri: lb://sourcelin-blog
+          predicates:
+            - Path=/blog/**
+          filters:
+            - StripPrefix=1
+        - id: sourcelin-file
+          uri: lb://sourcelin-file
+          predicates:
+            - Path=/file/**
+          filters:
+            - StripPrefix=1
+        - id: sourcelin-ai
+          uri: lb://sourcelin-ai
+          predicates:
+            - Path=/ai/**
+          filters:
+            - StripPrefix=1
+        - id: sourcelin-message
+          uri: lb://sourcelin-message
+          predicates:
+            - Path=/message/**
+          filters:
+            - StripPrefix=1
     sentinel:
       # 取消控制台懒加载
       eager: true
@@ -43,3 +90,23 @@ spring:
             groupId: BLOG_GROUP
             data-type: json
             rule-type: gw-flow
+
+# Nacos 配置解析失败时的本地回退（与 sourcelin-gateway-dev.yml 对齐）
+security:
+  captcha:
+    enabled: true
+    type: math
+  xss:
+    enabled: true
+    excludeUrls:
+      - /system/notice
+  ignore:
+    whites:
+      - /message/stream
+      - /auth/logout
+      - /auth/login
+      - /auth/register
+      - /blog/front/ai/status
+      - /blog/front/ai/abilities/ai_agent_chat/invoke/stream
+      - /*/v2/api-docs
+      - /csrf

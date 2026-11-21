@@ -9,6 +9,7 @@ import com.sourcelin.common.security.annotation.EnableRyFeignClients;
  * 
  * @author sourcelin
  */
+@org.springframework.scheduling.annotation.EnableAsync
 @EnableCustomConfig
 @EnableRyFeignClients
 @SpringBootApplication

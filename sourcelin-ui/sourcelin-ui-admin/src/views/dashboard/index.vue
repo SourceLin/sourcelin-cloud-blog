@@ -1,8 +1,5 @@
-﻿<template>
+<template>
   <div class="dashboard-shell">
-    <div class="dashboard-shell__glow dashboard-shell__glow--primary" />
-    <div class="dashboard-shell__glow dashboard-shell__glow--secondary" />
-
     <DashboardHero
       :user-info="userStore.userInfo"
       :today-label="todayLabel"

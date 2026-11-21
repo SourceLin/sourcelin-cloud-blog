@@ -1,4 +1,5 @@
 dist
+sourcelin-ui-admin/
 node_modules
 public
 .husky

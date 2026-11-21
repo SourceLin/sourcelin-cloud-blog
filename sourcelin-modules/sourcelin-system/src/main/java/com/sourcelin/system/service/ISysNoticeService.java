@@ -10,6 +10,10 @@ import com.sourcelin.system.domain.SysNotice;
  */
 public interface ISysNoticeService
 {
+    List<SysNotice> selectPersonalNotices(Long userId, Integer isRead, String title);
+
+    void markRead(Long userId, Long noticeId);
+
     /**
      * 查询公告信息
      * 

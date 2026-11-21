@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { darkTheme, NConfigProvider, NDialogProvider } from 'naive-ui'
 import { useRoute } from 'vue-router'
 import { useHead } from '@unhead/vue'
@@ -7,6 +7,8 @@ import { useThemeStore } from '@/stores/theme.store'
 import { useUiStore } from '@/stores/ui.store'
 import { useSiteStore } from '@/stores/site.store'
 import { getSiteInfo } from '@/modules/about/api/site.api'
+import { getAiStatus } from '@/modules/article/api/ai.api'
+import { useRealtimeMessages } from '@/shared/composables/useRealtimeMessages'
 import SearchDialog from '@/shared/components/feedback/SearchDialog.vue'
 import StartupLoadingOverlay from '@/shared/components/feedback/StartupLoadingOverlay.vue'
 import AppFooter from '@/shared/components/layout/AppFooter.vue'
@@ -16,15 +18,32 @@ import MobileNavDrawer from '@/shared/components/layout/MobileNavDrawer.vue'
 import ThemeTransition from '@/shared/components/layout/ThemeTransition.vue'
 import SMessage from '@/shared/components/ui/SMessage.vue'
 import SNotification from '@/shared/components/ui/SNotification.vue'
+import { AiAgentAvatar, AiAgentChatPanel, useAiAgentChat } from '@/modules/ai-agent'
 
 const themeStore = useThemeStore()
 const uiStore = useUiStore()
 const siteStore = useSiteStore()
+useRealtimeMessages()
+const aiEnabled = ref(false)
+onMounted(async () => { aiEnabled.value = await getAiStatus() })
 const route = useRoute()
 
 const isDark = computed(() => themeStore.isDark)
 const startupLoadingVisible = computed(() => uiStore.startupLoadingVisible)
 const useStandaloneShell = computed(() => route.meta?.shell === 'auth')
+
+// AI Agent 聊天状态
+const {
+  messages,
+  status,
+  panelVisible,
+  inputText,
+  togglePanel,
+  sendMessage,
+  stopGeneration,
+  clearMessages,
+  retryMessage
+} = useAiAgentChat()
 
 // 全局默认 TDK，各页面可通过 useSeoHead composable 覆盖
 const siteName = computed(() => siteStore.siteInfo.webName || '圆圈博客')
@@ -158,6 +177,25 @@ onMounted(async () => {
             </router-view>
             <AppFooter v-if="!useStandaloneShell" />
             <FloatingToolbar v-if="!useStandaloneShell" />
+            <AiAgentAvatar
+              v-if="!useStandaloneShell && aiEnabled"
+              :status="status"
+              :panel-visible="panelVisible"
+              @toggle="togglePanel"
+            />
+            <AiAgentChatPanel
+              v-if="aiEnabled && !useStandaloneShell"
+              :visible="panelVisible"
+              :status="status"
+              :messages="messages"
+              :input-text="inputText"
+              @close="togglePanel"
+              @send="sendMessage()"
+              @update-input-text="inputText = $event"
+              @stop="stopGeneration"
+              @clear="clearMessages"
+              @retry="retryMessage"
+            />
             <MobileNavDrawer v-if="!useStandaloneShell" />
             <SearchDialog v-if="!useStandaloneShell" />
             <ThemeTransition />

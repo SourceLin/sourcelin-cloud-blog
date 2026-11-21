@@ -1,0 +1,103 @@
+/* AI 对话框样式 */
+.ai-dialog__body {
+  display: grid;
+  gap: 20px;
+}
+
+.ai-dialog__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-dialog__badge {
+  font-size: 16px;
+  font-weight: 700;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ai-dialog__content {
+  display: grid;
+  gap: 16px;
+}
+
+.ai-dialog__card {
+  padding: 16px;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.ai-dialog__card--current {
+  background: color-mix(in srgb, var(--card-bg-color) 80%, var(--bg-page));
+}
+
+.ai-dialog__card--ai {
+  background: var(--primary-light);
+  border-color: var(--primary-opacity);
+}
+
+.ai-dialog__card-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.ai-dialog__card-label--ai {
+  color: var(--primary-color);
+}
+
+.ai-dialog__card-value {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-color);
+  white-space: pre-wrap;
+}
+
+.ai-dialog__cursor {
+  animation: blink 1s infinite;
+  color: var(--primary-color);
+}
+
+.ai-dialog__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-dialog__tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.ai-dialog__tag--current {
+  background: color-mix(in srgb, var(--ai-neutral-dark) 4%, transparent);
+  color: var(--text-secondary);
+}
+
+.ai-dialog__tag--ai {
+  background: var(--primary-light, color-mix(in srgb, var(--primary-color) 10%, transparent));
+  color: var(--primary-color);
+}
+
+.ai-dialog__empty {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.ai-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}

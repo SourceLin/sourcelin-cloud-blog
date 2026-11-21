@@ -19,8 +19,6 @@ public class ModerationProperties
 {
     private Article article = new Article();
     private Keyword keyword = new Keyword();
-    /** 一期占位 */
-    private boolean aiEnabled;
 
     @Data
     public static class Article

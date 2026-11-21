@@ -86,4 +86,20 @@ public class CacheConstants
      * 文章点击数
      */
     public static final String BLOG_ARTICLE_CLICK = "blog_article_click";
+
+    /**
+     * SSE 鉴权临时票据 cache key 前缀
+     */
+    public static final String SSE_TICKET_KEY = "sse:ticket:";
+
+    /**
+     * SSE 用户长连接所在节点路由 cache key 前缀（value = 持有该用户连接的消息服务实例 nodeId）。
+     * 用于将推送定向投递到具体实例，避免全量广播放大。
+     */
+    public static final String SSE_USER_NODE_KEY = "sse:user:node:";
+
+    /**
+     * AI速率限制 cache key 前缀
+     */
+    public static final String AI_RATE_LIMIT_KEY = "ai:rate_limit:";
 }

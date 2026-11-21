@@ -21,7 +21,7 @@ interface FrontUserInfo {
 
 export const useUserStore = defineStore('user', () => {
   const token = ref<string>(getToken() || '')
-  const userInfo = ref<unknown>(null)
+  const userInfo = ref<FrontUserInfo | null>(null)
   const roles = ref<string[]>([])
   const permissions = ref<string[]>([])
 
@@ -84,26 +84,38 @@ export const useUserStore = defineStore('user', () => {
     setExpiresIn(String(payload.expiresIn || 0))
   }
 
-  async function getUserInfoAction() {
-    if (!token.value) return null
+  async function getUserInfoAction({ background = false } = {}) {
+    const requestToken = token.value
+    if (!requestToken) return null
     try {
-      const res = await getInfo() as CurrentUserInfoPayload
+      const res = await getInfo(background)
+      if (token.value !== requestToken) return null
+      if (!res) {
+        clearSession()
+        return null
+      }
       userInfo.value = normalizeUserInfo(res)
       roles.value = Array.isArray(res.roles) ? res.roles : []
       permissions.value = Array.isArray(res.permissions) ? res.permissions : []
       return userInfo.value
-    } catch (error) {
-      logout()
+    } catch {
+      if (!background && token.value === requestToken) {
+        logout()
+      }
       return null
     }
   }
 
-  function logout() {
+  function clearSession() {
     token.value = ''
     userInfo.value = null
     roles.value = []
     permissions.value = []
     removeToken()
+  }
+
+  function logout() {
+    clearSession()
     router.push('/login')
   }
 

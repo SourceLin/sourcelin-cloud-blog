@@ -44,6 +44,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import com.sourcelin.common.core.constant.CacheConstants;
+import com.sourcelin.common.redis.service.RedisService;
 
 @Tag(name = "统一认证接口")
 @Validated
@@ -70,6 +75,17 @@ public class SysLoginController {
 
     @Autowired
     private MiniProgramAuthService miniProgramAuthService;
+
+    @Autowired
+    private RedisService redisService;
+
+    @Autowired
+    private com.sourcelin.auth.service.SseTicketService sseTicketService;
+
+    @GetMapping("/apply-ticket")
+    public String applyTicket(@org.springframework.web.bind.annotation.RequestParam(defaultValue="blog") String loginType) {
+        return sseTicketService.issue(loginType);
+    }
 
     @GetMapping("/captcha")
     public CaptchaVo getCaptcha(@RequestParam(value = "loginType", required = false) String loginType) {

@@ -389,3 +389,20 @@ export const interceptors = {
 };
 
 export { SUCCESS_CODE };
+
+/** SSE 使用同一网络基座，页面与业务客户端不直接创建 uni.request。 */
+interface ChunkedRequestTask extends UniApp.RequestTask { onChunkReceived(callback: (event: { data: ArrayBuffer }) => void): void }
+
+export function openSseStream(url: string, onChunk: (data: ArrayBuffer) => void, onEnd: () => void): UniApp.RequestTask {
+  const task = uni.request({
+    url, method: 'GET', enableChunked: true, responseType: 'arraybuffer',
+    header: { Accept: 'text/event-stream' }, success: onEnd, fail: onEnd
+  });
+  // Uniapp 运行时提供该能力，基础类型包尚未声明；先核实能力再订阅。
+  if (!("onChunkReceived" in task) || typeof task.onChunkReceived !== 'function') {
+    task.abort(); throw new Error('当前平台不支持分块消息连接');
+  }
+  const streamTask = task as ChunkedRequestTask;
+  streamTask.onChunkReceived(event => onChunk(event.data));
+  return task;
+}

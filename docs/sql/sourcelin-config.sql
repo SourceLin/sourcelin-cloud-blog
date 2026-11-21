@@ -16,11 +16,12 @@
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+CREATE DATABASE IF NOT EXISTS `sourcelin-config` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `sourcelin-config`;
 
 -- ----------------------------
 -- Table structure for config_info
 -- ----------------------------
-DROP TABLE IF EXISTS `config_info`;
 CREATE TABLE `config_info`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `data_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'data_id',
@@ -46,20 +47,19 @@ CREATE TABLE `config_info`  (
 -- ----------------------------
 -- Records of config_info
 -- ----------------------------
-INSERT INTO `config_info` VALUES (1, 'application-dev.yml', 'BLOG_GROUP', 'spring:\n  autoconfigure:\n    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure\n  mvc:\n    pathmatch:\n      matching-strategy: ant_path_matcher\n\n# feign 配置\nfeign:\n  sentinel:\n    enabled: true\n  okhttp:\n    enabled: true\n  httpclient:\n    enabled: false\n  client:\n    config:\n      default:\n        connectTimeout: 10000\n        readTimeout: 10000\n  compression:\n    request:\n      enabled: true\n    response:\n      enabled: true\n\n# 暴露监控端点\nmanagement:\n  endpoints:\n    web:\n      exposure:\n        include: \'*\'\n', 'aaa73b809cfd4d0058893aa13da57806', '2020-05-20 12:00:00', '2022-04-24 10:26:34', 'nacos', '0:0:0:0:0:0:0:1', '', '', '通用配置', 'null', 'null', 'yaml', NULL, '');
-INSERT INTO `config_info` VALUES (21, 'sourcelin-gateway-dev.yml', 'BLOG_GROUP', 'spring:\n  redis:\n    host: localhost\n    port: 6379\n    password:\n  cloud:\n    gateway:\n      discovery:\n        locator:\n          lowerCaseServiceId: true\n          enabled: true\n      routes:\n        # 认证中心\n        - id: sourcelin-auth\n          uri: lb://sourcelin-auth\n          predicates:\n            - Path=/auth/**\n          filters:\n            # 验证码处理\n            - CacheRequestFilter\n            - ValidateCodeFilter\n            - StripPrefix=1\n        # 定时任务\n        - id: sourcelin-job\n          uri: lb://sourcelin-job\n          predicates:\n            - Path=/schedule/**\n          filters:\n            - StripPrefix=1\n        # 系统模块\n        - id: sourcelin-system\n          uri: lb://sourcelin-system\n          predicates:\n            - Path=/system/**\n          filters:\n            - StripPrefix=1\n        # 文件服务\n        - id: sourcelin-file\n          uri: lb://sourcelin-file\n          predicates:\n            - Path=/file/**\n          filters:\n            - StripPrefix=1\n\n# 安全配置\nsecurity:\n  # 验证码\n  captcha:\n    enabled: true\n    type: math\n  # 防止XSS攻击\n  xss:\n    enabled: true\n    excludeUrls:\n      - /system/notice\n  # 不校验白名单\n  ignore:\n    whites:\n      - /auth/logout\n      - /auth/login\n      - /auth/register\n      - /*/v2/api-docs\n      - /csrf\n', 'eb34c667706a38bed8efc1e251ee4ff0', '2023-10-23 09:07:51', '2023-10-23 09:08:29', 'nacos', '0:0:0:0:0:0:0:1', '', '', '网关模块', '', '', 'yaml', '', NULL);
-INSERT INTO `config_info` VALUES (23, 'sourcelin-auth-dev.yml', 'BLOG_GROUP', 'spring:\n  redis:\n    host: localhost\n    port: 6379\n    password:\n', '8bd9dada9a94822feeab40de55efced6', '2023-10-23 09:09:22', '2023-10-23 09:09:22', NULL, '0:0:0:0:0:0:0:1', '', '', '认证中心', NULL, NULL, 'yaml', NULL, NULL);
-INSERT INTO `config_info` VALUES (30, 'sourcelin-blog-dev.yml', 'BLOG_GROUP', '# spring配置\nspring:\n  redis:\n    host: ${BLOG_REDIS_HOST:localhost}\n    port: ${BLOG_REDIS_PORT:6379}\n    password: ${BLOG_REDIS_PASSWORD:}\n  datasource:\n    dynamic:\n      primary: master\n      datasource:\n        master:\n          driver-class-name: com.mysql.cj.jdbc.Driver\n          url: ${BLOG_DB_URL:jdbc:mysql://127.0.0.1:3306/sourcelin-cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8}\n          username: ${BLOG_DB_USERNAME:root}\n          password: ${BLOG_DB_PASSWORD:}\n      druid:\n        initial-size: 5\n        min-idle: 5\n        maxActive: 20\n        maxWait: 60000\n        connectTimeout: 30000\n        socketTimeout: 60000\n        timeBetweenEvictionRunsMillis: 60000\n        minEvictableIdleTimeMillis: 300000\n        validationQuery: SELECT 1 FROM DUAL\n        testWhileIdle: true\n        testOnBorrow: false\n        testOnReturn: false\n        poolPreparedStatements: true\n        maxPoolPreparedStatementPerConnectionSize: 20\n        filters: stat,slf4j\n        connectionProperties: druid.stat.mergeSql\\=true;druid.stat.slowSqlMillis\\=5000\n\n# mybatis配置\nmybatis:\n  type-aliases-package: com.sourcelin.blog\n  mapper-locations: classpath:mapper/**/*.xml\n\n# 博客 AI 整合相关配置\nblog:\n  ai:\n    enabled: ${BLOG_AI_ENABLED:false}\n', '08e0e49f9092ed14cf963bcc9b1d33e3', '2026-06-04 00:00:00', '2026-06-04 00:00:00', 'nacos', '0:0:0:0:0:0:0:1', '', '', '博客模块', '', '', 'yaml', '', NULL);
-INSERT INTO `config_info` VALUES (24, 'sourcelin-monitor-dev.yml', 'BLOG_GROUP', '# spring\nspring:\n  security:\n    user:\n      name: sourcelin\n      password: change_me\n  boot:\n    admin:\n      ui:\n        title: sourcelin服务状态监控\n', '37cca58185e62cf785232b0bff321976', '2023-10-23 09:09:22', '2023-10-24 10:38:19', 'nacos', '0:0:0:0:0:0:0:1', '', '', '监控中心', '', '', 'yaml', '', NULL);
-INSERT INTO `config_info` VALUES (25, 'sourcelin-system-dev.yml', 'BLOG_GROUP', '# spring配置\nspring:\n  redis:\n    host: localhost\n    port: 6379\n    password:\n  datasource:\n    druid:\n      stat-view-servlet:\n        enabled: true\n        loginUsername: admin\n        loginPassword: change_me\n    dynamic:\n      druid:\n        initial-size: 5\n        min-idle: 5\n        maxActive: 20\n        maxWait: 60000\n        timeBetweenEvictionRunsMillis: 60000\n        minEvictableIdleTimeMillis: 300000\n        validationQuery: SELECT 1 FROM DUAL\n        testWhileIdle: true\n        testOnBorrow: false\n        testOnReturn: false\n        poolPreparedStatements: true\n        maxPoolPreparedStatementPerConnectionSize: 20\n        filters: stat,slf4j\n        connectionProperties: druid.stat.mergeSql\\=true;druid.stat.slowSqlMillis\\=5000\n      datasource:\n          # 主库数据源\n          master:\n            driver-class-name: com.mysql.cj.jdbc.Driver\n            url: jdbc:mysql://127.0.0.1:3306/sourcelin-cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8\n            username: sourcelin\n            password: change_me\n          # 从库数据源\n          # slave:\n            # username: \n            # password: \n            # url: \n            # driver-class-name: \n\n# mybatis配置\nmybatis:\n    # 搜索指定包别名\n    typeAliasesPackage: com.sourcelin.system\n    # 配置mapper的扫描，找到所有的mapper.xml映射文件\n    mapperLocations: classpath:mapper/**/*.xml\n\n# swagger配置\nswagger:\n  title: 系统模块接口文档\n  license: Powered By sourcelin\n  licenseUrl: https://sourcelin.vip', 'c4dbcde02707a9a988efcda8dca44c30', '2023-10-23 09:09:22', '2023-10-24 10:38:55', 'nacos', '0:0:0:0:0:0:0:1', '', '', '系统模块', '', '', 'yaml', '', NULL);
-INSERT INTO `config_info` VALUES (27, 'sourcelin-job-dev.yml', 'BLOG_GROUP', '# spring配置\nspring:\n  redis:\n    host: localhost\n    port: 6379\n    password: \n  datasource:\n    driver-class-name: com.mysql.cj.jdbc.Driver\n    url: jdbc:mysql://127.0.0.1:3306/sourcelin-cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8\n    username: sourcelin\n    password: change_me\n\n# mybatis配置\nmybatis:\n    # 搜索指定包别名\n    typeAliasesPackage: com.sourcelin.job.domain\n    # 配置mapper的扫描，找到所有的mapper.xml映射文件\n    mapperLocations: classpath:mapper/**/*.xml\n\n# swagger配置\nswagger:\n  title: 定时任务接口文档\n  license: Powered By sourcelin\n  licenseUrl: https://sourcelin.vip\n', 'fde8acd1c3f602255bc920225dac5bcd', '2023-10-23 09:09:22', '2023-10-24 10:39:34', 'nacos', '0:0:0:0:0:0:0:1', '', '', '定时任务', '', '', 'yaml', '', NULL);
-INSERT INTO `config_info` VALUES (28, 'sourcelin-file-dev.yml', 'BLOG_GROUP', '# 本地文件上传    \nfile:\n    domain: http://127.0.0.1:9300\n    path: D:/sourcelin/uploadPath\n    prefix: /statics\n\n# FastDFS配置\nfdfs:\n  domain: http://127.0.0.1\n  soTimeout: 3000\n  connectTimeout: 2000\n  trackerList: 127.0.0.1:22122\n\n# Minio配置\nminio:\n  url: http://127.0.0.1:9000\n  accessKey: change_me\n  secretKey: change_me\n  bucketName: test', '2f6168ec171dd306a29c06ddcff0a404', '2023-10-23 09:09:22', '2023-10-24 10:39:54', 'nacos', '0:0:0:0:0:0:0:1', '', '', '文件服务', '', '', 'yaml', '', NULL);
-INSERT INTO `config_info` VALUES (29, 'sentinel-sourcelin-gateway', 'BLOG_GROUP', '[\n    {\n        \"resource\": \"sourcelin-auth\",\n        \"count\": 500,\n        \"grade\": 1,\n        \"limitApp\": \"default\",\n        \"strategy\": 0,\n        \"controlBehavior\": 0\n    },\n	{\n        \"resource\": \"sourcelin-system\",\n        \"count\": 1000,\n        \"grade\": 1,\n        \"limitApp\": \"default\",\n        \"strategy\": 0,\n        \"controlBehavior\": 0\n    },\n	{\n        \"resource\": \"sourcelin-job\",\n        \"count\": 300,\n        \"grade\": 1,\n        \"limitApp\": \"default\",\n        \"strategy\": 0,\n        \"controlBehavior\": 0\n    }\n]', 'e098656939fcd7d6b7da93f317b16b83', '2023-10-23 09:09:22', '2023-10-23 09:12:03', 'nacos', '0:0:0:0:0:0:0:1', '', '', '限流策略', '', '', 'json', '', NULL);
+INSERT INTO `config_info` VALUES (1, 'application-dev.yml', 'BLOG_GROUP', 'spring:\n  redis:\n    host: ${REDIS_HOST:127.0.0.1}\n    port: ${REDIS_PORT:6379}\n    password: ${REDIS_PASSWORD:}\n    database: ${REDIS_DATABASE:0}\n  autoconfigure:\n    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure\n  mvc:\n    pathmatch:\n      matching-strategy: ant_path_matcher\n\n# feign 配置\nfeign:\n  sentinel:\n    enabled: true\n  okhttp:\n    enabled: true\n  httpclient:\n    enabled: false\n  client:\n    config:\n      default:\n        connectTimeout: 10000\n        readTimeout: 10000\n  compression:\n    request:\n      enabled: true\n    response:\n      enabled: true\n\n# 暴露监控端点\nmanagement:\n  endpoints:\n    web:\n      exposure:\n        include: \'*\'\n', '746e467adfd67bb173daf5f8dca5d841', '2020-05-20 12:00:00', '2022-04-24 10:26:34', 'nacos', '0:0:0:0:0:0:0:1', '', '', '通用配置', 'null', 'null', 'yaml', NULL, '');
+INSERT INTO `config_info` VALUES (21, 'sourcelin-gateway-dev.yml', 'BLOG_GROUP', 'spring:\n  cloud:\n    gateway:\n      discovery:\n        locator:\n          lowerCaseServiceId: true\n          enabled: true\n      routes:\n        - id: sourcelin-blog\n          uri: lb://sourcelin-blog\n          predicates:\n            - Path=/blog/**\n          filters:\n            - StripPrefix=1\n        - id: sourcelin-ai\n          uri: lb://sourcelin-ai\n          predicates:\n            - Path=/ai/**\n          filters:\n            - StripPrefix=1\n        - id: sourcelin-message\n          uri: lb://sourcelin-message\n          predicates:\n            - Path=/message/**\n          filters:\n            - StripPrefix=1\n        # 认证中心\n        - id: sourcelin-auth\n          uri: lb://sourcelin-auth\n          predicates:\n            - Path=/auth/**\n          filters:\n            - CacheRequestFilter\n            - StripPrefix=1\n        # 定时任务\n        - id: sourcelin-job\n          uri: lb://sourcelin-job\n          predicates:\n            - Path=/schedule/**\n          filters:\n            - StripPrefix=1\n        # 系统模块\n        - id: sourcelin-system\n          uri: lb://sourcelin-system\n          predicates:\n            - Path=/system/**\n          filters:\n            - StripPrefix=1\n        # 文件服务\n        - id: sourcelin-file\n          uri: lb://sourcelin-file\n          predicates:\n            - Path=/file/**\n          filters:\n            - StripPrefix=1\n\n# 安全配置\nsecurity:\n  # 验证码\n  captcha:\n    enabled: true\n    type: math\n  # 防止XSS攻击\n  xss:\n    enabled: true\n    excludeUrls:\n      - /system/notice\n  # 不校验白名单\n  ignore:\n    whites:\n      - /message/stream\n      - /blog/front/ai/status\n      - /blog/front/messages/realtime-status\n      - /blog/front/ai/abilities/ai_agent_chat/invoke/stream\n      - /auth/logout\n      - /auth/login\n      - /auth/register\n      - /*/v2/api-docs\n      - /csrf\n', '3eb98433d15afe3105a6f44b7317ef8a', '2023-10-23 09:07:51', '2023-10-23 09:08:29', 'nacos', '0:0:0:0:0:0:0:1', '', '', '网关模块', '', '', 'yaml', '', NULL);
+INSERT INTO `config_info` VALUES (23, 'sourcelin-auth-dev.yml', 'BLOG_GROUP', '{}\n', '8a80554c91d9fca8acb82f023de02f11', '2023-10-23 09:09:22', '2023-10-23 09:09:22', NULL, '0:0:0:0:0:0:0:1', '', '', '认证中心', NULL, NULL, 'yaml', NULL, NULL);
+INSERT INTO `config_info` VALUES (30, 'sourcelin-blog-dev.yml', 'BLOG_GROUP', '# spring配置\nspring:\n  datasource:\n    dynamic:\n      primary: master\n      datasource:\n        master:\n          driver-class-name: com.mysql.cj.jdbc.Driver\n          url: ${BLOG_DB_URL:${DB_URL:jdbc:mysql://127.0.0.1:3306/sourcelin-cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8}}\n          username: ${BLOG_DB_USERNAME:${DB_USERNAME:root}}\n          password: ${BLOG_DB_PASSWORD:${DB_PASSWORD:}}\n      druid:\n        initial-size: 5\n        min-idle: 5\n        maxActive: 20\n        maxWait: 60000\n        connectTimeout: 30000\n        socketTimeout: 60000\n        timeBetweenEvictionRunsMillis: 60000\n        minEvictableIdleTimeMillis: 300000\n        validationQuery: SELECT 1 FROM DUAL\n        testWhileIdle: true\n        testOnBorrow: false\n        testOnReturn: false\n        poolPreparedStatements: true\n        maxPoolPreparedStatementPerConnectionSize: 20\n        filters: stat,slf4j\n        connectionProperties: druid.stat.mergeSql\\=true;druid.stat.slowSqlMillis\\=5000\n\n# mybatis配置\nmybatis:\n  type-aliases-package: com.sourcelin.blog\n  mapper-locations: classpath:mapper/**/*.xml\n\n# 博客 AI 整合相关配置\nblog:\n  ai:\n    enabled: ${BLOG_AI_ENABLED:false}\n', 'c2206bd17cf9879e6e404449c7f6995e', '2026-06-04 00:00:00', '2026-06-04 00:00:00', 'nacos', '0:0:0:0:0:0:0:1', '', '', '博客模块', '', '', 'yaml', '', NULL);
+INSERT INTO `config_info` VALUES (24, 'sourcelin-monitor-dev.yml', 'BLOG_GROUP', '# spring\nspring:\n  security:\n    user:\n      name: sourcelin\n      password: change_me\n  boot:\n    admin:\n      ui:\n        title: sourcelin服务状态监控\n', '884b8979104c9103888fe2b92af6059b', '2023-10-23 09:09:22', '2023-10-24 10:38:19', 'nacos', '0:0:0:0:0:0:0:1', '', '', '监控中心', '', '', 'yaml', '', NULL);
+INSERT INTO `config_info` VALUES (25, 'sourcelin-system-dev.yml', 'BLOG_GROUP', '# spring配置\nspring:\n  datasource:\n    druid:\n      stat-view-servlet:\n        enabled: true\n        loginUsername: admin\n        loginPassword: change_me\n    dynamic:\n      druid:\n        initial-size: 5\n        min-idle: 5\n        maxActive: 20\n        maxWait: 60000\n        timeBetweenEvictionRunsMillis: 60000\n        minEvictableIdleTimeMillis: 300000\n        validationQuery: SELECT 1 FROM DUAL\n        testWhileIdle: true\n        testOnBorrow: false\n        testOnReturn: false\n        poolPreparedStatements: true\n        maxPoolPreparedStatementPerConnectionSize: 20\n        filters: stat,slf4j\n        connectionProperties: druid.stat.mergeSql\\=true;druid.stat.slowSqlMillis\\=5000\n      datasource:\n          # 主库数据源\n          master:\n            driver-class-name: com.mysql.cj.jdbc.Driver\n            url: ${SYSTEM_DB_URL:${DB_URL:jdbc:mysql://127.0.0.1:3306/sourcelin-cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8}}\n            username: ${SYSTEM_DB_USERNAME:${DB_USERNAME:root}}\n            password: ${SYSTEM_DB_PASSWORD:${DB_PASSWORD:}}\n          # 从库数据源\n          # slave:\n            # username: \n            # password: \n            # url: \n            # driver-class-name: \n\n# mybatis配置\nmybatis:\n    # 搜索指定包别名\n    typeAliasesPackage: com.sourcelin.system\n    # 配置mapper的扫描，找到所有的mapper.xml映射文件\n    mapperLocations: classpath:mapper/**/*.xml\n\n# swagger配置\nswagger:\n  title: 系统模块接口文档\n  license: Powered By sourcelin\n  licenseUrl: https://sourcelin.vip', '59fe2e4e3c4648388b5b43e193315cf6', '2023-10-23 09:09:22', '2023-10-24 10:38:55', 'nacos', '0:0:0:0:0:0:0:1', '', '', '系统模块', '', '', 'yaml', '', NULL);
+INSERT INTO `config_info` VALUES (27, 'sourcelin-job-dev.yml', 'BLOG_GROUP', '# spring配置\nspring:\n  datasource:\n    driver-class-name: com.mysql.cj.jdbc.Driver\n    url: ${JOB_DB_URL:${DB_URL:jdbc:mysql://127.0.0.1:3306/sourcelin-cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8}}\n    username: ${JOB_DB_USERNAME:${DB_USERNAME:root}}\n    password: ${JOB_DB_PASSWORD:${DB_PASSWORD:}}\n\n# mybatis配置\nmybatis:\n    # 搜索指定包别名\n    typeAliasesPackage: com.sourcelin.job.domain\n    # 配置mapper的扫描，找到所有的mapper.xml映射文件\n    mapperLocations: classpath:mapper/**/*.xml\n\n# swagger配置\nswagger:\n  title: 定时任务接口文档\n  license: Powered By sourcelin\n  licenseUrl: https://sourcelin.vip\n', 'e3b8fd798d87bb252b2ae8c59112cc23', '2023-10-23 09:09:22', '2023-10-24 10:39:34', 'nacos', '0:0:0:0:0:0:0:1', '', '', '定时任务', '', '', 'yaml', '', NULL);
+INSERT INTO `config_info` VALUES (28, 'sourcelin-file-dev.yml', 'BLOG_GROUP', '# 本地文件上传    \nfile:\n    domain: http://127.0.0.1:9300\n    path: D:/sourcelin/uploadPath\n    prefix: /statics\n\n# FastDFS配置\nfdfs:\n  domain: http://127.0.0.1\n  soTimeout: 3000\n  connectTimeout: 2000\n  trackerList: 127.0.0.1:22122\n\n# Minio配置\nminio:\n  url: http://127.0.0.1:9000\n  accessKey: change_me\n  secretKey: change_me\n  bucketName: test', 'a829f491b7057e2026cbed6ee3247b43', '2023-10-23 09:09:22', '2023-10-24 10:39:54', 'nacos', '0:0:0:0:0:0:0:1', '', '', '文件服务', '', '', 'yaml', '', NULL);
+INSERT INTO `config_info` VALUES (29, 'sentinel-sourcelin-gateway', 'BLOG_GROUP', '[\n    {\n        \"resource\": \"sourcelin-auth\",\n        \"count\": 500,\n        \"grade\": 1,\n        \"limitApp\": \"default\",\n        \"strategy\": 0,\n        \"controlBehavior\": 0\n    },\n	{\n        \"resource\": \"sourcelin-system\",\n        \"count\": 1000,\n        \"grade\": 1,\n        \"limitApp\": \"default\",\n        \"strategy\": 0,\n        \"controlBehavior\": 0\n    },\n	{\n        \"resource\": \"sourcelin-job\",\n        \"count\": 300,\n        \"grade\": 1,\n        \"limitApp\": \"default\",\n        \"strategy\": 0,\n        \"controlBehavior\": 0\n    }\n]', '9edfca354a291fb8c5b93aa690ddbe01', '2023-10-23 09:09:22', '2023-10-23 09:12:03', 'nacos', '0:0:0:0:0:0:0:1', '', '', '限流策略', '', '', 'json', '', NULL);
 
 -- ----------------------------
 -- Table structure for config_info_aggr
 -- ----------------------------
-DROP TABLE IF EXISTS `config_info_aggr`;
 CREATE TABLE `config_info_aggr`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `data_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'data_id',
@@ -76,7 +76,6 @@ CREATE TABLE `config_info_aggr`  (
 -- ----------------------------
 -- Table structure for config_info_beta
 -- ----------------------------
-DROP TABLE IF EXISTS `config_info_beta`;
 CREATE TABLE `config_info_beta`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `data_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'data_id',
@@ -98,7 +97,6 @@ CREATE TABLE `config_info_beta`  (
 -- ----------------------------
 -- Table structure for config_info_tag
 -- ----------------------------
-DROP TABLE IF EXISTS `config_info_tag`;
 CREATE TABLE `config_info_tag`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `data_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'data_id',
@@ -119,7 +117,6 @@ CREATE TABLE `config_info_tag`  (
 -- ----------------------------
 -- Table structure for config_tags_relation
 -- ----------------------------
-DROP TABLE IF EXISTS `config_tags_relation`;
 CREATE TABLE `config_tags_relation`  (
   `id` bigint(20) NOT NULL COMMENT 'id',
   `tag_name` varchar(128) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'tag_name',
@@ -136,7 +133,6 @@ CREATE TABLE `config_tags_relation`  (
 -- ----------------------------
 -- Table structure for group_capacity
 -- ----------------------------
-DROP TABLE IF EXISTS `group_capacity`;
 CREATE TABLE `group_capacity`  (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `group_id` varchar(128) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT 'Group ID，空字符表示整个集群',
@@ -155,7 +151,6 @@ CREATE TABLE `group_capacity`  (
 -- ----------------------------
 -- Table structure for his_config_info
 -- ----------------------------
-DROP TABLE IF EXISTS `his_config_info`;
 CREATE TABLE `his_config_info`  (
   `id` bigint(64) UNSIGNED NOT NULL,
   `nid` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -184,7 +179,6 @@ CREATE TABLE `his_config_info`  (
 -- ----------------------------
 -- Table structure for permissions
 -- ----------------------------
-DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE `permissions`  (
   `role` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `resource` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
@@ -195,7 +189,6 @@ CREATE TABLE `permissions`  (
 -- ----------------------------
 -- Table structure for roles
 -- ----------------------------
-DROP TABLE IF EXISTS `roles`;
 CREATE TABLE `roles`  (
   `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `role` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
@@ -210,7 +203,6 @@ INSERT INTO `roles` VALUES ('nacos', 'ROLE_ADMIN');
 -- ----------------------------
 -- Table structure for tenant_capacity
 -- ----------------------------
-DROP TABLE IF EXISTS `tenant_capacity`;
 CREATE TABLE `tenant_capacity`  (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `tenant_id` varchar(128) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT 'Tenant ID',
@@ -229,7 +221,6 @@ CREATE TABLE `tenant_capacity`  (
 -- ----------------------------
 -- Table structure for tenant_info
 -- ----------------------------
-DROP TABLE IF EXISTS `tenant_info`;
 CREATE TABLE `tenant_info`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `kp` varchar(128) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'kp',
@@ -247,7 +238,6 @@ CREATE TABLE `tenant_info`  (
 -- ----------------------------
 -- Table structure for users
 -- ----------------------------
-DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users`  (
   `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `password` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,

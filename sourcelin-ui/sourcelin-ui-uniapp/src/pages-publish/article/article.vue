@@ -208,7 +208,7 @@ import { normalizeAssetUrl } from '@/utils/url';
 type SubmitMode = 'draft' | 'review' | '';
 const themeStore = useThemeStore();
 const userStore = useUserStore();
-const { guard } = useMiniAccess();
+const { guard, can } = useMiniAccess();
 
 onShow(() => {
   themeStore.syncNativeArea();
@@ -436,6 +436,10 @@ function buildPayload(status: number) {
 }
 
 async function pickCover(): Promise<void> {
+  if (!userStore.isBlogger && !can('userUploadEnabled')) {
+    showInfoToast('当前不支持上传文件');
+    return;
+  }
   const filePath = await pickSingleImagePath({
     sizeType: ['compressed'],
     sourceType: ['album', 'camera']

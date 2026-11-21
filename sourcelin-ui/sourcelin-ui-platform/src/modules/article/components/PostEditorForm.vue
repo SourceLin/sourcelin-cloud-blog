@@ -2,22 +2,62 @@
   <div class="form-container">
     <SSurfacePanel class="form-card">
       <div class="form-group">
-        <label class="form-label">文章标题</label>
+        <div class="form-label-row">
+          <label class="form-label">文章标题</label>
+          <SButton
+            v-if="aiEnabled"
+            size="small"
+            type="primary"
+            :loading="aiLoading['title']"
+            class="ai-btn"
+            @click="handleAiGenerate({ prop: 'title', aiAbility: 'article_title_generate', label: '标题' })"
+          >
+            ✨ AI 生成
+          </SButton>
+        </div>
         <SInput v-model="form.title" placeholder="请输入文章标题" />
       </div>
 
       <div class="form-group">
-        <label class="form-label">文章摘要</label>
+        <div class="form-label-row">
+          <label class="form-label">文章摘要</label>
+          <SButton
+            v-if="aiEnabled"
+            size="small"
+            type="primary"
+            :loading="aiLoading['summary']"
+            class="ai-btn"
+            @click="handleAiGenerate({ prop: 'summary', aiAbility: 'article_summary', label: '摘要' })"
+          >
+            ✨ AI 生成
+          </SButton>
+        </div>
         <STextarea v-model="form.summary" placeholder="请输入文章摘要（选填）" :rows="3" />
       </div>
 
       <div class="form-group">
         <div class="form-label-row">
           <label class="form-label">文章封面</label>
-          <span class="form-tip">选填，建议上传横版图片</span>
+          <div style="display: flex; align-items: center; gap: 12px">
+            <span class="form-tip">选填，建议上传横版图片</span>
+            <SButton
+              v-if="aiEnabled"
+              size="small"
+              type="primary"
+              :loading="aiLoading['cover']"
+              class="ai-btn"
+              @click="handleAiGenerate({ prop: 'cover', aiAbility: 'article_cover_generate', label: '封面' })"
+            >
+              ✨ AI 智能配图
+            </SButton>
+          </div>
         </div>
 
         <div class="cover-panel">
+          <div v-if="aiLoading['cover']" class="cover-placeholder">
+            <span class="cover-placeholder-text">✨ AI 正在根据文章内容绘制封面，请稍候...</span>
+          </div>
+          <template v-else>
           <SUpload
             v-if="!coverDisplayUrl"
             :key="coverUploadKey"
@@ -70,6 +110,7 @@
               </template>
             </SInput>
           </div>
+          </template>
         </div>
       </div>
 
@@ -82,7 +123,19 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">文章标签</label>
+        <div class="form-label-row">
+          <label class="form-label">文章标签</label>
+          <SButton
+            v-if="aiEnabled"
+            size="small"
+            type="primary"
+            :loading="aiLoading['tagIds']"
+            class="ai-btn"
+            @click="handleAiGenerate({ prop: 'tagIds', aiAbility: 'article_tags', label: '标签' })"
+          >
+            ✨ AI 推荐
+          </SButton>
+        </div>
         <SSelect v-model="form.tagIds" :options="tagOptions" multiple placeholder="请选择标签（选填）" clearable />
       </div>
 
@@ -95,7 +148,19 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">文章内容</label>
+        <div class="form-label-row">
+          <label class="form-label">文章内容</label>
+          <SButton
+            v-if="aiEnabled"
+            size="small"
+            type="primary"
+            :loading="aiLoading['content']"
+            class="ai-btn"
+            @click="handleAiGenerate({ prop: 'content', aiAbility: 'article_content_refine', label: '内容' })"
+          >
+            ✨ AI 润色
+          </SButton>
+        </div>
         <PostRichEditor ref="editorRef" v-model="form.content" />
       </div>
 
@@ -117,12 +182,16 @@
       <img v-if="coverDisplayUrl" :src="coverDisplayUrl" alt="cover-preview" class="cover-preview-modal__image">
     </div>
   </SModal>
+
+  <PostAiSuggestionDialog v-model:show="showAiDialog" :result="aiResult" @close="cleanTypingTimer" @discard="discardAiResult" @apply="applyAiResult" />
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { uploadArticleFile } from '@/modules/article/api/article.api'
+import { usePostEditorAi } from '@/modules/article/composables/usePostEditorAi'
 import { resolveUploadedFileDisplayUrl, useFileUrl } from '@/shared/composables/useFileUrl'
+import PostAiSuggestionDialog from '@/modules/article/components/PostAiSuggestionDialog.vue'
 import PostRichEditor from '@/modules/article/components/PostRichEditor.vue'
 import SButton from '@/shared/components/ui/SButton.vue'
 import SInput from '@/shared/components/ui/SInput.vue'
@@ -162,20 +231,22 @@ const coverUploadKey = ref(0)
 const coverUploading = ref(false)
 const skipNextCustomRequest = ref(false)
 
+const props = defineProps<{
+  categories: Array<{ label: string; value: number }>
+  tagOptions: Array<{ label: string; value: number }>
+  loading: boolean
+  submitText?: string
+  cancelText?: string
+  aiEnabled?: boolean
+}>()
+const { aiLoading, showAiDialog, aiResult, handleAiGenerate, cleanTypingTimer, applyAiResult, discardAiResult } = usePostEditorAi(form, props)
+
 const coverDisplayUrl = computed(() => {
   return resolveCoverUrl({
     avatar: form.value.externalAvatarUrl || form.value.avatar,
     avatarFileId: form.value.avatarFileId
   })
 })
-
-defineProps<{
-  categories: Array<{ label: string; value: number }>
-  tagOptions: Array<{ label: string; value: number }>
-  loading: boolean
-  submitText?: string
-  cancelText?: string
-}>()
 
 const emit = defineEmits<{
   submit: []
@@ -318,175 +389,4 @@ function openCoverPreview() {
 }
 </script>
 
-<style scoped lang="scss">
-@import '@/shared/styles/responsive';
-
-.form-container {
-  width: 100%;
-  max-width: 1520px;
-  margin: 0;
-  padding: 0 var(--spacing-xl) var(--spacing-xxxl);
-}
-
-.form-card {
-  padding: 32px;
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--glass-stroke);
-  background: var(--surface-glass-card-muted);
-  box-shadow: var(--glass-shadow);
-}
-
-:global(html[data-theme='dark']) .form-card {
-  background: var(--surface-glass-card);
-}
-
-.form-group {
-  margin-bottom: 24px;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--text-color);
-}
-
-.form-label-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
-.form-tip {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-}
-
-.cover-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.cover-upload {
-  width: 100%;
-}
-
-.cover-preview-card {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.cover-preview,
-.cover-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 220px;
-  border-radius: var(--border-radius-lg);
-  overflow: hidden;
-  border: 1px dashed var(--border-color);
-  background: color-mix(in srgb, var(--card-bg-color) 88%, var(--bg-page));
-}
-
-.cover-preview img {
-  display: block;
-  width: 100%;
-  max-height: 320px;
-  object-fit: cover;
-}
-
-.cover-reupload {
-  width: fit-content;
-}
-
-.cover-preview {
-  position: relative;
-  cursor: pointer;
-}
-
-.cover-preview-actions {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  opacity: 0;
-  pointer-events: none;
-  background: color-mix(in srgb, var(--mask-color) 78%, transparent);
-  transition: opacity 0.2s ease;
-}
-
-.cover-preview:hover .cover-preview-actions {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.cover-placeholder {
-  color: var(--text-secondary);
-}
-
-.cover-placeholder-text {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-}
-
-.cover-external {
-  margin-top: 12px;
-}
-
-.external-label {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border-color);
-}
-
-.cover-preview-modal__body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 0;
-}
-
-.cover-preview-modal__image {
-  max-width: 100%;
-  max-height: 76vh;
-  border-radius: var(--border-radius-md);
-  object-fit: contain;
-}
-
-@include sourcelin-down(md) {
-  .form-card {
-    padding: 24px;
-  }
-
-  .form-container {
-    max-width: none;
-    padding-left: var(--spacing-md);
-    padding-right: var(--spacing-md);
-  }
-
-  .form-label-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .cover-preview,
-  .cover-placeholder {
-    min-height: 180px;
-  }
-}
-</style>
+<style scoped lang="scss" src="./PostEditorForm.scss"></style>

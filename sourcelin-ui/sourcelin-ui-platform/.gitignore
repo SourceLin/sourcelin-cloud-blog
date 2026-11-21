@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# TypeScript 编译产物（源码为 .ts/.vue，禁止 tsc/vue-tsc emit 落入 src）
+src/**/*.js
+src/**/*.vue.js
+*.tsbuildinfo
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

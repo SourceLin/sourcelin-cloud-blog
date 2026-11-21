@@ -58,32 +58,32 @@
         <view class="settings__switch" :class="{ 'settings__switch--active': preferences.analyticsEnabled }" />
       </view>
 
-        <view class="settings__row" @tap="requestSubscribeAuthorization">
-          <view>
-            <view class="settings__row-title">订阅消息</view>
-            <view class="settings__row-desc">{{ subscriptionDesc }}</view>
-          </view>
-          <view class="settings__action-chip">授权</view>
+      <view class="settings__row" @tap="requestSubscribeAuthorization">
+        <view>
+          <view class="settings__row-title">订阅消息</view>
+          <view class="settings__row-desc">{{ subscriptionDesc }}</view>
         </view>
+        <view class="settings__action-chip">授权</view>
+      </view>
 
-        <view v-if="showSubscriptionDetail && subscribeTemplates.length > 0" class="settings__subscription-panel">
-          <view
-            v-for="template in subscribeTemplates"
-            :key="template.id"
-            class="settings__subscription-item"
-          >
-            <view class="settings__subscription-head">
-              <view class="settings__subscription-name">{{ template.name }}</view>
-              <view class="settings__subscription-status" :class="`settings__subscription-status--${resolveTemplateStatus(template.id)}`">
-                {{ resolveTemplateStatusLabel(template.id) }}
-              </view>
-            </view>
-            <view class="settings__subscription-scene">{{ template.scene }}</view>
-            <view v-if="template.keywords.length > 0" class="settings__subscription-keywords">
-              {{ template.keywords.join(' / ') }}
+      <view v-if="showSubscriptionDetail && subscribeTemplates.length > 0" class="settings__subscription-panel">
+        <view
+          v-for="template in subscribeTemplates"
+          :key="template.id"
+          class="settings__subscription-item"
+        >
+          <view class="settings__subscription-head">
+            <view class="settings__subscription-name">{{ template.name }}</view>
+            <view class="settings__subscription-status" :class="`settings__subscription-status--${resolveTemplateStatus(template.id)}`">
+              {{ resolveTemplateStatusLabel(template.id) }}
             </view>
           </view>
+          <view class="settings__subscription-scene">{{ template.scene }}</view>
+          <view v-if="template.keywords.length > 0" class="settings__subscription-keywords">
+            {{ template.keywords.join(' / ') }}
+          </view>
         </view>
+      </view>
     </view>
   </view>
 </template>

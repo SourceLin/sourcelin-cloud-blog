@@ -1,0 +1,456 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&family=Share+Tech+Mono&display=swap');
+
+.ai-agent-message {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  position: relative;
+  animation: msg-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes msg-enter {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.ai-agent-message--user {
+  flex-direction: row-reverse;
+}
+
+/* ========== 头像设计 ========== */
+.ai-agent-message__avatar {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  margin-top: 2px;
+}
+
+.ai-agent-message__avatar-bot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ai-neutral-dark) 5%, transparent); // 柔和背景
+  border: 1px solid color-mix(in srgb, var(--ai-neutral-dark) 8%, transparent); // 柔和边框
+  box-shadow: none; // 移除 Orb 阴影
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: color-mix(in srgb, var(--ai-neutral-dark) 50%, transparent); // 图标颜色
+}
+
+.ai-agent-message__avatar-user {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ai-neutral-dark) 3%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ai-neutral-dark) 6%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: color-mix(in srgb, var(--ai-neutral-dark) 40%, transparent);
+}
+
+.ai-agent-message__avatar-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid color-mix(in srgb, var(--ai-neutral-dark) 8%, transparent);
+}
+
+/* ========== 消息气泡 (默认亮色模式) ========== */
+.ai-agent-message__bubble {
+  position: relative;
+  max-width: 82%;
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+/* 用户气泡：亮丽紫蓝渐变 */
+.ai-agent-message--user .ai-agent-message__bubble {
+  background: linear-gradient(135deg, var(--ai-accent-blue), var(--ai-accent-blue)); /* 柔和蓝色渐变 */
+  color: var(--ai-neutral-light);
+  border-radius: 20px 20px 4px 20px;
+  border: 1px solid color-mix(in srgb, var(--ai-neutral-light) 8%, transparent);
+  box-shadow:
+    0 6px 14px -6px color-mix(in srgb, var(--ai-accent-purple) 30%, transparent),
+    0 1px 3px color-mix(in srgb, var(--ai-neutral-dark) 8%, transparent),
+    inset 0 1px 1px color-mix(in srgb, var(--ai-neutral-light) 15%, transparent);
+}
+
+/* 机器人气泡：浅白磨砂卡片，左侧配以彩虹竖条 */
+.ai-agent-message--assistant .ai-agent-message__bubble {
+  background: color-mix(in srgb, var(--ai-neutral-light) 88%, transparent); /* 提升不透明度保证亮色下清晰 */
+  border: 1px solid color-mix(in srgb, var(--ai-neutral-dark) 6%, transparent);
+  color: var(--text-color);
+  border-radius: 20px 20px 20px 4px;
+  padding-left: 20px; /* 为左侧彩虹装饰线留出空间 */
+  box-shadow:
+    0 2px 8px color-mix(in srgb, var(--ai-neutral-dark) 4%, transparent),
+    inset 0 1px 1px color-mix(in srgb, var(--ai-neutral-light) 90%, transparent);
+
+  /* 左侧渐变彩虹立线条 */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 14px;
+    bottom: 14px;
+    width: 3px;
+    border-radius: 1.5px;
+    background: linear-gradient(180deg, var(--ai-accent-purple), var(--ai-accent-purple)); /* 柔化彩虹条 */
+    opacity: 0.8;
+  }
+}
+
+.ai-agent-message__text {
+  position: relative;
+}
+
+/* ========== Hover 动作工具栏 ========== */
+.ai-agent-message__actions {
+  position: absolute;
+  top: -10px;
+  right: 12px;
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 10;
+}
+
+.ai-agent-message:hover .ai-agent-message__actions {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.ai-agent-message__action-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--ai-neutral-dark) 6%, transparent);
+  background: var(--ai-neutral-light);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--ai-neutral-dark) 6%, transparent);
+  color: color-mix(in srgb, var(--ai-neutral-dark) 45%, transparent);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+
+  &:hover {
+    background: color-mix(in srgb, var(--ai-neutral-dark) 3%, transparent);
+    color: var(--ai-neutral-dark);
+    border-color: color-mix(in srgb, var(--ai-neutral-dark) 12%, transparent);
+  }
+
+  &--success {
+    color: var(--ai-accent-success);
+    border-color: color-mix(in srgb, var(--ai-accent-success) 20%, transparent);
+    background: color-mix(in srgb, var(--ai-accent-success) 5%, transparent);
+    box-shadow: none;
+  }
+}
+
+/* ========== 打字流式呼吸光标 ========== */
+.ai-agent-message__cursor {
+  display: inline-block;
+  width: 2.5px;
+  height: 14px;
+  background: linear-gradient(180deg, var(--ai-accent-purple), var(--ai-accent-purple));
+  animation: cursor-pulse 0.7s ease-in-out infinite alternate;
+  margin-left: 5px;
+  vertical-align: middle;
+  border-radius: 1px;
+}
+
+@keyframes cursor-pulse {
+  0% { opacity: 0.2; transform: scaleY(0.85); }
+  100% { opacity: 1; transform: scaleY(1.05); }
+}
+
+/* ========== Markdown 排版及高端代码卡片样式 (默认亮色下排版) ========== */
+.markdown-body {
+  display: inline;
+  font-family: inherit;
+  color: inherit; /* 核心修复：强制富文本继承气泡的 color 设定，防止白字在亮色下消失 */
+
+  :deep(.code-block) {
+    margin: 14px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--ai-neutral-light) 6%, transparent);
+    background: var(--ai-code-background);
+    color: var(--ai-code-foreground);
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    font-size: 0.82rem;
+    display: block;
+    box-shadow:
+      0 8px 20px color-mix(in srgb, var(--ai-neutral-dark) 15%, transparent),
+      inset 0 1px 1px color-mix(in srgb, var(--ai-neutral-light) 3%, transparent);
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--ai-code-background);
+      padding: 8px 14px;
+      font-size: 0.72rem;
+      color: color-mix(in srgb, var(--ai-neutral-light) 40%, transparent);
+      border-bottom: 1px solid color-mix(in srgb, var(--ai-neutral-light) 4%, transparent);
+      user-select: none;
+
+      .code-mac-dots {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+      }
+
+      .code-mac-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        display: inline-block;
+        opacity: 0.8;
+
+        &--red { background: var(--ai-accent-danger); }
+        &--yellow { background: var(--ai-accent-warning); }
+        &--green { background: var(--ai-accent-success); }
+      }
+
+      .code-lang {
+        text-transform: uppercase;
+        font-weight: 600;
+        font-family: 'Share Tech Mono', Consolas, monospace;
+        letter-spacing: 0.8px;
+        font-size: 0.68rem;
+        margin-left: 10px;
+        margin-right: auto;
+      }
+
+      .code-copy-btn {
+        background: color-mix(in srgb, var(--ai-neutral-light) 3%, transparent);
+        border: 1px solid color-mix(in srgb, var(--ai-neutral-light) 6%, transparent);
+        color: color-mix(in srgb, var(--ai-neutral-light) 40%, transparent);
+        padding: 2px 8px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.65rem;
+        font-weight: 600;
+        transition: all 0.2s;
+
+        &:hover {
+          background: color-mix(in srgb, var(--ai-neutral-light) 8%, transparent);
+          color: var(--ai-neutral-light);
+          border-color: color-mix(in srgb, var(--ai-neutral-light) 12%, transparent);
+        }
+
+        &--success {
+          background: color-mix(in srgb, var(--ai-accent-success) 10%, transparent);
+          color: var(--ai-accent-success);
+          border-color: color-mix(in srgb, var(--ai-accent-success) 25%, transparent);
+        }
+      }
+    }
+
+    code {
+      display: block;
+      padding: 14px;
+      overflow-x: auto;
+      white-space: pre;
+      background: transparent;
+      line-height: 1.55;
+
+      &::-webkit-scrollbar {
+        height: 5px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: color-mix(in srgb, var(--ai-neutral-light) 8%, transparent);
+        border-radius: 2.5px;
+      }
+    }
+  }
+
+  :deep(.inline-code) {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    font-size: 0.82em;
+    background: color-mix(in srgb, var(--ai-neutral-dark) 4%, transparent);
+    color: var(--primary-color);
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1px solid color-mix(in srgb, var(--ai-neutral-dark) 5%, transparent);
+    word-break: break-all;
+  }
+
+  :deep(strong) {
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+
+  :deep(em) {
+    font-style: italic;
+    opacity: 0.85;
+  }
+
+  :deep(ul.markdown-list),
+  :deep(ol.markdown-list-ordered) {
+    margin: 8px 0;
+    padding-left: 20px;
+    display: block;
+  }
+
+  :deep(ul.markdown-list) {
+    list-style-type: disc;
+  }
+
+  :deep(ol.markdown-list-ordered) {
+    list-style-type: decimal;
+  }
+
+  :deep(li) {
+    margin: 6px 0;
+  }
+
+  :deep(br) {
+    display: block;
+    content: "";
+    margin-top: 4px;
+  }
+}
+
+/* ========================================================== */
+/* ========== 暗色模式差异化 (html[data-theme='dark']) ========== */
+/* ========================================================== */
+/* ========== 暗色模式差异化 (平铺全局选择器) ========== */
+:global(html[data-theme='dark'] .ai-agent-message__avatar-bot) {
+  background: color-mix(in srgb, var(--ai-neutral-light) 8%, transparent);
+  border-color: color-mix(in srgb, var(--ai-neutral-light) 12%, transparent);
+  box-shadow: 0 4px 10px color-mix(in srgb, var(--ai-neutral-dark) 20%, transparent);
+}
+
+:global(html[data-theme='dark'] .ai-agent-message__avatar-user) {
+  background: color-mix(in srgb, var(--ai-neutral-light) 4%, transparent);
+  border-color: color-mix(in srgb, var(--ai-neutral-light) 8%, transparent);
+  color: color-mix(in srgb, var(--ai-neutral-light) 45%, transparent);
+}
+
+:global(html[data-theme='dark'] .ai-agent-message__avatar-img) {
+  border-color: color-mix(in srgb, var(--ai-neutral-light) 15%, transparent);
+}
+
+/* 用户气泡：暗色下投射紫光微影 */
+:global(html[data-theme='dark'] .ai-agent-message--user .ai-agent-message__bubble) {
+  box-shadow:
+    0 8px 20px -8px color-mix(in srgb, var(--ai-accent-purple) 40%, transparent),
+    0 2px 4px color-mix(in srgb, var(--ai-neutral-dark) 10%, transparent),
+    inset 0 1px 1px color-mix(in srgb, var(--ai-neutral-light) 15%, transparent);
+}
+
+/* 机器人气泡：深色下通透朦胧磨砂 */
+:global(html[data-theme='dark'] .ai-agent-message--assistant .ai-agent-message__bubble) {
+  background: color-mix(in srgb, var(--ai-neutral-light) 2.5%, transparent);
+  border-color: color-mix(in srgb, var(--ai-neutral-light) 6%, transparent);
+  color: color-mix(in srgb, var(--ai-neutral-light) 90%, transparent);
+  box-shadow:
+    0 4px 16px color-mix(in srgb, var(--ai-neutral-dark) 15%, transparent),
+    inset 0 1px 1px color-mix(in srgb, var(--ai-neutral-light) 5%, transparent);
+}
+
+:global(html[data-theme='dark'] .ai-agent-message__action-btn) {
+  border-color: color-mix(in srgb, var(--ai-neutral-light) 8%, transparent);
+  background: color-mix(in srgb, var(--ai-panel-shade) 90%, transparent);
+  color: color-mix(in srgb, var(--ai-neutral-light) 45%, transparent);
+  box-shadow: none;
+}
+:global(html[data-theme='dark'] .ai-agent-message__action-btn:hover) {
+  background: color-mix(in srgb, var(--ai-neutral-light) 8%, transparent);
+  color: var(--ai-neutral-light);
+  border-color: color-mix(in srgb, var(--ai-neutral-light) 15%, transparent);
+}
+:global(html[data-theme='dark'] .ai-agent-message__action-btn--success) {
+  color: var(--ai-accent-success);
+  border-color: color-mix(in srgb, var(--ai-accent-success) 30%, transparent);
+  background: color-mix(in srgb, var(--ai-accent-success) 10%, transparent);
+}
+
+/* 行内和粗体文字在暗色下的着色 */
+:global(html[data-theme='dark'] .markdown-body .inline-code) {
+  background: color-mix(in srgb, var(--ai-neutral-light) 5%, transparent);
+  color: var(--ai-accent-cyan);
+  border-color: color-mix(in srgb, var(--ai-neutral-light) 8%, transparent);
+}
+
+:global(html[data-theme='dark'] .markdown-body strong) {
+  color: var(--ai-accent-cyan);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--ai-accent-cyan) 15%, transparent);
+}
+
+/* ========== 错误警告气泡及重试按钮样式 ========== */
+.ai-agent-message__retry {
+  margin-top: 8px;
+  display: flex;
+}
+
+.ai-agent-message__retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--ai-accent-danger) 20%, transparent);
+  background: color-mix(in srgb, var(--ai-accent-danger) 4%, transparent);
+  color: var(--ai-accent-danger);
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover {
+    background: color-mix(in srgb, var(--ai-accent-danger) 8%, transparent);
+    border-color: color-mix(in srgb, var(--ai-accent-danger) 35%, transparent);
+    transform: translateY(-0.5px);
+  }
+}
+
+.ai-agent-message--error .ai-agent-message__bubble {
+  background: color-mix(in srgb, var(--ai-accent-danger) 90%, transparent);
+  border-color: color-mix(in srgb, var(--ai-accent-danger) 18%, transparent);
+  color: var(--ai-accent-danger);
+  box-shadow:
+    0 4px 12px color-mix(in srgb, var(--ai-accent-danger) 3%, transparent),
+    inset 0 1px 1px color-mix(in srgb, var(--ai-neutral-light) 80%, transparent);
+
+  &::before {
+    background: linear-gradient(180deg, var(--ai-accent-danger), var(--ai-accent-warning));
+  }
+}
+
+/* 暗色模式差异化错误态 */
+:global(html[data-theme='dark'] .ai-agent-message--error .ai-agent-message__bubble) {
+  background: color-mix(in srgb, var(--ai-accent-danger) 4%, transparent);
+  border-color: color-mix(in srgb, var(--ai-accent-danger) 15%, transparent);
+  color: var(--ai-accent-danger);
+  box-shadow:
+    0 4px 16px color-mix(in srgb, var(--ai-neutral-dark) 20%, transparent),
+    inset 0 1px 1px color-mix(in srgb, var(--ai-neutral-light) 2%, transparent);
+
+  &::before {
+    background: linear-gradient(180deg, var(--ai-accent-danger), var(--ai-accent-warning));
+  }
+}
+
+:global(html[data-theme='dark'] .ai-agent-message__retry-btn) {
+  border-color: color-mix(in srgb, var(--ai-accent-danger) 25%, transparent);
+  background: color-mix(in srgb, var(--ai-accent-danger) 8%, transparent);
+  color: var(--ai-accent-danger);
+}
+
+:global(html[data-theme='dark'] .ai-agent-message__retry-btn:hover) {
+  background: color-mix(in srgb, var(--ai-accent-danger) 15%, transparent);
+  border-color: color-mix(in srgb, var(--ai-accent-danger) 40%, transparent);
+  color: var(--ai-neutral-light);
+}

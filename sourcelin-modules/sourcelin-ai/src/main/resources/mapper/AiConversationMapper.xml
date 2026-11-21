@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.ai.mapper.AiConversationMapper">
+
+    <resultMap id="AiConversationResult" type="com.sourcelin.ai.domain.AiConversation">
+        <id property="id" column="id" />
+        <result property="sessionKey" column="session_key" />
+        <result property="abilityCode" column="ability_code" />
+        <result property="conversationId" column="conversation_id" />
+        <result property="userId" column="user_id" />
+        <result property="tenantId" column="tenant_id" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <select id="selectBySessionKeyAndAbilityCode" resultMap="AiConversationResult">
+        SELECT id, session_key, ability_code, conversation_id, user_id, tenant_id, create_time, update_time
+        FROM ai_conversation
+        WHERE session_key = #{sessionKey} AND ability_code = #{abilityCode}
+    </select>
+
+    <insert id="insertOrUpdate" parameterType="com.sourcelin.ai.domain.AiConversation">
+        INSERT INTO ai_conversation (session_key, ability_code, conversation_id, user_id, tenant_id)
+        VALUES (#{sessionKey}, #{abilityCode}, #{conversationId}, #{userId}, #{tenantId})
+        ON DUPLICATE KEY UPDATE
+            conversation_id = VALUES(conversation_id),
+            update_time = NOW()
+    </insert>
+
+</mapper>

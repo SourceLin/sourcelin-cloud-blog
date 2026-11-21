@@ -16,6 +16,10 @@
     </description>
 	
     <dependencies>
+        <dependency>
+            <groupId>com.sourcelin</groupId>
+            <artifactId>sourcelin-api-message</artifactId>
+        </dependency>
     	
     	<!-- SpringCloud Alibaba Nacos -->
         <dependency>

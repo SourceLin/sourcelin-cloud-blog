@@ -2,6 +2,7 @@ package com.sourcelin.system.mapper;
 
 import java.util.List;
 import com.sourcelin.system.domain.SysNotice;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 通知公告表 数据层
@@ -10,6 +11,11 @@ import com.sourcelin.system.domain.SysNotice;
  */
 public interface SysNoticeMapper
 {
+    List<SysNotice> selectPersonalNotices(@Param("userId") Long userId, @Param("isRead") Integer isRead,
+        @Param("title") String title);
+
+    int markRead(@Param("userId") Long userId, @Param("noticeId") Long noticeId);
+
     /**
      * 查询公告信息
      * 

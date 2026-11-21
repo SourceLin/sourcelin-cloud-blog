@@ -1,0 +1,7 @@
+export { default as AiAgentAvatar } from './components/AiAgentAvatar.vue'
+export { default as AiAgentChatPanel } from './components/AiAgentChatPanel.vue'
+export { default as AiAgentMessageItem } from './components/AiAgentMessageItem.vue'
+export { default as AiAgentTypingDots } from './components/AiAgentTypingDots.vue'
+export { clearAiAgentArticleContext, setAiAgentArticleContext, useAiAgentChat } from './composables/useAiAgentChat'
+export type { AgentStatus } from './composables/useAiAgentChat'
+export type { AiAgentArticleContext } from './api/ai-agent.api'

@@ -97,7 +97,11 @@ public class BlogLoginService {
         // 更新登录信息
         user.setLoginIp(IpUtils.getIpAddr());
         user.setLoginDate(new java.util.Date());
-        remoteUserService.updateUserInfo(user, SecurityConstants.INNER);
+        User loginMetadata = new User();
+        loginMetadata.setId(user.getId());
+        loginMetadata.setLoginIp(user.getLoginIp());
+        loginMetadata.setLoginDate(user.getLoginDate());
+        remoteUserService.updateUserInfo(loginMetadata, SecurityConstants.INNER);
 
         sysRecordLogService.recordLogininfor(username, Constants.LOGIN_SUCCESS, "登录成功");
         return userInfo;

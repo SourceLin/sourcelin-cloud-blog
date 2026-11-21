@@ -1,6 +1,8 @@
-﻿<template>
+<template>
   <NModal :class="modalClass" v-bind="$attrs">
-    <slot />
+    <template v-for="(_, slotName) in $slots" #[slotName]="slotProps">
+      <slot :name="slotName" v-bind="slotProps || {}" />
+    </template>
   </NModal>
 </template>
 

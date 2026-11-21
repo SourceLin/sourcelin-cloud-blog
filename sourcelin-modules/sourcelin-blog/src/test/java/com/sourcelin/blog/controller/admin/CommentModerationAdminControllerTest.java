@@ -1,5 +1,6 @@
 package com.sourcelin.blog.controller.admin;
 
+import com.sourcelin.blog.config.BlogAiProperties;
 import com.sourcelin.blog.config.ModerationProperties;
 import com.sourcelin.blog.utils.BlogSensitiveWordTool;
 import com.sourcelin.common.core.enums.ResultCode;
@@ -31,6 +32,9 @@ class CommentModerationAdminControllerTest
     private ModerationProperties moderationProperties;
 
     @Mock
+    private BlogAiProperties blogAiProperties;
+
+    @Mock
     private BlogSensitiveWordTool blogSensitiveWordTool;
 
     @Test
@@ -46,7 +50,7 @@ class CommentModerationAdminControllerTest
 
         when(moderationProperties.getArticle()).thenReturn(article);
         when(moderationProperties.getKeyword()).thenReturn(keyword);
-        when(moderationProperties.isAiEnabled()).thenReturn(true);
+        when(blogAiProperties.isEnabled()).thenReturn(true);
         when(blogSensitiveWordTool.getCurrentVersion()).thenReturn(5);
 
         CommentModerationAdminController.KeywordCurrentVO result = controller.currentKeyword();

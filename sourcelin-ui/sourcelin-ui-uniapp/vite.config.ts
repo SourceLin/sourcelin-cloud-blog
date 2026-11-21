@@ -42,6 +42,9 @@ function patchSassLegacyWarnings(): void {
 
 patchSassLegacyWarnings();
 
+// 本地联调可直连隔离网关，路径与公开站点的反向代理保持一致。
+const localGateway = process.env.VITE_APP_API_URL;
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [uni()],
@@ -61,8 +64,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/blog-api': {
-        target: 'https://sourcelin.cn',
-        changeOrigin: true
+        target: localGateway || 'https://sourcelin.cn',
+        changeOrigin: true,
+        rewrite: localGateway ? (url) => url.replace(/^\/blog-api(\/front(?=\/|$))?/, (_, front: string | undefined) =>
+          front ? `/blog${front}` : '') : undefined
       }
     }
   },

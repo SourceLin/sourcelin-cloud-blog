@@ -124,4 +124,11 @@ public interface ArticleMapper
      * @return 文章列表
      */
     public List<Article> selectArticleCollectCountsByIds(@Param("ids") List<Long> ids);
+
+    /**
+     * 查询可同步到知识库的公开已发布文章 ID。
+     *
+     * @return 文章 ID 列表
+     */
+    public List<Long> selectKnowledgeSyncCandidateIds();
 }

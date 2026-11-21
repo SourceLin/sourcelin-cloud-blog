@@ -156,7 +156,7 @@ import { deleteComment } from '@/modules/comment/api/comment.api';
 import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 import { showInfoToast } from '@/utils/feedback';
 
-const { userStore, can } = useMiniAccess();
+const { userStore, can, guard } = useMiniAccess();
 const themeStore = useThemeStore();
 const { backToTopVisible, handlePageScroll } = useBackToTop();
 
@@ -225,6 +225,9 @@ const emptyText = computed(() => {
 });
 
 onLoad((options) => {
+  if (!guard('interactionCenterEnabled')) {
+    return;
+  }
   const tab = typeof options?.tab === 'string' ? options.tab : '';
   if (tab === 'collect' || tab === 'like' || tab === 'comment') {
     activeTab.value = tab;

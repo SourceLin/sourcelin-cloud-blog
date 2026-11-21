@@ -83,6 +83,11 @@
 
         <dependency>
             <groupId>com.sourcelin</groupId>
+            <artifactId>sourcelin-api-ai</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sourcelin</groupId>
             <artifactId>sourcelin-common-redis</artifactId>
         </dependency>
 
@@ -102,6 +107,13 @@
             <artifactId>fastjson2</artifactId>
         </dependency>
 
+        <!-- Prometheus Metrics -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
+        <dependency><groupId>com.sourcelin</groupId><artifactId>sourcelin-api-message</artifactId></dependency>
     </dependencies>
 
     <build>

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.sourcelin.common.core.enums.ResultCode;
 import com.sourcelin.common.core.exception.BusinessException;
@@ -52,6 +53,36 @@ public class SysNoticeController extends BaseController
         startPage();
         List<SysNotice> list = noticeService.selectNoticeList(notice);
         return toPageResult(list);
+    }
+
+    @SaCheckPermission(type = "admin", value = "system:notice:list")
+    @GetMapping("/my")
+    public PageResult<SysNotice> personalList(@RequestParam(required = false) Integer isRead,
+        @RequestParam(required = false) String title)
+    {
+        Long userId = adminLoginAccessor.getCurrentUserId();
+        if (isRead != null && isRead != 0 && isRead != 1)
+        {
+            throw new BusinessException(ResultCode.VALIDATION_ERROR);
+        }
+        startPage();
+        return toPageResult(noticeService.selectPersonalNotices(userId, isRead, title));
+    }
+
+    @SaCheckPermission(type = "admin", value = "system:notice:query")
+    @PostMapping("/my/{noticeId}/read")
+    public Void markRead(@PathVariable Long noticeId)
+    {
+        noticeService.markRead(adminLoginAccessor.getCurrentUserId(), noticeId);
+        return null;
+    }
+
+    @SaCheckPermission(type = "admin", value = "system:notice:list")
+    @PostMapping("/my/read-all")
+    public Void markAllRead()
+    {
+        noticeService.markRead(adminLoginAccessor.getCurrentUserId(), null);
+        return null;
     }
 
     /**

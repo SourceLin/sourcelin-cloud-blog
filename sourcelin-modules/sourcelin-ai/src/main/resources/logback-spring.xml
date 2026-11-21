@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="APP_NAME" value="sourcelin-ai"/>
+    <property name="LOG_PATH" value="${LOG_PATH:-./logs}"/>
+    <property name="LOG_LEVEL" value="${LOG_LEVEL:-INFO}"/>
+
+    <!-- 控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [%X{traceId}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 文件输出 - 应用日志 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${APP_NAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [%X{traceId}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 文件输出 - 错误日志 -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${APP_NAME}-error.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}-error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [%X{traceId}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- AI调用日志 -->
+    <appender name="AI_CALL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${APP_NAME}-ai-calls.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}-ai-calls.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}|%X{requestId}|%X{userId}|%X{abilityCode}|%X{providerType}|%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 性能日志 -->
+    <appender name="PERFORMANCE_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${APP_NAME}-performance.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}-performance.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>15</maxHistory>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}|%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 应用日志 -->
+    <logger name="com.sourcelin.ai" level="${LOG_LEVEL}" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="ERROR_FILE"/>
+    </logger>
+
+    <!-- AI调用日志 -->
+    <logger name="com.sourcelin.ai.service.AiAdapterService" level="${LOG_LEVEL}" additivity="false">
+        <appender-ref ref="AI_CALL_FILE"/>
+    </logger>
+
+    <!-- 性能日志 -->
+    <logger name="com.sourcelin.ai.monitor" level="${LOG_LEVEL}" additivity="false">
+        <appender-ref ref="PERFORMANCE_FILE"/>
+    </logger>
+
+    <!-- 第三方库日志 -->
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="org.springframework.cloud" level="WARN"/>
+    <logger name="com.alibaba.cloud" level="WARN"/>
+    <logger name="com.alibaba.nacos" level="WARN"/>
+
+    <root level="${LOG_LEVEL}">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.BlogAiRecordMapper">
+
+    <resultMap type="com.sourcelin.blog.domain.BlogAiRecord" id="BlogAiRecordResult">
+        <result property="id" column="id" />
+        <result property="ownerId" column="owner_id" />
+        <result property="abilityCode" column="ability_code" />
+        <result property="bizId" column="biz_id" />
+        <result property="aiResult" column="ai_result" />
+        <result property="status" column="status" />
+        <result property="adoptUserId" column="adopt_user_id" />
+        <result property="adoptTime" column="adopt_time" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectBlogAiRecordVo">
+        select id, owner_id, ability_code, biz_id, ai_result, status, adopt_user_id, adopt_time, create_time, update_time
+        from b_blog_ai_record
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="BlogAiRecordResult">
+        <include refid="selectBlogAiRecordVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectByBizIdAndAbility" resultMap="BlogAiRecordResult">
+        <include refid="selectBlogAiRecordVo"/>
+        where biz_id = #{bizId} and ability_code = #{abilityCode}
+        order by create_time desc
+    </select>
+
+    <select id="selectList" parameterType="com.sourcelin.blog.domain.BlogAiRecord" resultMap="BlogAiRecordResult">
+        <include refid="selectBlogAiRecordVo"/>
+        <where>
+            <if test="abilityCode != null and abilityCode != ''"> and ability_code = #{abilityCode}</if>
+            <if test="bizId != null and bizId != ''"> and biz_id = #{bizId}</if>
+            <if test="status != null and status != ''"> and status = #{status}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.sourcelin.blog.domain.BlogAiRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into b_blog_ai_record (
+            owner_id, ability_code,
+            <if test="bizId != null and bizId != ''">biz_id,</if>
+            <if test="aiResult != null and aiResult != ''">ai_result,</if>
+            status,
+            <if test="adoptUserId != null and adoptUserId != ''">adopt_user_id,</if>
+            <if test="adoptTime != null">adopt_time,</if>
+            create_time, update_time
+        ) values (
+            #{ownerId}, #{abilityCode},
+            <if test="bizId != null and bizId != ''">#{bizId},</if>
+            <if test="aiResult != null and aiResult != ''">#{aiResult},</if>
+            #{status},
+            <if test="adoptUserId != null and adoptUserId != ''">#{adoptUserId},</if>
+            <if test="adoptTime != null">#{adoptTime},</if>
+            sysdate(), sysdate()
+        )
+    </insert>
+
+    <update id="update" parameterType="com.sourcelin.blog.domain.BlogAiRecord">
+        update b_blog_ai_record
+        <set>
+            <if test="aiResult != null and aiResult != ''">ai_result = #{aiResult},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="adoptUserId != null and adoptUserId != ''">adopt_user_id = #{adoptUserId},</if>
+            <if test="adoptTime != null">adopt_time = #{adoptTime},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

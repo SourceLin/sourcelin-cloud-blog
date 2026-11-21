@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.ai.mapper.AiTaskEventMapper">
+
+    <resultMap type="com.sourcelin.ai.domain.AiTaskEvent" id="AiTaskEventResult">
+        <result property="id" column="id" />
+        <result property="taskId" column="task_id" />
+        <result property="eventType" column="event_type" />
+        <result property="eventMessage" column="event_message" />
+        <result property="eventPayload" column="event_payload" />
+        <result property="createTime" column="create_time" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.sourcelin.ai.domain.AiTaskEvent" useGeneratedKeys="true" keyProperty="id">
+        insert into ai_task_event (
+            task_id,
+            event_type,
+            <if test="eventMessage != null and eventMessage != ''">event_message,</if>
+            <if test="eventPayload != null and eventPayload != ''">event_payload,</if>
+            create_time
+        ) values (
+            #{taskId},
+            #{eventType},
+            <if test="eventMessage != null and eventMessage != ''">#{eventMessage},</if>
+            <if test="eventPayload != null and eventPayload != ''">#{eventPayload},</if>
+            sysdate()
+        )
+    </insert>
+
+    <select id="selectByTaskId" parameterType="String" resultMap="AiTaskEventResult">
+        select id, task_id, event_type, event_message, event_payload, create_time
+        from ai_task_event
+        where task_id = #{taskId}
+        order by create_time asc
+    </select>
+</mapper>

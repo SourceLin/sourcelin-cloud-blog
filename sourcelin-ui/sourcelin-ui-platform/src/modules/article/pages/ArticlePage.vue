@@ -14,6 +14,7 @@ import { resolveArticleSourceContext } from '@/modules/article/utils/article-sou
 import { useArticleComments } from '@/modules/article/composables/useArticleComments'
 import CommentComposer from '@/shared/components/comments/CommentComposer.vue'
 import CommentThread from '@/shared/components/comments/CommentThread.vue'
+import { clearAiAgentArticleContext, setAiAgentArticleContext } from '@/modules/ai-agent'
 
 const route = useRoute()
 const router = useRouter()
@@ -89,6 +90,33 @@ const breadcrumbSourceLabel = computed(() => articleSourceContext.value.label)
 const articleCommentCount = computed(() =>
   Math.max(Number(article.value?.commentCount ?? 0), Number(commentTotal.value ?? 0))
 )
+const articleAiContext = computed(() => {
+  if (loading.value || !article.value?.title) {
+    return null
+  }
+  if (article.value.needLogin && !article.value.readFull) {
+    return null
+  }
+
+  const plainContent = toPlainTextExcerpt(article.value.content || article.value.summary || '', 1500)
+  return {
+    title: article.value.title,
+    content: plainContent,
+    url: typeof window === 'undefined' ? undefined : window.location.href
+  }
+})
+
+function toPlainTextExcerpt(value: string, maxLength: number): string {
+  const plain = value
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  return plain.length > maxLength ? `${plain.slice(0, maxLength)}...` : plain
+}
 
 function goToSourcePage() {
   void router.push(articleSourceContext.value.to)
@@ -136,6 +164,10 @@ watch(() => route.params.id, async () => {
   syncSidebarStickable()
 }, { immediate: true })
 
+watch(articleAiContext, (context) => {
+  setAiAgentArticleContext(context)
+}, { immediate: true })
+
 onMounted(async () => {
   await nextTick()
   syncSidebarStickable()
@@ -148,6 +180,7 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+  clearAiAgentArticleContext()
   window.removeEventListener('resize', syncSidebarStickable)
   sidebarResizeObserver?.disconnect()
   sidebarResizeObserver = null

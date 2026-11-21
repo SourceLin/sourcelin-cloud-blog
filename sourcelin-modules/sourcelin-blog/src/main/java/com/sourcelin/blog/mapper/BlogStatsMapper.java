@@ -3,6 +3,7 @@ package com.sourcelin.blog.mapper;
 import com.sourcelin.blog.vo.BlogArticleStatusCount;
 import com.sourcelin.blog.vo.BlogTreeholeStatusCount;
 import com.sourcelin.blog.vo.BlogTrendCount;
+import com.sourcelin.blog.vo.FrontStatsCounts;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
@@ -13,6 +14,9 @@ import java.util.List;
  */
 public interface BlogStatsMapper
 {
+    public FrontStatsCounts selectFrontStatsCounts(@Param("start") Date start, @Param("split") Date split,
+                                                   @Param("end") Date end);
+
     public Long countArticles();
 
     public Long countComments();

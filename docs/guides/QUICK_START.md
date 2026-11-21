@@ -35,6 +35,8 @@ cd sourcelin-cloud-blog
 
 ### 2. 初始化数据库
 
+以下命令用于空库。前两份 SQL 一次性完成业务库和 Nacos 配置库初始化。使用 Seata 时再导入事务库。
+
 ```bash
 mysql -u root -p < docs/sql/sourcelin-cloud.sql
 mysql -u root -p < docs/sql/sourcelin-config.sql
@@ -59,11 +61,10 @@ SQL 说明见 [sql/README.md](../sql/README.md)。
 
 ### 4. 修改配置
 
-根据你的本地环境，调整各服务 `bootstrap.yml` 中的：
+配置各服务的 Nacos 地址和账号，并在 `BLOG_GROUP` 下核对实际生效的配置。
 
-- MySQL 连接
-- Redis 连接
-- Nacos 地址与账号
+- 为 Java 服务设置业务库的 `DB_URL`、`DB_USERNAME`、`DB_PASSWORD`。Nacos 服务连接自己的配置库。
+- 在 `application-dev.yml` 统一 Redis 实例和库编号。样例读取 `REDIS_HOST`、`REDIS_PORT`、`REDIS_PASSWORD`、`REDIS_DATABASE`，默认 `127.0.0.1:6379` 的第 0 库。认证签发会话与其他服务校验会话须使用同一实例和库编号。
 
 如果需要联调 Uniapp 微信快捷登录，还必须在 Nacos 的 `BLOG_GROUP / sourcelin-auth-dev.yml` 中补齐：
 
@@ -72,7 +73,7 @@ SQL 说明见 [sql/README.md](../sql/README.md)。
 
 推荐直接参考：
 
-- [Sa-Token + Nacos 配置基线](../internal/configs/sa-token-nacos-configs.md)
+- [AI 与实时消息部署](AI_MESSAGE_SETUP.md)
 
 ### 5. 启动后端核心服务
 

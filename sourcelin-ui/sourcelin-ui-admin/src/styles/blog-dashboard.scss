@@ -1,58 +1,22 @@
 .blog-dash {
-  --blog-primary-soft: color-mix(in srgb, var(--el-color-primary) 10%, transparent);
-  --blog-primary-soft-strong: color-mix(in srgb, var(--el-color-primary) 16%, transparent);
-  --blog-primary-soft-hover: color-mix(in srgb, var(--el-color-primary) 12%, transparent);
-  --blog-primary-border: color-mix(in srgb, var(--el-color-primary) 14%, transparent);
-  --blog-primary-border-strong: color-mix(in srgb, var(--el-color-primary) 20%, transparent);
-  --blog-success-soft: color-mix(in srgb, var(--el-color-success) 12%, transparent);
-  --blog-surface-strong: color-mix(
-    in srgb,
-    var(--el-bg-color-overlay) 88%,
-    var(--el-color-primary) 6%
-  );
-  --blog-surface: color-mix(in srgb, var(--el-bg-color-overlay) 80%, var(--el-color-primary) 6%);
-  --blog-surface-soft: color-mix(
-    in srgb,
-    var(--el-bg-color-overlay) 72%,
-    var(--el-color-primary) 4%
-  );
-  --blog-surface-chip: color-mix(
-    in srgb,
-    var(--el-bg-color-overlay) 62%,
-    var(--el-color-primary) 4%
-  );
-  --blog-shadow-strong: color-mix(in srgb, var(--el-text-color-primary) 8%, transparent);
-  --blog-shadow-soft: color-mix(in srgb, var(--el-text-color-primary) 5%, transparent);
-  --blog-inset-highlight: color-mix(in srgb, var(--el-fill-color-blank) 72%, transparent);
+  // 品牌色与背景变量
+  --blog-primary-soft: color-mix(in srgb, var(--el-color-primary) 8%, transparent);
+  --blog-primary-soft-strong: color-mix(in srgb, var(--el-color-primary) 12%, transparent);
+  --blog-primary-soft-hover: color-mix(in srgb, var(--el-color-primary) 10%, transparent);
+  --blog-primary-border: var(--el-border-color-lighter);
+  --blog-primary-border-strong: color-mix(in srgb, var(--el-color-primary) 30%, transparent);
+  --blog-success-soft: color-mix(in srgb, var(--el-color-success) 8%, transparent);
+  --blog-warning-soft: color-mix(in srgb, var(--el-color-warning) 8%, transparent);
+  --blog-danger-soft: color-mix(in srgb, var(--el-color-danger) 8%, transparent);
+  --blog-info-soft: color-mix(in srgb, var(--el-color-info) 8%, transparent);
+
   --blog-title-color: var(--el-text-color-primary);
   --blog-body-color: var(--el-text-color-secondary);
+
   position: relative;
   padding: 24px;
-  overflow: hidden;
   background-color: var(--el-bg-color);
-
-  .blog-dash__glow {
-    position: absolute;
-    pointer-events: none;
-    border-radius: 999px;
-    filter: blur(90px);
-  }
-
-  .blog-dash__glow--primary {
-    top: -100px;
-    right: -60px;
-    width: 280px;
-    height: 280px;
-    background: var(--blog-primary-soft-strong);
-  }
-
-  .blog-dash__glow--secondary {
-    bottom: 60px;
-    left: -90px;
-    width: 240px;
-    height: 240px;
-    background: var(--blog-success-soft);
-  }
+  animation: fadeIn 0.4s ease-out;
 
   .dash-hero-banner,
   .dash-kpi-grid,
@@ -62,142 +26,92 @@
     z-index: 1;
   }
 
+  // 1. 运营总览 Banner 升级：柔渐变配合波点几何噪点背景
   .dash-hero-banner {
+    position: relative;
     display: block;
-    padding: 28px;
-    margin-bottom: 20px;
-    background:
-      linear-gradient(
-        135deg,
-        var(--blog-surface-strong),
-        color-mix(in srgb, var(--el-bg-color-overlay) 74%, transparent)
-      ),
-      linear-gradient(
-        135deg,
-        var(--blog-primary-soft),
-        color-mix(in srgb, var(--el-color-success) 8%, transparent)
-      );
-    border: 1px solid var(--blog-primary-border);
-    border-radius: 28px;
-    box-shadow:
-      0 18px 40px var(--blog-shadow-strong),
-      inset 0 1px 0 var(--blog-inset-highlight);
-    backdrop-filter: blur(18px);
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    background: radial-gradient(
+      circle at 95% 80%,
+      color-mix(in srgb, var(--el-color-primary) 3.5%, transparent) 0%,
+      var(--el-bg-color-overlay) 100%
+    );
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 18px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+
+    &::after {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 220px;
+      pointer-events: none;
+      content: "";
+      background-image: radial-gradient(var(--el-color-primary) 1.5px, transparent 0);
+      background-size: 10px 10px;
+      opacity: 0.04;
+    }
   }
 
   .dash-pill {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 7px 12px;
-    margin-bottom: 14px;
+    padding: 5px 12px;
+    margin-bottom: 12px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--el-color-primary);
     background: var(--blog-primary-soft);
     border-radius: 999px;
   }
 
-  .dash-hero__title {
+  .dash-hero-banner__title {
     margin: 0;
     font-family: var(--el-font-family);
-    font-size: 34px;
-    line-height: 1.15;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.25;
     color: var(--blog-title-color);
+    letter-spacing: 0.5px;
   }
 
-  .dash-hero__desc {
-    max-width: 640px;
-    margin: 14px 0 0;
-    font-size: 15px;
-    line-height: 1.8;
+  .dash-hero-banner__desc {
+    max-width: 760px;
+    margin: 10px 0 0;
+    font-size: 14px;
+    line-height: 1.7;
     color: var(--blog-body-color);
+    letter-spacing: 0.2px;
   }
 
-  .dash-hero__chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 18px;
-  }
-
-  .dash-chip {
-    padding: 8px 12px;
-    font-size: 12px;
-    color: var(--blog-body-color);
-    background: var(--blog-surface-chip);
-    border: 1px solid var(--blog-primary-border);
-    border-radius: 999px;
-  }
-
-  // KPI 浮起微动效
-  .dash-kpi-card {
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    &:hover {
-      border-color: var(--blog-primary-border-strong);
-      box-shadow: 0 16px 32px var(--blog-shadow-strong);
-      transform: translateY(-4px);
-    }
-  }
-
-  // 待办卡片智能高亮与 pending 特效
-  .dash-workbench-card {
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-
-    &.has-pending {
-      background: linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--el-color-danger) 4%, var(--blog-surface)) 0%,
-        var(--blog-surface) 100%
-      ) !important;
-      border-color: var(--el-color-danger-light-5) !important;
-      box-shadow: 0 8px 24px rgba(245, 108, 108, 0.05);
-
-      .dash-workbench-card__value {
-        color: var(--el-color-danger) !important;
-        text-shadow: 0 0 10px rgba(245, 108, 108, 0.15);
-      }
-
-      &:hover {
-        border-color: var(--el-color-danger) !important;
-        box-shadow: 0 12px 28px rgba(245, 108, 108, 0.12) !important;
-        transform: translateY(-2px);
-      }
-    }
-
-    .warning-tag {
-      display: inline-block;
-      padding: 1px 6px;
-      margin-right: 6px;
-      font-size: 10px;
-      font-weight: bold;
-      color: var(--el-color-danger);
-      background-color: var(--el-color-danger-light-9);
-      border-radius: 4px;
-    }
-
-    .warning-text {
-      font-weight: bold;
-      color: var(--el-color-danger);
-    }
-  }
-
+  // 2. KPI 总览网格：立体悬浮与 HSL 微色块
   .dash-kpi-grid {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 16px;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
   }
 
   .dash-kpi-card {
     display: flex;
-    gap: 12px;
+    gap: 14px;
     align-items: center;
-    padding: 18px;
-    background: var(--blog-surface);
-    border: 1px solid var(--blog-primary-border);
-    border-radius: 22px;
-    box-shadow: 0 12px 24px var(--blog-shadow-soft);
+    padding: 22px 18px;
+    background: var(--el-bg-color-overlay);
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.01);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    &:hover {
+      border-color: var(--blog-primary-border-strong);
+      box-shadow: 0 12px 30px color-mix(in srgb, var(--el-color-primary) 8%, transparent);
+      transform: translateY(-3px);
+    }
   }
 
   .dash-kpi-card__icon {
@@ -207,68 +121,97 @@
     justify-content: center;
     width: 44px;
     height: 44px;
-    font-size: 20px;
-    color: var(--el-color-white);
-    border-radius: 14px;
+    font-size: 18px;
+    border-radius: 10px;
+    transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  .dash-kpi-card:hover .dash-kpi-card__icon {
+    transform: scale(1.1) rotate(2deg);
   }
 
   .dash-kpi-card__icon--article {
-    background: linear-gradient(135deg, var(--el-color-primary), var(--el-color-primary-light-3));
+    color: var(--el-color-primary);
+    background: var(--blog-primary-soft);
   }
 
   .dash-kpi-card__icon--comment {
-    background: linear-gradient(135deg, var(--el-color-success), var(--el-color-success-light-3));
+    color: var(--el-color-success);
+    background: var(--blog-success-soft);
   }
 
   .dash-kpi-card__icon--user {
-    background: linear-gradient(135deg, var(--el-color-warning), var(--el-color-warning-light-3));
+    color: var(--el-color-warning);
+    background: var(--blog-warning-soft);
   }
 
   .dash-kpi-card__icon--view {
-    background: linear-gradient(135deg, var(--el-color-info), var(--el-color-info-light-3));
+    color: var(--el-color-info);
+    background: var(--blog-info-soft);
   }
 
   .dash-kpi-card__icon--treehole {
-    background: linear-gradient(135deg, var(--el-color-danger), var(--el-color-danger-light-3));
+    color: var(--el-color-danger);
+    background: var(--blog-danger-soft);
   }
 
   .dash-kpi-card__icon--treehole-msg {
-    background: linear-gradient(135deg, var(--el-color-primary-light-3), var(--el-color-success));
+    color: var(--el-color-primary);
+    background: var(--blog-primary-soft);
   }
 
   .dash-kpi-card__label {
-    font-size: 13px;
+    font-size: 12.5px;
+    font-weight: 550;
     color: var(--blog-body-color);
   }
 
   .dash-kpi-card__value {
-    margin-top: 8px;
+    margin-top: 6px;
     font-family: var(--el-font-family);
     font-size: 24px;
     font-weight: 700;
     color: var(--blog-title-color);
   }
 
+  // 3. 工作台与待办中心
   .dash-section-head {
-    margin-bottom: 14px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 20px;
+
+    &::before {
+      display: inline-block;
+      width: 4px;
+      height: 16px;
+      content: "";
+      background: linear-gradient(
+        180deg,
+        var(--el-color-primary) 0%,
+        color-mix(in srgb, var(--el-color-primary) 50%, white) 100%
+      );
+      border-radius: 2px;
+    }
   }
 
   .dash-section-head__title {
     margin: 0;
     font-family: var(--el-font-family);
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 800;
     color: var(--blog-title-color);
+    letter-spacing: 0.3px;
   }
 
   .dash-section-head__desc {
-    margin: 8px 0 0;
+    margin: 4px 0 0;
     font-size: 13px;
     color: var(--blog-body-color);
   }
 
   .dash-workbench {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
   }
 
   .dash-workbench__grid,
@@ -280,41 +223,73 @@
 
   .dash-workbench-card,
   .dash-panel {
-    background: var(--blog-surface);
-    border: 1px solid var(--blog-primary-border);
-    border-radius: 24px;
-    box-shadow:
-      0 18px 36px var(--blog-shadow-soft),
-      inset 0 1px 0 var(--blog-inset-highlight);
-    backdrop-filter: blur(16px);
+    background: var(--el-bg-color-overlay);
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.01);
   }
 
   .dash-workbench-card {
-    min-height: 176px;
-    padding: 20px;
+    min-height: 160px;
+    padding: 22px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
   .dash-workbench-card.is-clickable {
     cursor: pointer;
-    transition:
-      transform 0.2s ease,
-      border-color 0.2s ease,
-      background-color 0.2s ease;
   }
 
   .dash-workbench-card.is-clickable:hover {
     background: var(--blog-primary-soft-hover);
     border-color: var(--blog-primary-border-strong);
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--el-color-primary) 6%, transparent);
     transform: translateY(-2px);
   }
 
+  // 待办卡片温和融合高亮
+  .dash-workbench-card.has-pending {
+    background: color-mix(
+      in srgb,
+      var(--el-color-danger) 2.5%,
+      var(--el-bg-color-overlay)
+    ) !important;
+    border-color: color-mix(in srgb, var(--el-color-danger) 22%, transparent) !important;
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--el-color-danger) 3%, transparent);
+
+    .dash-workbench-card__value {
+      color: var(--el-color-danger) !important;
+    }
+
+    &:hover {
+      border-color: var(--el-color-danger) !important;
+      box-shadow: 0 10px 24px color-mix(in srgb, var(--el-color-danger) 10%, transparent) !important;
+    }
+  }
+
+  .warning-tag {
+    display: inline-block;
+    padding: 1px 6px;
+    margin-right: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--el-color-danger);
+    background-color: color-mix(in srgb, var(--el-color-danger) 10%, transparent);
+    border-radius: 4px;
+  }
+
+  .warning-text {
+    font-weight: 700;
+    color: var(--el-color-danger);
+  }
+
   .dash-workbench-card__label {
-    font-size: 13px;
+    font-size: 12.5px;
+    font-weight: 600;
     color: var(--blog-body-color);
   }
 
   .dash-workbench-card__value {
-    margin: 12px 0 10px;
+    margin: 10px 0 8px;
     font-family: var(--el-font-family);
     font-size: 30px;
     font-weight: 700;
@@ -323,21 +298,29 @@
 
   .dash-workbench-card__hint {
     font-size: 12px;
-    line-height: 1.7;
+    line-height: 1.5;
     color: var(--blog-body-color);
   }
 
+  // 列表分割线与微滑推交互
   .dash-struct-list {
     padding: 0;
-    margin: 12px 0 0;
+    margin: 10px 0 0;
     list-style: none;
 
     li {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 9px 0;
-      border-bottom: 1px dashed var(--el-border-color-lighter);
+      padding: 8px 6px;
+      border-bottom: 1px solid var(--el-border-color-extra-light);
+      border-radius: 6px;
+      transition: all 0.25s ease;
+
+      &:hover {
+        padding-left: 10px;
+        background-color: color-mix(in srgb, var(--el-color-primary) 3%, transparent);
+      }
 
       &:last-child {
         border-bottom: none;
@@ -345,10 +328,12 @@
     }
 
     span {
+      font-size: 13px;
       color: var(--blog-body-color);
     }
 
     b {
+      font-size: 13.5px;
       color: var(--blog-title-color);
     }
   }
@@ -360,13 +345,18 @@
 
   .dash-panel {
     overflow: hidden;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02);
+    }
   }
 
   .dash-panel--wide {
     width: 100%;
   }
 
-  .dash-panel .el-card__body {
+  .dash-panel :deep(.el-card__body) {
     padding: 20px;
   }
 
@@ -380,24 +370,17 @@
     }
   }
 
-  @media (max-width: 1080px) {
-    .dash-hero {
-      grid-template-columns: 1fr;
-    }
-  }
-
   @media (max-width: 768px) {
     padding: 16px;
 
-    .dash-hero {
+    .dash-hero-banner {
       padding: 20px;
     }
 
-    .dash-hero__title {
-      font-size: 28px;
+    .dash-hero-banner__title {
+      font-size: 24px;
     }
 
-    .dash-hero__signals,
     .dash-kpi-grid,
     .dash-workbench__grid,
     .dash-analytics__grid {
@@ -414,20 +397,20 @@ html.dark .blog-dash {
   );
   --blog-body-color: color-mix(in srgb, var(--el-color-white) 76%, var(--el-color-primary-light-5));
 }
-// 原地审核抽屉 (Audit Drawer) 专属高端磨砂玻璃及卡片列表样式
+
+// 4. 原地审核抽屉 (Audit Drawer) 精精致净化样式
 .audit-drawer {
-  background-color: color-mix(in srgb, var(--el-bg-color-overlay) 85%, transparent) !important;
+  background-color: var(--el-bg-color-overlay) !important;
   border-left: 1px solid var(--el-border-color-lighter);
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(20px);
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.05);
 
   .el-drawer__header {
     padding-bottom: 15px;
     margin-bottom: 20px;
-    border-bottom: 1px dashed var(--el-border-color-lighter);
+    border-bottom: 1px solid var(--el-border-color-lighter);
 
     .el-drawer__title {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       color: var(--el-text-color-primary);
     }
@@ -453,16 +436,16 @@ html.dark .blog-dash {
 }
 
 .audit-card {
-  padding: 16px;
+  padding: 18px;
   background: var(--el-bg-color-overlay);
   border: 1px solid var(--el-border-color-lighter);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.01);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
   &:hover {
-    border-color: var(--el-color-primary-light-5);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    border-color: var(--blog-primary-border-strong);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
     transform: translateY(-2px);
   }
 }
@@ -471,11 +454,11 @@ html.dark .blog-dash {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   font-size: 12px;
 
   .auditor-ip {
-    font-weight: 550;
+    font-weight: 600;
     color: var(--el-text-color-regular);
   }
 
@@ -504,7 +487,7 @@ html.dark .blog-dash {
   margin-bottom: 14px;
 
   .comment-content-text {
-    padding: 10px;
+    padding: 12px;
     margin: 0;
     font-size: 13px;
     line-height: 1.6;
@@ -512,16 +495,22 @@ html.dark .blog-dash {
     white-space: pre-wrap;
     background-color: var(--el-fill-color-blank);
     border: 1px solid var(--el-border-color-extra-light);
-    border-radius: 6px;
+    border-radius: 8px;
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-color: var(--el-border-color-light);
+    }
   }
 
   .link-url-text,
   .link-desc-text {
-    margin: 4px 0;
-    font-size: 12px;
+    margin: 6px 0;
+    font-size: 12.5px;
     color: var(--el-text-color-regular);
 
     a {
+      font-weight: 600;
       color: var(--el-color-primary);
       text-decoration: none;
       &:hover {
@@ -535,4 +524,15 @@ html.dark .blog-dash {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

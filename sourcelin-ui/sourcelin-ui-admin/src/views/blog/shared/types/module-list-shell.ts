@@ -1,4 +1,4 @@
-﻿export type SelectOption = {
+export type SelectOption = {
   label: string;
   value: string | number;
 };
@@ -51,6 +51,14 @@ export type FormField = {
   treeValueProp?: string;
   /** treeSelect：节点 label 字段 */
   treeLabelProp?: string;
+  /** AI能力配置 */
+  aiAbility?: {
+    code: string;
+    label?: string;
+    prompt?: string;
+    /** 是否走异步任务（如封面生成） */
+    async?: boolean;
+  };
 };
 
 export type TagValueConfig =

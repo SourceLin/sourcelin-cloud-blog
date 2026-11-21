@@ -26,4 +26,14 @@ public class ServiceNameConstants
      * 博客服务的serviceid
      */
     public static final String BLOG_SERVICE = "sourcelin-blog";
+
+    /**
+     * AI服务的serviceid
+     */
+    public static final String AI_SERVICE = "sourcelin-ai";
+
+    /**
+     * 消息推送服务的serviceid
+     */
+    public static final String MESSAGE_SERVICE = "sourcelin-message";
 }

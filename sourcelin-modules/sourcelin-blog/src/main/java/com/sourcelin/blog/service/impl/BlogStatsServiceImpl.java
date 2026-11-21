@@ -7,6 +7,8 @@ import com.sourcelin.blog.vo.BlogStatsSummaryVO;
 import com.sourcelin.blog.vo.BlogTreeholeStatusCount;
 import com.sourcelin.blog.vo.BlogStatsTrendVO;
 import com.sourcelin.blog.vo.BlogTrendCount;
+import com.sourcelin.blog.vo.FrontStatsCounts;
+import com.sourcelin.blog.vo.FrontStatsVO;
 import com.sourcelin.common.core.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,36 @@ public class BlogStatsServiceImpl implements IBlogStatsService
 
     @Autowired
     private BlogStatsMapper blogStatsMapper;
+
+    @Override
+    public FrontStatsVO getFrontStats()
+    {
+        LocalDate today = LocalDate.now();
+        FrontStatsCounts counts = blogStatsMapper.selectFrontStatsCounts(
+                DateUtils.toDate(today.minusDays(13).atStartOfDay()),
+                DateUtils.toDate(today.minusDays(6).atStartOfDay()),
+                DateUtils.toDate(today.atTime(23, 59, 59)));
+
+        FrontStatsVO stats = new FrontStatsVO();
+        stats.setArticleCount(counts.getArticleCount());
+        stats.setArticleTrend(calcTrend(counts.getArticlePrevious(), counts.getArticleCurrent()));
+        stats.setCommentCount(counts.getCommentCount());
+        stats.setCommentTrend(calcTrend(counts.getCommentPrevious(), counts.getCommentCurrent()));
+        stats.setViewCount(counts.getViewCount());
+        stats.setViewTrend(0L);
+        stats.setUserCount(counts.getUserCount());
+        stats.setUserTrend(calcTrend(counts.getUserPrevious(), counts.getUserCurrent()));
+        return stats;
+    }
+
+    private long calcTrend(long previous, long current)
+    {
+        if (previous == 0L)
+        {
+            return current > 0L ? 100L : 0L;
+        }
+        return Math.round((current - previous) * 100.0D / previous);
+    }
 
     @Override
     public BlogStatsSummaryVO getSummary()

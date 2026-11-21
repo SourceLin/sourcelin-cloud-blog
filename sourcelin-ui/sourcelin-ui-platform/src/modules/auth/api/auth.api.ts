@@ -123,10 +123,15 @@ export function emailLogin(data: {
   })
 }
 
-export function getInfo() {
-  return requestData<CurrentUserInfoPayload>({
+export function getInfo(background = false) {
+  return requestData<CurrentUserInfoPayload | null>({
     url: '/front/user/info',
-    method: 'get'
+    method: 'get',
+    ...(background && {
+      allowUnauthorized: true,
+      skipErrorMessage: true,
+      validateStatus: (status: number) => status === 401 || (status >= 200 && status < 300)
+    })
   })
 }
 

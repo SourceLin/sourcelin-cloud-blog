@@ -35,11 +35,9 @@
 | Version | Deployment and customization | Java baseline |
 | --- | --- | --- |
 | **No-AI edition (`v1`)** | Available now. Includes the blog frontend, admin panel, and Uniapp mini program. Use this as a baseline for projects without AI or SSE notifications. [Gitee](https://gitee.com/my_lyq/sourcelin-cloud-blog/tree/v1) · [GitHub](https://github.com/SourceLin/sourcelin-cloud-blog/tree/v1) · [GitCode](https://gitcode.com/SourceLin/sourcelin-cloud-blog/tree/v1) | JDK 8 |
-| **Main codebase (optional AI)** | The AI edition is pending release. The core blog runs without model credentials. AI writing assistance, chat, comment moderation, Dify knowledge base sync, and SSE notifications can be enabled as needed. | JDK 8 currently |
+| **Main codebase (optional AI)** | The core blog runs without model credentials. AI writing assistance, chat, comment moderation, Dify knowledge base sync, and SSE notifications can be enabled as needed. | JDK 8 |
 
-Clone the no-AI edition with `--branch v1`. The quick-start guide is available on [Gitee](https://gitee.com/my_lyq/sourcelin-cloud-blog/blob/v1/docs/guides/QUICK_START.md) · [GitHub](https://github.com/SourceLin/sourcelin-cloud-blog/blob/v1/docs/guides/QUICK_START.md) · [GitCode](https://gitcode.com/SourceLin/sourcelin-cloud-blog/blob/v1/docs/guides/QUICK_START.md).
-
-AI and real-time messaging are off by default on the main codebase. The deployment and architecture guides will be available with the AI release.
+Clone with `--branch v1` for the no-AI edition. For the main codebase, see the [quick start](docs/guides/QUICK_START.md) and [AI and real-time messaging setup](docs/guides/AI_MESSAGE_SETUP.md). Both optional features are off by default.
 
 ## What is Sourcelin Blog?
 
@@ -248,7 +246,7 @@ mysql -u root -p < docs/sql/sourcelin-cloud.sql
 
 2. **Initialize Nacos config**
 
-Import `docs/sql/sourcelin-config.sql` into Nacos.
+Import `docs/sql/sourcelin-config.sql` into MySQL before starting Nacos. Use `BLOG_GROUP / application-dev.yml` to point all services to the same Redis instance and database number.
 
 3. **Start backend services** (in order)
 

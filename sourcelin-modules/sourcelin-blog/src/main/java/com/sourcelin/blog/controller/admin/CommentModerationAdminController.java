@@ -1,5 +1,6 @@
 package com.sourcelin.blog.controller.admin;
 
+import com.sourcelin.blog.config.BlogAiProperties;
 import com.sourcelin.blog.config.ModerationProperties;
 import com.sourcelin.blog.utils.BlogSensitiveWordTool;
 import com.sourcelin.common.core.enums.ResultCode;
@@ -28,6 +29,9 @@ public class CommentModerationAdminController
     private ModerationProperties moderationProperties;
 
     @Autowired
+    private BlogAiProperties blogAiProperties;
+
+    @Autowired
     private BlogSensitiveWordTool blogSensitiveWordTool;
 
     @SaCheckPermission(type = "admin", value = "blog:moderation:query")
@@ -42,7 +46,7 @@ public class CommentModerationAdminController
         body.setSuspect(k.getSuspect());
         body.setLoadedVersion(blogSensitiveWordTool.getCurrentVersion());
         body.setAutoPassOnClean(moderationProperties.getArticle().isAutoPassOnClean());
-        body.setAiEnabled(moderationProperties.isAiEnabled());
+        body.setAiEnabled(blogAiProperties.isEnabled());
         return body;
     }
 

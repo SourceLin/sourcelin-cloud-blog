@@ -1,4 +1,4 @@
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { dayjs } from "element-plus";
 import { useCssVar, useTransition } from "@vueuse/core";
@@ -11,6 +11,7 @@ import { formatGrowthRate } from "@/utils";
 import { isElementPlusIconName } from "@/utils/element-icons";
 import { resolveThemeColor, withAlpha } from "@/utils/theme";
 import { useSettingsStore } from "@/store/modules/settings";
+import { subscribeUnreadChanges } from "@/utils/SseClientManager";
 
 export function useDashboard() {
   const router = useRouter();
@@ -247,10 +248,14 @@ export function useDashboard() {
   }
 
   function fetchUnreadNoticeCount() {
-    NoticeAPI.getMyNoticePage({ page: 1, pageSize: 1, isRead: 0 }).then((page) => {
-      unreadNoticeCount.value = page.total ?? 0;
-    });
+    void NoticeAPI.getMyNoticePage({ page: 1, pageSize: 1, isRead: 0 })
+      .then((page) => {
+        unreadNoticeCount.value = page.total ?? 0;
+      })
+      .catch(() => undefined);
   }
+
+  onUnmounted(subscribeUnreadChanges(fetchUnreadNoticeCount));
 
   function goProfile() {
     router.push("/profile");

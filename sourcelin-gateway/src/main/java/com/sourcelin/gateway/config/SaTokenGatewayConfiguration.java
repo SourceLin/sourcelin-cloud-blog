@@ -9,6 +9,11 @@ import com.sourcelin.gateway.config.properties.IgnoreWhiteProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
+
 /**
  * Sa-Token 网关配置
  * 
@@ -24,12 +29,31 @@ public class SaTokenGatewayConfiguration
 {
     private static final StpLogic ADMIN_LOGIC = new StpLogic("admin");
     private static final StpLogic BLOG_LOGIC = new StpLogic("blog");
+    private static final Set<String> PUBLIC_BLOG_GET_PATHS = new HashSet<>(Arrays.asList(
+        "/home", "/config", "/config/siteInfo", "/config/about", "/navbars", "/navigation",
+        "/stats", "/articles", "/articles/search", "/categories", "/categories/search",
+        "/tags", "/tags/search", "/search/hot", "/search/suggestions", "/hot/articles",
+        "/hot/categories", "/hot/searches", "/comments", "/says", "/treehole", "/treeholes",
+        "/treeholes/barrage", "/links", "/mobile/capabilities", "/dicts", "/interactions/targets/stat"
+    ));
+    private static final Pattern PUBLIC_BLOG_GET_DETAIL = Pattern.compile(
+        "/(?:(?:articles|categories|tags|says|treeholes|users)"
+            + "|(?:categories|tags)/articles|users/(?:articles|followers|followings))/[0-9]+");
+    private static final Pattern PUBLIC_BLOG_POST_PATH = Pattern.compile(
+        "/(?:analytics/events|articles/view/[0-9]+|navigation/[0-9]+/click)");
 
     private final IgnoreWhiteProperties ignoreWhiteProperties;
 
     public SaTokenGatewayConfiguration(IgnoreWhiteProperties ignoreWhiteProperties)
     {
         this.ignoreWhiteProperties = ignoreWhiteProperties;
+    }
+
+    @Bean
+    public cn.dev33.satoken.config.SaTokenConfig saTokenConfig() {
+        cn.dev33.satoken.config.SaTokenConfig config = new cn.dev33.satoken.config.SaTokenConfig();
+        config.setTokenName("Authorization"); config.setTokenPrefix("Bearer");
+        config.setIsReadHeader(true); config.setIsReadCookie(false); return config;
     }
 
     @Bean
@@ -40,7 +64,7 @@ public class SaTokenGatewayConfiguration
             .setAuth(obj -> {
                 String path = SaHolder.getRequest().getRequestPath();
                 String method = SaHolder.getRequest().getMethod();
-                if (isWhitePath(path) || isPublicFileRoute(path))
+                if (isWhitePath(path) || isPublicBlogRoute(path, method) || isPublicFileRoute(path))
                 {
                     return;
                 }
@@ -58,6 +82,9 @@ public class SaTokenGatewayConfiguration
                 {
                     ADMIN_LOGIC.checkLogin();
                 }
+            })
+            .setError(error -> {
+                throw error instanceof RuntimeException ? (RuntimeException) error : new IllegalStateException(error);
             });
     }
 
@@ -81,7 +108,23 @@ public class SaTokenGatewayConfiguration
 
     private boolean isWhitePath(String path)
     {
-        return StringUtils.matches(path, ignoreWhiteProperties.getWhites());
+        return java.util.Arrays.asList("/message/stream", "/blog/front/ai/status", "/blog/front/messages/realtime-status", "/blog/front/ai/abilities/ai_agent_chat/invoke/stream").contains(path)
+            || StringUtils.matches(path, ignoreWhiteProperties.getWhites());
+    }
+
+    private boolean isPublicBlogRoute(String path, String method)
+    {
+        String prefix = "/blog/front";
+        if (!path.startsWith(prefix + "/"))
+        {
+            return false;
+        }
+        String endpoint = path.substring(prefix.length());
+        if ("GET".equals(method))
+        {
+            return PUBLIC_BLOG_GET_PATHS.contains(endpoint) || PUBLIC_BLOG_GET_DETAIL.matcher(endpoint).matches();
+        }
+        return "POST".equals(method) && PUBLIC_BLOG_POST_PATH.matcher(endpoint).matches();
     }
 
     private boolean isPublicFileRoute(String path)

@@ -88,19 +88,11 @@ public class ApiResponse<T> implements Serializable
             return UUID.randomUUID().toString().replace("-", "");
         }
 
-        String requestId = request.getHeader("X-Request-Id");
-        if (StringUtils.isBlank(requestId))
-        {
-            requestId = request.getHeader("requestId");
+        Object attribute = request.getAttribute("requestId");
+        String[] candidates = { attribute == null ? null : String.valueOf(attribute), request.getHeader("X-Request-Id"), request.getHeader("requestId") };
+        for (String candidate : candidates) {
+            if (candidate != null && candidate.trim().matches("[A-Za-z0-9._-]{1,64}")) return candidate.trim();
         }
-        if (StringUtils.isBlank(requestId))
-        {
-            Object requestIdAttr = request.getAttribute("requestId");
-            if (requestIdAttr != null)
-            {
-                requestId = String.valueOf(requestIdAttr);
-            }
-        }
-        return StringUtils.isBlank(requestId) ? UUID.randomUUID().toString().replace("-", "") : requestId;
+        return UUID.randomUUID().toString().replace("-", "");
     }
 }

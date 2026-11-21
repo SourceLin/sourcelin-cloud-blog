@@ -433,81 +433,12 @@ onMounted(() => {
 .barrage-container { position: absolute; inset: 0; overflow: hidden; z-index: 1; pointer-events: none; }
 .message-in { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); color: var(--text-color-light); text-align: center; width: min(560px, calc(100% - 32px)); z-index: 10; }
 .message-title { display: inline-flex; align-items: center; justify-content: center; padding: 0.58rem 1.4rem; margin-bottom: 1rem; border-radius: 999px; color: var(--text-color-light); font-size: clamp(1.8rem, 4vw, 2.5rem); background: color-mix(in srgb, var(--surface-panel-chip-accent) 52%, transparent); border: 1px solid color-mix(in srgb, var(--border-panel-badge-accent) 78%, transparent); box-shadow: var(--highlight-panel-chip), var(--shadow-panel-soft); backdrop-filter: blur(calc(var(--glass-blur) - 2px)) saturate(calc(var(--glass-saturate) + 4%)); }
-.input-row {
-  display: flex;
-  align-items: center;
-  gap: 0.42rem;
-  padding: 0.25rem 0.25rem 0.25rem 0.78rem;
-  border-radius: 999px;
-  border: 1px solid var(--border-panel-subtle);
-  background: var(--surface-panel-soft);
-  box-shadow: var(--highlight-panel-soft), var(--shadow-panel-soft);
-  backdrop-filter: blur(calc(var(--glass-blur) + 4px)) saturate(var(--glass-saturate));
-  transition: border-color var(--transition-base), box-shadow var(--transition-base), background var(--transition-base);
-}
-.input-row:focus-within {
-  border-color: var(--primary-color);
-  background: var(--surface-panel-default);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 16%, transparent), var(--shadow-panel-hover);
-}
-.message-input {
-  flex: 1;
-  --s-input-min-height: 38px;
-  --s-input-border-radius: 999px;
-}
-.message-input :deep(.n-input-wrapper) {
-  padding: 0 !important;
-  min-height: 38px !important;
-}
-.message-input,
-.message-input:hover,
-.message-input:focus,
-.message-input.n-input--focus,
-.message-input :deep(.n-input),
-.message-input :deep(.n-input:hover),
-.message-input :deep(.n-input:focus),
-.message-input :deep(.n-input-wrapper),
-.message-input :deep(.n-input-wrapper:hover),
-.message-input :deep(.n-input-wrapper:focus),
-.message-input :deep(.n-input-wrapper.n-input-wrapper--focus),
-.message-input :deep(.n-input-wrapper.n-input-wrapper--active),
-.message-input :deep(.n-input__border),
-.message-input :deep(.n-input__state-border) {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-.message-input :deep(.n-input__input-el) {
-  color: var(--text-color) !important;
-}
-.message-input :deep(.n-input__placeholder) {
-  color: var(--text-color-muted) !important;
-  opacity: 0.62;
-}
-.send-btn {
-  min-width: 76px;
-  height: 38px;
-  padding: 0 1rem;
-  border-radius: 999px;
-  border: none !important;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
-  color: #FFFFFF !important;
-  font-size: 0.86rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25) !important;
-  transition: transform var(--transition-base), box-shadow var(--transition-base), background var(--transition-base);
-}
-.send-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4) !important;
-}
-.send-btn:disabled {
-  opacity: 0.72;
-  cursor: progress;
-  transform: none;
-}
+.input-row { display: flex; align-items: center; gap: 0.42rem; padding: 0.25rem 0.25rem 0.25rem 0.78rem; border-radius: 999px; border: 1px solid var(--border-panel-subtle); background: var(--surface-panel-soft); box-shadow: var(--highlight-panel-soft), var(--shadow-panel-soft); }
+.input-row:focus-within { border-color: var(--primary-color); box-shadow: var(--input-focus-ring); }
+.message-input { flex: 1; min-width: 0; --s-input-min-height: 38px; --s-input-border-radius: 999px; --input-background: transparent; --input-background-focus: transparent; --input-border: transparent; --input-border-hover: transparent; --input-border-focus: transparent; --input-focus-ring: none; }
+.send-btn { min-width: 76px; height: 38px; padding: 0 1rem; border-radius: 999px; border: none; background: var(--primary-gradient); color: var(--text-color-light); font-size: 0.86rem; font-weight: 700; cursor: pointer; box-shadow: var(--button-glow); }
+.send-btn:hover { transform: translateY(-1px); box-shadow: var(--button-glow-strong); }
+.send-btn:disabled { opacity: 0.72; cursor: progress; transform: none; }
 .treehole-main {
   position: relative;
   z-index: 1;
@@ -764,27 +695,6 @@ onMounted(() => {
   background: none;
 }
 
-:global(html[data-theme='dark']) .input-row {
-  background: rgba(15, 23, 42, 0.55) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
-}
-
-:global(html[data-theme='dark']) .input-row:focus-within {
-  background: rgba(15, 23, 42, 0.75) !important;
-  border-color: var(--primary-color) !important;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25), 0 8px 32px rgba(0, 0, 0, 0.32) !important;
-}
-
-:global(html[data-theme='dark']) .message-input :deep(.n-input__placeholder) {
-  color: rgba(255, 255, 255, 0.44) !important;
-}
-
-:global(html[data-theme='dark']) .message-input :deep(.n-input__input-el) {
-  color: #FFFFFF !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
-}
-
 @include sourcelin-down(md) {
   .treehole-main {
     margin-top: 0;
@@ -804,9 +714,6 @@ onMounted(() => {
     align-items: stretch;
     padding: 0.6rem;
     border-radius: calc(var(--glass-radius) + 6px);
-  }
-  .message-input :deep(.n-input-wrapper) {
-    padding: 0 0.25rem !important;
   }
   .send-btn,
   .submit-btn { width: 100%; justify-content: center; }

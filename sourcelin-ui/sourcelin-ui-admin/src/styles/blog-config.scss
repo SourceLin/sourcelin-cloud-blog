@@ -1,0 +1,312 @@
+.blog-config-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.4s ease-out;
+
+  .config-card {
+    overflow: hidden;
+    background: var(--el-bg-color-overlay);
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 18px;
+    box-shadow: var(--el-box-shadow-light);
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: var(--el-box-shadow);
+    }
+
+    :deep(.el-card__body) {
+      padding: 0;
+    }
+  }
+
+  // 侧边双栏设置中心
+  .settings-container {
+    display: flex;
+    min-height: 620px;
+
+    // 左侧导航面板，采用微几何渐变背景
+    .settings-sidebar-tabs {
+      width: 100%;
+
+      .el-tabs__header.is-left {
+        width: 196px;
+        padding: 32px 0;
+        margin-right: 0;
+        background: linear-gradient(
+          180deg,
+          var(--el-bg-color-overlay) 0%,
+          color-mix(in srgb, var(--el-bg-color-overlay) 95%, var(--el-color-primary)) 100%
+        );
+        border-right: 1px solid var(--el-border-color-lighter);
+      }
+
+      .el-tabs__item.is-left {
+        position: relative;
+        height: 42px;
+        padding: 0 18px;
+        margin: 0 14px 6px 14px;
+        font-size: 13.5px;
+        font-weight: 600;
+        line-height: 42px;
+        color: var(--el-text-color-regular);
+        text-align: left;
+        letter-spacing: 0.3px;
+        border-radius: 8px;
+        transition: all 0.28s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+        &::before {
+          position: absolute;
+          top: 50%;
+          left: 0;
+          width: 3px;
+          height: 16px;
+          content: "";
+          background-color: var(--el-color-primary);
+          border-radius: 2px;
+          transform: translateY(-50%) scaleY(0);
+          transition: transform 0.28s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        &:hover {
+          color: var(--el-color-primary);
+          background-color: color-mix(in srgb, var(--el-color-primary) 5%, transparent);
+          transform: translateX(2px);
+        }
+
+        &.is-active {
+          color: var(--el-color-primary);
+          background-color: color-mix(in srgb, var(--el-color-primary) 8%, transparent);
+          transform: translateX(4px); // 被选中时灵动的右侧推入感
+
+          &::before {
+            transform: translateY(-50%) scaleY(1);
+          }
+        }
+      }
+
+      .el-tabs__active-bar.is-left {
+        display: none; // 隐藏默认侧边条
+      }
+
+      .el-tabs__content {
+        flex: 1;
+        padding: 28px 40px 48px 40px;
+        overflow-y: auto;
+        background: var(--el-bg-color-overlay);
+      }
+    }
+
+    .settings-pane-content {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 24px; // 拼图卡片间距
+    }
+
+    // 模块头部排版优化
+    .settings-section-head {
+      padding-bottom: 12px;
+      margin-bottom: 8px;
+
+      .settings-section-title {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin: 0;
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--el-text-color-primary);
+        letter-spacing: 0.5px;
+
+        &::before {
+          display: inline-block;
+          width: 4px;
+          height: 18px;
+          content: "";
+          background: linear-gradient(
+            180deg,
+            var(--el-color-primary) 0%,
+            color-mix(in srgb, var(--el-color-primary) 50%, white) 100%
+          );
+          border-radius: 2px;
+        }
+      }
+
+      .settings-section-desc {
+        margin: 8px 0 0;
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--el-text-color-secondary);
+        letter-spacing: 0.2px;
+      }
+    }
+  }
+
+  // 内容段落分组
+  .settings-sub-card {
+    padding-bottom: 28px;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--el-border-color-lighter);
+
+    &:last-of-type {
+      padding-bottom: 0;
+      margin-bottom: 0;
+      border-bottom: none;
+    }
+
+    .settings-sub-card__title {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 22px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--el-text-color-primary);
+
+      &::before {
+        display: inline-block;
+        width: 3px;
+        height: 13px;
+        content: "";
+        background-color: var(--el-color-primary);
+        border-radius: 2px;
+      }
+    }
+  }
+
+  // 表单排版优化
+  .settings-form {
+    display: flex;
+    flex-direction: column;
+
+    .el-form-item {
+      margin-bottom: 20px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      :deep(.el-form-item__label) {
+        padding-right: 12px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--el-text-color-regular);
+      }
+    }
+
+    // 问号气泡提示微调
+    .gui-item-tip {
+      margin-left: 5px;
+      font-size: 13.5px;
+      vertical-align: middle;
+      color: var(--el-text-color-placeholder);
+      cursor: pointer;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: var(--el-color-primary);
+      }
+    }
+
+    // 统一大单栏宽度控制
+    :deep(.el-input:not(.el-input--textarea)),
+    :deep(.el-select),
+    :deep(.el-input-number) {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    :deep(.el-textarea) {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    // 大宽版下取消文本域的限制以自适应栅格分栏
+    .is-full & {
+      :deep(.el-textarea) {
+        max-width: none;
+      }
+    }
+
+    .upload-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 36px;
+
+      .upload-item-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .upload-desc {
+          max-width: 260px;
+          font-size: 12px;
+          line-height: 1.4;
+          color: var(--el-text-color-placeholder);
+        }
+      }
+    }
+
+    // 输入框聚焦发光微动效
+    :deep(.el-input__wrapper),
+    :deep(.el-textarea__inner) {
+      background-color: color-mix(in srgb, var(--el-bg-color) 40%, var(--el-bg-color-overlay));
+      transition:
+        box-shadow 0.25s cubic-bezier(0.25, 0.8, 0.25, 1),
+        border-color 0.25s ease;
+    }
+
+    :deep(.el-input__wrapper.is-focus),
+    :deep(.el-textarea__inner:focus) {
+      outline: none;
+      background-color: var(--el-bg-color-overlay) !important;
+      border-color: var(--el-color-primary) !important;
+      box-shadow:
+        0 0 0 1px var(--el-color-primary) inset,
+        0 0 0 4px color-mix(in srgb, var(--el-color-primary) 12%, transparent) !important;
+    }
+
+    // 富文本容器
+    .editor-card-wrapper {
+      overflow: hidden;
+      border: 1px solid var(--el-border-color-lighter);
+      border-radius: 10px;
+      box-shadow: var(--el-box-shadow-lighter);
+      transition: border-color 0.3s ease;
+
+      &:focus-within {
+        border-color: var(--el-color-primary-light-5);
+      }
+    }
+  }
+
+  // 底部动作栏
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    padding-top: 24px;
+    margin-top: 16px;
+    margin-bottom: 0;
+    border-top: 1px dashed var(--el-border-color-extra-light);
+
+    .el-button {
+      padding: 9px 20px;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

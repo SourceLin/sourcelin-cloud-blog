@@ -11,6 +11,8 @@ public interface IFileCenterService
 {
     SysFile upload(MultipartFile file) throws Exception;
 
+    SysFile uploadByUrl(String url) throws Exception;
+
     SysFile getFileMetadata(Long fileId);
 
     FileInfo getFileInfo(Long fileId);

@@ -13,6 +13,8 @@
         <module>sourcelin-job</module>
         <module>sourcelin-file</module>
         <module>sourcelin-blog</module>
+        <module>sourcelin-ai</module>
+        <module>sourcelin-message</module>
     </modules>
 
     <artifactId>sourcelin-modules</artifactId>

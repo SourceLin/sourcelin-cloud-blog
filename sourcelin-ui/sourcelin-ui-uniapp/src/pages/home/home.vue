@@ -6,7 +6,7 @@
       class="home__hero-header"
       :style="headerPaddingStyle"
     >
-      <view class="home__search-btn" @tap="goSearch">
+      <view v-if="can('searchEnabled')" class="home__search-btn" @tap="goSearch">
         <uni-icons type="search" size="18" color="currentColor" />
       </view>
       <view :style="headerSpacerStyle" />
@@ -187,7 +187,7 @@ const { loading, siteInfo, notices, featured, feedItems, finished, isEmpty, refr
 const themeStore = useThemeStore();
 const appStore = useAppStore();
 const { backToTopVisible, handlePageScroll } = useBackToTop();
-const { can, resolveLiquidTabs } = useMiniAccess();
+const { can, resolveLiquidTabs, capabilityStore } = useMiniAccess();
 const brokenCoverArticleIds = shallowRef<Set<number>>(new Set());
 const activeTabPath = 'pages/home/home';
 const visibleLiquidTabItems = computed(() => resolveLiquidTabs(liquidTabItems));
@@ -294,7 +294,8 @@ onReachBottom(() => {
 
 onPageScroll(handlePageScroll);
 
-onShow(() => {
+onShow(async () => {
+  await capabilityStore.waitUntilReady();
   hideNativeTabbar();
   refreshCapsuleMetrics();
   themeStore.syncNativeArea();

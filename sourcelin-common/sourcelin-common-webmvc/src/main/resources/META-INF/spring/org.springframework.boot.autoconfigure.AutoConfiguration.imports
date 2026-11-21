@@ -1,2 +1,3 @@
 com.sourcelin.common.core.web.advice.ApiResponseBodyAdvice
 com.sourcelin.common.core.web.advice.GlobalMvcExceptionHandler
+com.sourcelin.common.core.web.config.TraceIdConfiguration

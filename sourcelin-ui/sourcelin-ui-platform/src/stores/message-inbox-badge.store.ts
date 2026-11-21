@@ -17,12 +17,13 @@ export const useMessageInboxBadgeStore = defineStore('messageInboxBadge', () => 
       totalCount.value = 0
       return
     }
+    const token = userStore.token
     loading.value = true
     try {
       const data = await getUnreadCount()
-      totalCount.value = Number(data.total ?? 0)
+      if (token === userStore.token) totalCount.value = Number(data.total ?? 0)
     } catch {
-      totalCount.value = 0
+      if (token === userStore.token) totalCount.value = 0
     } finally {
       loading.value = false
     }

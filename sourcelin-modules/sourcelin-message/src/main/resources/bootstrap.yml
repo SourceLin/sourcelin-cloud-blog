@@ -1,0 +1,34 @@
+# Tomcat
+server:
+  port: 9400
+
+# Spring
+spring:
+  application:
+    # 应用名称
+    name: sourcelin-message
+  profiles:
+    # 环境配置
+    active: dev
+  redis:
+    host: ${BLOG_REDIS_HOST:localhost}
+    port: ${BLOG_REDIS_PORT:6379}
+    password: ${BLOG_REDIS_PASSWORD:}
+  cloud:
+    nacos:
+      discovery:
+        # 分组
+        group: ${NACOS_GROUP:BLOG_GROUP}
+        # 服务注册地址
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+      config:
+        # 分组
+        group: ${NACOS_GROUP:BLOG_GROUP}
+        # 配置中心地址
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+        # 配置文件格式
+        file-extension: yml
+        # 共享配置
+        shared-configs:
+          - data-id: application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+            group: ${spring.cloud.nacos.config.group}

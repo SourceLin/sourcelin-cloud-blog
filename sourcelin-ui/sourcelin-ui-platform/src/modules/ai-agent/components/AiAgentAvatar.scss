@@ -1,0 +1,355 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap');
+@import '@/shared/styles/responsive';
+
+/* ========== 亮色模式 (默认) ========== */
+.ai-agent-avatar {
+  position: fixed;
+  right: 20px;
+  bottom: 320px; /* 调整为工具栏上方，相距 14px */
+  z-index: 1100;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ai-neutral-light) 85%, transparent); /* 提升亮色不透明度，保证完全可见 */
+  background-image: var(--glass-noise);
+  background-blend-mode: soft-light;
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid color-mix(in srgb, var(--ai-neutral-dark) 10%, transparent);
+  box-shadow:
+    inset 0 1px 2px color-mix(in srgb, var(--ai-neutral-light) 80%, transparent),
+    0 8px 20px color-mix(in srgb, var(--ai-neutral-dark) 8%, transparent),
+    0 0 12px color-mix(in srgb, var(--primary-color) 8%, transparent);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    background 0.3s,
+    border-color 0.3s,
+    box-shadow 0.3s;
+  overflow: visible;
+}
+
+/* 内部流体极光发光体 */
+.ai-agent-avatar__aurora {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--ai-accent-cyan) 45%, transparent), transparent 60%),
+              radial-gradient(circle at 80% 80%, color-mix(in srgb, var(--ai-accent-purple) 40%, transparent), transparent 60%),
+              radial-gradient(circle at 50% 10%, color-mix(in srgb, var(--ai-accent-pink) 35%, transparent), transparent 50%);
+  filter: blur(2px);
+  opacity: 0.75;
+  mix-blend-mode: normal; /* 亮暗通用 */
+  transition: opacity 0.5s, filter 0.5s;
+  animation: aurora-flow 6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes aurora-flow {
+  0% {
+    transform: rotate(0deg) scale(1);
+    filter: blur(2px) hue-rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) scale(1.08);
+    filter: blur(3px) hue-rotate(45deg);
+  }
+}
+
+.ai-agent-avatar:hover {
+  transform: scale(1.12) translateY(-2px);
+  border-color: color-mix(in srgb, var(--ai-neutral-dark) 18%, transparent);
+  box-shadow:
+    inset 0 1.5px 3px color-mix(in srgb, var(--ai-neutral-light) 95%, transparent),
+    0 12px 28px color-mix(in srgb, var(--ai-neutral-dark) 12%, transparent),
+    0 0 20px color-mix(in srgb, var(--primary-color) 16%, transparent);
+
+  .ai-agent-avatar__aurora {
+    opacity: 0.9;
+    filter: blur(1.5px) scale(1.03);
+    animation: aurora-flow 3s ease-in-out infinite alternate;
+  }
+}
+
+.ai-agent-avatar:active {
+  transform: scale(0.95) translateY(1px);
+  transition: transform 0.1s;
+}
+
+/* ========== 霓虹外发光环 ========== */
+.ai-agent-avatar__glow {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--ai-accent-purple) 12%, transparent) 0%,
+    color-mix(in srgb, var(--ai-accent-cyan) 6%, transparent) 40%,
+    transparent 70%
+  );
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.ai-agent-avatar:hover .ai-agent-avatar__glow {
+  opacity: 0.85;
+}
+
+/* ========== SVG 中央双星芒与公转轨道 ========== */
+.ai-agent-avatar__core {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.ai-agent-avatar__svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ai-agent-avatar__ring {
+  transform-origin: 12px 12px;
+  animation: ring-rotate 12s linear infinite;
+  transition: stroke 0.3s ease;
+}
+
+.ai-agent-avatar__particle {
+  transform-origin: 12px 12px;
+
+  &--1 {
+    animation: orbit-1 6s linear infinite;
+  }
+
+  &--2 {
+    animation: orbit-2 8s linear infinite;
+  }
+}
+
+@keyframes orbit-1 {
+  0% { transform: rotate(0deg) translate(9.5px) rotate(0deg); }
+  100% { transform: rotate(360deg) translate(9.5px) rotate(-360deg); }
+}
+
+@keyframes orbit-2 {
+  0% { transform: rotate(180deg) translate(9.5px) rotate(-180deg); }
+  100% { transform: rotate(-180deg) translate(9.5px) rotate(180deg); }
+}
+
+.ai-agent-avatar__sparkle-main {
+  transform-origin: 11px 11px;
+  animation: main-breathe 3s ease-in-out infinite;
+  transition: fill 0.3s ease;
+}
+
+.ai-agent-avatar__sparkle-sub {
+  transform-origin: 18.5px 6.5px;
+  animation: sub-sparkle 2.5s ease-in-out infinite;
+  transition: fill 0.3s ease;
+}
+
+@keyframes ring-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes main-breathe {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 2px color-mix(in srgb, var(--ai-accent-cyan) 30%, transparent)); }
+  50% { transform: scale(0.85); filter: drop-shadow(0 0 5px color-mix(in srgb, var(--ai-accent-cyan) 60%, transparent)); }
+}
+
+@keyframes sub-sparkle {
+  0%, 100% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 2px var(--ai-accent-cyan)); }
+}
+
+/* ========== 状态变体样式 ========== */
+.ai-agent-avatar--listening {
+  border-color: color-mix(in srgb, var(--ai-accent-success) 25%, transparent);
+  box-shadow:
+    inset 0 1px 2px color-mix(in srgb, var(--ai-neutral-light) 65%, transparent),
+    0 8px 24px color-mix(in srgb, var(--ai-neutral-dark) 8%, transparent),
+    0 0 16px color-mix(in srgb, var(--ai-accent-success) 20%, transparent);
+
+  .ai-agent-avatar__aurora {
+    background: radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--ai-accent-success) 45%, transparent), transparent 60%),
+                radial-gradient(circle at 80% 80%, color-mix(in srgb, var(--ai-accent-success) 35%, transparent), transparent 60%),
+                radial-gradient(circle at 50% 10%, color-mix(in srgb, var(--ai-accent-success) 25%, transparent), transparent 50%);
+    animation: aurora-flow 3s ease-in-out infinite alternate;
+  }
+
+  .ai-agent-avatar__ring {
+    animation: ring-rotate 4s linear infinite;
+  }
+
+  .ai-agent-avatar__sparkle-main {
+    animation: main-breathe-fast 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes main-breathe-fast {
+  0%, 100% { transform: scale(0.9); filter: drop-shadow(0 0 3px color-mix(in srgb, var(--ai-accent-success) 40%, transparent)); }
+  50% { transform: scale(1.1); filter: drop-shadow(0 0 8px color-mix(in srgb, var(--ai-accent-success) 70%, transparent)); }
+}
+
+.ai-agent-avatar--speaking {
+  border-color: color-mix(in srgb, var(--ai-accent-pink) 25%, transparent);
+  box-shadow:
+    inset 0 1px 2px color-mix(in srgb, var(--ai-neutral-light) 65%, transparent),
+    0 8px 24px color-mix(in srgb, var(--ai-neutral-dark) 8%, transparent),
+    0 0 20px color-mix(in srgb, var(--ai-accent-pink) 25%, transparent);
+
+  .ai-agent-avatar__aurora {
+    animation: aurora-flow 1.5s ease-in-out infinite alternate;
+  }
+
+  .ai-agent-avatar__sparkle-main {
+    animation: main-speak 0.5s ease-in-out infinite;
+  }
+
+  .ai-agent-avatar__sparkle-sub {
+    animation: sub-speak 0.35s ease-in-out infinite;
+  }
+}
+
+@keyframes main-speak {
+  0%, 100% { transform: scale(0.9); filter: drop-shadow(0 0 3px color-mix(in srgb, var(--ai-accent-pink) 40%, transparent)); }
+  50% { transform: scale(1.2); filter: drop-shadow(0 0 9px color-mix(in srgb, var(--ai-accent-pink) 80%, transparent)); }
+}
+
+@keyframes sub-speak {
+  0%, 100% { transform: scale(0.8); opacity: 0.6; }
+  50% { transform: scale(1.25); opacity: 1; filter: drop-shadow(0 0 3px var(--ai-accent-pink)); }
+}
+
+.ai-agent-avatar--active {
+  border-color: color-mix(in srgb, var(--ai-neutral-dark) 12%, transparent);
+  box-shadow:
+    inset 0 1px 2px color-mix(in srgb, var(--ai-neutral-light) 65%, transparent),
+    0 8px 20px color-mix(in srgb, var(--ai-neutral-dark) 10%, transparent),
+    0 0 20px color-mix(in srgb, var(--primary-color) 20%, transparent);
+}
+
+/* ========== 极简毛玻璃 Tooltip ========== */
+.ai-agent-avatar__tooltip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1110;
+}
+
+.ai-agent-avatar__tooltip-inner {
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-color);
+  background: color-mix(in srgb, var(--ai-neutral-light) 92%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, var(--ai-neutral-dark) 6%, transparent);
+  padding: 6px 12px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--ai-neutral-dark) 6%, transparent);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ai-agent-avatar__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+
+  &--idle {
+    background: var(--primary-color);
+    box-shadow: 0 0 4px var(--primary-color);
+  }
+
+  &--listening {
+    background: var(--ai-accent-success);
+    box-shadow: 0 0 6px var(--ai-accent-success);
+    animation: status-pulse 1s infinite alternate;
+  }
+
+  &--speaking {
+    background: var(--ai-accent-pink);
+    box-shadow: 0 0 6px var(--ai-accent-pink);
+    animation: status-pulse 0.6s infinite alternate;
+  }
+}
+
+@keyframes status-pulse {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  100% { transform: scale(1.3); opacity: 1; }
+}
+
+.ai-agent-avatar:hover .ai-agent-avatar__tooltip,
+.ai-agent-avatar__tooltip--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ========== 移动端 ========== */
+@include sourcelin-down(md) {
+  .ai-agent-avatar {
+    width: 48px;
+    height: 48px;
+    right: 12px;
+    bottom: 240px;
+  }
+
+  .ai-agent-avatar__core {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+/* ========== 暗色模式差异化 (平铺全局选择器) ========== */
+:global(html[data-theme='dark'] .ai-agent-avatar) {
+  background: color-mix(in srgb, var(--ai-panel-shade) 85%, transparent);
+  border-color: color-mix(in srgb, var(--ai-neutral-light) 15%, transparent);
+}
+
+:global(html[data-theme='dark'] .ai-agent-avatar__tooltip-inner) {
+  color: var(--ai-neutral-light);
+  background: color-mix(in srgb, var(--ai-panel-shade) 85%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ai-neutral-light) 10%, transparent);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--ai-neutral-dark) 30%, transparent);
+}
+
+:global(html[data-theme='dark'] .ai-agent-avatar__status-dot--idle) {
+  background: var(--ai-accent-cyan);
+  box-shadow: 0 0 4px var(--ai-accent-cyan);
+}
+
+/* ========== 移动端 ========== */
+@include sourcelin-down(md) {
+  .ai-agent-avatar {
+    width: 48px;
+    height: 48px;
+    right: 12px;
+    bottom: 300px;
+  }
+
+  .ai-agent-avatar__core {
+    width: 26px;
+    height: 26px;
+  }
+}

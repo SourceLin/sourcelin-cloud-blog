@@ -12,6 +12,8 @@
         <module>sourcelin-api-file</module>
         <module>sourcelin-api-system</module>
         <module>sourcelin-api-blog</module>
+        <module>sourcelin-api-ai</module>
+        <module>sourcelin-api-message</module>
     </modules>
 
     <artifactId>sourcelin-api</artifactId>

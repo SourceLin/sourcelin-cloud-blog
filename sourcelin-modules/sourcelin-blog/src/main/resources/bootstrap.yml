@@ -11,19 +11,45 @@ spring:
     # 环境配置
     active: dev
   redis:
-    host: ${BLOG_REDIS_HOST:localhost}
-    port: ${BLOG_REDIS_PORT:6379}
-    password: ${BLOG_REDIS_PASSWORD:}
+    host: ${BLOG_REDIS_HOST:${REDIS_HOST:localhost}}
+    port: ${BLOG_REDIS_PORT:${REDIS_PORT:6379}}
+    password: ${BLOG_REDIS_PASSWORD:${REDIS_PASSWORD:}}
   datasource:
+    druid:
+      dynamic:
+        datasource:
+          master:
+            driver-class-name: com.mysql.cj.jdbc.Driver
+            url: ${BLOG_DB_URL:${DB_URL:jdbc:mysql://127.0.0.1:3306/sourcelin-cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8}}
+            username: ${BLOG_DB_USERNAME:${DB_USERNAME:root}}
+            password: ${BLOG_DB_PASSWORD:${DB_PASSWORD:}}
+        # 连接池与动态路由的基础参数（用于兜底；若 Nacos 配置解析成功将被其覆盖/合并）
+        druid:
+          initial-size: 5
+          min-idle: 5
+          maxActive: 20
+          maxWait: 60000
+          connectTimeout: 30000
+          socketTimeout: 60000
+          timeBetweenEvictionRunsMillis: 60000
+          minEvictableIdleTimeMillis: 300000
+          validationQuery: SELECT 1 FROM DUAL
+          testWhileIdle: true
+          testOnBorrow: false
+          testOnReturn: false
+          poolPreparedStatements: true
+          maxPoolPreparedStatementPerConnectionSize: 20
+          filters: stat,slf4j
+          connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
     # dynamic-datasource 默认配置兜底（确保 primary 数据源可用）
     dynamic:
       primary: master
       datasource:
         master:
           driver-class-name: com.mysql.cj.jdbc.Driver
-          url: ${BLOG_DB_URL:jdbc:mysql://127.0.0.1:3306/sourcelin-cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8}
-          username: ${BLOG_DB_USERNAME:root}
-          password: ${BLOG_DB_PASSWORD:}
+          url: ${BLOG_DB_URL:${DB_URL:jdbc:mysql://127.0.0.1:3306/sourcelin-cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8}}
+          username: ${BLOG_DB_USERNAME:${DB_USERNAME:root}}
+          password: ${BLOG_DB_PASSWORD:${DB_PASSWORD:}}
       druid:
         initial-size: 5
         min-idle: 5
@@ -40,7 +66,7 @@ spring:
         poolPreparedStatements: true
         maxPoolPreparedStatementPerConnectionSize: 20
         filters: stat,slf4j
-        connectionProperties: druid.stat.mergeSql\\=true;druid.stat.slowSqlMillis\\=5000
+        connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
   cloud:
     nacos:
       discovery:

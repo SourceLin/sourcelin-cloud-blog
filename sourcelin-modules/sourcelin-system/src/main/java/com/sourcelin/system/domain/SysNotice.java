@@ -6,12 +6,14 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.sourcelin.common.core.web.domain.BaseEntity;
 import com.sourcelin.common.core.xss.Xss;
+import org.apache.ibatis.type.Alias;
 
 /**
  * 通知公告表 sys_notice
  * 
  * @author sourcelin
  */
+@Alias("SystemNotice")
 public class SysNotice extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -30,6 +32,18 @@ public class SysNotice extends BaseEntity
 
     /** 公告状态（0正常 1关闭） */
     private String status;
+
+    private Integer isRead;
+
+    public Integer getIsRead()
+    {
+        return isRead;
+    }
+
+    public void setIsRead(Integer isRead)
+    {
+        this.isRead = isRead;
+    }
 
     public Long getNoticeId()
     {

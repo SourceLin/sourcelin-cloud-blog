@@ -442,8 +442,8 @@ onMounted(() => {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
   &:hover {
-    transform: translateY(-2px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
   }
 
   &--blue {
@@ -464,20 +464,20 @@ onMounted(() => {
 
   :deep(.el-card__body) {
     display: flex;
+    gap: 16px;
     align-items: center;
     width: 100%;
-    gap: 16px;
   }
 
   &__icon {
-    font-size: 32px;
-    color: var(--stat-color);
-    background-color: rgba(var(--stat-color), 0.1);
-    padding: 12px;
-    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 12px;
+    font-size: 32px;
+    color: var(--stat-color);
+    background-color: rgba(var(--stat-color), 0.1);
+    border-radius: 8px;
   }
 
   &__info {
@@ -499,8 +499,8 @@ onMounted(() => {
 }
 
 .filter-section {
-  background-color: #fff;
   padding: 18px 18px 0;
+  background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
@@ -511,10 +511,10 @@ onMounted(() => {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 
   &__toolbar {
-    margin-bottom: 16px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
   }
 }
 
@@ -528,22 +528,22 @@ onMounted(() => {
 
 .file-ext-badge {
   position: absolute;
-  bottom: -4px;
   right: -4px;
-  background-color: #606266;
-  color: #fff;
-  font-size: 10px;
+  bottom: -4px;
   padding: 1px 4px;
-  border-radius: 4px;
-  text-transform: uppercase;
+  font-size: 10px;
   font-weight: bold;
+  color: #fff;
+  text-transform: uppercase;
+  background-color: #606266;
+  border-radius: 4px;
   transform: scale(0.85);
 }
 
 .image-preview-container {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   padding: 10px;
   background-color: #f5f7fa;
   border-radius: 6px;
@@ -551,8 +551,8 @@ onMounted(() => {
 
 .image-loading {
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
   color: #909399;
 }
 </style>

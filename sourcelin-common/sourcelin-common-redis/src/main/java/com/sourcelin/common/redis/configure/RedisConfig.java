@@ -6,13 +6,18 @@ import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
- * redis配置
- * 
+ * redis 自定义配置。
+ * <p>
+ * 先注册模板定义，以便 {@link RedisAutoConfiguration} 跳过默认模板。
+ * 连接工厂在创建模板实例时注入。
+ * </p>
+ *
  * @author sourcelin
  */
 @Configuration
@@ -21,6 +26,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig extends CachingConfigurerSupport
 {
     @Bean
+    @Primary
     @SuppressWarnings(value = { "unchecked", "rawtypes" })
     public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory connectionFactory)
     {

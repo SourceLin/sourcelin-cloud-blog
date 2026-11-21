@@ -1,10 +1,11 @@
 /**
  * 通知中心逻辑
  */
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import type { NoticeItem, NoticeDetail, NoticeQueryParams } from "@/types/api";
 import NoticeAPI from "@/api/system/notice";
 import router from "@/router";
+import { subscribeUnreadChanges } from "@/utils/SseClientManager";
 
 const PAGE_SIZE = 5;
 
@@ -33,6 +34,7 @@ export function useNotice() {
 
   async function read(id: string) {
     detail.value = await NoticeAPI.getDetail(id);
+    await NoticeAPI.markRead(id);
     dialogVisible.value = true;
 
     const idx = list.value.findIndex((item: NoticeItem) => item.id === id);
@@ -57,9 +59,12 @@ export function useNotice() {
   // 生命周期
   // ============================================
 
-  onMounted(() => {
-    fetchList();
-  });
+  function refreshUnread() {
+    void fetchList().catch(() => undefined);
+  }
+
+  onMounted(refreshUnread);
+  onUnmounted(subscribeUnreadChanges(refreshUnread));
 
   return {
     list,

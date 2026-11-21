@@ -363,8 +363,15 @@ public class FileCenterServiceImpl implements IFileCenterService
     }
 
     @Override
-    public java.util.List<FileInfo> selectFileInfoList(FileInfo fileInfo)
-    {
+    public java.util.List<FileInfo> selectFileInfoList(FileInfo fileInfo) {
         return fileInfoMapper.selectFileInfoList(fileInfo);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.sourcelin.file.service.RemoteMediaDownloader remoteMediaDownloader;
+
+    @Override
+    public SysFile uploadByUrl(String fileUrl) throws Exception {
+        return upload(remoteMediaDownloader.download(fileUrl));
     }
 }

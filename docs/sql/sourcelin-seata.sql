@@ -16,11 +16,12 @@
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+CREATE DATABASE IF NOT EXISTS `sourcelin-seata` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `sourcelin-seata`;
 
 -- ----------------------------
 -- Table structure for branch_table
 -- ----------------------------
-DROP TABLE IF EXISTS `branch_table`;
 CREATE TABLE `branch_table`  (
   `branch_id` bigint(20) NOT NULL,
   `xid` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
@@ -40,7 +41,6 @@ CREATE TABLE `branch_table`  (
 -- ----------------------------
 -- Table structure for global_table
 -- ----------------------------
-DROP TABLE IF EXISTS `global_table`;
 CREATE TABLE `global_table`  (
   `xid` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `transaction_id` bigint(20) NULL DEFAULT NULL,
@@ -61,7 +61,6 @@ CREATE TABLE `global_table`  (
 -- ----------------------------
 -- Table structure for lock_table
 -- ----------------------------
-DROP TABLE IF EXISTS `lock_table`;
 CREATE TABLE `lock_table`  (
   `row_key` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `xid` varchar(96) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
@@ -79,7 +78,6 @@ CREATE TABLE `lock_table`  (
 -- ----------------------------
 -- Table structure for undo_log
 -- ----------------------------
-DROP TABLE IF EXISTS `undo_log`;
 CREATE TABLE `undo_log`  (
   `branch_id` bigint(20) NOT NULL COMMENT 'branch transaction id',
   `xid` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'global transaction id',

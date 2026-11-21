@@ -1,9 +1,5 @@
 <template>
   <div v-loading="pageLoading" class="app-container blog-dash">
-    <!-- 背景渐变高光 -->
-    <div class="blog-dash__glow blog-dash__glow--primary" />
-    <div class="blog-dash__glow blog-dash__glow--secondary" />
-
     <!-- 看板 Header 与 KPI 汇总网格 -->
     <section class="dash-hero-banner">
       <div class="dash-hero-banner__copy">

@@ -42,6 +42,10 @@ sourcelin-modules/    # 业务服务
 
   sourcelin-job/      # 定时任务
 
+  sourcelin-ai/       # 可选 AI 能力服务，端口 9205
+
+  sourcelin-message/  # 可选 SSE 消息服务，端口 9400
+
 sourcelin-visual/     # 监控等可视化服务
 
 ```
@@ -419,3 +423,10 @@ mysql -u root -p < docs/sql/sourcelin-cloud.sql
 
 - MUST NOT：引入重型框架替代当前技术栈。
 
+
+## 16. 可选 AI 与消息模块
+
+- AI 与消息开发同时遵守 `rules/backend.md`、`rules/api-contract.md` 及相应前端规则。
+- AI 密钥只从部署环境和管理后台配置，服务端点保持内部认证；结果、文章与任务校验用户归属。
+- SSE 票据必须原子核销，身份包含 admin/blog 域，连接清理按连接编号执行。
+- 变更同步 `docs/architecture/ai-message-architecture.md` 和 `docs/guides/AI_MESSAGE_SETUP.md`；SQL 在独立空库验证。

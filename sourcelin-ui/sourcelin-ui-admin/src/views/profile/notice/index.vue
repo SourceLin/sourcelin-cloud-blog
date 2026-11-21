@@ -144,8 +144,10 @@ function handleResetQuery() {
 
 async function handleReadNotice(id: string) {
   const data = await NoticeAPI.getDetail(id);
+  await NoticeAPI.markRead(id);
   noticeDetail.value = data;
   noticeDialogVisible.value = true;
+  await handleQuery();
 }
 
 onMounted(() => {

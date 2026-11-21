@@ -164,7 +164,7 @@ async function ensureUserInfo() {
   if (!isLoggedIn.value || userStore.userInfo) {
     return
   }
-  await userStore.getUserInfoAction()
+  await userStore.getUserInfoAction({ background: true })
 }
 
 function handlePrimaryAction() {

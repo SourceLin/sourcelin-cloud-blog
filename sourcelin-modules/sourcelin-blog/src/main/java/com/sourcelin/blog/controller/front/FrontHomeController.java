@@ -67,14 +67,14 @@ public class FrontHomeController
         Article recommendFilter = new Article();
         recommendFilter.setStatus(2L);
         recommendFilter.setIsRecommend(1);
-        PageHelper.startPage(1, 6);
+        PageHelper.startPage(1, 6, false);
         List<ArticleVO> recommendList = articleService.selectArticleVoList(recommendFilter);
         PageHelper.clearPage();
 
         Article topFilter = new Article();
         topFilter.setStatus(2L);
         topFilter.setIsTop(1);
-        PageHelper.startPage(1, 5);
+        PageHelper.startPage(1, 5, false);
         List<ArticleVO> topList = articleService.selectArticleVoList(topFilter);
         PageHelper.clearPage();
 

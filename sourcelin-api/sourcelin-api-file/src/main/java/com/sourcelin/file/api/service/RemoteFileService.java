@@ -15,6 +15,8 @@ import com.sourcelin.common.core.constant.ServiceNameConstants;
 import com.sourcelin.common.core.web.domain.response.ApiResponse;
 import com.sourcelin.file.api.factory.RemoteFileFallbackFactory;
 
+import org.springframework.web.bind.annotation.RequestParam;
+
 /**
  * 文件服务
  * 
@@ -31,6 +33,15 @@ public interface RemoteFileService
      */
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<SysFile> upload(@RequestPart(value = "file") MultipartFile file);
+
+    /**
+     * 根据 URL 上传并转存文件（用于大模型临时媒体链接归档）
+     *
+     * @param url 第三方临时媒体文件 URL
+     * @return 结果
+     */
+    @PostMapping(value = "/upload/url")
+    public ApiResponse<SysFile> uploadByUrl(@RequestParam("url") String url, @org.springframework.web.bind.annotation.RequestHeader(com.sourcelin.common.core.constant.SecurityConstants.FROM_SOURCE) String source);
 
     /**
      * 确认文件

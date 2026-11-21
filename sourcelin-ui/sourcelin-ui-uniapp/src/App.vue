@@ -3,15 +3,20 @@
  * App.vue：全局生命周期入口
  * 业务初始化（启动校验、token 还原、未读拉取）放在这里
  */
-import { onLaunch, onShow, onError } from '@dcloudio/uni-app';
+import { onLaunch, onShow, onError, onHide } from '@dcloudio/uni-app';
+import { ref, watch } from 'vue';
+import { fetchUnreadMessageCount } from '@/modules/message/api/message.api';
 import { useUserStore } from '@/stores/user';
 import { useAppStore } from '@/stores/app';
 import { useThemeStore } from '@/stores/theme';
 import { useCapabilityStore } from '@/stores/capability';
+import { http } from '@/utils/request';
+import sseClientManager from '@/utils/SseClientManager';
 const userStore = useUserStore();
 const appStore = useAppStore();
 const themeStore = useThemeStore();
 const capabilityStore = useCapabilityStore();
+const appVisible = ref(false);
 
 onLaunch((options) => {
   // 尽早加载多端能力配置，作为过审/安全兜底
@@ -33,14 +38,51 @@ onShow(() => {
   if (themeStore.initialized) {
     themeStore.resolveTheme();
   }
-  // 冷启动后再次进入，可在此刷新 token 时效与未读
-  if (userStore.isLoggedIn) {
-    // appStore.refreshUnread();
-  }
+  appVisible.value = true;
 });
 
 onError((err) => {
   console.error('[App][onError]', err);
+});
+
+onHide(() => {
+  appVisible.value = false;
+  sseClientManager.disconnect();
+});
+
+async function refreshUnread() {
+  const token = userStore.token;
+  try {
+    const data = await fetchUnreadMessageCount();
+    if (appVisible.value && token === userStore.token) appStore.setUnreadCount(data.total ?? 0);
+  } catch { /* 保留现有未读数，后续页面查询恢复。 */ }
+}
+function handleSseMessage(payload: { content: string }) {
+  try {
+    const event: unknown = JSON.parse(payload.content);
+    if (event && typeof event === 'object' && 'type' in event && event.type === 'unread_changed') {
+      void refreshUnread();
+    }
+  } catch { /* 忽略非业务事件。 */ }
+}
+watch(() => [appVisible.value, userStore.token] as const, ([visible, token], previous, onCleanup) => {
+  if (token !== previous?.[1]) appStore.setUnreadCount(0);
+  if (!visible || !token || !userStore.isLoggedIn) return;
+  let current = true;
+  sseClientManager.on('message', handleSseMessage);
+  sseClientManager.on('reconnected', refreshUnread);
+  onCleanup(() => {
+    current = false;
+    sseClientManager.off('message', handleSseMessage);
+    sseClientManager.off('reconnected', refreshUnread);
+    sseClientManager.disconnect();
+  });
+  void refreshUnread();
+  void http.get<boolean>('/front/messages/realtime-status', undefined, { isToken: false, skipErrorToast: true })
+    .then(enabled => {
+      if (enabled && current && appVisible.value && userStore.token === token) void sseClientManager.connect();
+    })
+    .catch(() => undefined);
 });
 </script>
 

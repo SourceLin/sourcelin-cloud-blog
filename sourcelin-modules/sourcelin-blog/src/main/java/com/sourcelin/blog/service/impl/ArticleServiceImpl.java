@@ -6,11 +6,13 @@ import com.sourcelin.blog.dto.ArticleInsertDTO;
 import com.sourcelin.blog.mapper.ArticleMapper;
 import com.sourcelin.blog.mapper.TagMapper;
 import com.sourcelin.blog.service.IArticleService;
+import com.sourcelin.blog.service.event.ArticleKnowledgeSyncEvent;
 import com.sourcelin.blog.support.BlogFileCenterSupport;
 import com.sourcelin.blog.support.BlogRichTextSanitizer;
 import com.sourcelin.blog.vo.ArticleVO;
 import com.sourcelin.common.core.utils.bean.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +39,8 @@ public class ArticleServiceImpl implements IArticleService
     private BlogRichTextSanitizer blogRichTextSanitizer;
     @Autowired
     private BlogFileCenterSupport blogFileCenterSupport;
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * 查询博客文章
@@ -106,6 +110,7 @@ public class ArticleServiceImpl implements IArticleService
         if (insert > 0)
         {
             confirmArticleFiles(article.getId(), dto);
+            publishKnowledgeSyncEvent(article.getId());
         }
         return insert;
     }
@@ -136,6 +141,7 @@ public class ArticleServiceImpl implements IArticleService
         if (update > 0)
         {
             confirmArticleFiles(article.getId(), dto);
+            publishKnowledgeSyncEvent(article.getId());
         }
         return update;
     }
@@ -154,7 +160,15 @@ public class ArticleServiceImpl implements IArticleService
         {
             tagMapper.deleteByArticleIds(Arrays.asList(ids));
         }
-        return articleMapper.deleteArticleByIds(ids);
+        int rows = articleMapper.deleteArticleByIds(ids);
+        if (rows > 0 && ids != null)
+        {
+            for (Long id : ids)
+            {
+                publishKnowledgeSyncEvent(id);
+            }
+        }
+        return rows;
     }
 
     /**
@@ -168,7 +182,12 @@ public class ArticleServiceImpl implements IArticleService
     public int deleteArticleById(Long id)
     {
         tagMapper.deleteByArticleIds(Collections.singletonList(id));
-        return articleMapper.deleteArticleById(id);
+        int rows = articleMapper.deleteArticleById(id);
+        if (rows > 0)
+        {
+            publishKnowledgeSyncEvent(id);
+        }
+        return rows;
     }
 
     /**
@@ -267,6 +286,14 @@ public class ArticleServiceImpl implements IArticleService
         for (Long fileId : fileIds)
         {
             blogFileCenterSupport.confirmFile(fileId, "article", bizId);
+        }
+    }
+
+    private void publishKnowledgeSyncEvent(Long articleId)
+    {
+        if (articleId != null)
+        {
+            applicationEventPublisher.publishEvent(new ArticleKnowledgeSyncEvent(articleId));
         }
     }
 }

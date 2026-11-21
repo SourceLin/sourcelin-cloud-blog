@@ -53,7 +53,14 @@ export function useArticleTable() {
   ];
 
   const formFields = computed(() => [
-    { prop: "title", label: "标题", type: "input", required: true, span: 24 },
+    {
+      prop: "title",
+      label: "标题",
+      type: "input",
+      required: true,
+      span: 24,
+      aiAbility: { code: "article_title_generate" },
+    },
     {
       prop: "categoryId",
       label: "分类",
@@ -68,6 +75,7 @@ export function useArticleTable() {
       options: tagOptions.value,
       multiple: true,
       span: 12,
+      aiAbility: { code: "article_tags" },
     },
     {
       prop: "status",
@@ -76,9 +84,29 @@ export function useArticleTable() {
       options: ARTICLE_STATUS_OPTIONS,
       required: true,
     },
-    { prop: "avatar", label: "封面", type: "image", span: 24 },
-    { prop: "summary", label: "摘要", type: "textarea", span: 24, rows: 3 },
-    { prop: "content", label: "正文", type: "editor", span: 24, required: true },
+    {
+      prop: "avatar",
+      label: "封面",
+      type: "image",
+      span: 24,
+      aiAbility: { code: "article_cover_generate", async: true },
+    },
+    {
+      prop: "summary",
+      label: "摘要",
+      type: "textarea",
+      span: 24,
+      rows: 3,
+      aiAbility: { code: "article_summary" },
+    },
+    {
+      prop: "content",
+      label: "正文",
+      type: "editor",
+      span: 24,
+      required: true,
+      aiAbility: { code: "article_content_refine" },
+    },
     { prop: "readAuth", label: "阅读权限", type: "select", options: READ_AUTH_OPTIONS },
     { prop: "isComment", label: "允许评论", type: "select", options: YES_NO_OPTIONS },
     { prop: "isRecommend", label: "推荐", type: "select", options: YES_NO_OPTIONS },
@@ -98,16 +126,33 @@ export function useArticleTable() {
   };
 
   function deserializeForm(row: Record<string, any>) {
-    const current = row as ArticleItem;
-    const ids = current.tagId
-      ? String(current.tagId)
-          .split(",")
-          .map((item) => item.trim())
-          .filter(Boolean)
-      : [];
+    const current = row as ArticleItem & {
+      tagIds?: string | number | Array<string | number>;
+      tags?: Array<{ id?: number }>;
+    };
+    let ids: Array<string | number> = [];
+
+    if (Array.isArray(current.tagIds) && current.tagIds.length > 0) {
+      ids = current.tagIds;
+    } else if (current.tagIds !== undefined && current.tagIds !== null && current.tagIds !== "") {
+      ids = String(current.tagIds)
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    } else if (current.tagId) {
+      ids = String(current.tagId)
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    } else if (Array.isArray(current.tags) && current.tags.length > 0) {
+      ids = current.tags
+        .map((tag) => tag.id)
+        .filter((id): id is number => id !== undefined && id !== null);
+    }
+
     return {
       ...current,
-      tagIds: ids,
+      tagIds: ids.map((id) => Number(id) || id),
     };
   }
 

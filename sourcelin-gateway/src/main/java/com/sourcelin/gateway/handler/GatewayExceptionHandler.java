@@ -1,5 +1,9 @@
 package com.sourcelin.gateway.handler;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONWriter;
+import com.sourcelin.common.core.enums.ResultCode;
+import com.sourcelin.common.core.web.domain.response.ApiResponse;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.SaTokenException;
 import org.springframework.cloud.gateway.support.NotFoundException;
@@ -9,11 +13,11 @@ import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
-import com.sourcelin.common.core.utils.ServletUtils;
 import reactor.core.publisher.Mono;
 
 /**
@@ -38,40 +42,54 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler
             return Mono.error(ex);
         }
 
-        String msg;
-        HttpStatus httpStatus = HttpStatus.OK;
-        int code = 500;
+        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        ResultCode code = ResultCode.SYSTEM_ERROR;
 
         if (ex instanceof NotFoundException)
         {
-            msg = "服务未找到";
+            httpStatus = HttpStatus.SERVICE_UNAVAILABLE;
+            code = ResultCode.REMOTE_SERVICE_ERROR;
         }
         else if (ex instanceof NotLoginException
             || ex instanceof SaTokenException
             || ex.getClass().getSimpleName().contains("NotLogin"))
         {
-            msg = "请先登录";
             httpStatus = HttpStatus.UNAUTHORIZED;
-            code = HttpStatus.UNAUTHORIZED.value();
+            code = ResultCode.UNAUTHORIZED;
         }
         else if (ex instanceof ResponseStatusException)
         {
-            ResponseStatusException responseStatusException = (ResponseStatusException) ex;
-            msg = responseStatusException.getMessage();
-            HttpStatus status = responseStatusException.getStatus();
-            if (status != null)
+            httpStatus = ((ResponseStatusException) ex).getStatus();
+            switch (httpStatus)
             {
-                httpStatus = status;
-                code = status.value();
+                case NOT_FOUND: code = ResultCode.NOT_FOUND; break;
+                case UNAUTHORIZED: code = ResultCode.UNAUTHORIZED; break;
+                case FORBIDDEN: code = ResultCode.FORBIDDEN; break;
+                case TOO_MANY_REQUESTS: code = ResultCode.TOO_MANY_REQUESTS; break;
+                default: if (httpStatus.is4xxClientError()) code = ResultCode.BAD_REQUEST;
             }
         }
-        else
+
+        if (httpStatus.is5xxServerError())
         {
-            msg = "内部服务器错误";
+            log.warn("网关转发失败，路径={}，异常类型={}", exchange.getRequest().getPath(), ex.getClass().getSimpleName());
         }
 
-        log.error("[网关异常处理]请求路径:{},异常信息:{}", exchange.getRequest().getPath(), ex.getMessage());
-
-        return ServletUtils.webFluxResponseWriter(response, httpStatus, msg, code);
+        ApiResponse<Object> body = ApiResponse.fail(code);
+        String header = "X-Request-Id";
+        String requestId = response.getHeaders().getFirst(header);
+        if (requestId == null)
+        {
+            requestId = exchange.getRequest().getHeaders().getFirst(header);
+        }
+        if (requestId != null && requestId.matches("[A-Za-z0-9._-]{1,64}"))
+        {
+            body.setRequestId(requestId);
+        }
+        response.setStatusCode(httpStatus);
+        response.getHeaders().set(header, body.getRequestId());
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        return response.writeWith(Mono.just(response.bufferFactory().wrap(
+            JSON.toJSONBytes(body, JSONWriter.Feature.WriteNulls))));
     }
 }

@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { createArticle, getArticleDetail, updateArticle, type ArticleCreateUpdateDTO, type ArticleDetail as ArticleDetailPayload, type ArticleDetailTag as ArticleDetailTagPayload } from '@/modules/article/api/article.api'
 import { getCategories, type CategoryOption } from '@/modules/article/api/category.api'
 import { getTags, type TagOption } from '@/modules/article/api/tag.api'
+import { getAiStatus } from '@/modules/article/api/ai.api'
 import PostEditorForm from '@/modules/article/components/PostEditorForm.vue'
 import HeroStatCard from '@/shared/components/business/HeroStatCard.vue'
 import PageShell from '@/shared/components/layout/PageShell.vue'
@@ -128,6 +129,7 @@ const categories = ref<SelectOption[]>([])
 const tagOptions = ref<SelectOption[]>([])
 const loading = ref(false)
 const bootstrapLoading = ref(false)
+const aiEnabled = ref(false)
 
 const pageTitle = computed(() => (isEditing.value ? '编辑文章' : '发布文章'))
 const headerSubtitle = computed(() =>
@@ -283,9 +285,17 @@ const submitArticle = async () => {
 }
 
 onMounted(async () => {
-  await Promise.all([loadCategories(), loadTags()])
+  await Promise.all([loadCategories(), loadTags(), loadAiStatus()])
   await loadArticleDetail()
 })
+
+const loadAiStatus = async () => {
+  try {
+    aiEnabled.value = await getAiStatus()
+  } catch {
+    aiEnabled.value = false
+  }
+}
 </script>
 
 <template>
@@ -363,6 +373,7 @@ onMounted(async () => {
         :tag-options="tagOptions"
         :loading="loading"
         :submit-text="submitText"
+        :ai-enabled="aiEnabled"
         cancel-text="返回"
         @cancel="router.back()"
         @submit="submitArticle"

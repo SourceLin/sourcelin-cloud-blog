@@ -1,6 +1,7 @@
 package com.sourcelin.blog.service;
 
 import cn.hutool.dfa.WordTree;
+import com.sourcelin.blog.config.BlogAiProperties;
 import com.sourcelin.blog.config.ModerationProperties;
 import com.sourcelin.blog.constant.ModerationDecisionEnum;
 import com.sourcelin.blog.utils.BlogSensitiveWordTool;
@@ -36,6 +37,9 @@ class ModerationPipelineTest {
     @Mock
     private BlogSensitiveWordTool sensitiveWordTool;
 
+    @Mock
+    private BlogAiProperties blogAiProperties;
+
     private final WordTree allowTree = new WordTree();
     private final WordTree blockTree = new WordTree();
     private final WordTree suspectTree = new WordTree();
@@ -51,7 +55,7 @@ class ModerationPipelineTest {
         lenient().when(sensitiveWordTool.getBlockTree()).thenReturn(blockTree);
         lenient().when(sensitiveWordTool.getSuspectTree()).thenReturn(suspectTree);
         lenient().when(sensitiveWordTool.normalizeContent(anyString())).thenAnswer(inv -> inv.getArgument(0));
-        pipeline = new ModerationPipeline(moderationProperties, sensitiveWordTool);
+        pipeline = new ModerationPipeline(moderationProperties, sensitiveWordTool, blogAiProperties);
     }
 
     @Test

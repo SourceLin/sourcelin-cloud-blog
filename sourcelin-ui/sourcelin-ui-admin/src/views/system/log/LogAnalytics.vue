@@ -463,8 +463,8 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  background-color: #f5f7fa;
   padding: 8px 0;
+  background-color: #f5f7fa;
 }
 
 .stat-row {
@@ -476,23 +476,23 @@ onUnmounted(() => {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
   &:hover {
-    transform: translateY(-2px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
   }
 
   &__body {
     display: flex;
-    align-items: center;
     gap: 16px;
+    align-items: center;
   }
 
   &__icon {
-    font-size: 28px;
-    padding: 14px;
-    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 14px;
+    font-size: 28px;
+    border-radius: 8px;
   }
 
   &__content {
@@ -508,8 +508,8 @@ onUnmounted(() => {
 
   &__value {
     display: flex;
-    align-items: baseline;
     gap: 4px;
+    align-items: baseline;
     color: #303133;
 
     .value-num {
@@ -528,15 +528,15 @@ onUnmounted(() => {
     color: #c0c4cc;
 
     .color-success {
-      color: #67c23a;
-      font-weight: 500;
       margin-right: 4px;
+      font-weight: 500;
+      color: #67c23a;
     }
 
     .color-info {
-      color: #909399;
-      font-weight: 500;
       margin-right: 4px;
+      font-weight: 500;
+      color: #909399;
     }
   }
 }
@@ -550,8 +550,8 @@ onUnmounted(() => {
 
   .card-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     font-size: 15px;
     font-weight: bold;
     color: #303133;
@@ -559,7 +559,7 @@ onUnmounted(() => {
 }
 
 .chart-container {
-  height: 320px;
   width: 100%;
+  height: 320px;
 }
 </style>

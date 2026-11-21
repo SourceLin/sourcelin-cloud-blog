@@ -3,6 +3,18 @@ import type { NoticeQueryParams, NoticeForm, NoticeItem, NoticeDetail } from "@/
 
 const NOTICE_BASE_URL = "/system/notice";
 
+interface NoticeWireItem {
+  noticeId: number;
+  noticeTitle: string;
+  noticeContent: string;
+  noticeType: string;
+  status: string;
+  createBy: string;
+  createTime?: Date;
+  updateTime?: Date;
+  isRead?: number;
+}
+
 const mapNoticeStatusToPublishStatus = (status?: string): number => {
   if (status === "0") {
     return 1;
@@ -20,7 +32,7 @@ const mapPublishStatusToNoticeStatus = (publishStatus?: number): string => {
   return "1";
 };
 
-function mapNoticeItem(item: Record<string, any>): NoticeItem {
+function mapNoticeItem(item: NoticeWireItem): NoticeItem {
   return {
     id: item.noticeId != null ? String(item.noticeId) : "",
     title: item.noticeTitle,
@@ -28,7 +40,7 @@ function mapNoticeItem(item: Record<string, any>): NoticeItem {
     type: item.noticeType != null ? Number(item.noticeType) : 1,
     level: "L",
     publishStatus: mapNoticeStatusToPublishStatus(item.status),
-    isRead: 0,
+    isRead: item.isRead ?? 0,
     publishTime: item.status === "0" ? (item.updateTime ?? item.createTime) : undefined,
     revokeTime: item.status === "1" ? item.updateTime : undefined,
     createTime: item.createTime,
@@ -53,7 +65,7 @@ function buildNoticePayload(data: NoticeForm) {
 const NoticeAPI = {
   /** 获取通知公告分页数据 */
   async getPage(queryParams?: NoticeQueryParams) {
-    const data = await request<any, PageResult<Record<string, any>>>({
+    const data = await request<unknown, PageResult<NoticeWireItem>>({
       url: `${NOTICE_BASE_URL}/list`,
       method: "get",
       params: {
@@ -155,12 +167,21 @@ const NoticeAPI = {
 
   /** 全部已读 */
   readAll() {
-    return Promise.resolve(true);
+    return request({ url: `${NOTICE_BASE_URL}/my/read-all`, method: "post" });
+  },
+
+  markRead(id: string) {
+    return request({ url: `${NOTICE_BASE_URL}/my/${id}/read`, method: "post" });
   },
 
   /** 获取我的通知分页列表 */
-  getMyNoticePage(queryParams?: NoticeQueryParams) {
-    return this.getPage(queryParams);
+  async getMyNoticePage(queryParams?: NoticeQueryParams) {
+    const page = await request<unknown, PageResult<NoticeWireItem>>({
+      url: `${NOTICE_BASE_URL}/my`,
+      method: "get",
+      params: queryParams,
+    });
+    return { ...page, items: page.items.map(mapNoticeItem) };
   },
 };
 

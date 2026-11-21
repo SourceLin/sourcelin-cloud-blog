@@ -224,7 +224,7 @@ import { showInfoToast } from '@/utils/feedback';
 import { normalizeAssetUrl } from '@/utils/url';
 import SThemeSheet from '../components/s-theme-sheet/s-theme-sheet.vue';
 
-const { userStore, can } = useMiniAccess();
+const { userStore, can, guard } = useMiniAccess();
 const themeStore = useThemeStore();
 const articleId = ref(0);
 const article = ref<ArticleDetail | null>(null);
@@ -600,6 +600,9 @@ async function tryRestoreReadingProgress(id: number): Promise<void> {
 }
 
 onLoad((options) => {
+  if (!guard('articleReadEnabled')) {
+    return;
+  }
   const id = Number(options?.id);
   if (!Number.isFinite(id) || id <= 0) {
     showInfoToast('文章参数无效');

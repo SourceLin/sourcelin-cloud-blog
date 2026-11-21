@@ -424,7 +424,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background: var(--surface-code-inline, #1e1e1e);
+  background: var(--surface-code-inline, var(--avatar-crop-background));
   transition: border-color var(--transition-base), background var(--transition-base), transform var(--transition-base);
   text-align: center;
   padding: var(--spacing-lg);
@@ -432,14 +432,14 @@ onBeforeUnmount(() => {
 
   &:hover {
     border-color: var(--primary-color);
-    background: color-mix(in srgb, var(--primary-color) 4%, var(--surface-code-inline, #1e1e1e));
+    background: color-mix(in srgb, var(--primary-color) 4%, var(--surface-code-inline, var(--avatar-crop-background)));
     transform: scale(1.01);
   }
 }
 
 .cropper-dropzone--dragover {
   border-color: var(--primary-color);
-  background: color-mix(in srgb, var(--primary-color) 8%, var(--surface-code-inline, #1e1e1e));
+  background: color-mix(in srgb, var(--primary-color) 8%, var(--surface-code-inline, var(--avatar-crop-background)));
   transform: scale(1.02);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-color) 12%, transparent);
 }
@@ -490,9 +490,9 @@ onBeforeUnmount(() => {
   height: 280px;
   border-radius: var(--border-radius-lg);
   overflow: hidden;
-  background: var(--surface-code-inline, #1e1e1e);
+  background: var(--surface-code-inline, var(--avatar-crop-background));
   user-select: none;
-  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 0 12px color-mix(in srgb, var(--ai-neutral-dark) 40%, transparent);
 }
 
 .cropper-image-wrapper {
@@ -530,7 +530,7 @@ onBeforeUnmount(() => {
   height: 180px;
   border-radius: 50%;
   border: 2px dashed var(--primary-color);
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 0 9999px color-mix(in srgb, var(--ai-neutral-dark) 60%, transparent);
 }
 
 .cropper-controls {
@@ -579,7 +579,7 @@ onBeforeUnmount(() => {
     border-radius: 50%;
     background: var(--primary-color);
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px color-mix(in srgb, var(--ai-neutral-dark) 20%, transparent);
     transition: transform var(--transition-base);
   }
 

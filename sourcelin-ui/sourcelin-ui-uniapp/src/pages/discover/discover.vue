@@ -3,7 +3,7 @@
     <s-loading :visible="loading && hotArticles.length === 0" />
 
     <!-- 搜索条 -->
-    <view class="discover__search-bar" @tap="goSearch">
+    <view v-if="can('searchEnabled')" class="discover__search-bar" @tap="goSearch">
       <uni-icons type="search" size="18" color="currentColor" />
       <text class="discover__search-placeholder">搜索文章、分类或标签</text>
     </view>
@@ -74,7 +74,7 @@
           <view>
             <text class="discover__section-title">分类漫游</text>
           </view>
-          <view class="discover__more sl-button sl-button--ghost sl-button--sm" @tap="goSearch">搜索</view>
+          <view v-if="can('searchEnabled')" class="discover__more sl-button sl-button--ghost sl-button--sm" @tap="goSearch">搜索</view>
         </view>
         <view v-if="categories.length > 0" class="discover__category-mosaic">
           <!-- 第 1 个分类：跨列大卡 -->
@@ -145,7 +145,7 @@ import { useBackToTop } from '@/shared/composables/useBackToTop';
 import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 const themeStore = useThemeStore();
-const { resolveLiquidTabs } = useMiniAccess();
+const { can, resolveLiquidTabs, capabilityStore } = useMiniAccess();
 
 const loading = ref(false);
 const hotArticles = ref<ArticleSummary[]>([]);
@@ -165,7 +165,8 @@ watch([hotArticles, categories], () => {
   });
 }, { immediate: true });
 
-onShow(() => {
+onShow(async () => {
+  await capabilityStore.waitUntilReady();
   themeStore.syncNativeArea();
   if (hotArticles.value.length === 0 && categories.value.length === 0) {
     loadDiscover();

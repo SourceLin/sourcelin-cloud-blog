@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.ai.mapper.AiAbilityConfigMapper">
+
+    <resultMap type="com.sourcelin.ai.domain.AiAbilityConfig" id="AiAbilityConfigResult">
+        <result property="id" column="id" />
+        <result property="abilityCode" column="ability_code" />
+        <result property="abilityName" column="ability_name" />
+        <result property="appCode" column="app_code" />
+        <result property="domainCode" column="domain_code" />
+        <result property="providerType" column="provider_type" />
+        <result property="providerAppId" column="provider_app_id" />
+        <result property="providerWorkflowId" column="provider_workflow_id" />
+        <result property="endpointUrl" column="endpoint_url" />
+        <result property="authConfigRef" column="auth_config_ref" />
+        <result property="apiKey" column="api_key" typeHandler="com.sourcelin.ai.security.AiApiKeyTypeHandler" />
+        <result property="promptTemplate" column="prompt_template" />
+        <result property="invokeMode" column="invoke_mode" />
+        <result property="enabled" column="enabled" />
+        <result property="version" column="version" />
+        <result property="chatMode" column="chat_mode" />
+        <result property="remark" column="remark" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectAiAbilityConfigVo">
+        select id, ability_code, ability_name, app_code, domain_code, provider_type,
+               provider_app_id, provider_workflow_id, endpoint_url, auth_config_ref,
+               api_key,
+               prompt_template, invoke_mode, enabled, version, chat_mode, remark, create_time, update_time
+        from ai_ability_config
+    </sql>
+
+    <select id="selectByAbilityCode" parameterType="String" resultMap="AiAbilityConfigResult">
+        <include refid="selectAiAbilityConfigVo"/>
+        where ability_code = #{abilityCode}
+    </select>
+
+    <select id="selectList" parameterType="com.sourcelin.ai.domain.AiAbilityConfig" resultMap="AiAbilityConfigResult">
+        <include refid="selectAiAbilityConfigVo"/>
+        <where>
+            <if test="abilityCode != null and abilityCode != ''"> and ability_code = #{abilityCode}</if>
+            <if test="abilityName != null and abilityName != ''"> and ability_name like concat('%', #{abilityName}, '%')</if>
+            <if test="providerType != null and providerType != ''"> and provider_type = #{providerType}</if>
+            <if test="enabled != null and enabled != ''"> and enabled = #{enabled}</if>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.sourcelin.ai.domain.AiAbilityConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into ai_ability_config (
+            <if test="abilityCode != null and abilityCode != ''">ability_code,</if>
+            <if test="abilityName != null and abilityName != ''">ability_name,</if>
+            <if test="appCode != null and appCode != ''">app_code,</if>
+            <if test="domainCode != null and domainCode != ''">domain_code,</if>
+            <if test="providerType != null and providerType != ''">provider_type,</if>
+            <if test="providerAppId != null and providerAppId != ''">provider_app_id,</if>
+            <if test="providerWorkflowId != null and providerWorkflowId != ''">provider_workflow_id,</if>
+            <if test="endpointUrl != null and endpointUrl != ''">endpoint_url,</if>
+            <if test="authConfigRef != null and authConfigRef != ''">auth_config_ref,</if>
+            <if test="apiKey != null and apiKey != ''">api_key,</if>
+            <if test="promptTemplate != null and promptTemplate != ''">prompt_template,</if>
+            <if test="invokeMode != null and invokeMode != ''">invoke_mode,</if>
+            <if test="enabled != null and enabled != ''">enabled,</if>
+            <if test="version != null">version,</if>
+            <if test="chatMode != null and chatMode != ''">chat_mode,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time, update_time
+        ) values (
+            <if test="abilityCode != null and abilityCode != ''">#{abilityCode},</if>
+            <if test="abilityName != null and abilityName != ''">#{abilityName},</if>
+            <if test="appCode != null and appCode != ''">#{appCode},</if>
+            <if test="domainCode != null and domainCode != ''">#{domainCode},</if>
+            <if test="providerType != null and providerType != ''">#{providerType},</if>
+            <if test="providerAppId != null and providerAppId != ''">#{providerAppId},</if>
+            <if test="providerWorkflowId != null and providerWorkflowId != ''">#{providerWorkflowId},</if>
+            <if test="endpointUrl != null and endpointUrl != ''">#{endpointUrl},</if>
+            <if test="authConfigRef != null and authConfigRef != ''">#{authConfigRef},</if>
+            <if test="apiKey != null and apiKey != ''">#{apiKey,typeHandler=com.sourcelin.ai.security.AiApiKeyTypeHandler},</if>
+            <if test="promptTemplate != null and promptTemplate != ''">#{promptTemplate},</if>
+            <if test="invokeMode != null and invokeMode != ''">#{invokeMode},</if>
+            <if test="enabled != null and enabled != ''">#{enabled},</if>
+            <if test="version != null">#{version},</if>
+            <if test="chatMode != null and chatMode != ''">#{chatMode},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate(), sysdate()
+        )
+    </insert>
+
+    <update id="update" parameterType="com.sourcelin.ai.domain.AiAbilityConfig">
+        update ai_ability_config
+        <set>
+            <if test="abilityName != null and abilityName != ''">ability_name = #{abilityName},</if>
+            <if test="appCode != null and appCode != ''">app_code = #{appCode},</if>
+            <if test="domainCode != null and domainCode != ''">domain_code = #{domainCode},</if>
+            <if test="providerType != null and providerType != ''">provider_type = #{providerType},</if>
+            <if test="providerAppId != null and providerAppId != ''">provider_app_id = #{providerAppId},</if>
+            <if test="providerWorkflowId != null and providerWorkflowId != ''">provider_workflow_id = #{providerWorkflowId},</if>
+            <if test="endpointUrl != null and endpointUrl != ''">endpoint_url = #{endpointUrl},</if>
+            <if test="authConfigRef != null and authConfigRef != ''">auth_config_ref = #{authConfigRef},</if>
+            <if test="apiKey != null and apiKey != ''">api_key = #{apiKey,typeHandler=com.sourcelin.ai.security.AiApiKeyTypeHandler},</if>
+            <if test="promptTemplate != null and promptTemplate != ''">prompt_template = #{promptTemplate},</if>
+            <if test="invokeMode != null and invokeMode != ''">invoke_mode = #{invokeMode},</if>
+            <if test="enabled != null and enabled != ''">enabled = #{enabled},</if>
+            <if test="version != null">version = #{version},</if>
+            <if test="chatMode != null and chatMode != ''">chat_mode = #{chatMode},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from ai_ability_config where id = #{id}
+    </delete>
+</mapper>

@@ -1,5 +1,5 @@
 import request from "@/utils/request";
-import type { BloggerApplyItem, BloggerApplyQueryParams } from "@/types/api";
+import type { BloggerApplyQueryParams } from "@/types/api";
 
 const BloggerApplyAPI = {
   listApply(params: BloggerApplyQueryParams) {

@@ -19,7 +19,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import BloggerApplyAPI from "@/api/blog/bloggerApply";
 import ModuleListShell from "../shared/ModuleListShell.vue";
 import type { FormField, QueryField, TableColumn } from "../shared/types/module-list-shell";

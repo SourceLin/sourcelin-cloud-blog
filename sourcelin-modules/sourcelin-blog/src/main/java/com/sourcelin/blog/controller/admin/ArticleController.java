@@ -4,10 +4,13 @@ import com.sourcelin.blog.domain.Article;
 import com.sourcelin.blog.domain.Tag;
 import com.sourcelin.blog.dto.ArticleInsertDTO;
 import com.sourcelin.blog.service.IArticleService;
+import com.sourcelin.blog.service.IArticleKnowledgeSyncService;
 import com.sourcelin.blog.service.ICategoryService;
 import com.sourcelin.blog.service.ITagService;
 import com.sourcelin.blog.shared.support.BlogPageResults;
 import com.sourcelin.blog.vo.AdminArticleDetailVO;
+import com.sourcelin.blog.vo.ArticleKnowledgeBatchSyncVO;
+import com.sourcelin.blog.vo.ArticleKnowledgeSyncVO;
 import com.sourcelin.blog.vo.ArticleVO;
 import com.sourcelin.common.core.enums.ResultCode;
 import com.sourcelin.common.core.exception.BusinessException;
@@ -45,6 +48,8 @@ public class ArticleController
     private ICategoryService categoryService;
     @Autowired
     private ITagService tagService;
+    @Autowired
+    private IArticleKnowledgeSyncService articleKnowledgeSyncService;
 
     /**
      * 查询博客文章列表
@@ -138,5 +143,27 @@ public class ArticleController
             throw new BusinessException(ResultCode.SYSTEM_ERROR, "删除文章失败");
         }
         return null;
+    }
+
+    /**
+     * 手动同步单篇文章到 Dify 知识库。
+     */
+    @SaCheckPermission(type = "admin", value = "blog:article:edit")
+    @Log(title = "博客文章知识库同步", businessType = BusinessType.UPDATE)
+    @PostMapping("/{id}/knowledge/sync")
+    public ArticleKnowledgeSyncVO syncKnowledge(@PathVariable("id") Long id)
+    {
+        return articleKnowledgeSyncService.syncArticle(id);
+    }
+
+    /**
+     * 手动同步所有公开已发布文章到 Dify 知识库。
+     */
+    @SaCheckPermission(type = "admin", value = "blog:article:edit")
+    @Log(title = "博客文章知识库批量同步", businessType = BusinessType.UPDATE)
+    @PostMapping("/knowledge/sync-published")
+    public ArticleKnowledgeBatchSyncVO syncPublishedKnowledge()
+    {
+        return articleKnowledgeSyncService.syncPublishedArticles();
     }
 }

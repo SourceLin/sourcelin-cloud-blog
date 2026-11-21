@@ -72,7 +72,7 @@ public class MobileCapabilityServiceImpl implements IMobileCapabilityService
 
     /**
      * 修改能力配置
-     * 
+     *
      * @param mobileCapability 能力配置
      * @return 结果
      */

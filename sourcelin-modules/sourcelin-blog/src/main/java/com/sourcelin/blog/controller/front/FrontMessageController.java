@@ -71,6 +71,12 @@ public class FrontMessageController extends BaseController
         return true;
     }
 
+    @org.springframework.beans.factory.annotation.Value("${blog.message.enabled:false}")
+    private boolean realtimeEnabled;
+
+    @GetMapping("/realtime-status")
+    public Boolean realtimeStatus() { return realtimeEnabled; }
+
     @GetMapping("/unread-count")
     public AnnouncementUnreadVO unreadCount()
     {

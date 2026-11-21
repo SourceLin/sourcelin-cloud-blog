@@ -409,4 +409,3 @@ export interface BloggerApplyQueryParams extends BlogQueryParams {
   username?: string;
   nickname?: string;
 }
-

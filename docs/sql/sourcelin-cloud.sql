@@ -6,10 +6,179 @@ SET FOREIGN_KEY_CHECKS = 0;
 CREATE DATABASE IF NOT EXISTS `sourcelin-cloud` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `sourcelin-cloud`;
 
+CREATE TABLE `ai_ability_config` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `ability_code` VARCHAR(100) NOT NULL COMMENT 'AI能力编码',
+  `ability_name` VARCHAR(100) NOT NULL COMMENT 'AI能力名称',
+  `app_code` VARCHAR(50) DEFAULT 'blog' COMMENT '应用编码',
+  `domain_code` VARCHAR(50) DEFAULT NULL COMMENT '业务域编码',
+  `provider_type` VARCHAR(30) NOT NULL COMMENT '平台类型：dify/fastgpt/maxkb/ragflow/direct_llm/custom',
+  `provider_app_id` VARCHAR(100) DEFAULT NULL COMMENT '平台应用ID',
+  `provider_workflow_id` VARCHAR(100) DEFAULT NULL COMMENT '平台Workflow ID',
+  `endpoint_url` VARCHAR(500) DEFAULT NULL COMMENT '调用地址',
+  `auth_config_ref` VARCHAR(100) DEFAULT NULL COMMENT '鉴权配置引用',
+  `api_key` TEXT DEFAULT NULL COMMENT '直接持有的API KEY',
+  `prompt_template` MEDIUMTEXT DEFAULT NULL COMMENT 'Prompt模板，支持{变量}占位符',
+  `invoke_mode` VARCHAR(20) NOT NULL COMMENT '调用模式：sync/sse/async',
+  `chat_mode` VARCHAR(20) DEFAULT 'workflow' COMMENT 'Dify 应用模式：workflow / chat',
+  `enabled` CHAR(1) NOT NULL DEFAULT '0' COMMENT '是否启用',
+  `version` INT NOT NULL DEFAULT 1 COMMENT '配置版本',
+  `remark` VARCHAR(500) DEFAULT NULL COMMENT '备注',
+  `create_time` DATETIME DEFAULT NULL COMMENT '创建时间',
+  `update_time` DATETIME DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_ai_ability_code` (`ability_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='AI能力配置表';
+
+CREATE TABLE `ai_conversation` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `session_key` VARCHAR(256) NOT NULL COMMENT '前端生成的完整 session_id',
+  `ability_code` VARCHAR(100) NOT NULL COMMENT 'AI能力编码',
+  `conversation_id` VARCHAR(200) NOT NULL COMMENT 'Dify 侧 conversation_id',
+  `user_id` VARCHAR(100) DEFAULT NULL COMMENT '用户ID（登录用户）',
+  `tenant_id` VARCHAR(100) DEFAULT NULL COMMENT '租户ID',
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_session_ability` (`session_key`, `ability_code`),
+  KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI会话映射表';
+
+CREATE TABLE `ai_call_log` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `request_id` VARCHAR(100) NOT NULL COMMENT '请求ID',
+  `app_code` VARCHAR(50) DEFAULT 'blog' COMMENT '应用编码',
+  `domain_code` VARCHAR(50) DEFAULT NULL COMMENT '业务域编码',
+  `ability_code` VARCHAR(100) NOT NULL COMMENT 'AI能力编码',
+  `biz_id` VARCHAR(100) DEFAULT NULL COMMENT '业务对象ID',
+  `user_id` VARCHAR(100) DEFAULT NULL COMMENT '触发用户ID',
+  `tenant_id` VARCHAR(100) DEFAULT NULL COMMENT '租户ID',
+  `provider_type` VARCHAR(30) NOT NULL COMMENT '平台类型',
+  `provider_trace_id` VARCHAR(100) DEFAULT NULL COMMENT '平台侧追踪ID',
+  `invoke_mode` VARCHAR(20) NOT NULL COMMENT '调用模式',
+  `request_summary` TEXT COMMENT '请求摘要',
+  `response_summary` TEXT COMMENT '响应摘要',
+  `status` VARCHAR(20) NOT NULL COMMENT '状态：success/failed/timeout/cancelled',
+  `error_code` VARCHAR(100) DEFAULT NULL COMMENT '错误码',
+  `error_message` VARCHAR(1000) DEFAULT NULL COMMENT '错误信息',
+  `latency_ms` BIGINT DEFAULT NULL COMMENT '耗时毫秒',
+  `token_usage` BIGINT DEFAULT NULL COMMENT 'Token用量',
+  `cost_amount` DECIMAL(12, 6) DEFAULT NULL COMMENT '成本金额',
+  `create_time` DATETIME DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_ai_call_request` (`request_id`),
+  KEY `idx_ai_call_ability_time` (`ability_code`, `create_time`),
+  KEY `idx_ai_call_biz` (`biz_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='AI调用日志表';
+
+CREATE TABLE `ai_task` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `task_id` VARCHAR(100) NOT NULL COMMENT '任务ID',
+  `request_id` VARCHAR(100) NOT NULL COMMENT '请求ID',
+  `app_code` VARCHAR(50) DEFAULT 'blog' COMMENT '应用编码',
+  `domain_code` VARCHAR(50) DEFAULT NULL COMMENT '业务域编码',
+  `ability_code` VARCHAR(100) NOT NULL COMMENT 'AI能力编码',
+  `biz_id` VARCHAR(100) DEFAULT NULL COMMENT '业务对象ID',
+  `user_id` VARCHAR(100) DEFAULT NULL COMMENT '触发用户ID',
+  `tenant_id` VARCHAR(100) DEFAULT NULL COMMENT '租户ID',
+  `status` VARCHAR(20) NOT NULL COMMENT '状态：pending/running/succeeded/failed/cancelled',
+  `progress` INT NOT NULL DEFAULT 0 COMMENT '进度',
+  `input_snapshot` MEDIUMTEXT COMMENT '输入快照',
+  `result_snapshot` MEDIUMTEXT COMMENT '结果快照',
+  `error_message` VARCHAR(1000) DEFAULT NULL COMMENT '错误信息',
+  `retry_count` INT NOT NULL DEFAULT 0 COMMENT '重试次数',
+  `callback_url` VARCHAR(500) DEFAULT NULL COMMENT '回调地址',
+  `started_time` DATETIME DEFAULT NULL COMMENT '开始时间',
+  `finished_time` DATETIME DEFAULT NULL COMMENT '完成时间',
+  `create_time` DATETIME DEFAULT NULL COMMENT '创建时间',
+  `update_time` DATETIME DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_ai_task_id` (`task_id`),
+  KEY `idx_ai_task_biz` (`biz_id`),
+  KEY `idx_ai_task_status_time` (`status`, `create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='AI异步任务表';
+
+CREATE TABLE `ai_task_event` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `task_id` VARCHAR(100) NOT NULL COMMENT '任务ID',
+  `event_type` VARCHAR(50) NOT NULL COMMENT '事件类型',
+  `event_message` VARCHAR(1000) DEFAULT NULL COMMENT '事件说明',
+  `event_payload` MEDIUMTEXT COMMENT '事件内容',
+  `create_time` DATETIME DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_ai_task_event_task` (`task_id`, `create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='AI任务事件表';
+
+CREATE TABLE `b_blog_ai_record` (
+  `owner_id` VARCHAR(100) DEFAULT NULL COMMENT '创建者身份域及编号',
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `ability_code` VARCHAR(100) NOT NULL COMMENT 'AI能力编码',
+  `biz_id` VARCHAR(100) DEFAULT NULL COMMENT '关联业务对象ID',
+  `ai_result` MEDIUMTEXT DEFAULT NULL COMMENT 'AI生成的结果内容',
+  `status` VARCHAR(20) NOT NULL DEFAULT 'pending' COMMENT '采纳状态：pending/adopted/discarded/failed',
+  `adopt_user_id` VARCHAR(100) DEFAULT NULL COMMENT '采纳人用户ID',
+  `adopt_time` DATETIME DEFAULT NULL COMMENT '采纳时间',
+  `create_time` DATETIME DEFAULT NULL COMMENT '创建时间',
+  `update_time` DATETIME DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_blog_ai_biz` (`biz_id`),
+  KEY `idx_blog_ai_ability` (`ability_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='博客AI记录表';
+
+CREATE TABLE `b_article_knowledge_sync` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `article_id` BIGINT NOT NULL COMMENT '文章ID',
+  `source_type` VARCHAR(30) NOT NULL DEFAULT 'article' COMMENT '来源类型',
+  `ability_code` VARCHAR(100) NOT NULL DEFAULT 'dify_knowledge_article_sync' COMMENT '同步能力编码',
+  `document_id` VARCHAR(100) DEFAULT NULL COMMENT 'Dify 文档ID',
+  `content_hash` CHAR(64) DEFAULT NULL COMMENT '同步内容 SHA-256',
+  `sync_status` VARCHAR(20) NOT NULL DEFAULT 'pending' COMMENT '同步状态：pending/success/failed/skipped',
+  `indexing_status` VARCHAR(50) DEFAULT NULL COMMENT 'Dify 索引状态',
+  `batch` VARCHAR(100) DEFAULT NULL COMMENT 'Dify 索引批次',
+  `error_message` VARCHAR(1000) DEFAULT NULL COMMENT '失败原因',
+  `last_sync_time` DATETIME DEFAULT NULL COMMENT '最后同步时间',
+  `create_time` DATETIME DEFAULT NULL COMMENT '创建时间',
+  `update_time` DATETIME DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_article_knowledge_article` (`article_id`),
+  KEY `idx_article_knowledge_doc` (`document_id`),
+  KEY `idx_article_knowledge_status` (`sync_status`, `last_sync_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='文章知识库同步记录表';
+
+CREATE TABLE `b_mobile_capability` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `client` varchar(20) NOT NULL COMMENT '客户端类型(mini/h5/app)',
+  `review_safe_mode` tinyint(1) NOT NULL DEFAULT '1' COMMENT '小程序安全模式',
+  `article_read_enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '文章阅读',
+  `search_enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '搜索',
+  `profile_enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '个人资料',
+  `favorite_enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '收藏',
+  `reading_history_enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '阅读历史',
+  `settings_enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '体验设置',
+  `policy_enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '协议与政策',
+  `about_enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '关于本站',
+  `friend_link_enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '友情链接',
+  `navigation_enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '网站导航',
+  `article_publish_enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '写文章',
+  `article_publish_role` varchar(50) DEFAULT 'blogger' COMMENT '允许写文章的最小角色',
+  `comment_enabled` tinyint(1) NOT NULL DEFAULT '0' COMMENT '评论与回复',
+  `community_enabled` tinyint(1) NOT NULL DEFAULT '0' COMMENT '社区Tab',
+  `say_publish_enabled` tinyint(1) NOT NULL DEFAULT '0' COMMENT '发布说说',
+  `treehole_enabled` tinyint(1) NOT NULL DEFAULT '0' COMMENT '树洞投递',
+  `interaction_center_enabled` tinyint(1) NOT NULL DEFAULT '0' COMMENT '我的互动',
+  `follow_enabled` tinyint(1) NOT NULL DEFAULT '0' COMMENT '关注/粉丝',
+  `message_center_enabled` tinyint(1) NOT NULL DEFAULT '0' COMMENT '消息中心',
+  `user_home_enabled` tinyint(1) NOT NULL DEFAULT '0' COMMENT '用户主页',
+  `user_upload_enabled` tinyint(1) NOT NULL DEFAULT '0' COMMENT '普通用户上传图片/音频',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_client` (`client`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='移动端能力配置表';
+
 -- ----------------------------
 -- Table structure for `announcement`
 -- ----------------------------
-DROP TABLE IF EXISTS `announcement`;
 CREATE TABLE `announcement` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `title` varchar(200) NOT NULL COMMENT '标题',
@@ -33,7 +202,6 @@ CREATE TABLE `announcement` (
 -- ----------------------------
 -- Table structure for `announcement_read`
 -- ----------------------------
-DROP TABLE IF EXISTS `announcement_read`;
 CREATE TABLE `announcement_read` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `announcement_id` bigint(20) NOT NULL COMMENT '公告ID',
@@ -48,7 +216,6 @@ CREATE TABLE `announcement_read` (
 -- ----------------------------
 -- Table structure for `b_article`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_article`;
 CREATE TABLE `b_article` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户id',
@@ -83,7 +250,6 @@ CREATE TABLE `b_article` (
 -- ----------------------------
 -- Table structure for `b_article_tag`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_article_tag`;
 CREATE TABLE `b_article_tag` (
   `article_id` bigint(20) NOT NULL COMMENT '文章ID',
   `tag_id` bigint(20) NOT NULL COMMENT '标签ID',
@@ -95,7 +261,6 @@ CREATE TABLE `b_article_tag` (
 -- ----------------------------
 -- Table structure for `b_category`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_category`;
 CREATE TABLE `b_category` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '博客分类ID',
   `name` varchar(255) NOT NULL COMMENT '名称',
@@ -115,7 +280,6 @@ CREATE TABLE `b_category` (
 -- ----------------------------
 -- Table structure for `b_collect`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_collect`;
 CREATE TABLE `b_collect` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `user_id` bigint(20) NOT NULL COMMENT '用户id',
@@ -136,7 +300,6 @@ CREATE TABLE `b_collect` (
 -- ----------------------------
 -- Table structure for `b_comment`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_comment`;
 CREATE TABLE `b_comment` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户id',
@@ -167,7 +330,6 @@ CREATE TABLE `b_comment` (
 -- ----------------------------
 -- Table structure for `b_comment_moderation`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_comment_moderation`;
 CREATE TABLE `b_comment_moderation` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `comment_id` bigint(20) NOT NULL COMMENT '评论ID b_comment.id',
@@ -183,7 +345,6 @@ CREATE TABLE `b_comment_moderation` (
 -- ----------------------------
 -- Table structure for `b_follow`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_follow`;
 CREATE TABLE `b_follow` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `user_id` bigint(20) NOT NULL COMMENT '用户id',
@@ -202,7 +363,6 @@ CREATE TABLE `b_follow` (
 -- ----------------------------
 -- Table structure for `b_friend_link`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_friend_link`;
 CREATE TABLE `b_friend_link` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `name` varchar(50) NOT NULL COMMENT '名称',
@@ -230,7 +390,6 @@ CREATE TABLE `b_friend_link` (
 -- ----------------------------
 -- Table structure for `b_like_record`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_like_record`;
 CREATE TABLE `b_like_record` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `user_id` bigint(20) NOT NULL COMMENT '用户ID',
@@ -247,7 +406,6 @@ CREATE TABLE `b_like_record` (
 -- ----------------------------
 -- Table structure for `b_navigation`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_navigation`;
 CREATE TABLE `b_navigation` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(128) NOT NULL COMMENT '名称',
@@ -274,7 +432,6 @@ CREATE TABLE `b_navigation` (
 -- ----------------------------
 -- Table structure for `b_say`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_say`;
 CREATE TABLE `b_say` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户id',
@@ -299,7 +456,6 @@ CREATE TABLE `b_say` (
 -- ----------------------------
 -- Table structure for `b_tag`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_tag`;
 CREATE TABLE `b_tag` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '标签ID',
   `name` varchar(255) NOT NULL COMMENT '名称',
@@ -319,7 +475,6 @@ CREATE TABLE `b_tag` (
 -- ----------------------------
 -- Table structure for `b_treehole`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_treehole`;
 CREATE TABLE `b_treehole` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户id（可为空，匿名）',
@@ -346,7 +501,6 @@ CREATE TABLE `b_treehole` (
 -- ----------------------------
 -- Table structure for `b_user`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_user`;
 CREATE TABLE `b_user` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '用户id',
   `username` varchar(75) NOT NULL COMMENT '用户账号',
@@ -388,7 +542,6 @@ CREATE TABLE `b_user` (
 -- ----------------------------
 -- Table structure for `b_web_config`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_web_config`;
 CREATE TABLE `b_web_config` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `logo` varchar(255) DEFAULT NULL COMMENT '网站logo',
@@ -427,7 +580,6 @@ CREATE TABLE `b_web_config` (
 -- ----------------------------
 -- Table structure for `b_web_navbar`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_web_navbar`;
 CREATE TABLE `b_web_navbar` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '导航栏ID',
   `name` varchar(50) NOT NULL COMMENT '导航栏名称',
@@ -454,7 +606,6 @@ CREATE TABLE `b_web_navbar` (
 -- ----------------------------
 -- Table structure for `file_info`
 -- ----------------------------
-DROP TABLE IF EXISTS `file_info`;
 CREATE TABLE `file_info` (
   `file_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '文件ID',
   `file_name` varchar(255) NOT NULL COMMENT '存储文件名',
@@ -490,7 +641,6 @@ CREATE TABLE `file_info` (
 -- ----------------------------
 -- Table structure for `gen_table`
 -- ----------------------------
-DROP TABLE IF EXISTS `gen_table`;
 CREATE TABLE `gen_table` (
   `table_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
   `table_name` varchar(200) DEFAULT '' COMMENT '表名称',
@@ -518,7 +668,6 @@ CREATE TABLE `gen_table` (
 -- ----------------------------
 -- Table structure for `gen_table_column`
 -- ----------------------------
-DROP TABLE IF EXISTS `gen_table_column`;
 CREATE TABLE `gen_table_column` (
   `column_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
   `table_id` bigint(20) DEFAULT NULL COMMENT '归属表编号',
@@ -548,7 +697,6 @@ CREATE TABLE `gen_table_column` (
 -- ----------------------------
 -- Table structure for `qrtz_blob_triggers`
 -- ----------------------------
-DROP TABLE IF EXISTS `qrtz_blob_triggers`;
 CREATE TABLE `qrtz_blob_triggers` (
   `sched_name` varchar(120) NOT NULL COMMENT '调度名称',
   `trigger_name` varchar(200) NOT NULL COMMENT 'qrtz_triggers表trigger_name的外键',
@@ -561,7 +709,6 @@ CREATE TABLE `qrtz_blob_triggers` (
 -- ----------------------------
 -- Table structure for `qrtz_calendars`
 -- ----------------------------
-DROP TABLE IF EXISTS `qrtz_calendars`;
 CREATE TABLE `qrtz_calendars` (
   `sched_name` varchar(120) NOT NULL COMMENT '调度名称',
   `calendar_name` varchar(200) NOT NULL COMMENT '日历名称',
@@ -572,7 +719,6 @@ CREATE TABLE `qrtz_calendars` (
 -- ----------------------------
 -- Table structure for `qrtz_cron_triggers`
 -- ----------------------------
-DROP TABLE IF EXISTS `qrtz_cron_triggers`;
 CREATE TABLE `qrtz_cron_triggers` (
   `sched_name` varchar(120) NOT NULL COMMENT '调度名称',
   `trigger_name` varchar(200) NOT NULL COMMENT 'qrtz_triggers表trigger_name的外键',
@@ -586,7 +732,6 @@ CREATE TABLE `qrtz_cron_triggers` (
 -- ----------------------------
 -- Table structure for `qrtz_fired_triggers`
 -- ----------------------------
-DROP TABLE IF EXISTS `qrtz_fired_triggers`;
 CREATE TABLE `qrtz_fired_triggers` (
   `sched_name` varchar(120) NOT NULL COMMENT '调度名称',
   `entry_id` varchar(95) NOT NULL COMMENT '调度器实例id',
@@ -607,7 +752,6 @@ CREATE TABLE `qrtz_fired_triggers` (
 -- ----------------------------
 -- Table structure for `qrtz_job_details`
 -- ----------------------------
-DROP TABLE IF EXISTS `qrtz_job_details`;
 CREATE TABLE `qrtz_job_details` (
   `sched_name` varchar(120) NOT NULL COMMENT '调度名称',
   `job_name` varchar(200) NOT NULL COMMENT '任务名称',
@@ -625,7 +769,6 @@ CREATE TABLE `qrtz_job_details` (
 -- ----------------------------
 -- Table structure for `qrtz_locks`
 -- ----------------------------
-DROP TABLE IF EXISTS `qrtz_locks`;
 CREATE TABLE `qrtz_locks` (
   `sched_name` varchar(120) NOT NULL COMMENT '调度名称',
   `lock_name` varchar(40) NOT NULL COMMENT '悲观锁名称',
@@ -635,7 +778,6 @@ CREATE TABLE `qrtz_locks` (
 -- ----------------------------
 -- Table structure for `qrtz_paused_trigger_grps`
 -- ----------------------------
-DROP TABLE IF EXISTS `qrtz_paused_trigger_grps`;
 CREATE TABLE `qrtz_paused_trigger_grps` (
   `sched_name` varchar(120) NOT NULL COMMENT '调度名称',
   `trigger_group` varchar(200) NOT NULL COMMENT 'qrtz_triggers表trigger_group的外键',
@@ -645,7 +787,6 @@ CREATE TABLE `qrtz_paused_trigger_grps` (
 -- ----------------------------
 -- Table structure for `qrtz_scheduler_state`
 -- ----------------------------
-DROP TABLE IF EXISTS `qrtz_scheduler_state`;
 CREATE TABLE `qrtz_scheduler_state` (
   `sched_name` varchar(120) NOT NULL COMMENT '调度名称',
   `instance_name` varchar(200) NOT NULL COMMENT '实例名称',
@@ -657,7 +798,6 @@ CREATE TABLE `qrtz_scheduler_state` (
 -- ----------------------------
 -- Table structure for `qrtz_simple_triggers`
 -- ----------------------------
-DROP TABLE IF EXISTS `qrtz_simple_triggers`;
 CREATE TABLE `qrtz_simple_triggers` (
   `sched_name` varchar(120) NOT NULL COMMENT '调度名称',
   `trigger_name` varchar(200) NOT NULL COMMENT 'qrtz_triggers表trigger_name的外键',
@@ -672,7 +812,6 @@ CREATE TABLE `qrtz_simple_triggers` (
 -- ----------------------------
 -- Table structure for `qrtz_simprop_triggers`
 -- ----------------------------
-DROP TABLE IF EXISTS `qrtz_simprop_triggers`;
 CREATE TABLE `qrtz_simprop_triggers` (
   `sched_name` varchar(120) NOT NULL COMMENT '调度名称',
   `trigger_name` varchar(200) NOT NULL COMMENT 'qrtz_triggers表trigger_name的外键',
@@ -695,7 +834,6 @@ CREATE TABLE `qrtz_simprop_triggers` (
 -- ----------------------------
 -- Table structure for `qrtz_triggers`
 -- ----------------------------
-DROP TABLE IF EXISTS `qrtz_triggers`;
 CREATE TABLE `qrtz_triggers` (
   `sched_name` varchar(120) NOT NULL COMMENT '调度名称',
   `trigger_name` varchar(200) NOT NULL COMMENT '触发器的名字',
@@ -721,7 +859,6 @@ CREATE TABLE `qrtz_triggers` (
 -- ----------------------------
 -- Table structure for `sys_config`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_config`;
 CREATE TABLE `sys_config` (
   `config_id` int(5) NOT NULL AUTO_INCREMENT COMMENT '参数主键',
   `config_name` varchar(100) DEFAULT '' COMMENT '参数名称',
@@ -739,7 +876,6 @@ CREATE TABLE `sys_config` (
 -- ----------------------------
 -- Table structure for `sys_dept`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_dept`;
 CREATE TABLE `sys_dept` (
   `dept_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '部门id',
   `parent_id` bigint(20) DEFAULT '0' COMMENT '父部门id',
@@ -761,7 +897,6 @@ CREATE TABLE `sys_dept` (
 -- ----------------------------
 -- Table structure for `sys_dict_data`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_dict_data`;
 CREATE TABLE `sys_dict_data` (
   `dict_code` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '字典编码',
   `dict_sort` int(4) DEFAULT '0' COMMENT '字典排序',
@@ -783,7 +918,6 @@ CREATE TABLE `sys_dict_data` (
 -- ----------------------------
 -- Table structure for `sys_dict_type`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_dict_type`;
 CREATE TABLE `sys_dict_type` (
   `dict_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '字典主键',
   `dict_name` varchar(100) DEFAULT '' COMMENT '字典名称',
@@ -801,7 +935,6 @@ CREATE TABLE `sys_dict_type` (
 -- ----------------------------
 -- Table structure for `sys_job`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_job`;
 CREATE TABLE `sys_job` (
   `job_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '任务ID',
   `job_name` varchar(64) NOT NULL DEFAULT '' COMMENT '任务名称',
@@ -822,7 +955,6 @@ CREATE TABLE `sys_job` (
 -- ----------------------------
 -- Table structure for `sys_job_log`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_job_log`;
 CREATE TABLE `sys_job_log` (
   `job_log_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '任务日志ID',
   `job_name` varchar(64) NOT NULL COMMENT '任务名称',
@@ -840,7 +972,6 @@ CREATE TABLE `sys_job_log` (
 -- ----------------------------
 -- Table structure for `sys_logininfor`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_logininfor`;
 CREATE TABLE `sys_logininfor` (
   `info_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '访问ID',
   `user_name` varchar(50) DEFAULT '' COMMENT '用户账号',
@@ -856,7 +987,6 @@ CREATE TABLE `sys_logininfor` (
 -- ----------------------------
 -- Table structure for `sys_menu`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_menu`;
 CREATE TABLE `sys_menu` (
   `menu_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '菜单ID',
   `menu_name` varchar(50) NOT NULL COMMENT '菜单名称',
@@ -884,7 +1014,6 @@ CREATE TABLE `sys_menu` (
 -- ----------------------------
 -- Table structure for `sys_notice`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_notice`;
 CREATE TABLE `sys_notice` (
   `notice_id` int(4) NOT NULL AUTO_INCREMENT COMMENT '公告ID',
   `notice_title` varchar(50) NOT NULL COMMENT '公告标题',
@@ -903,7 +1032,6 @@ CREATE TABLE `sys_notice` (
 -- ----------------------------
 -- Table structure for `sys_notice_read`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_notice_read`;
 CREATE TABLE `sys_notice_read` (
   `read_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '已读主键',
   `notice_id` int(4) NOT NULL COMMENT '公告id',
@@ -916,7 +1044,6 @@ CREATE TABLE `sys_notice_read` (
 -- ----------------------------
 -- Table structure for `sys_oper_log`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_oper_log`;
 CREATE TABLE `sys_oper_log` (
   `oper_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '日志主键',
   `title` varchar(50) DEFAULT '' COMMENT '模块标题',
@@ -944,7 +1071,6 @@ CREATE TABLE `sys_oper_log` (
 -- ----------------------------
 -- Table structure for `sys_post`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_post`;
 CREATE TABLE `sys_post` (
   `post_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '岗位ID',
   `post_code` varchar(64) NOT NULL COMMENT '岗位编码',
@@ -962,7 +1088,6 @@ CREATE TABLE `sys_post` (
 -- ----------------------------
 -- Table structure for `sys_role`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_role`;
 CREATE TABLE `sys_role` (
   `role_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '角色ID',
   `role_name` varchar(30) NOT NULL COMMENT '角色名称',
@@ -984,7 +1109,6 @@ CREATE TABLE `sys_role` (
 -- ----------------------------
 -- Table structure for `sys_role_dept`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_role_dept`;
 CREATE TABLE `sys_role_dept` (
   `role_id` bigint(20) NOT NULL COMMENT '角色ID',
   `dept_id` bigint(20) NOT NULL COMMENT '部门ID',
@@ -994,7 +1118,6 @@ CREATE TABLE `sys_role_dept` (
 -- ----------------------------
 -- Table structure for `sys_role_menu`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_role_menu`;
 CREATE TABLE `sys_role_menu` (
   `role_id` bigint(20) NOT NULL COMMENT '角色ID',
   `menu_id` bigint(20) NOT NULL COMMENT '菜单ID',
@@ -1004,7 +1127,6 @@ CREATE TABLE `sys_role_menu` (
 -- ----------------------------
 -- Table structure for `sys_user`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user` (
   `user_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
   `dept_id` bigint(20) DEFAULT NULL COMMENT '部门ID',
@@ -1034,7 +1156,6 @@ CREATE TABLE `sys_user` (
 -- ----------------------------
 -- Table structure for `sys_user_blog_relation`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_user_blog_relation`;
 CREATE TABLE `sys_user_blog_relation` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `sys_user_id` bigint(20) NOT NULL COMMENT '后台用户ID',
@@ -1050,7 +1171,6 @@ CREATE TABLE `sys_user_blog_relation` (
 -- ----------------------------
 -- Table structure for `sys_user_post`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_user_post`;
 CREATE TABLE `sys_user_post` (
   `user_id` bigint(20) NOT NULL COMMENT '用户ID',
   `post_id` bigint(20) NOT NULL COMMENT '岗位ID',
@@ -1060,7 +1180,6 @@ CREATE TABLE `sys_user_post` (
 -- ----------------------------
 -- Table structure for `sys_user_role`
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_user_role`;
 CREATE TABLE `sys_user_role` (
   `user_id` bigint(20) NOT NULL COMMENT '用户ID',
   `role_id` bigint(20) NOT NULL COMMENT '角色ID',
@@ -1198,6 +1317,11 @@ INSERT INTO `sys_dict_data` (`dict_code`, `dict_sort`, `dict_label`, `dict_value
 (20202, 2, '已发布', '1', 'blog_announcement_publish_status', '', 'success', 'N', '0', 'admin', '2026-04-16 14:36:48', '', NULL, '对前台可见'),
 (20203, 3, '已下线', '2', 'blog_announcement_publish_status', '', 'danger', 'N', '0', 'admin', '2026-04-16 14:36:48', '', NULL, '前台不可见');
 
+INSERT INTO `sys_dict_data` (`dict_sort`, `dict_label`, `dict_value`, `dict_type`, `list_class`, `status`, `create_by`, `create_time`) VALUES
+(1, '审核中', '0', 'blog_comment_audit_status', 'I', '0', 'admin', NOW()),
+(2, '通过', '1', 'blog_comment_audit_status', 'S', '0', 'admin', NOW()),
+(3, '审核未通过', '2', 'blog_comment_audit_status', 'W', '0', 'admin', NOW());
+
 -- ----------------------------
 -- Seed data for `sys_dict_type`
 -- ----------------------------
@@ -1225,6 +1349,9 @@ INSERT INTO `sys_dict_type` (`dict_id`, `dict_name`, `dict_type`, `status`, `cre
 (24, '博客登录方式', 'blog_login_type', '0', 'admin', '2026-04-05 12:36:33', '', NULL, 'login_type_list：1账号密码 2码云 3Github 4QQ 5微信'),
 (201, '博客通知公告作用域', 'blog_announcement_scope_type', '0', 'admin', '2026-04-16 14:38:29', '', NULL, 'announcement.scope_type'),
 (202, '博客通知公告发布状态', 'blog_announcement_publish_status', '0', 'admin', '2026-04-16 14:38:29', '', NULL, 'announcement.publish_status');
+
+INSERT INTO `sys_dict_type` (`dict_name`, `dict_type`, `status`, `create_by`, `create_time`, `remark`)
+VALUES ('评论审核状态', 'blog_comment_audit_status', '0', 'admin', NOW(), 'b_comment.status');
 
 -- ----------------------------
 -- Seed data for `sys_job`
@@ -1317,7 +1444,20 @@ INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`
 (1063, '博客管理', 0, 6, 'blog', NULL, NULL, 'Blog', 1, 0, 'M', '0', '0', NULL, 'Document', 'admin', '2024-07-01 20:26:15', '', NULL, ''),
 (1064, '网站配置', 1061, 1, 'config', 'blog/config/index', '', 'BlogConfig', 1, 0, 'C', '0', '0', 'blog:config:list', 'Setting', 'admin', '2024-07-01 20:28:19', '1', '2026-04-10 12:49:34', '网站配置菜单'),
 (1065, '网站配置查询', 1064, 1, '#', '', NULL, '', 1, 0, 'F', '0', '0', 'blog:config:query', 'Operation', 'admin', '2024-07-01 20:29:18', '', NULL, ''),
-(1066, '网站配置新增', 1064, 2, '#', '', NULL, '', 1, 0, 'F', '0', '0', 'blog:config:add', 'Operation', 'admin', '2024-07-01 20:29:18', '', NULL, '');
+(1066, '网站配置新增', 1064, 2, '#', '', NULL, '', 1, 0, 'F', '0', '0', 'blog:config:add', 'Operation', 'admin', '2024-07-01 20:29:18', '', NULL, ''),
+(1223, '博主申请', 1063, 19, 'blogger-apply', 'blog/blogger-apply/index', '', 'BloggerApply', 1, 0, 'C', '0', '0', 'blog:blogger:list', 'Stamp', 'admin', '2026-06-16 10:22:00', '', NULL, '博主申请管理菜单'),
+(1224, '申请查询', 1223, 1, '', '', NULL, '', 1, 0, 'F', '0', '0', 'blog:blogger:query', '#', 'admin', '2026-06-16 10:22:00', '', NULL, '博主申请详情查询权限'),
+(1225, '申请审核', 1223, 2, '', '', NULL, '', 1, 0, 'F', '0', '0', 'blog:blogger:audit', '#', 'admin', '2026-06-16 10:22:00', '', NULL, '博主申请审核权限'),
+(1222, 'AI 管理', 0, 5, 'ai-manager', NULL, NULL, 'AiManager', 1, 0, 'M', '0', '0', NULL, 'Cpu', 'admin', NOW(), '', NULL, 'AI 能力统一管理（配置/日志/任务）'),
+(1219, 'AI能力配置', 1222, 1, 'ai/config', 'blog/ai/config', '', 'BlogAiConfig', 1, 0, 'C', '0', '0', 'blog:ai:config', 'Setting', 'admin', NOW(), '', NULL, 'AI能力配置管理（Provider/端点/Prompt）'),
+(1220, 'AI调用日志', 1222, 2, 'ai/call-log', 'blog/ai/call-log', '', 'BlogAiCallLog', 1, 0, 'C', '0', '0', 'blog:ai:log', 'Document', 'admin', NOW(), '', NULL, 'AI调用日志查询（只读）'),
+(1221, 'AI异步任务', 1222, 3, 'ai/task', 'blog/ai/task', '', 'BlogAiTask', 1, 0, 'C', '0', '0', 'blog:ai:task', 'Timer', 'admin', NOW(), '', NULL, 'AI异步任务追踪与重试'),
+(1218, 'AI生成记录', 1063, 20, 'ai/records', 'blog/ai/records', '', 'BlogAiRecords', 1, 0, 'C', '0', '0', 'blog:article:list', 'Cpu', 'admin', NOW(), '', NULL, 'AI生成建议采纳与审计记录（博客业务）'),
+(2001, '移动端权限管理', 1061, 17, 'mobile-capability', 'blog/mobile/index', NULL, 'MobileCapability', 1, 0, 'C', '0', '0', 'blog:mobile:list', 'Iphone', 'admin', NOW(), '', NULL, '管理小程序端能力配置'),
+(2002, '移动端权限查询', 2001, 1, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'blog:mobile:query', '#', 'admin', NOW(), '', NULL, '查询小程序能力配置按钮'),
+(2003, '移动端权限修改', 2001, 2, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'blog:mobile:edit', '#', 'admin', NOW(), '', NULL, '修改小程序能力配置按钮'),
+(2004, '移动端权限新增', 2001, 3, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'blog:mobile:add', '#', 'admin', NOW(), '', NULL, '新增小程序能力配置按钮'),
+(2005, '移动端权限删除', 2001, 4, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'blog:mobile:remove', '#', 'admin', NOW(), '', NULL, '删除小程序能力配置按钮');
 INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `route_name`, `is_frame`, `is_cache`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES
 (1067, '网站配置修改', 1064, 3, '#', '', NULL, '', 1, 0, 'F', '0', '0', 'blog:config:edit', 'Operation', 'admin', '2024-07-01 20:29:18', '', NULL, ''),
 (1068, '网站配置删除', 1064, 4, '#', '', NULL, '', 1, 0, 'F', '0', '0', 'blog:config:remove', 'Operation', 'admin', '2024-07-01 20:29:18', '', NULL, ''),
@@ -1438,6 +1578,19 @@ INSERT INTO `sys_role_dept` (`role_id`, `dept_id`) VALUES
 -- Seed data for `sys_role_menu`
 -- ----------------------------
 INSERT INTO `sys_role_menu` (`role_id`, `menu_id`) VALUES
+(1, 1218),
+(1, 1219),
+(1, 1220),
+(1, 1221),
+(1, 1222),
+(1, 1223),
+(1, 1224),
+(1, 1225),
+(1, 2001),
+(1, 2002),
+(1, 2003),
+(1, 2004),
+(1, 2005),
 (1, 1211),
 (1, 1212),
 (1, 1213),
@@ -1540,7 +1693,6 @@ INSERT INTO `sys_user_role` (`user_id`, `role_id`) VALUES
 -- ----------------------------
 -- Table structure for `b_content_report`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_content_report`;
 CREATE TABLE `b_content_report` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `user_id` bigint(20) DEFAULT NULL COMMENT '举报用户ID',
@@ -1566,7 +1718,6 @@ CREATE TABLE `b_content_report` (
 -- ----------------------------
 -- Table structure for `b_analytics_event`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_analytics_event`;
 CREATE TABLE `b_analytics_event` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
@@ -1593,7 +1744,6 @@ CREATE TABLE `b_analytics_event` (
 -- ----------------------------
 -- Table structure for `blog_subscribe_authorization`
 -- ----------------------------
-DROP TABLE IF EXISTS `blog_subscribe_authorization`;
 CREATE TABLE `blog_subscribe_authorization` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
@@ -1616,7 +1766,6 @@ CREATE TABLE `blog_subscribe_authorization` (
 -- ----------------------------
 -- Table structure for `b_blogger_apply`
 -- ----------------------------
-DROP TABLE IF EXISTS `b_blogger_apply`;
 CREATE TABLE `b_blogger_apply` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `user_id` bigint(20) NOT NULL COMMENT '用户id',
@@ -1636,14 +1785,22 @@ CREATE TABLE `b_blogger_apply` (
   KEY `idx_blogger_apply_user_status` (`user_id`, `status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='博主申请表';
 
--- ----------------------------
--- Menu configuration for blogger apply
--- ----------------------------
-INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `route_name`, `is_frame`, `is_cache`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES
-(1223, '博主申请', 1063, 19, 'blogger-apply', 'blog/blogger-apply/index', '', 'BloggerApply', 1, 0, 'C', '0', '0', 'blog:blogger:list', 'Stamp', 'admin', '2026-06-16 10:22:00', '', NULL, '博主申请管理菜单'),
-(1224, '申请查询', 1223, 1, '', '', NULL, '', 1, 0, 'F', '0', '0', 'blog:blogger:query', '#', 'admin', '2026-06-16 10:22:00', '', NULL, '博主申请详情查询权限'),
-(1225, '申请审核', 1223, 2, '', '', NULL, '', 1, 0, 'F', '0', '0', 'blog:blogger:audit', '#', 'admin', '2026-06-16 10:22:00', '', NULL, '博主申请审核权限');
+-- Seed data for mobile clients
+INSERT INTO `b_mobile_capability` (`client`, `review_safe_mode`, `article_read_enabled`, `search_enabled`, `profile_enabled`, `favorite_enabled`, `reading_history_enabled`, `settings_enabled`, `policy_enabled`, `about_enabled`, `friend_link_enabled`, `navigation_enabled`, `article_publish_enabled`, `article_publish_role`, `comment_enabled`, `community_enabled`, `say_publish_enabled`, `treehole_enabled`, `interaction_center_enabled`, `follow_enabled`, `message_center_enabled`, `user_home_enabled`, `user_upload_enabled`)
+VALUES
+('mini', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'blogger', 0, 0, 0, 0, 0, 0, 0, 0, 0),
+('h5', 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'blogger', 1, 1, 1, 1, 1, 1, 1, 1, 1),
+('app', 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'blogger', 1, 1, 1, 1, 1, 1, 1, 1, 1);
+
+-- AI abilities start disabled and without credentials
+INSERT INTO `ai_ability_config` (`ability_code`, `ability_name`, `app_code`, `domain_code`, `provider_type`, `provider_app_id`, `provider_workflow_id`, `endpoint_url`, `auth_config_ref`, `api_key`, `prompt_template`, `invoke_mode`, `chat_mode`, `enabled`, `version`, `remark`, `create_time`, `update_time`) VALUES
+('article_title_generate', '生成文章标题', 'blog', 'article', 'direct_llm', NULL, NULL, NULL, NULL, NULL, '你是一个专业的博客文章标题优化助手。请根据文章内容生成 3 个吸引人的、符合 SEO 的文章标题。返回格式：每行一个标题，不要有其他解释。文章内容：\n{content}', 'sync', 'workflow', '0', 1, '生成文章标题能力配置', NOW(), NOW()),
+('article_summary', '生成文章摘要', 'blog', 'article', 'direct_llm', NULL, NULL, NULL, NULL, NULL, '你是一个专业的文章摘要助手。请为以下文章生成一段简明扼要的摘要（字数控制在 100-200 字之间）。文章标题：{title}\n文章内容：\n{content}', 'sync', 'workflow', '0', 1, '生成文章摘要能力配置', NOW(), NOW()),
+('article_tags', '推荐文章标签', 'blog', 'article', 'direct_llm', NULL, NULL, NULL, NULL, NULL, '你是一个专业的文章标签提取助手。请根据文章内容及候选标签列表(格式为包含id和name的JSON数组)，挑选 3-5 个最符合文章内容的标签，并仅返回它们对应的 id。当前候选列表：{tagOptions}。返回格式：以英文逗号分隔的 id 列表，不要有任何其他文字解释，例如：1,2,3。文章标题：{title}\n文章内容：\n{content}', 'sync', 'workflow', '0', 1, '推荐文章标签能力配置', NOW(), NOW()),
+('comment_risk_check', '评论安全审查', 'blog', 'comment', 'direct_llm', NULL, NULL, NULL, NULL, NULL, '你是一个内容安全审核助手。请判断以下评论是否存在违规风险（包括但不限于：色情、暴力、政治敏感、人身攻击、广告引流、违法信息）。仅返回一个 JSON 对象，不要输出 Markdown 代码块、解释说明或评论原文。返回格式：{"decision":"PASS 或 REJECT","reason":"当 decision 为 REJECT 时填写不超过15字的简短违规原因（如：人身攻击、疑似广告引流），PASS 时留空字符串"}。评论内容：\n{content}', 'sync', 'workflow', '0', 1, '评论安全审查机审配置', NOW(), NOW()),
+('ai_agent_chat', 'AI 智能体对话', 'blog', 'agent', 'dify', NULL, NULL, NULL, NULL, NULL, '你是圆圈博客的 AI 助手，名字叫"小圈"。你的特点：\n- 友好、热情、简洁，回复像朋友聊天一样自然\n- 你了解本站的技术文章和内容，可以推荐相关文章\n- 回复限制在 300 字以内，简洁有力\n- 如果用户问文章相关问题，可以推荐站内搜索或浏览分类\n\n用户的问题：{question}', 'sse', 'chat', '0', 1, 'AI 智能体对话能力配置', NOW(), NOW()),
+('dify_knowledge_article_sync', 'Dify 文章知识库同步', 'blog', 'article', 'dify', NULL, NULL, 'https://api.dify.ai/v1', NULL, NULL, NULL, 'sync', 'workflow', '0', 1, '文章发布后同步到 Dify 知识库；provider_app_id 填 Dify 知识库 ID，api_key 填 Knowledge API Key 后启用', NOW(), NOW()),
+('article_cover_generate', '生成文章封面', 'blog', 'article', 'direct_image', NULL, '1024x768', NULL, NULL, NULL, '为博客文章生成一张横版封面配图。要求：画面简洁大气、与文章主题高度契合、适合 16:9 展示、无文字水印、写实或插画风格均可。\n文章标题：{title}\n文章摘要：{summary}\n正文节选：{content}', 'async', 'workflow', '0', 1, '文章封面异步生成，需在后台配置模型、端点和 API Key', NOW(), NOW()),
+('article_content_refine', '文章内容润色', 'blog', 'article', 'direct_llm', NULL, NULL, NULL, NULL, NULL, '保持原意和安全 HTML 结构，润色文章内容。只输出正文：{content}', 'sync', 'workflow', '0', 1, NULL, NOW(), NOW());
 
 SET FOREIGN_KEY_CHECKS = 1;
-
-
