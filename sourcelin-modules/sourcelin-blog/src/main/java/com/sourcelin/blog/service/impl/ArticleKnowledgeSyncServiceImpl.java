@@ -23,6 +23,8 @@ import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
+import feign.FeignException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -48,20 +50,29 @@ public class ArticleKnowledgeSyncServiceImpl implements IArticleKnowledgeSyncSer
     private final ArticleKnowledgeSyncMapper articleKnowledgeSyncMapper;
     private final RemoteAiService remoteAiService;
     private final BlogAiProperties properties;
+    private final TransactionTemplate transactions;
 
     public ArticleKnowledgeSyncServiceImpl(ArticleMapper articleMapper,
                                            ArticleKnowledgeSyncMapper articleKnowledgeSyncMapper,
                                            RemoteAiService remoteAiService,
-                                           BlogAiProperties properties) {
+                                           BlogAiProperties properties,
+                                           TransactionTemplate transactions) {
         this.articleMapper = articleMapper;
         this.articleKnowledgeSyncMapper = articleKnowledgeSyncMapper;
         this.remoteAiService = remoteAiService;
         this.properties = properties;
+        this.transactions = transactions;
     }
 
     @Override
     public ArticleKnowledgeSyncVO syncArticle(Long articleId) {
         requireKnowledgeSyncEnabled();
+        return transactions.execute(status -> synchronizeCurrentArticle(articleId));
+    }
+
+    private ArticleKnowledgeSyncVO synchronizeCurrentArticle(Long articleId) {
+        // 在读取文章之前锁定同步记录，串行处理同一文章的人工补同步和提交后事件。
+        articleKnowledgeSyncMapper.lockArticle(articleId);
         Article article = articleMapper.selectArticleById(articleId);
         ArticleKnowledgeSync sync = articleKnowledgeSyncMapper.selectByArticleId(articleId);
         if (!shouldSync(article)) {
@@ -153,8 +164,13 @@ public class ArticleKnowledgeSyncServiceImpl implements IArticleKnowledgeSyncSer
     }
 
     private DifyKnowledgeDocumentSyncResult invokeRemoteSync(DifyKnowledgeDocumentSyncRequest request) {
-        ApiResponse<DifyKnowledgeDocumentSyncResult> response =
-                remoteAiService.syncDifyKnowledgeDocument(request, SecurityConstants.INNER);
+        ApiResponse<DifyKnowledgeDocumentSyncResult> response;
+        try {
+            response = remoteAiService.syncDifyKnowledgeDocument(request, SecurityConstants.INNER);
+        } catch (FeignException e) {
+            log.warn("知识库请求失败，文章 {}，HTTP 状态 {}", request.getSourceId(), e.status());
+            return failedResult(request, "REMOTE_REQUEST_FAILED", "AI 服务请求失败，HTTP 状态 " + e.status());
+        }
         if (response == null) {
             return failedResult(request, "REMOTE_EMPTY_RESPONSE", "AI 服务未返回同步结果");
         }
@@ -176,7 +192,9 @@ public class ArticleKnowledgeSyncServiceImpl implements IArticleKnowledgeSyncSer
         sync.setArticleId(articleId);
         sync.setSourceType(SOURCE_TYPE_ARTICLE);
         sync.setAbilityCode(ABILITY_CODE);
-        sync.setDocumentId(remoteResult.getDocumentId());
+        if (remoteResult.isSuccess() || StringUtils.isNotBlank(remoteResult.getDocumentId())) {
+            sync.setDocumentId(remoteResult.getDocumentId());
+        }
         sync.setContentHash(contentHash);
         sync.setSyncStatus(remoteResult.isSuccess() ? "success" : "failed");
         sync.setIndexingStatus(remoteResult.getIndexingStatus());

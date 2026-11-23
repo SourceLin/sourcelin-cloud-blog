@@ -1,0 +1,124 @@
+# Tomcat
+server:
+  port: 8080
+
+# Spring
+spring:
+  http:
+    converters:
+      preferred-json-mapper: jackson2
+    codecs:
+      preferred-json-mapper: jackson2
+  config:
+    import:
+      - "optional:nacos:application-${spring.profiles.active}.yml?group=${spring.cloud.nacos.config.group}&refreshEnabled=true"
+      - "optional:nacos:${spring.application.name}-${spring.profiles.active}.yml?group=${spring.cloud.nacos.config.group}&refreshEnabled=true"
+  application:
+    # 应用名称
+    name: sourcelin-gateway
+  profiles:
+    # 环境配置
+    active: dev
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+  cloud:
+    nacos:
+      username: ${NACOS_USERNAME:}
+      password: ${NACOS_PASSWORD:}
+      discovery:
+        namespace: ${NACOS_NAMESPACE:}
+        # 分组
+        group: ${NACOS_GROUP:BLOG_GROUP}
+        # 服务注册地址
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+      config:
+        namespace: ${NACOS_NAMESPACE:}
+        # 分组
+        group: ${NACOS_GROUP:BLOG_GROUP}
+        # 配置中心地址
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+        # 配置文件格式
+        file-extension: yml
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              lowerCaseServiceId: true
+              enabled: true
+          routes:
+            - id: sourcelin-auth
+              uri: lb://sourcelin-auth
+              predicates:
+                - Path=/auth/**
+              filters:
+                - CacheRequestFilter
+                - StripPrefix=1
+            - id: sourcelin-system
+              uri: lb://sourcelin-system
+              predicates:
+                - Path=/system/**
+              filters:
+                - StripPrefix=1
+            - id: sourcelin-blog
+              uri: lb://sourcelin-blog
+              predicates:
+                - Path=/blog/**
+              filters:
+                - StripPrefix=1
+            - id: sourcelin-file
+              uri: lb://sourcelin-file
+              predicates:
+                - Path=/file/**
+              filters:
+                - StripPrefix=1
+            - id: sourcelin-ai
+              uri: lb://sourcelin-ai
+              predicates:
+                - Path=/ai/**
+              filters:
+                - StripPrefix=1
+            - id: sourcelin-message
+              uri: lb://sourcelin-message
+              predicates:
+                - Path=/message/**
+              filters:
+                - StripPrefix=1
+    sentinel:
+      # 取消控制台懒加载
+      eager: true
+      transport:
+        # 控制台地址
+        dashboard: 127.0.0.1:8718
+      # nacos配置持久化
+      datasource:
+        ds1:
+          nacos:
+            server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+            dataId: sentinel-sourcelin-gateway
+            groupId: BLOG_GROUP
+            data-type: json
+            rule-type: gw-flow
+
+# Nacos 配置解析失败时的本地回退（与 sourcelin-gateway-dev.yml 对齐）
+security:
+  captcha:
+    enabled: true
+    type: math
+  xss:
+    enabled: true
+    excludeUrls:
+      - /system/notice
+  ignore:
+    whites:
+      - /message/stream
+      - /auth/logout
+      - /auth/login
+      - /auth/register
+      - /blog/front/ai/status
+      - /blog/front/ai/abilities/ai_agent_chat/invoke/stream
+      - /*/v2/api-docs
+      - /csrf

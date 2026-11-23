@@ -1,9 +1,8 @@
 package com.sourcelin.modules.monitor;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import de.codecentric.boot.admin.server.config.EnableAdminServer;
 
@@ -18,8 +17,7 @@ import de.codecentric.boot.admin.server.config.EnableAdminServer;
         // classpath 中若存在 JDBC/MyBatis 相关依赖，默认会触发 DataSource 自动装配，
         // 在未配置 url/driver 时导致启动失败。
         DataSourceAutoConfiguration.class,
-        DataSourceTransactionManagerAutoConfiguration.class,
-        HibernateJpaAutoConfiguration.class
+        DataSourceTransactionManagerAutoConfiguration.class
 })
 public class MonitorApplication
 {

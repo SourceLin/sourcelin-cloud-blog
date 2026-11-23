@@ -286,7 +286,7 @@ async function testUseContentCommentsDefinesCancelReplyBeforeImmediateWatch() {
   )
 
   const cancelReplyIndex = source.indexOf('function cancelReply()')
-  const immediateWatchIndex = source.indexOf('watch(\n    [options.targetId, commentMode],')
+  const immediateWatchIndex = source.search(/watch\(\r?\n    \[options\.targetId, commentMode\],/)
 
   assert.notEqual(cancelReplyIndex, -1, 'useContentComments should define cancelReply')
   assert.notEqual(immediateWatchIndex, -1, 'useContentComments should keep the immediate target/mode watch')

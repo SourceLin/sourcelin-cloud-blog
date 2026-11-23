@@ -2,7 +2,7 @@ package com.sourcelin.common.security.feign;
 
 import java.util.Map;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 import com.sourcelin.common.core.constant.SecurityConstants;
 import com.sourcelin.common.core.utils.ServletUtils;

@@ -21,11 +21,12 @@ services:
       - ${DATA_ROOT}/redis-local:/data
 
   nacos:
-    image: nacos/nacos-server:v2.4.0
+    image: nacos/nacos-server:v3.1.1
     container_name: sourcelin-nacos
     restart: always
     network_mode: host
     environment:
+      NACOS_CONSOLE_PORT: 8082
       MODE: standalone
       SPRING_DATASOURCE_PLATFORM: mysql
       MYSQL_SERVICE_HOST: ${MYSQL_HOST}
@@ -46,7 +47,7 @@ services:
       - ${DATA_ROOT}/nacos:/home/nacos/data
 
   gateway:
-    image: eclipse-temurin:8-jre
+    image: eclipse-temurin:27-jre
     container_name: sourcelin-gateway
     environment: *redis-environment
     restart: always
@@ -71,7 +72,7 @@ services:
       - ${LOG_ROOT}/gateway:/app/logs
 
   auth:
-    image: eclipse-temurin:8-jre
+    image: eclipse-temurin:27-jre
     container_name: sourcelin-auth
     environment: *redis-environment
     restart: always
@@ -96,7 +97,7 @@ services:
       - ${LOG_ROOT}/auth:/app/logs
 
   system:
-    image: eclipse-temurin:8-jre
+    image: eclipse-temurin:27-jre
     container_name: sourcelin-system
     environment:
       <<: *business-environment
@@ -122,8 +123,36 @@ services:
       - ${JAR_ROOT}/sourcelin-system.jar:/app/sourcelin-system.jar:ro
       - ${LOG_ROOT}/system:/app/logs
 
+  job:
+    profiles: ["job"]
+    image: eclipse-temurin:27-jre
+    container_name: sourcelin-job
+    environment:
+      <<: *business-environment
+      BLOG_MESSAGE_ENABLED: ${BLOG_MESSAGE_ENABLED:-false}
+    restart: always
+    network_mode: host
+    depends_on:
+      - nacos
+      - redis_local
+    command: >
+      sh -c "java -Xms112m -Xmx144m -Dfile.encoding=UTF-8
+      -Dspring.cloud.sentinel.enabled=false
+      -Dfeign.sentinel.enabled=false
+      -Dspring.cloud.nacos.discovery.server-addr=${NACOS_SERVER_ADDR}
+      -Dspring.cloud.nacos.config.server-addr=${NACOS_SERVER_ADDR}
+      -Dspring.cloud.nacos.discovery.group=${NACOS_GROUP}
+      -Dspring.cloud.nacos.config.group=${NACOS_GROUP}
+      -Dspring.cloud.nacos.username=${NACOS_USERNAME}
+      -Dspring.cloud.nacos.password=${NACOS_PASSWORD}
+      -jar /app/sourcelin-job.jar"
+    mem_limit: 480m
+    volumes:
+      - ${JAR_ROOT}/sourcelin-job.jar:/app/sourcelin-job.jar:ro
+      - ${LOG_ROOT}/job:/app/logs
+
   blog:
-    image: eclipse-temurin:8-jre
+    image: eclipse-temurin:27-jre
     container_name: sourcelin-blog
     environment:
       <<: *business-environment
@@ -151,7 +180,7 @@ services:
       - ${LOG_ROOT}/blog:/app/logs
 
   file:
-    image: eclipse-temurin:8-jre
+    image: eclipse-temurin:27-jre
     container_name: sourcelin-file
     environment:
       <<: *business-environment
@@ -179,7 +208,7 @@ services:
 
   ai:
     profiles: ["ai"]
-    image: eclipse-temurin:8-jre
+    image: eclipse-temurin:27-jre
     container_name: sourcelin-ai
     environment:
       <<: *business-environment
@@ -210,7 +239,7 @@ services:
 
   message:
     profiles: ["message"]
-    image: eclipse-temurin:8-jre
+    image: eclipse-temurin:27-jre
     container_name: sourcelin-message
     environment: *redis-environment
     restart: always
@@ -235,7 +264,7 @@ services:
       - ${LOG_ROOT}/message:/app/logs
 
   monitor:
-    image: eclipse-temurin:8-jre
+    image: eclipse-temurin:27-jre
     container_name: sourcelin-monitor
     restart: always
     network_mode: host

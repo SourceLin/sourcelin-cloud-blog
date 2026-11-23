@@ -124,3 +124,9 @@
 - MUST：异步任务和流式中继使用实际执行器提交；SSE 票据原子核销，多连接按连接编号清理。
 - MUST：未启用可选服务时客户端停止建立连接；业务通知只发布失效事件，客户端按权限查询数据。
 - CHECK：执行受影响 Maven 单测、真实 HTTP/SSE 契约验证及相关前端检查；SQL 在独立空库导入。
+
+## 平台迁移验收
+
+- MUST：以 JDK 27、Maven 3.9.x 和 MySQL 8.4 为目标。按官方 BOM 核对 Boot、Cloud、Alibaba 与 starter。
+- CHECK：分别验证 MVC 与 WebFlux，迁移 Servlet 和 Validation 到 Jakarta 时保留 Java SE 包。验证 spring.config.import 导入的公共及服务配置覆盖顺序、刷新和注册发现。
+- CHECK：记录数据库版本、端口、账号与目标库，在隔离实例验证初始化、迁移及恢复。

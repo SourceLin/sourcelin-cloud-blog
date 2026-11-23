@@ -1,9 +1,11 @@
-﻿<template>
-  <NNumberAnimation class="s-number-animation" v-bind="$attrs" />
+<template>
+  <span class="s-number-animation"><NNumberAnimation v-bind="props" /></span>
 </template>
 
 <script setup lang="ts">
-import { NNumberAnimation } from 'naive-ui'
+import { NNumberAnimation, numberAnimationProps } from 'naive-ui'
+
+const props = defineProps(numberAnimationProps)
 </script>
 
 <style scoped lang="scss">

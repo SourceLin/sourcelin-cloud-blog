@@ -1,5 +1,7 @@
 package com.sourcelin.file;
 
+import com.github.tobato.fastdfs.FdfsClientConfig;
+import org.springframework.context.annotation.Import;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -13,6 +15,7 @@ import com.sourcelin.common.security.annotation.EnableRyFeignClients;
 @EnableCustomConfig
 @EnableRyFeignClients
 @EnableDiscoveryClient
+@Import(FdfsClientConfig.class)
 @SpringBootApplication
 public class FileApplication
 {

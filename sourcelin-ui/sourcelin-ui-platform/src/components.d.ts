@@ -80,6 +80,7 @@ declare module 'vue' {
     NoticeMenu: typeof import('./modules/notice/components/NoticeMenu.vue')['default']
     PageHeader: typeof import('./shared/components/layout/PageHeader.vue')['default']
     PageShell: typeof import('./shared/components/layout/PageShell.vue')['default']
+    PostAiSuggestionDialog: typeof import('./modules/article/components/PostAiSuggestionDialog.vue')['default']
     PostEditorForm: typeof import('./modules/article/components/PostEditorForm.vue')['default']
     PostRichEditor: typeof import('./modules/article/components/PostRichEditor.vue')['default']
     PrivacyPolicyPage: typeof import('./modules/about/pages/PrivacyPolicyPage.vue')['default']

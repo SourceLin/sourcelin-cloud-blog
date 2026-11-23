@@ -9,10 +9,11 @@ import cn.dev33.satoken.exception.SaTokenException;
 import org.springframework.cloud.gateway.support.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
+import org.springframework.boot.webflux.error.ErrorWebExceptionHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.lang.NonNull;
@@ -42,7 +43,7 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler
             return Mono.error(ex);
         }
 
-        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        HttpStatusCode httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         ResultCode code = ResultCode.SYSTEM_ERROR;
 
         if (ex instanceof NotFoundException)
@@ -59,13 +60,13 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler
         }
         else if (ex instanceof ResponseStatusException)
         {
-            httpStatus = ((ResponseStatusException) ex).getStatus();
-            switch (httpStatus)
+            httpStatus = ((ResponseStatusException) ex).getStatusCode();
+            switch (httpStatus.value())
             {
-                case NOT_FOUND: code = ResultCode.NOT_FOUND; break;
-                case UNAUTHORIZED: code = ResultCode.UNAUTHORIZED; break;
-                case FORBIDDEN: code = ResultCode.FORBIDDEN; break;
-                case TOO_MANY_REQUESTS: code = ResultCode.TOO_MANY_REQUESTS; break;
+                case 404: code = ResultCode.NOT_FOUND; break;
+                case 401: code = ResultCode.UNAUTHORIZED; break;
+                case 403: code = ResultCode.FORBIDDEN; break;
+                case 429: code = ResultCode.TOO_MANY_REQUESTS; break;
                 default: if (httpStatus.is4xxClientError()) code = ResultCode.BAD_REQUEST;
             }
         }

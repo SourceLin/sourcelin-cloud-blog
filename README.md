@@ -14,9 +14,9 @@
 <p align="center">
   <a href="https://github.com/SourceLin/sourcelin-cloud-blog"><img src="https://img.shields.io/github/stars/SourceLin/sourcelin-cloud-blog?style=flat-square&logo=github&logoColor=white" alt="GitHub Stars"></a>
   <a href="https://gitee.com/my_lyq/sourcelin-cloud-blog"><img src="https://gitee.com/my_lyq/sourcelin-cloud-blog/badge/star.svg?theme=dark" alt="Gitee Stars"></a>
-  <img src="https://img.shields.io/badge/Java-1.8+-blue.svg" alt="Java">
-  <img src="https://img.shields.io/badge/Spring%20Boot-2.7.18-brightgreen.svg" alt="Spring Boot">
-  <img src="https://img.shields.io/badge/Spring%20Cloud-2021.0.9-brightgreen.svg" alt="Spring Cloud">
+  <img src="https://img.shields.io/badge/Java-27-blue.svg" alt="Java">
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.0.10-brightgreen.svg" alt="Spring Boot">
+  <img src="https://img.shields.io/badge/Spring%20Cloud-2025.1.5-brightgreen.svg" alt="Spring Cloud">
   <img src="https://img.shields.io/badge/Vue-3.x-42b883.svg" alt="Vue">
   <img src="https://img.shields.io/badge/Uniapp-Vue3-2b9939.svg" alt="Uniapp">
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License"></a>
@@ -37,7 +37,7 @@
 | 版本 | 部署与二次开发 | Java 基线 |
 | --- | --- | --- |
 | **无 AI 版（`v1`）** | 已公开。包含博客前台、管理后台和 Uniapp 小程序，适合作为不集成 AI 与 SSE 实时消息的项目基线。 [Gitee](https://gitee.com/my_lyq/sourcelin-cloud-blog/tree/v1) · [GitHub](https://github.com/SourceLin/sourcelin-cloud-blog/tree/v1) · [GitCode](https://gitcode.com/SourceLin/sourcelin-cloud-blog/tree/v1) | JDK 8 |
-| **项目主线（含可选 AI）** | 基础博客无需模型密钥即可运行。AI 创作、聊天、评论审核、Dify 知识库同步及 SSE 实时消息可按需启用。 | JDK 8 |
+| **项目主线（含可选 AI）** | 基础博客无需模型密钥即可运行。AI 创作、聊天、评论审核、Dify 知识库同步及 SSE 实时消息可按需启用。 | JDK 27 |
 
 克隆 `v1` 时指定 `--branch v1`。部署主线请参考[快速启动](docs/guides/QUICK_START.md)和[AI 与实时消息部署](docs/guides/AI_MESSAGE_SETUP.md)，两个可选功能默认关闭。
 
@@ -282,14 +282,14 @@ sourcelin-cloud-blog/
 
 | 技术 | 版本 / 说明 |
 |---|---|
-| Java | 1.8+ |
-| Spring Boot | 2.7.18 |
-| Spring Cloud | 2021.0.9 |
-| Spring Cloud Alibaba | 2021.0.6.1 |
+| Java | 27 |
+| Spring Boot | 4.0.10 |
+| Spring Cloud | 2025.1.5 |
+| Spring Cloud Alibaba | 2025.1.0.0 |
 | Nacos | 注册中心 / 配置中心 |
 | Sentinel | 网关与服务流量控制 |
 | Seata | 分布式事务 |
-| MySQL | 5.7+ / 8.0+ |
+| MySQL | 8.4 LTS |
 | Redis | 缓存 / Token 存储 |
 | Druid + dynamic-datasource | 数据源与多数据源管理 |
 | MyBatis + PageHelper | ORM 与分页 |
@@ -381,12 +381,12 @@ sourcelin-cloud-blog/
 
 | 组件 | 最低版本 | 推荐版本 |
 |---|---|---|
-| JDK | 1.8+ | 1.8 / 11 |
-| Maven | 3.6+ | 3.8.x |
-| MySQL | 5.7+ | 8.0 |
-| Redis | 5.0+ | 6.0+ |
-| Node.js | 18+ | 20 LTS / 22 LTS |
-| Nacos | 2.0+ | 2.0.x |
+| JDK | 27 | 27 |
+| Maven | 3.9 | 3.9.x |
+| MySQL | 8.4 | 8.4 LTS |
+| Redis | 6.0（支持 `SET ... KEEPTTL`） | 7.2.x |
+| Node.js | 22.12 | 22 LTS |
+| Nacos | 3.1.1 | 3.1.1 |
 | Docker | 20+ | 24.x |
 
 ### 本地启动

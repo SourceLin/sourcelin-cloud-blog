@@ -124,10 +124,9 @@ public class DirectLlmProviderClient implements AiProviderClient {
         if (baseUrl == null || baseUrl.trim().isEmpty()) {
             throw new IllegalArgumentException("DirectLLM Endpoint URL is not configured for ability: " + config.getAbilityCode());
         }
-        String url = baseUrl.trim();
+        String url = baseUrl.trim().replaceAll("/+$", "");
         if (!url.endsWith("/chat/completions")) {
-            url = url.replaceAll("/+$", "");
-            url = url.endsWith("/v1") ? url + "/chat/completions" : url + "/v1/chat/completions";
+            url += url.matches(".*/v[0-9]+") ? "/chat/completions" : "/v1/chat/completions";
         }
         return url;
     }

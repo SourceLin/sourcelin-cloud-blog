@@ -2,7 +2,7 @@ package com.sourcelin.auth;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import com.sourcelin.common.security.annotation.EnableRyFeignClients;
 
 /**

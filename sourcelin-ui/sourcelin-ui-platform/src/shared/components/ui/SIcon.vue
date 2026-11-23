@@ -5,12 +5,12 @@
     :color="color"
     v-bind="$attrs"
   >
-    <component :is="icon" />
+    <component :is="toRaw(icon)" />
   </NIcon>
 </template>
 
 <script setup lang="ts">
-import type { Component } from 'vue'
+import { toRaw, type Component } from 'vue'
 import { NIcon } from 'naive-ui'
 
 interface Props {

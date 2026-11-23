@@ -1,7 +1,7 @@
 package com.sourcelin.common.redis.configure;
 
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +14,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 /**
  * redis 自定义配置。
  * <p>
- * 先注册模板定义，以便 {@link RedisAutoConfiguration} 跳过默认模板。
+ * 先注册模板定义，以便 {@link DataRedisAutoConfiguration} 跳过默认模板。
  * 连接工厂在创建模板实例时注入。
  * </p>
  *
@@ -22,7 +22,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  */
 @Configuration
 @EnableCaching
-@AutoConfigureBefore(RedisAutoConfiguration.class)
+@AutoConfigureBefore(DataRedisAutoConfiguration.class)
 public class RedisConfig extends CachingConfigurerSupport
 {
     @Bean

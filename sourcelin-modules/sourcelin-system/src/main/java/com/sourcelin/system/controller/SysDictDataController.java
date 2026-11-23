@@ -2,7 +2,7 @@ package com.sourcelin.system.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.sourcelin.system.service.ISysDictDataService;
 import com.sourcelin.system.service.ISysDictTypeService;

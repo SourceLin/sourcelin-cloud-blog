@@ -87,7 +87,7 @@ http {
 1. 登录、注册、验证码仍走网关统一入口。
 2. 网关白名单只允许真正公开接口，不能把 `/front/**`、`/blog/**`、`/blog-api/**` 整段放开。
 3. `/blog/front/user/**`、`/blog/front/follow/**`、`/blog/front/collect/**` 等私有接口不得通过 Nginx 或白名单绕过登录校验。
-4. 前台密码传输、验证码消费、登录态创建细节以 [configs/sa-token-nacos-configs.md](../internal/configs/sa-token-nacos-configs.md) 为准。
+4. 认证、网关和业务服务使用同一个 Redis 实例及库编号。图形验证码由认证服务校验，客户端通过 `Authorization: Bearer <token>` 传递登录凭证。参见 [部署配置与登录检查](../guides/AI_MESSAGE_SETUP.md)。
 
 ## 说明
 

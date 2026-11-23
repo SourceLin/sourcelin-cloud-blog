@@ -2,7 +2,7 @@ package com.sourcelin.auth.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "微信小程序绑定已有账号请求")
 public class MiniProgramBindDTO {

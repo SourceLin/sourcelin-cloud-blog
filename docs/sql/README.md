@@ -36,3 +36,9 @@
 ## 可选 AI 与消息能力
 
 数据库导入完成后，通过服务和能力开关启用可选功能。部署密钥与启用方式见 [AI 与消息部署](../guides/AI_MESSAGE_SETUP.md)。
+
+## Nacos 3.1.1 配置库
+
+初始化前在隔离 MySQL 8.4 实例核对版本、端口、当前账号及库名。三个初始化脚本含固定 USE 语句。配置库采用 [Nacos 3.1.1 官方表结构](https://github.com/alibaba/nacos/blob/3.1.1/distribution/conf/mysql-schema.sql)，首次启动通过控制台设置管理员密码，再配置客户端账号与权限。
+
+升级时保留旧 Nacos 实例及其配置库。在独立的新库初始化，按命名空间导出并导入现有配置，保留 Group、Data ID 和权限映射。新组按本版本示例调整 Redis、OpenFeign 和网关配置键。切换前比对导出清单，回切时恢复旧实例连接参数。

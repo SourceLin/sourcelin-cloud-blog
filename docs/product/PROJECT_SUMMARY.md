@@ -16,15 +16,15 @@
 
 | 技术 | 版本 / 说明 |
 |------|-------------|
-| Java | 1.8+ |
-| Spring Boot | 2.7.18 |
-| Spring Cloud | 2021.0.9 |
-| Spring Cloud Alibaba | 2021.0.6.1 |
-| Nacos | 注册中心 / 配置中心 |
+| Java | 27 |
+| Spring Boot | 4.0.10 |
+| Spring Cloud | 2025.1.5 |
+| Spring Cloud Alibaba | 2025.1.0.0 |
+| Nacos | 3.1.1，注册中心 / 配置中心 |
 | Sentinel | 流量控制 |
 | Seata | 分布式事务 |
-| MySQL | 8.0+ |
-| Redis | 缓存 |
+| MySQL | 8.4 LTS |
+| Redis | 6.0 及以上，缓存与会话 |
 | Druid | 数据源 |
 | PageHelper | 分页 |
 | MinIO | 文件存储 |
@@ -34,9 +34,9 @@
 
 | 端 | 技术栈 |
 |----|--------|
-| 博客前台 | Vue 3 + TypeScript + Naive UI + Vite |
-| 管理后台 | Vue 3 + TypeScript + Element Plus |
-| 旧版迁移对照 | `sourcelin-ui-admin-vue2`，不承载新功能 |
+| 博客前台 | Vue 3.5 + TypeScript 5.9 + Naive UI + Vite 8 |
+| 管理后台 | Vue 3.5 + TypeScript 5.9 + Element Plus + Vite 8 |
+| H5 / 微信小程序 | Uniapp 3 + Vue 3.5 + TypeScript 5.6 + Vite 5 |
 
 ## 系统架构
 
@@ -44,7 +44,7 @@
 客户端层
 ├── 管理后台（Vue 3 + Element Plus）
 ├── 博客前台（Vue 3 + Naive UI）
-└── 小程序 / H5（规划中）
+└── 微信小程序 / H5（Uniapp）
 
           ↓
 API 网关（8080）
@@ -55,7 +55,9 @@ API 网关（8080）
 ├── 系统服务（9201）
 ├── 博客服务（9204）
 ├── 文件服务（9300，可选）
-├── 定时任务（9203）
+├── 定时任务（9203，可选）
+├── AI 服务（9205，可选）
+├── SSE 消息服务（9400，可选）
 └── 监控中心（9100，可选）
 
           ↓
@@ -77,12 +79,14 @@ sourcelin-cloud-blog/
 │   ├── sourcelin-system/                  # 系统管理
 │   ├── sourcelin-blog/                    # 博客业务
 │   ├── sourcelin-file/                    # 文件服务
+│   ├── sourcelin-ai/                      # AI 服务
+│   ├── sourcelin-message/                 # SSE 消息服务
 │   └── sourcelin-job/                     # 定时任务
 ├── sourcelin-visual/                      # 可视化监控
 ├── sourcelin-ui/
 │   ├── sourcelin-ui-platform/             # 博客前台
 │   ├── sourcelin-ui-admin/                # 管理后台
-│   └── sourcelin-ui-admin-vue2/           # 旧版迁移对照
+│   └── sourcelin-ui-uniapp/               # H5 与微信小程序
 ├── docs/                                  # 长期文档
 ├── rules/                                 # 仓库规则
 ├── skills/                                # AI 协作技能
@@ -172,14 +176,16 @@ sourcelin-cloud-blog/
 
 5. `sourcelin-file`
 6. `sourcelin-job`
-7. `sourcelin-visual-monitor`
+7. `sourcelin-ai`
+8. `sourcelin-message`
+9. `sourcelin-visual-monitor`
 
 ### 参考文档
 
 - [README.md](../../README.md)
 - [QUICK_START.md](../guides/QUICK_START.md)
-- [DEPLOY_SOURCELIN_CN_DOCKER.md](../internal/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)
-- [DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md](../internal/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md)
+- [Compose 示例](../../docker-compose.example.yml)
+- [Nginx 配置](../deployment/NGINX_CONFIG.md)
 
 ## 当前路线图
 
@@ -187,7 +193,7 @@ sourcelin-cloud-blog/
 - AI 内容助手
 - AI 审核升级
 - 消息中心增强
-- SSE 实时推送
+- 公告推送的多端重连与未读数一致性验证
 - Python 转载系统
 - SEO / 流量增长
 - 运营看板

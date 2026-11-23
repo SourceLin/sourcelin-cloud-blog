@@ -21,12 +21,10 @@
 - `skills/`
 - `.cursor/README.md`
 - `.cursor/rules/project-rules.mdc`
-- `.opencode/README.md`
-- `.opencode/skills/`
 
 ## 维护原则
 
 - `rules/` 是规则源
 - `skills/` 是技能源
-- `.cursor/` 和 `.opencode/` 只保留入口说明，不重复维护完整正文
+- `.cursor/` 只保留入口说明，不重复维护完整正文
 - 更新规则或技能后，要反查轻量入口是否仍然指向正确文件

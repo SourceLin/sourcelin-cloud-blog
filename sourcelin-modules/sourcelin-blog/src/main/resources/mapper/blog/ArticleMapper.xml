@@ -274,12 +274,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <select id="selectKnowledgeSyncCandidateIds" resultType="Long">
-        select id
-        from b_article
-        where deleted = 0
-          and status = 2
-          and read_auth = 1
-        order by update_time desc, id desc
+        select id from b_article where deleted = 0 and status = 2 and read_auth = 1
+        union
+        select article_id from b_article_knowledge_sync where document_id is not null
+        order by id
     </select>
 
 </mapper>

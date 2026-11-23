@@ -100,3 +100,7 @@ description: 用于新增或修改 Sourcelin 后端 Controller、Service、Mappe
 ## AI 与消息补充
 
 处理可选 AI/消息模块时，读取 `docs/architecture/ai-message-architecture.md`；核实内部认证、身份域、资源归属、密钥配置、异步调度及 SSE 生命周期。部署与 SQL 步骤以 `docs/guides/AI_MESSAGE_SETUP.md` 和 `docs/sql/README.md` 为准。
+
+## 升级验证
+
+在仓库根目录先用 `mvn -version` 核对 JDK 27 与 Maven 3.9.x。升级后检查九个服务的配置导入与有效依赖，分别访问网关、MVC 服务和 SSE，保存实际响应及测试计数。

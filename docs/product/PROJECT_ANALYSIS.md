@@ -17,9 +17,9 @@ Sourcelin Blog（圆圈博客）是一套面向个人写作与生活记录的博
 
 | 层级 | 技术 |
 |------|------|
-| 后端 | Spring Boot 2.7.18 + Spring Cloud 2021.0.9 + Spring Cloud Alibaba 2021.0.6.1 |
+| 后端 | JDK 27 + Spring Boot 4.0.10 + Spring Cloud 2025.1.5 + Spring Cloud Alibaba 2025.1.0.0 |
 | 前端 | 博客前台：Vue 3 + TypeScript + Naive UI；管理后台：Vue 3 + TypeScript + Element Plus |
-| 数据库 | MySQL 8.0 + Redis |
+| 数据库 | MySQL 8.4 LTS + Redis 6.0 及以上 |
 | 微服务组件 | Nacos + Sentinel + Seata |
 | 文件存储 | MinIO |
 

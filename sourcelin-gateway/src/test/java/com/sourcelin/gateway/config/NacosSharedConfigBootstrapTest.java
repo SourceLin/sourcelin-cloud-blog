@@ -13,18 +13,20 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 class NacosSharedConfigBootstrapTest {
 
-    private static final List<String> BOOTSTRAP_PATHS = Arrays.asList(
-        "sourcelin-auth/src/main/resources/bootstrap.yml",
-        "sourcelin-gateway/src/main/resources/bootstrap.yml",
-        "sourcelin-modules/sourcelin-system/src/main/resources/bootstrap.yml",
-        "sourcelin-modules/sourcelin-blog/src/main/resources/bootstrap.yml",
-        "sourcelin-modules/sourcelin-job/src/main/resources/bootstrap.yml",
-        "sourcelin-modules/sourcelin-file/src/main/resources/bootstrap.yml"
+    private static final List<String> CONFIG_PATHS = Arrays.asList(
+        "sourcelin-auth/src/main/resources/application.yml",
+        "sourcelin-gateway/src/main/resources/application.yml",
+        "sourcelin-modules/sourcelin-system/src/main/resources/application.yml",
+        "sourcelin-modules/sourcelin-blog/src/main/resources/application.yml",
+        "sourcelin-modules/sourcelin-job/src/main/resources/application.yml",
+        "sourcelin-modules/sourcelin-file/src/main/resources/application.yml",
+        "sourcelin-modules/sourcelin-ai/src/main/resources/application.yml",
+        "sourcelin-modules/sourcelin-message/src/main/resources/application.yml",
+        "sourcelin-visual/sourcelin-monitor/src/main/resources/application.yml"
     );
 
     @Test
@@ -32,34 +34,21 @@ class NacosSharedConfigBootstrapTest {
         Path repoRoot = Paths.get("").toAbsolutePath().normalize().getParent();
         Yaml yaml = new Yaml();
 
-        for (String bootstrapPath : BOOTSTRAP_PATHS) {
-            Path path = repoRoot.resolve(bootstrapPath);
+        for (String configPath : CONFIG_PATHS) {
+            Path path = repoRoot.resolve(configPath);
             try (InputStream inputStream = Files.newInputStream(path)) {
                 Map<String, Object> document = yaml.load(inputStream);
-                List<?> sharedConfigs = readSharedConfigs(document);
-
-                assertFalse(sharedConfigs.isEmpty(), bootstrapPath + " must declare shared-configs");
-
-                Object firstEntry = sharedConfigs.get(0);
-                Map<?, ?> sharedConfig = assertInstanceOf(Map.class, firstEntry,
-                    bootstrapPath + " must use map-style shared-configs so group is explicit");
-
-                assertEquals("application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}",
-                    sharedConfig.get("data-id"),
-                    bootstrapPath + " must load the shared application config");
-                assertEquals("${spring.cloud.nacos.config.group}",
-                    sharedConfig.get("group"),
-                    bootstrapPath + " must read the shared config from BLOG_GROUP instead of DEFAULT_GROUP");
+                Map<?, ?> spring = assertInstanceOf(Map.class, document.get("spring"));
+                Map<?, ?> config = assertInstanceOf(Map.class, spring.get("config"));
+                assertEquals(List.of(
+                        "optional:nacos:application-${spring.profiles.active}.yml?group=${spring.cloud.nacos.config.group}&refreshEnabled=true",
+                        "optional:nacos:${spring.application.name}-${spring.profiles.active}.yml?group=${spring.cloud.nacos.config.group}&refreshEnabled=true"
+                ), config.get("import"), configPath);
+                Map<?, ?> cloud = assertInstanceOf(Map.class, spring.get("cloud"));
+                Map<?, ?> nacos = assertInstanceOf(Map.class, cloud.get("nacos"));
+                Map<?, ?> nacosConfig = assertInstanceOf(Map.class, nacos.get("config"));
+                assertEquals("${NACOS_GROUP:BLOG_GROUP}", nacosConfig.get("group"), configPath);
             }
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<?> readSharedConfigs(Map<String, Object> document) {
-        Map<String, Object> spring = (Map<String, Object>) document.get("spring");
-        Map<String, Object> cloud = (Map<String, Object>) spring.get("cloud");
-        Map<String, Object> nacos = (Map<String, Object>) cloud.get("nacos");
-        Map<String, Object> config = (Map<String, Object>) nacos.get("config");
-        return (List<?>) config.get("shared-configs");
     }
 }

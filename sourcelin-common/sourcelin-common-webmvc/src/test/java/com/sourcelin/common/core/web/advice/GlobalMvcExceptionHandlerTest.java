@@ -36,7 +36,7 @@ class GlobalMvcExceptionHandlerTest
             new BusinessException(ResultCode.NOT_FOUND, "文章不存在")
         );
 
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(404, response.getStatusCode().value());
         assertEquals(ResultCode.NOT_FOUND.getCode(), response.getBody().getCode());
         assertEquals("文章不存在", response.getBody().getMessage());
     }

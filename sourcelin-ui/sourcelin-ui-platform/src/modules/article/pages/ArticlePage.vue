@@ -381,7 +381,7 @@ onBeforeUnmount(() => {
 .sidebar-area.is-sticky { position: sticky; top: var(--sidebar-sticky-top); }
 .sidebar-area :deep(.sidebar-card) { position: relative; }
 
-@include sourcelin-down(lg) { .lead-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } .main-layout { grid-template-columns: 1fr; } .sidebar-area, .sidebar-area.is-sticky { position: static; top: auto; } .sidebar-area :deep(.sidebar-card) { position: static; } }
+@include sourcelin-down(lg) { .lead-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } .main-layout { grid-template-columns: minmax(0, 1fr); } .sidebar-area, .sidebar-area.is-sticky { position: static; top: auto; } .sidebar-area :deep(.sidebar-card) { position: static; } }
 @include sourcelin-down(md) {
   .feature-shell {
     width: min(100% - 32px, 100%);

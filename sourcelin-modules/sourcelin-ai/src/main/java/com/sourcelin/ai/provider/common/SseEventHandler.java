@@ -33,6 +33,7 @@ public abstract class SseEventHandler extends EventSourceListener {
     protected final AiStreamResultCallback callback;
     protected final StringBuilder fullResponseAccumulator = new StringBuilder();
     protected final long startTime = System.currentTimeMillis();
+    private boolean terminated;
 
     public SseEventHandler(SseEmitter emitter, AiAbilityConfig config, Map<String, Object> inputs,
                           String bizId, String requestId, AiCallLogService aiCallLogService,
@@ -53,6 +54,7 @@ public abstract class SseEventHandler extends EventSourceListener {
 
     @Override
     public void onEvent(EventSource eventSource, String id, String type, String data) {
+        if (terminated) return;
         // 处理 OpenAI 格式的流结束标记 [DONE]
         if ("[DONE]".equals(data)) {
             handleStreamComplete(eventSource);
@@ -78,6 +80,8 @@ public abstract class SseEventHandler extends EventSourceListener {
 
     @Override
     public void onFailure(EventSource eventSource, Throwable t, Response response) {
+        if (terminated) return;
+        terminated = true;
         String errorMsg = resolveFailureMessage(t, response);
         if (t != null) {
             log.error("SSE stream failed for requestId: " + requestId, t);
@@ -138,6 +142,8 @@ public abstract class SseEventHandler extends EventSourceListener {
      * 处理流完成：归档结果、发送完成事件、关闭连接
      */
     protected void handleStreamComplete(EventSource eventSource) {
+        if (terminated) return;
+        terminated = true;
         String fullText = fullResponseAccumulator.toString();
         Long recordId = archiveResult(fullText);
 

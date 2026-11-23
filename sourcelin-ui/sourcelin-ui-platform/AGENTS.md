@@ -221,8 +221,6 @@ Design Tokens
 - `.cursor/README.md`
 - `.cursor/rules/project-rules.mdc`
 - `skills/`
-- `.opencode/README.md`
-- `.opencode/skills/`
 
 ## 规则源说明
 
@@ -233,8 +231,6 @@ Design Tokens
 ## 技能源说明
 
 - `skills/` 是唯一技能源目录。
-- `.opencode/skills/` 只保留给 OpenCode 使用的轻量入口文件。
-- 如需修改技能内容，应优先修改 `skills/`，而不是在 `.opencode/` 中重复维护完整技能正文。
 
 ## 额外资源
 
@@ -243,4 +239,3 @@ Design Tokens
 - **样式台账**：`docs/style-asset-ledger.md`
 - **项目技能**：`skills/README.md`
 - **Cursor 入口**：`.cursor/rules/project-rules.mdc`
-- **OpenCode 入口**：`.opencode/skills/sourcelin-ui-refactor/SKILL.md`

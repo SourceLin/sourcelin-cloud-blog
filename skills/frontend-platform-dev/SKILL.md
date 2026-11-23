@@ -48,3 +48,7 @@ description: 用于新增或修改 Sourcelin 博客前台 Vue3 页面、组件�
 - 禁止新增 `glass-card`、`FeatureCard`、`:deep(.n-*)`、`@include liquid-glass-effect`、`!important`。
 - 禁止页面读取 `rows/records/list/msg` 或判断 `code === 200`。
 - 禁止通过降低 `style:guard` 或 `test:architecture` 规则来通过验证。
+
+## 升级验证
+
+在 `sourcelin-ui/sourcelin-ui-platform` 从锁文件执行 `npm ci`，按模块入口执行类型、样式与架构检查，再执行 `npm run build`。生产静态目录为模块内的 `sourcelin-ui-platform/`。

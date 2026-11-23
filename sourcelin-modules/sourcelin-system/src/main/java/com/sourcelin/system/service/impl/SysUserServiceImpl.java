@@ -3,7 +3,7 @@ package com.sourcelin.system.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.validation.Validator;
+import jakarta.validation.Validator;
 
 import com.sourcelin.system.service.ISysConfigService;
 import com.sourcelin.system.service.ISysUserService;

@@ -27,7 +27,7 @@ src/
 
 ## 硬边界
 
-- Naive UI 只允许出现在 `src/shared/components/ui/**`、`src/app/App.vue` 和 `src/shared/api/http.ts` 的显式例外中。
+- Naive UI 的允许位置以 `rules/ui-design-system-core.md` 为准。
 - 业务组件和页面不得新增 `n-*`、glass mixin、`:deep(.n-*)`、`.n-*` override 或硬编码颜色。
 - 新的共享视觉值必须先进入 Token。
 - 导航永远由 route meta 推导，不再维护第二份导航配置。
@@ -54,8 +54,6 @@ src/
 - `skills/`
 - `.cursor/README.md`
 - `.cursor/rules/project-rules.mdc`
-- `.opencode/README.md`
-- `.opencode/skills/`
 
 ## 最低验证
 

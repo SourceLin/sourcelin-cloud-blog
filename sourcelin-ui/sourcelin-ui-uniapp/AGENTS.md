@@ -21,18 +21,18 @@ Sourcelin Liquid Glass Mobile 设计语言
 
 每次移动端开发、重构、审查或测试必须读取：
 
-- `rules/README.md`
-- `rules/api-contract.md`
-- `rules/frontend-uniapp.md`
-- `rules/coding-conventions.md`
-- `rules/testing-and-validation.md`
-- `skills/frontend-uniapp-dev/SKILL.md`
+- `../../rules/README.md`
+- `../../rules/api-contract.md`
+- `../../rules/frontend-uniapp.md`
+- `../../rules/coding-conventions.md`
+- `../../rules/testing-and-validation.md`
+- `../../skills/frontend-uniapp-dev/SKILL.md`
 
 涉及后端接口新增或修改时，追加读取：
 
-- `rules/backend.md`
-- `skills/backend-dev/SKILL.md`
-- `skills/api-contract-governance/SKILL.md`
+- `../../rules/backend.md`
+- `../../skills/backend-dev/SKILL.md`
+- `../../skills/api-contract-governance/SKILL.md`
 
 ## 3. 目录约定
 
@@ -97,7 +97,7 @@ src/static/**             # tabbar、图片等静态资源
 
 ## 7. UI 与体验
 
-- UI 遵守 `docs/product/UNIAPP_MINI_PROGRAM_PRODUCT_DESIGN.md` 中的 Liquid Glass Mobile 规范。
+- UI 遵守 `../../docs/product/UNIAPP_MINI_PROGRAM_PRODUCT_DESIGN.md` 中的 Liquid Glass Mobile 规范。
 - 小程序端玻璃态以半透明底色、渐变边框、轻阴影和弥散光为主，避免大面积 `backdrop-filter`。
 - 核心页面必须提供加载态、空态、错误态、到底态或禁用态。
 - 移动端必须优先考虑单手操作、触达区域、弱网反馈、下拉刷新和上拉加载。

@@ -54,3 +54,5 @@
 - MUST NOT：页面判断 `code === 200`。
 - MUST NOT：页面读取 `msg`、`rows`、`records`、`list`、`pageNum`、`limit`。
 - CHECK：执行对应前端类型检查，并审查 API 类型定义和页面消费字段。
+
+- CHECK：跨版本以同一组输入对照状态码、字段类型和业务值；下载验证媒体类型与文件内容，SSE 验证媒体类型、首包和断线恢复。

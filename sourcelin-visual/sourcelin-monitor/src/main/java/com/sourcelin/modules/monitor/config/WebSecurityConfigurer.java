@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
  * 
  * @author sourcelin
  */
+@org.springframework.context.annotation.Configuration
 @EnableWebSecurity
 public class WebSecurityConfigurer
 {
@@ -30,22 +31,15 @@ public class WebSecurityConfigurer
         successHandler.setDefaultTargetUrl(adminContextPath + "/");
 
         return httpSecurity
-                .headers().frameOptions().disable()
-                .and().authorizeRequests()
-                .antMatchers(adminContextPath + "/assets/**"
-                        , adminContextPath + "/login"
-                        , adminContextPath + "/actuator/**"
-                        , adminContextPath + "/instances/**"
-                ).permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin().loginPage(adminContextPath + "/login")
-                .successHandler(successHandler).and()
-                .logout().logoutUrl(adminContextPath + "/logout")
-                .and()
-                .httpBasic().and()
-                .csrf()
-                .disable()
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(adminContextPath + "/assets/**", adminContextPath + "/login",
+                                adminContextPath + "/actuator/**", adminContextPath + "/instances/**").permitAll()
+                        .anyRequest().authenticated())
+                .formLogin(form -> form.loginPage(adminContextPath + "/login").successHandler(successHandler))
+                .logout(logout -> logout.logoutUrl(adminContextPath + "/logout"))
+                .httpBasic(org.springframework.security.config.Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
                 .build();
     }
 }

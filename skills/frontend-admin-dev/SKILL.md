@@ -27,7 +27,7 @@ description: 用于新增或修改 Sourcelin Vue3 管理后台页面、接口封
 ## 执行步骤
 
 1. 读取 `AGENTS.md`、`rules/frontend-admin.md`、`rules/api-contract.md`、`rules/coding-conventions.md`、`rules/testing-and-validation.md`。
-2. 确认新功能落在 `sourcelin-ui/sourcelin-ui-admin`，不修改 `sourcelin-ui-admin-vue2`。
+2. 确认新功能落在 `sourcelin-ui/sourcelin-ui-admin`。
 3. API 封装放入 `src/api/**`，统一通过 `src/utils/request.ts`。
 4. 页面放入 `src/views/**`，共享结构优先复用 `src/components/**` 或领域 shared 组件。
 5. 表格页统一使用标准分页字段，查询、表格、分页、操作列优先复用共享壳。
@@ -43,8 +43,11 @@ description: 用于新增或修改 Sourcelin Vue3 管理后台页面、接口封
 
 ## 禁止行为
 
-- 禁止新增功能到 `sourcelin-ui-admin-vue2`。
 - 禁止页面判断 `response.code`、读取 `msg/rows/records/list`。
 - 禁止新增 `any`。
 - 禁止引入新的 UI 库。
-- 禁止复制一套查询表单、分页和操作列协议绕过现有共享壳。
+- 禁止复制一套查询表单、分页和操作列协议绕过现有共享壳。
+
+## 升级验证
+
+在 `sourcelin-ui/sourcelin-ui-admin` 使用 `pnpm install --frozen-lockfile`。在验证副本执行会改写文件的 lint。构建后检查模块内的 `sourcelin-ui-admin/` 及权限菜单、列表翻页和审核弹窗。

@@ -1,7 +1,7 @@
 package com.sourcelin.job.controller;
 
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.sourcelin.job.domain.SysJob;
 import com.sourcelin.job.service.ISysJobService;

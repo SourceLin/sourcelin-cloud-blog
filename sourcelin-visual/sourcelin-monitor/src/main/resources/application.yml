@@ -1,0 +1,49 @@
+# Tomcat
+server:
+  port: 9100
+
+# Spring
+spring:
+  http:
+    converters:
+      preferred-json-mapper: jackson2
+    codecs:
+      preferred-json-mapper: jackson2
+  config:
+    import:
+      - "optional:nacos:application-${spring.profiles.active}.yml?group=${spring.cloud.nacos.config.group}&refreshEnabled=true"
+      - "optional:nacos:${spring.application.name}-${spring.profiles.active}.yml?group=${spring.cloud.nacos.config.group}&refreshEnabled=true"
+  application:
+    # 应用名称
+    name: sourcelin-monitor
+  # 强制要求 JVM 使用 UTF-8，避免 Windows 默认 GBK 导致 Nacos YAML（含中文）解析失败
+  mandatory-file-encoding: UTF-8
+  profiles:
+    # 环境配置
+    active: dev
+  # 监控中心仅作为 Spring Boot Admin Server 使用，不依赖数据库。
+  # 若 classpath 中存在 JDBC 相关依赖，默认 DataSource 自动装配会在未配置 url/driver 时导致启动失败。
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
+      - org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration
+  cloud:
+    nacos:
+      username: ${NACOS_USERNAME:}
+      password: ${NACOS_PASSWORD:}
+      discovery:
+        namespace: ${NACOS_NAMESPACE:}
+        # 分组
+        group: ${NACOS_GROUP:BLOG_GROUP}
+        # 服务注册地址
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+      config:
+        namespace: ${NACOS_NAMESPACE:}
+        # 分组
+        group: ${NACOS_GROUP:BLOG_GROUP}
+        # 配置中心地址
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+        # 明确指定 Nacos 配置编码，避免在 Windows 环境下出现 YAML 解析乱码/编码异常
+        encode: UTF-8
+        # 配置文件格式
+        file-extension: yml

@@ -20,6 +20,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateTime" column="update_time" />
     </resultMap>
 
+    <insert id="lockArticle">
+        insert into b_article_knowledge_sync (article_id, create_time, update_time)
+        values (#{articleId}, sysdate(), sysdate())
+        on duplicate key update article_id = #{articleId}
+    </insert>
+
     <select id="selectByArticleId" resultMap="ArticleKnowledgeSyncResult">
         select id, article_id, source_type, ability_code, document_id, content_hash,
                sync_status, indexing_status, batch, error_message, last_sync_time,

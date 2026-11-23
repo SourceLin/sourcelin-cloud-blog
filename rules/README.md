@@ -17,7 +17,7 @@
 1. 仓库根 `AGENTS.md`
 2. 更近目录的 `AGENTS.md` / `rules/`
 3. `rules/api-contract.md`
-4. 领域规则：`backend.md` / `frontend-platform.md` / `frontend-admin.md`
+4. 领域规则：`backend.md` / `frontend-platform.md` / `frontend-uniapp.md` / `frontend-admin.md`
 5. `coding-conventions.md`
 6. `testing-and-validation.md`
 
@@ -35,8 +35,8 @@
 - MUST：开源分支可以提交项目文档，但不得提交市场分析和商业模式文档。
 - MUST：规则和技能不得引用开源分支不提交的本地维护脚本。
 - MUST NOT：提交 `scripts/**`。
-- MUST NOT：提交 `docs/internal/MARKET_ANALYSIS.md` 或 `docs/internal/BUSINESS_MODEL.md`。
-- CHECK：执行 `git ls-files scripts docs/internal/MARKET_ANALYSIS.md docs/internal/BUSINESS_MODEL.md` 必须无输出。
+- MUST NOT：提交 `docs/internal/**`。
+- CHECK：执行 `git ls-files scripts docs/internal` 必须无输出。
 
 ## 仓库发布模型
 
@@ -51,8 +51,11 @@
 
 ## 维护规则
 
+- MUST：跨栈升级先核对仓库及模块入口、领域规则与关联技能，修正影响本轮实施的过时约定。区分当前基线、升级目标和已验证状态。
+- CHECK：从受影响模块的入口走查到技能、工作目录和验证命令；处理会把新实现导向旧约定的冲突后，再修改依赖、代码、SQL 或部署配置。
+
 - MUST：规则与真实目录、技术栈保持一致。
-- MUST：新增长期规则必须放入本目录六个文件之一。
+- MUST：新增长期规则归入本目录对应领域的规则文件。
 - MUST：删除或替换旧规则时同步更新 `AGENTS.md`、`skills/README.md` 和相关技能。
 - MUST NOT：新增第二份 API 契约、第二份前端设计系统规则或第二份测试清单。
 - MUST NOT：使用“建议”“尽量”等不可验收表述作为硬性规则。

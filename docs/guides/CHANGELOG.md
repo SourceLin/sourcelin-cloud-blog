@@ -6,6 +6,14 @@
 
 > 说明：`v1.0.0` 章节主要反映首个开源版本时的历史发布信息，不完全等同于当前代码现状。当前实现以 [README.md](../../README.md)、[PROJECT_SUMMARY.md](../product/PROJECT_SUMMARY.md) 和 [rules/](../../rules/) 为准。
 
+## 2026-11-23 主线架构升级
+
+- 后端迁移到 JDK 27 + Spring Boot 4.0.10 + Spring Cloud 2025.1.5 + Spring Cloud Alibaba 2025.1.0.0，服务配置入口迁入 `application.yml`。
+- 业务库与 Nacos 配置库的初始化基线更新为 MySQL 8.4 LTS。Redis 会话存储要求 6.0 及以上。
+- 博客前台与管理后台使用 Vite 8，Uniapp 的 H5 和微信小程序使用 Vite 5。三端分别使用各自的锁文件安装依赖。
+- 修正跨服务登录态反序列化、AI 长文本结果回写及文章详情窄屏布局。
+- 已有部署的配置迁移见[升级指南](../deployment/UPGRADE.md)。
+
 ## [v1.0.0] - 2024-07-19
 
 ### 新增
@@ -25,7 +33,7 @@
 ### 功能
 - 基于 Spring Cloud Alibaba 微服务架构
 - Nacos 服务注册与配置中心
-- Spring Security + JWT 认证授权（历史基线，当前实现已迁移到 Sa-Token 方向，现行基线见 docs/configs）
+- Spring Security + JWT 认证授权（历史基线，现行主线使用 Sa-Token）
 - Sentinel 流量控制
 - Seata 分布式事务
 - Redis 缓存
@@ -45,30 +53,6 @@
 - Nacos 配置数据
 - Seata 事务表
 
-## [待发布] - 开发中
-
-### 当前基线
-- 当前前端主线为 Vue 3 博客前台和 Vue 3 管理后台
-- 当前认证基线为 Sa-Token
-- 当前文件存储基线为 MinIO
-- 当前公开部署入口包含 `docker-compose.example.yml` 与 `.env.example`
-
-### 计划中
-- [ ] 前台 API 接口完善
-- [ ] 文章详情页
-- [ ] 用户中心数据对接
-- [ ] 点赞/收藏/关注前台功能
-- [ ] 小程序支持（Uni-app）
-- [ ] 一键部署脚本（Docker）
-- [ ] SEO 优化
-- [ ] 数据分析功能
-
-### 待修复
-- [ ] 前台页面数据对接
-- [ ] 部分 Bug 修复
-
----
-
 ## 版本历史
 
 | 版本 | 日期 | 说明 |
@@ -79,7 +63,7 @@
 
 ### 从早期 3.6.x 基线升级
 
-请说明 [升级文档](../deployment/UPGRADE.md)
+参见[升级文档](../deployment/UPGRADE.md)
 
 ### 全新安装
 
@@ -88,7 +72,7 @@
 3. 修改各服务配置文件
 4. 启动服务
 
-详见 [快速开始](../README.md#quick-start)
+详见 [快速开始](./QUICK_START.md)
 
 ## 鸣谢
 

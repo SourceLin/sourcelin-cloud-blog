@@ -7,7 +7,7 @@ import com.sourcelin.common.core.web.filter.TraceIdFilter;
 import com.sourcelin.message.service.SseTicketService;
 import com.sourcelin.message.session.SseSessionManager;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.context.annotation.*;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -31,8 +31,8 @@ class SseHttpContractTest {
   TomcatServletWebServerFactory factory=new TomcatServletWebServerFactory(0);
   WebServer server=factory.getWebServer(servletContext -> {
    context.setServletContext(servletContext);context.refresh();
-   javax.servlet.ServletRegistration.Dynamic registration=servletContext.addServlet("dispatcher",new DispatcherServlet(context));registration.setAsyncSupported(true);registration.addMapping("/");
-   javax.servlet.FilterRegistration.Dynamic filter=servletContext.addFilter("trace",new TraceIdFilter());filter.setAsyncSupported(true);filter.addMappingForUrlPatterns(null,false,"/*");
+   jakarta.servlet.ServletRegistration.Dynamic registration=servletContext.addServlet("dispatcher",new DispatcherServlet(context));registration.setAsyncSupported(true);registration.addMapping("/");
+   jakarta.servlet.FilterRegistration.Dynamic filter=servletContext.addFilter("trace",new TraceIdFilter());filter.setAsyncSupported(true);filter.addMappingForUrlPatterns(null,false,"/*");
   });
   server.start();
   try {

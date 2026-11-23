@@ -8,6 +8,8 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface ArticleKnowledgeSyncMapper {
 
+    void lockArticle(@Param("articleId") Long articleId);
+
     ArticleKnowledgeSync selectByArticleId(@Param("articleId") Long articleId);
 
     int insert(ArticleKnowledgeSync sync);

@@ -1,11 +1,12 @@
 package com.sourcelin.ai.feign;
 
+import com.sourcelin.ai.api.domain.AiRecordCreateRequest;
 import com.sourcelin.common.core.constant.SecurityConstants;
 import com.sourcelin.common.core.constant.ServiceNameConstants;
 import com.sourcelin.common.core.domain.R;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 /**
@@ -17,11 +18,8 @@ public interface RemoteBlogAiCallbackService {
     /**
      * 内网调用：保存流式生成完毕的 AI 结果记录，并返回生成的记录 ID
      */
-    @PostMapping("/inner/blog/ai/records/create")
+    @PostMapping(value = "/inner/blog/ai/records", consumes = "application/json")
     R<Long> createRecord(
-            @RequestParam("abilityCode") String abilityCode,
-            @RequestParam("bizId") String bizId,
-            @RequestParam("aiResult") String aiResult,
-            @RequestParam("ownerId") String ownerId,
+            @RequestBody AiRecordCreateRequest request,
             @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 }

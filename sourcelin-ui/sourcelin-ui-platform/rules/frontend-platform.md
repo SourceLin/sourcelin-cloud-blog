@@ -34,7 +34,7 @@
 - `src/shared/composables/**`
   - 跨模块复用逻辑
 - `src/shared/api/http.ts`
-  - 请求基座和离散消息例外
+  - 请求基座，使用根 Provider 注入的消息实例
 
 ## 请求与状态
 

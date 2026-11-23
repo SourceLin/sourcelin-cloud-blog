@@ -1,6 +1,6 @@
 # 可选 AI 与实时消息部署
 
-发布基线为 JDK 8。基础部署只需要 MySQL、Redis、Nacos 和核心服务。AI 与实时消息默认关闭，可分别启用。
+当前开发主线使用 JDK 27。基础部署只需要 MySQL、Redis、Nacos 和核心服务。AI 与实时消息默认关闭，可分别启用。
 
 ## 数据库
 
@@ -14,6 +14,8 @@
 
 ## 服务与环境
 
+滚动升级 AI 归档功能时，先更新全部博客服务实例，再更新 AI 服务。回退时先回退 AI 服务。新版 AI 使用 JSON 请求体传输长文，旧版 AI 可继续调用新版博客服务保留的归档接口。
+
 构建命令：
 
 ```powershell
@@ -25,6 +27,8 @@ mvn package -pl sourcelin-modules/sourcelin-ai,sourcelin-modules/sourcelin-messa
 AI 服务使用 `AI_CONFIG_ENCRYPTION_KEY`，值为部署环境生成的 32 字节随机密钥的 Base64 表示。密钥应稳定保存于密钥管理中，更换前迁移密文。通过 Nacos 或 `AI_DB_URL`、`AI_DB_USERNAME`、`AI_DB_PASSWORD` 配置 AI 业务库连接。
 
 在博客服务配置 `blog.ai.enabled=true` 后，管理员填写能力 Provider、Endpoint、模型/应用 ID、API Key 和 Prompt，再启用需要的能力。所有初始化能力均关闭；不支持的 Provider 不应作为生产配置选择。封面模型与端点不绑定特定供应商。
+
+火山方舟 Agent Plan 文本能力可选择“直连大模型”（`direct_llm`），Endpoint 填 `https://ark.cn-beijing.volces.com/api/plan/v3`，模型 ID 填 `deepseek-v4.1-flash`。普通和流式调用共用该配置。
 
 知识库同步还需配置 `blog.ai.knowledge-sync-enabled=true`；未启用时文章编辑不会访问知识库同步表。
 

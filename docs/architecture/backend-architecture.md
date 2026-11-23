@@ -1,8 +1,10 @@
-﻿# 后端架构说明
+# 后端架构说明
 
 ## 当前状态
 
-后端采用 Spring Cloud Alibaba + Spring Boot，按网关、认证中心、业务服务和公共模块拆分。当前统一响应体由 WebMVC 公共能力处理，安全模块只保留安全相关异常处理，避免网关依赖 `common-security`。
+后端使用 JDK 27、Spring Boot 4.0 和 Spring Cloud Alibaba 2025.1，按网关、认证中心、业务服务和公共模块拆分。当前统一响应体由 WebMVC 公共能力处理，安全模块只保留安全相关异常处理，避免网关依赖 `common-security`。
+
+具体补丁版本由根 POM 管理。九个服务通过 application.yml 导入 Nacos 配置；网关运行于 WebFlux，MVC 公共模块处理业务服务的响应和异常。构建时用 Maven 3.9.x 并核对 mvn -version 中的 Java 版本。
 
 关键边界：
 
@@ -53,7 +55,5 @@ blog/
 ## 验证命令
 
 ```bash
-node scripts/api-contract-scan.mjs
-node scripts/architecture-guard/backend-guard.mjs
-mvn test -pl sourcelin-common/sourcelin-common-core -am
+mvn clean verify
 ```

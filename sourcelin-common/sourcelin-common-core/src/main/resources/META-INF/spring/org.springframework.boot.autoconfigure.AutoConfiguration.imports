@@ -1,1 +1,2 @@
 com.sourcelin.common.core.utils.SpringUtils
+com.sourcelin.common.core.config.PageHelperConfiguration

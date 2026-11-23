@@ -173,7 +173,7 @@ public class MiniProgramAuthService {
     }
 
     protected MiniProgramSession exchangeCode(String code) {
-        String url = UriComponentsBuilder.fromHttpUrl(miniProgramProperties.getCode2SessionUrl())
+        String url = UriComponentsBuilder.fromUriString(miniProgramProperties.getCode2SessionUrl())
             .queryParam("appid", miniProgramProperties.getAppId())
             .queryParam("secret", miniProgramProperties.getAppSecret())
             .queryParam("js_code", code)

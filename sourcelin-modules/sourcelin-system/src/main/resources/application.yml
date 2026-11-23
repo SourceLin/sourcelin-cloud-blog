@@ -4,16 +4,26 @@ server:
 
 # Spring
 spring:
+  http:
+    converters:
+      preferred-json-mapper: jackson2
+    codecs:
+      preferred-json-mapper: jackson2
+  config:
+    import:
+      - "optional:nacos:application-${spring.profiles.active}.yml?group=${spring.cloud.nacos.config.group}&refreshEnabled=true"
+      - "optional:nacos:${spring.application.name}-${spring.profiles.active}.yml?group=${spring.cloud.nacos.config.group}&refreshEnabled=true"
   application:
     # 应用名称
     name: sourcelin-system
   profiles:
     # 环境配置
     active: dev
-  redis:
-    host: ${SYSTEM_REDIS_HOST:${REDIS_HOST:localhost}}
-    port: ${SYSTEM_REDIS_PORT:${REDIS_PORT:6379}}
-    password: ${SYSTEM_REDIS_PASSWORD:${REDIS_PASSWORD:}}
+  data:
+    redis:
+      host: ${SYSTEM_REDIS_HOST:${REDIS_HOST:localhost}}
+      port: ${SYSTEM_REDIS_PORT:${REDIS_PORT:6379}}
+      password: ${SYSTEM_REDIS_PASSWORD:${REDIS_PASSWORD:}}
   datasource:
     druid:
       dynamic:
@@ -69,22 +79,22 @@ spring:
         connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
   cloud:
     nacos:
+      username: ${NACOS_USERNAME:}
+      password: ${NACOS_PASSWORD:}
       discovery:
+        namespace: ${NACOS_NAMESPACE:}
         # 分组
         group: ${NACOS_GROUP:BLOG_GROUP}
         # 服务注册地址
         server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
       config:
+        namespace: ${NACOS_NAMESPACE:}
         # 分组
         group: ${NACOS_GROUP:BLOG_GROUP}
         # 配置中心地址
         server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
         # 配置文件格式
         file-extension: yml
-        # 共享配置
-        shared-configs:
-          - data-id: application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
-            group: ${spring.cloud.nacos.config.group}
 
 # mybatis兜底配置（Nacos 配置解析异常时也能保证 mapper XML 可加载）
 mybatis:

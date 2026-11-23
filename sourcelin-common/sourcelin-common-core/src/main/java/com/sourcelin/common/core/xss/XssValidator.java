@@ -2,8 +2,8 @@ package com.sourcelin.common.core.xss;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import com.sourcelin.common.core.utils.StringUtils;
 
 /**

@@ -53,4 +53,8 @@
 - MUST：`rules/`、`skills/` 或 `AGENTS.md` 改动后，检查引用路径均在开源分支真实存在。
 - MUST：数据库初始化脚本改动后，导入空库验证表结构和必要初始化数据。
 - MUST NOT：保留旧规则、旧技能、已排除脚本、市场分析或商业模式文档引用。
-- CHECK：执行 `git ls-files scripts` 必须无输出；执行 `git ls-files docs` 时只允许 `docs/sql/**`。
+- CHECK：在公开候选树执行 `git ls-tree -r --name-only <候选提交> -- scripts docs/internal`，结果应为空。
+
+## 升级验收
+
+根目录执行 `mvn -version`、`mvn clean verify`、`mvn dependency:tree`，核对实际测试数。Web 与小程序使用 `npm ci`，后台使用 `pnpm install --frozen-lockfile`。在各端执行前述检查后，Web 与后台执行各自的 build。后台 lint 会自动写文件，应在验证副本运行。小程序检查主包字节数，并在真机验证登录、覆盖安装及流式重连。

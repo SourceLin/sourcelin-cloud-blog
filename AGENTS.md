@@ -64,7 +64,6 @@ sourcelin-ui/sourcelin-ui-uniapp/      # 移动端小程序，Uniapp + Vue3 + Ty
 
 sourcelin-ui/sourcelin-ui-admin/       # 管理后台主线，Vue3 + TypeScript + Element Plus
 
-sourcelin-ui/sourcelin-ui-admin-vue2/  # 旧版迁移对照，不承载新功能
 
 ```
 
@@ -274,6 +273,8 @@ mvn <goal>
 
 ## 11. 架构重构流程
 
+跨栈升级先执行 rules/README.md 的升级规则核对，再进入模块实现。
+
 
 1. 读取 `skills/architecture-refactor/SKILL.md`。
 
@@ -374,13 +375,14 @@ pnpm run lint
 
 
 
-SQL 初始化验证：
+在独立 MySQL 8.4 实例上，使用 mysql 客户端从仓库根目录执行：
 
 
 
-```powershell
+```sql
 
-mysql -u root -p < docs/sql/sourcelin-cloud.sql
+-- 在隔离 MySQL 8.4 实例的 mysql 客户端中执行（脚本自带 USE）
+SOURCE docs/sql/sourcelin-cloud.sql
 
 ```
 
@@ -405,7 +407,10 @@ mysql -u root -p < docs/sql/sourcelin-cloud.sql
 
 8. `sourcelin-file`，端口 9300，可选
 
-9. `sourcelin-visual-monitor`，端口 9100，可选
+9. `sourcelin-job`，端口 9203，可选
+10. `sourcelin-ai`，端口 9205，可选
+11. `sourcelin-message`，端口 9400，可选
+12. `sourcelin-visual-monitor`，端口 9100，可选
 
 
 

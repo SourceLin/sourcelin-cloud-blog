@@ -3,6 +3,7 @@ package com.sourcelin.ai.service;
 import com.alibaba.fastjson2.JSON;
 import com.sourcelin.ai.api.domain.AiAbilityInvokeRequest;
 import com.sourcelin.ai.api.domain.AiAbilityInvokeResult;
+import com.sourcelin.ai.api.domain.AiRecordCreateRequest;
 import com.sourcelin.ai.api.domain.AiTaskCreateRequest;
 import com.sourcelin.ai.api.domain.AiTaskStatusVO;
 import com.sourcelin.ai.domain.AiAbilityConfig;
@@ -318,10 +319,7 @@ public class AiAdapterService {
         }
         try {
             R<Long> recordResult = remoteBlogAiCallbackService.createRecord(
-                    request.getAbilityCode(),
-                    request.getBizId(),
-                    aiResult,
-                    request.getUserId(),
+                    new AiRecordCreateRequest(request.getAbilityCode(), request.getBizId(), aiResult, request.getUserId()),
                     SecurityConstants.INNER);
             if (recordResult == null || recordResult.getCode() != R.SUCCESS) {
                 log.warn("Failed to archive blog AI record for async task, ability={}, bizId={}",
@@ -379,7 +377,7 @@ public class AiAdapterService {
                 try {
                     if (remoteBlogAiCallbackService != null) {
                         R<Long> r = remoteBlogAiCallbackService.createRecord(
-                                abilityCode, request.getBizId(), fullText, request.getUserId(),
+                                new AiRecordCreateRequest(abilityCode, request.getBizId(), fullText, request.getUserId()),
                                 SecurityConstants.INNER);
                         if (r != null && r.getCode() == R.SUCCESS) {
                             return r.getData();

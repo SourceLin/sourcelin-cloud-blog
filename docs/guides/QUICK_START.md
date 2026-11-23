@@ -2,7 +2,7 @@
 
 本文档面向第一次接触 Sourcelin Blog 的开发者，目标是尽快完成本地启动和基础排错。
 
-如果你要看完整对外介绍，先读 [README.md](../../README.md)。如果你要做服务器部署，直接看 [DEPLOY_SOURCELIN_CN_DOCKER.md](../internal/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)。
+如果你要看完整对外介绍，先读 [README.md](../../README.md)。服务器部署可参考 [Compose 示例](../../docker-compose.example.yml) 和 [Nginx 配置](../deployment/NGINX_CONFIG.md)。
 
 ## 一、最快阅读路径
 
@@ -17,12 +17,12 @@
 
 | 组件 | 最低版本 | 推荐版本 |
 |------|----------|----------|
-| JDK | 1.8+ | 1.8 / 11 |
-| Maven | 3.6+ | 3.8.x |
-| MySQL | 5.7+ | 8.0 |
-| Redis | 5.0+ | 6.0+ |
-| Node.js | 14+ | 18 LTS |
-| Nacos | 2.0+ | 2.0.x |
+| JDK | 27 | 27.0.1.1 |
+| Maven | 3.9 | 3.9.x |
+| MySQL | 8.4 | 8.4 LTS |
+| Redis | 6.0（支持 `SET ... KEEPTTL`） | 7.2.x |
+| Node.js | 22.12 | 22 LTS |
+| Nacos | 3.1.1 | 3.1.1 |
 
 ## 三、本地最小启动
 
@@ -136,7 +136,7 @@ npm run dev
 
 - Nacos 是否真的启动成功
 - `sourcelin-config.sql` 是否已经导入
-- `bootstrap.yml` 中 Nacos 地址、用户名、密码是否正确
+- `application.yml` 中 Nacos 地址、用户名、密码是否正确
 
 ### 2. 服务启动报数据库连接错误
 
@@ -191,8 +191,7 @@ pnpm run build -- --base=/admin/
 
 如果你要参考现成部署方案，请看：
 
-- [DEPLOY_SOURCELIN_CN_DOCKER.md](../internal/deployment/DEPLOY_SOURCELIN_CN_DOCKER.md)
-- [DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md](../internal/deployment/DEPLOY_SOURCELIN_CN_SINGLE_DOMAIN.md)
+- [已有部署升级说明](../deployment/UPGRADE.md)
 - [NGINX_CONFIG.md](../deployment/NGINX_CONFIG.md)
 
 典型使用方式：

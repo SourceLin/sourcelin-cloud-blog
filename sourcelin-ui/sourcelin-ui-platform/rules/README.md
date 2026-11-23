@@ -1,6 +1,6 @@
 # 规则索引
 
-`rules/` 是当前仓库唯一规则源目录。正式规则只在这里维护，`AGENTS.md`、Cursor 和 OpenCode 入口只做引用和同步说明，不重复维护完整正文。
+`rules/` 是前台局部规则目录，`AGENTS.md` 和 Cursor 入口只做引用和同步说明，不重复维护完整正文。
 
 ## 文件列表
 
@@ -23,7 +23,7 @@
 
 - 改规则，只改 `rules/`
 - 改技能，只改 `skills/`
-- 更新架构说明时，同时检查 `README.md`、`AGENTS.md`、`docs/`、`.cursor/`、`.opencode/`
+- 更新架构说明时，同时检查 `README.md`、`AGENTS.md`、`docs/`、`.cursor/`
 - 入口目录只保留轻量说明，不复制规则正文
 
 ## 推荐联查文件

@@ -532,9 +532,9 @@ sourcelin-ui-uniapp/
 |------|------|
 | 前端(PC) | 博客前台：Vue 3 + TypeScript + Naive UI；管理后台：Vue 3 + TypeScript + Element Plus |
 | 前端(移动) | Uni-app + Vue 3 |
-| 后端 | Spring Boot 2.7 + Spring Cloud |
+| 后端 | JDK 27 + Spring Boot 4.0.10 + Spring Cloud 2025.1.5 + Spring Cloud Alibaba 2025.1.0.0 |
 | 微服务 | Nacos + Sentinel + Seata |
-| 数据库 | MySQL 8.0 + Redis |
+| 数据库 | MySQL 8.4 LTS + Redis 6.0 及以上 |
 | 文件存储 | MinIO |
 
 ### B. 服务端口

@@ -16,7 +16,6 @@ public class RestTemplateConfig {
     @LoadBalanced
     public RestTemplate loadBalancedRestTemplate() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setBufferRequestBody(false);
         factory.setConnectTimeout(5000);
         factory.setReadTimeout(300_000); // 5 分钟，匹配 SSE 超时
         return new RestTemplate(factory);

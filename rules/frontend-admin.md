@@ -1,6 +1,6 @@
 # 前端规则 - 管理后台
 
-适用范围：`sourcelin-ui/sourcelin-ui-admin`。`sourcelin-ui-admin-vue2` 仅作为迁移对照，不承载新功能。
+适用范围：`sourcelin-ui/sourcelin-ui-admin`。
 
 ## 1. 目录边界
 
@@ -10,7 +10,6 @@
 - MUST：路由放在 `src/router/**`。
 - MUST：状态管理遵守现有 `src/store/**` 结构。
 - MUST：跨页面复用组件放在 `src/components/**`，业务域复用组件放在对应 `src/views/<domain>/**`。
-- MUST NOT：新功能落入 `sourcelin-ui-admin-vue2`。
 - CHECK：审查新增文件路径，并执行 `pnpm run type-check`。
 
 ## 2. API 与类型
@@ -30,7 +29,7 @@
 - MUST：权限逻辑沿用现有路由、菜单、按钮权限体系。
 - MUST NOT：为单个页面复制一套查询表单、表格分页和操作列协议。
 - MUST NOT：改造页面时改变接口调用方式或权限逻辑，除非任务明确要求。
-- CHECK：后台模块化改动后执行 `pnpm run type-check`、`pnpm run lint`。
+- CHECK：使用 pnpm 10.26 或以上的 10.x 版本读取 `pnpm-workspace.yaml`，执行 `pnpm install --frozen-lockfile`。后台模块化改动后执行 `pnpm run type-check`、`pnpm run lint`。
 
 ## 4. UI 与错误处理
 

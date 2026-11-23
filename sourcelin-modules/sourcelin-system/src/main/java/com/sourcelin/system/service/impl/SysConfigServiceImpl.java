@@ -2,7 +2,7 @@ package com.sourcelin.system.service.impl;
 
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import com.sourcelin.system.service.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;

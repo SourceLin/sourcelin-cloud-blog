@@ -7,6 +7,7 @@ import cn.dev33.satoken.stp.StpLogic;
 import com.sourcelin.common.core.utils.StringUtils;
 import com.sourcelin.gateway.config.properties.IgnoreWhiteProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
@@ -50,6 +51,7 @@ public class SaTokenGatewayConfiguration
     }
 
     @Bean
+    @Primary
     public cn.dev33.satoken.config.SaTokenConfig saTokenConfig() {
         cn.dev33.satoken.config.SaTokenConfig config = new cn.dev33.satoken.config.SaTokenConfig();
         config.setTokenName("Authorization"); config.setTokenPrefix("Bearer");

@@ -14,9 +14,9 @@
 <p align="center">
   <a href="https://github.com/SourceLin/sourcelin-cloud-blog"><img src="https://img.shields.io/github/stars/SourceLin/sourcelin-cloud-blog?style=flat-square&logo=github&logoColor=white" alt="GitHub Stars"></a>
   <a href="https://gitee.com/my_lyq/sourcelin-cloud-blog"><img src="https://gitee.com/my_lyq/sourcelin-cloud-blog/badge/star.svg?theme=dark" alt="Gitee Stars"></a>
-  <img src="https://img.shields.io/badge/Java-1.8+-blue.svg" alt="Java">
-  <img src="https://img.shields.io/badge/Spring%20Boot-2.7.18-brightgreen.svg" alt="Spring Boot">
-  <img src="https://img.shields.io/badge/Spring%20Cloud-2021.0.9-brightgreen.svg" alt="Spring Cloud">
+  <img src="https://img.shields.io/badge/Java-27-blue.svg" alt="Java">
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.0.10-brightgreen.svg" alt="Spring Boot">
+  <img src="https://img.shields.io/badge/Spring%20Cloud-2025.1.5-brightgreen.svg" alt="Spring Cloud">
   <img src="https://img.shields.io/badge/Vue-3.x-42b883.svg" alt="Vue">
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License"></a>
 </p>
@@ -35,7 +35,7 @@
 | Version | Deployment and customization | Java baseline |
 | --- | --- | --- |
 | **No-AI edition (`v1`)** | Available now. Includes the blog frontend, admin panel, and Uniapp mini program. Use this as a baseline for projects without AI or SSE notifications. [Gitee](https://gitee.com/my_lyq/sourcelin-cloud-blog/tree/v1) · [GitHub](https://github.com/SourceLin/sourcelin-cloud-blog/tree/v1) · [GitCode](https://gitcode.com/SourceLin/sourcelin-cloud-blog/tree/v1) | JDK 8 |
-| **Main codebase (optional AI)** | The core blog runs without model credentials. AI writing assistance, chat, comment moderation, Dify knowledge base sync, and SSE notifications can be enabled as needed. | JDK 8 |
+| **Main codebase (optional AI)** | The core blog runs without model credentials. AI writing assistance, chat, comment moderation, Dify knowledge base sync, and SSE notifications can be enabled as needed. | JDK 27 |
 
 Clone with `--branch v1` for the no-AI edition. For the main codebase, see the [quick start](docs/guides/QUICK_START.md) and [AI and real-time messaging setup](docs/guides/AI_MESSAGE_SETUP.md). Both optional features are off by default.
 
@@ -192,12 +192,12 @@ Read more: [docs/openai-application.md](./docs/openai-application.md) | [docs/ai
 
 | Layer | Technology |
 |---|---|
-| Framework | Spring Boot 2.7.18, Spring Cloud 2021.0.9, Spring Cloud Alibaba 2021.0.6.0 |
+| Framework | Spring Boot 4.0.10, Spring Cloud 2025.1.5, Spring Cloud Alibaba 2025.1.0.0 |
 | Registry & Config | Nacos |
 | Gateway | Spring Cloud Gateway |
 | Auth | Sa-Token |
 | ORM | MyBatis, MyBatis-Plus, PageHelper |
-| Database | MySQL 8.0 |
+| Database | MySQL 8.4 LTS |
 | Cache | Redis |
 | Frontend | Vue 3, TypeScript, Naive UI (blog frontend), Element Plus (admin panel) |
 | Build | Maven, pnpm, Vite |
@@ -229,12 +229,12 @@ Read more: [docs/openai-application.md](./docs/openai-application.md) | [docs/ai
 
 ### Prerequisites
 
-- JDK 1.8+
-- Maven 3.6+
-- MySQL 8.0
-- Redis 6.0+
-- Nacos 2.x
-- Node.js 18+ & pnpm
+- JDK 27
+- Maven 3.9.x
+- MySQL 8.4 LTS
+- Redis 6.0+ with `SET ... KEEPTTL` support (7.2.x recommended)
+- Nacos 3.1.1
+- Node.js 22.12+ and pnpm
 
 ### Local Development
 
