@@ -27,6 +27,9 @@ class InteractionLikeServiceImplTest
     private InteractionLikeServiceImpl service;
 
     @Mock
+    private com.sourcelin.blog.service.InboxService inbox;
+
+    @Mock
     private LikeRecordMapper likeRecordMapper;
 
     @Mock
@@ -67,6 +70,7 @@ class InteractionLikeServiceImplTest
 
         assertTrue(changed);
         verify(likeRecordMapper).insertLikeRecord(any(LikeRecord.class));
+        verify(inbox).likeChanged(2L, "article", 7L, true);
         verify(interactionTargetSupport).increaseLikeCount(InteractionTargetTypeEnum.ARTICLE, 7L);
     }
 

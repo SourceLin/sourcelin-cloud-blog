@@ -25,6 +25,11 @@ export const useAppStore = defineStore('app', () => {
   const systemInfo = ref<SystemInfo | null>(null);
   const siteInfo = ref<SiteInfo | null>(null);
   const unreadCount = ref(0);
+  const inboxRevision = ref(0);
+
+  function invalidateInbox(): void {
+    inboxRevision.value++;
+  }
 
   function markLaunchReady(): void {
     launchReady.value = true;
@@ -60,6 +65,8 @@ export const useAppStore = defineStore('app', () => {
     systemInfo,
     siteInfo,
     unreadCount,
+    inboxRevision,
+    invalidateInbox,
     markLaunchReady,
     collectSystemInfo,
     setSiteInfo,

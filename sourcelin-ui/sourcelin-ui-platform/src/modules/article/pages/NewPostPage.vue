@@ -367,6 +367,8 @@ const loadAiStatus = async () => {
         </div>
       </div>
       <PostEditorForm
+        :key="editingId ?? 'new'"
+        :article-id="editingId"
         v-else
         v-model="form"
         :categories="categories"

@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.sourcelin.ai.domain.AiAbilityConfig;
 import com.sourcelin.ai.domain.ProviderTypeEnum;
 import com.sourcelin.ai.provider.AiProviderClient;
+import com.sourcelin.ai.provider.ProviderConfigurationException;
 import com.sourcelin.ai.provider.common.DirectLlmSseEventHandler;
 import okhttp3.*;
 import okhttp3.sse.EventSource;
@@ -122,7 +123,7 @@ public class DirectLlmProviderClient implements AiProviderClient {
     private String buildRequestUrl(AiAbilityConfig config) {
         String baseUrl = config.getEndpointUrl();
         if (baseUrl == null || baseUrl.trim().isEmpty()) {
-            throw new IllegalArgumentException("DirectLLM Endpoint URL is not configured for ability: " + config.getAbilityCode());
+            throw new ProviderConfigurationException("DirectLLM Endpoint URL is not configured for ability: " + config.getAbilityCode());
         }
         String url = baseUrl.trim().replaceAll("/+$", "");
         if (!url.endsWith("/chat/completions")) {
@@ -134,7 +135,7 @@ public class DirectLlmProviderClient implements AiProviderClient {
     private String requireApiKey(AiAbilityConfig config) {
         String apiKey = config.getApiKey();
         if (apiKey == null || apiKey.trim().isEmpty()) {
-            throw new IllegalArgumentException("DirectLLM API Key is not configured for ability: " + config.getAbilityCode());
+            throw new ProviderConfigurationException("DirectLLM API Key is not configured for ability: " + config.getAbilityCode());
         }
         return apiKey;
     }
@@ -142,7 +143,7 @@ public class DirectLlmProviderClient implements AiProviderClient {
     private String requireModelName(AiAbilityConfig config) {
         String modelName = config.getProviderAppId();
         if (modelName == null || modelName.trim().isEmpty()) {
-            throw new IllegalArgumentException("DirectLLM Model is not configured for ability: " + config.getAbilityCode());
+            throw new ProviderConfigurationException("DirectLLM Model is not configured for ability: " + config.getAbilityCode());
         }
         return modelName.trim();
     }
@@ -155,7 +156,7 @@ public class DirectLlmProviderClient implements AiProviderClient {
     private RenderedPrompt renderPrompt(AiAbilityConfig config, Map<String, Object> inputs) {
         String template = config.getPromptTemplate();
         if (template == null || template.trim().isEmpty()) {
-            throw new IllegalArgumentException("Prompt template is not configured for ability: " + config.getAbilityCode());
+            throw new ProviderConfigurationException("Prompt template is not configured for ability: " + config.getAbilityCode());
         }
 
         // 如果模板包含 {question}，拆分出 system prompt 和 user content

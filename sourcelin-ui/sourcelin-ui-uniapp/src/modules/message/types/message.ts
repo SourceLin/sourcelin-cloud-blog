@@ -3,6 +3,10 @@ export type MessageChannel = 'system' | 'interaction' | 'star' | 'follow';
 export interface MessageItem {
   id: number;
   title: string;
+  sourceAvailable?: boolean;
+  targetType?: string;
+  targetId?: number;
+  commentId?: number;
   content?: string;
   /** 消息所属频道（后端暂未下发时前端默认归为 system） */
   channel?: MessageChannel;

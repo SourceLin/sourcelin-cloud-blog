@@ -2,6 +2,10 @@ import { requestData } from '@/shared/api/http'
 import type { PageResult } from '@/shared/types/api'
 
 export interface SystemNoticeItem {
+  targetType?: string
+  targetId?: number
+  commentId?: number
+  sourceAvailable?: boolean
   id?: number
   title?: string
   content?: string
@@ -19,9 +23,13 @@ export interface MessageQuery {
   channel?: string
 }
 
+function channelUrl(channel = 'system') {
+  return channel === 'system' ? '/front/messages' : `/front/messages/inbox/${channel}`
+}
+
 export function getMessages(query: MessageQuery = {}) {
   return requestData<PageResult<SystemNoticeItem>>({
-    url: '/front/messages',
+    url: channelUrl(query.channel),
     method: 'get',
     params: {
       page: query.page ?? 1,
@@ -31,9 +39,9 @@ export function getMessages(query: MessageQuery = {}) {
   }).then((result) => result.items)
 }
 
-export function getMessageDetail(id: number) {
+export function getMessageDetail(id: number, channel = 'system') {
   return requestData<SystemNoticeItem>({
-    url: `/front/messages/${id}`,
+    url: `${channelUrl(channel)}/${id}`,
     method: 'get'
   })
 }
@@ -47,16 +55,16 @@ export function getNoticeDetail(id: number) {
   return getMessageDetail(id)
 }
 
-export function readMessage(id: number) {
+export function readMessage(id: number, channel = 'system') {
   return requestData<boolean>({
-    url: `/front/messages/${id}/read`,
+    url: `${channelUrl(channel)}/${id}/read`,
     method: 'post'
   })
 }
 
-export function readAllMessages() {
+export function readAllMessages(channel = 'system') {
   return requestData<boolean>({
-    url: '/front/messages/read-all',
+    url: `${channelUrl(channel)}/read-all`,
     method: 'post'
   })
 }

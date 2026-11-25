@@ -39,20 +39,20 @@ export const MESSAGE_CHANNELS: ChannelConfig[] = [
     name: '互动消息',
     icon: 'chat',
     color: '#00B42A',
-    description: '评论、回复与提及',
-    available: false,
-    emptyTitle: '互动消息即将上线',
-    emptyDescription: '评论回复与@提及提醒将在此聚合，后端接口就绪后开放。'
+    description: '评论与回复',
+    available: true,
+    emptyTitle: '互动消息',
+    emptyDescription: '收到的评论与回复会显示在这里。'
   },
   {
     id: 'star',
-    name: '赞与收藏',
+    name: '点赞通知',
     icon: 'star',
     color: '#FFB800',
-    description: '点赞与收藏动态',
-    available: false,
-    emptyTitle: '赞与收藏即将上线',
-    emptyDescription: '文章被点赞、收藏的通知将在此展示，敬请期待。'
+    description: '点点赞通知动态',
+    available: true,
+    emptyTitle: '点赞通知',
+    emptyDescription: '收到的新点赞会显示在这里。'
   },
   {
     id: 'follow',
@@ -60,9 +60,9 @@ export const MESSAGE_CHANNELS: ChannelConfig[] = [
     icon: 'heart',
     color: '#FF5B75',
     description: '新增粉丝',
-    available: false,
-    emptyTitle: '关注通知即将上线',
-    emptyDescription: '新粉丝提醒将在此展示，敬请期待。'
+    available: true,
+    emptyTitle: '关注通知',
+    emptyDescription: '新粉丝会显示在这里。'
   }
 ];
 

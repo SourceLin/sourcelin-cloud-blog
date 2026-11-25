@@ -63,6 +63,10 @@
         </s-empty>
       </view>
 
+      <view v-if="linkedComment" id="inbox-comment" class="detail__comments s-card">
+        <text class="detail__section-title">{{ linkedComment.title }}</text>
+        <view>{{ linkedComment.sourceAvailable ? linkedComment.content : '来源已不可用' }}</view>
+      </view>
       <view v-if="showCommentsSection" class="detail__comments s-card">
         <view class="detail__section-head">
           <text class="detail__section-title">评论</text>
@@ -201,6 +205,8 @@
 </template>
 
 <script setup lang="ts">
+import { fetchMessageDetail } from '@/modules/message/api/message.api';
+import type { MessageItem } from '@/modules/message/types/message';
 import { computed, nextTick, ref, watch } from 'vue';
 import { onHide, onLoad, onPageScroll, onShareAppMessage, onShow, onUnload } from '@dcloudio/uni-app';
 import { fetchArticleDetail, reportArticleView } from '@/modules/article/api/article.api';
@@ -599,7 +605,10 @@ async function tryRestoreReadingProgress(id: number): Promise<void> {
   }, 120);
 }
 
-onLoad((options) => {
+const linkedComment = ref<MessageItem | null>(null);
+watch(() => userStore.token, () => { linkedComment.value = null; });
+
+onLoad(async (options) => {
   if (!guard('articleReadEnabled')) {
     return;
   }
@@ -610,7 +619,17 @@ onLoad((options) => {
   }
   enterTimestamp.value = Date.now();
   uni.$on(AUTH_LOGIN_SUCCESS_EVENT, handleLoginSuccess);
-  loadDetail(id);
+  await loadDetail(id);
+  const message = Number(options?.message);
+  if (userStore.isLoggedIn && Number.isSafeInteger(message) && message > 0) {
+    const token = userStore.token;
+    const notice = await fetchMessageDetail(message, 'interaction');
+    if (userStore.token === token && notice.targetId === id) {
+      linkedComment.value = notice;
+      await nextTick();
+      uni.pageScrollTo({ selector: '#inbox-comment', duration: 250 });
+    }
+  }
 });
 
 onShow(() => {

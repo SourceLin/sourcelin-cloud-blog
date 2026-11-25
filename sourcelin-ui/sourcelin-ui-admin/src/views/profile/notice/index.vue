@@ -108,7 +108,9 @@ defineOptions({
   inheritAttrs: false,
 });
 
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, onUnmounted, reactive, ref } from "vue";
+import { subscribeUnreadChanges } from "@/utils/SseClientManager";
+import { AuthStorage } from "@/utils/auth";
 import NoticeAPI from "@/api/system/notice";
 import type { NoticeDetail, NoticeItem, NoticeQueryParams } from "@/types/api";
 
@@ -125,14 +127,18 @@ const queryParams = reactive<NoticeQueryParams>({
 const noticeDialogVisible = ref(false);
 const noticeDetail = ref<NoticeDetail | null>(null);
 
+let listRequest = 0;
 async function handleQuery() {
+  const request = ++listRequest;
+  const token = AuthStorage.getAccessToken();
   loading.value = true;
   try {
     const data = await NoticeAPI.getMyNoticePage(queryParams);
+    if (request !== listRequest || token !== AuthStorage.getAccessToken()) return;
     pageData.value = data.items;
     total.value = data.total ?? 0;
   } finally {
-    loading.value = false;
+    if (request === listRequest) loading.value = false;
   }
 }
 
@@ -143,13 +149,17 @@ function handleResetQuery() {
 }
 
 async function handleReadNotice(id: string) {
+  const token = AuthStorage.getAccessToken();
   const data = await NoticeAPI.getDetail(id);
+  if (token !== AuthStorage.getAccessToken()) return;
   await NoticeAPI.markRead(id);
+  if (token !== AuthStorage.getAccessToken()) return;
   noticeDetail.value = data;
   noticeDialogVisible.value = true;
   await handleQuery();
 }
 
+onUnmounted(subscribeUnreadChanges(handleQuery));
 onMounted(() => {
   handleQuery();
 });

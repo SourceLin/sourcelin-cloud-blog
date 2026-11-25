@@ -1,11 +1,17 @@
 import { ref, onBeforeUnmount, type Ref } from 'vue'
-import { generateArticleTitle, generateArticleSummary, recommendArticleTags, refineArticleContent, createAiAsyncTask, getAiTaskStatus } from '@/modules/article/api/ai.api'
+import { invokeAiAbility, createAiAsyncTask, getAiTaskStatus } from '@/modules/article/api/ai.api'
 import { useSMessage } from '@/shared/composables/useSMessage'
 import type { PostEditorFormModel } from '@/modules/article/components/PostEditorForm.vue'
-interface PostEditorAiProps { tagOptions: Array<{ label: string; value: number }> }
+interface PostEditorAiProps { articleId?: number | null; tagOptions: Array<{ label: string; value: number }> }
 export function usePostEditorAi(form: Ref<PostEditorFormModel>, props: Readonly<PostEditorAiProps>) {
 const message = useSMessage()
 let disposed = false
+let activeRequest: AbortController | null = null
+function cancelGeneration() {
+  activeRequest?.abort()
+  activeRequest = null
+  aiLoading.value = {}
+}
 // AI 相关状态
 const aiLoading = ref<Record<string, boolean>>({})
 const showAiDialog = ref(false)
@@ -51,20 +57,20 @@ function parseTagIdsFromAiResult(content: string): number[] {
   }
 }
 
-async function pollAsyncTaskResult(taskId: string): Promise<string> {
+async function pollAsyncTaskResult(taskId: string, signal: AbortSignal): Promise<string> {
   const maxAttempts = 60
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise((resolve) => setTimeout(resolve, 2000))
-    if (disposed) throw new Error('已离开编辑页面')
+    if (disposed || signal.aborted) throw new Error('已离开编辑页面')
     const status = await getAiTaskStatus(taskId)
     if (status?.status === 'succeeded') {
       return status.resultSnapshot || ''
     }
-    if (status?.status === 'failed') {
+    if (status?.status === 'failed' || status?.status === 'unconfirmed') {
       throw new Error(status.errorMessage || '异步任务执行失败')
     }
   }
-  throw new Error('生成超时，请稍后重试')
+  throw new Error(`等待结果超时，请按任务编号 ${taskId} 核对生成状态。`)
 }
 
 async function handleAiGenerate(field: { prop: string; aiAbility: string; label: string }) {
@@ -79,29 +85,26 @@ async function handleAiGenerate(field: { prop: string; aiAbility: string; label:
     return
   }
 
+  if (activeRequest || showAiDialog.value) return
+  const request = new AbortController()
+  activeRequest = request
   aiLoading.value[field.prop] = true
   try {
     let result
 
-    if (abilityCode === 'article_title_generate') {
-      result = await generateArticleTitle(content)
-    } else if (abilityCode === 'article_summary') {
-      result = await generateArticleSummary(form.value.title, content)
-    } else if (abilityCode === 'article_tags') {
-      const tagOptions = props.tagOptions.map((item) => ({ id: item.value, name: item.label }))
-      result = await recommendArticleTags(form.value.title, content, tagOptions)
-    } else if (abilityCode === 'article_cover_generate') {
-      const created = await createAiAsyncTask('article_cover_generate', { title: form.value.title, content })
-      if (!created?.taskId) {
-        throw new Error('未获取到任务 ID')
+    if (abilityCode === 'article_cover_generate') {
+      const created = await createAiAsyncTask(abilityCode, { title: form.value.title, content }, props.articleId ?? undefined)
+      if (!created?.taskId) throw new Error('未获取到任务 ID')
+      result = { success: true, content: await pollAsyncTaskResult(created.taskId, request.signal) }
+    } else {
+      const input: Record<string, unknown> = { content, title: form.value.title }
+      if (abilityCode === 'article_tags') {
+        input.tagOptions = JSON.stringify(props.tagOptions.map(item => ({ id: item.value, name: item.label })))
       }
-      const imageUrl = await pollAsyncTaskResult(created.taskId)
-      result = { success: true, content: imageUrl }
-    } else if (abilityCode === 'article_content_refine') {
-      result = await refineArticleContent(content)
+      result = await invokeAiAbility(abilityCode, input, props.articleId ?? undefined, request.signal)
     }
 
-    if (disposed) return
+    if (disposed || request.signal.aborted) return
     if (result?.success && result.content) {
       const finalContent = result.content
 
@@ -179,10 +182,11 @@ async function handleAiGenerate(field: { prop: string; aiAbility: string; label:
       message.error(result?.errorMessage || 'AI 生成失败，请稍后再试')
     }
   } catch (error) {
+    if (disposed || request.signal.aborted) return
     console.error('AI 生成失败:', error)
     message.error('AI 生成失败，请稍后再试')
   } finally {
-    aiLoading.value[field.prop] = false
+    if (activeRequest === request) { activeRequest = null; aiLoading.value[field.prop] = false }
   }
 }
 
@@ -257,6 +261,6 @@ function discardAiResult() {
   showAiDialog.value = false
 }
 
-onBeforeUnmount(() => { disposed = true; cleanTypingTimer() })
-return { aiLoading, showAiDialog, aiResult, handleAiGenerate, cleanTypingTimer, applyAiResult, discardAiResult }
+onBeforeUnmount(() => { disposed = true; cancelGeneration(); cleanTypingTimer() })
+return { cancelGeneration, aiLoading, showAiDialog, aiResult, handleAiGenerate, cleanTypingTimer, applyAiResult, discardAiResult }
 }

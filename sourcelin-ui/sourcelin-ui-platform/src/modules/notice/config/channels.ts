@@ -35,28 +35,28 @@ export const MESSAGE_CHANNELS: ChannelConfig[] = [
     id: 'interaction',
     name: '互动消息',
     icon: 'comment',
-    description: '评论、回复与提及',
-    available: false,
+    description: '评论与回复',
+    available: true,
     comingTitle: '互动消息',
-    comingDescription: '评论与回复提醒将在此聚合，后端接口就绪后开放。'
+    comingDescription: '收到的评论与回复会显示在这里。'
   },
   {
     id: 'star',
-    name: '赞与收藏',
+    name: '点赞通知',
     icon: 'heart',
-    description: '点赞与收藏动态',
-    available: false,
-    comingTitle: '赞与收藏',
-    comingDescription: '文章被点赞、收藏的通知将在此展示，敬请期待。'
+    description: '收到的点赞',
+    available: true,
+    comingTitle: '点赞通知',
+    comingDescription: '收到的新点赞会显示在这里。'
   },
   {
     id: 'follow',
     name: '关注通知',
     icon: 'visitors',
     description: '新增粉丝',
-    available: false,
+    available: true,
     comingTitle: '关注通知',
-    comingDescription: '新粉丝提醒将在此展示，敬请期待。'
+    comingDescription: '新粉丝会显示在这里。'
   }
 ]
 

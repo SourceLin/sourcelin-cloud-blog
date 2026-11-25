@@ -213,3 +213,7 @@ node scripts/blog-api-smoke.mjs
 - 超时可通过 `BLOG_SMOKE_TIMEOUT_MS` 覆盖（默认 15000）。  
 - 退出码：`0` 全部 2xx；`1` 存在失败；未设置 `BLOG_SMOKE_BASE_URL` 为 `2`。  
 - CI 中若无稳定环境，可跳过该步骤或仅在合并前流水线中配置密钥与 base URL 后执行。
+
+## 登录用户的互动收件箱
+
+在博客网关前缀下，`GET /front/messages/inbox/{channel}` 返回 PageResult，`GET /front/messages/inbox/{channel}/{id}` 返回详情。频道取 interaction、star 或 follow。POST 到详情路径的 /read 标记单条已读，POST 到频道的 /read-all 标记该频道全部已读。原公告路径保留，/front/messages/unread-count 返回各频道合计。不可见来源返回 sourceAvailable=false，评论正文为空。

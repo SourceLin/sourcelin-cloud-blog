@@ -13,6 +13,7 @@ import com.sourcelin.blog.vo.interaction.InteractionTargetStatVO;
 import com.sourcelin.common.core.enums.ResultCode;
 import com.sourcelin.common.core.exception.BusinessException;
 import com.sourcelin.common.core.utils.DateUtils;
+import com.sourcelin.blog.service.InboxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,9 @@ import java.util.List;
 @Service
 public class InteractionLikeServiceImpl implements IInteractionLikeService
 {
+    @Autowired
+    private InboxService inbox;
+
     @Autowired
     private LikeRecordMapper likeRecordMapper;
     @Autowired
@@ -79,6 +83,7 @@ public class InteractionLikeServiceImpl implements IInteractionLikeService
             throw new BusinessException(ResultCode.SYSTEM_ERROR, "点赞记录写入失败，请稍后重试");
         }
         interactionTargetSupport.increaseLikeCount(type, targetId);
+        inbox.likeChanged(userId, type.getCode(), targetId, true);
         return true;
     }
 
@@ -107,6 +112,7 @@ public class InteractionLikeServiceImpl implements IInteractionLikeService
             throw new BusinessException(ResultCode.SYSTEM_ERROR, "取消点赞失败，请稍后重试");
         }
         interactionTargetSupport.decreaseLikeCount(type, targetId);
+        inbox.likeChanged(userId, type.getCode(), targetId, false);
         return true;
     }
 

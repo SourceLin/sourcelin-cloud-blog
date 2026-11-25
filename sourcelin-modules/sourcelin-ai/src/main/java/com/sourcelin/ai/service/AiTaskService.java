@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface AiTaskService {
     int insert(AiTask task);
+    int claimPending(String taskId);
     int updateByTaskId(AiTask task);
     int resetFailedTask(String taskId, int retryCount);
     AiTask selectByTaskId(String taskId);

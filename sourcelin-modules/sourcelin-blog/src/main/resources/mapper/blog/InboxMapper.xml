@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sourcelin.blog.mapper.InboxMapper">
+    <sql id="owned">
+        recipient_id = #{user} and channel = #{channel} and active = 1
+        <if test="id != null">and id = #{id}</if>
+    </sql>
+    <select id="messages" resultType="com.sourcelin.blog.vo.InboxMessageVO">
+        select e.id, e.channel, e.target_type as targetType, e.target_id as targetId,
+               if(e.channel = 'interaction', e.source_id, null) as commentId,
+               e.is_read as isRead, e.create_time as publishTime,
+               concat(coalesce(u.nickname, '博客用户'), case e.event_type
+                 when 'reply' then '回复了你的评论' when 'comment' then '评论了你的文章'
+                 when 'follow' then '关注了你' else '赞了你的内容' end) as title,
+               case when e.channel = 'interaction' and c.id is not null and a.id is not null
+                    then c.content else '' end as content,
+               case e.target_type when 'article' then a.id is not null and
+                      (e.channel != 'interaction' or c.id is not null)
+                    when 'say' then s.id is not null when 'treehole' then t.id is not null
+                    else u.id is not null end as sourceAvailable
+        from (select * from b_inbox_event where <include refid="owned"/>) e
+        left join b_user u on u.id = e.actor_id and u.user_status = 0
+        left join b_article a on e.target_type = 'article' and a.id = e.target_id and a.deleted = 0 and a.status = 2 and coalesce(a.read_auth,1) = 1
+        left join b_comment c on e.channel = 'interaction' and c.id = e.source_id and c.article_id = e.target_id and c.deleted = 0 and c.status = 1
+        left join b_say s on e.target_type = 'say' and s.id = e.target_id and s.deleted = 0 and s.status in (0,1)
+        left join b_treehole t on e.target_type = 'treehole' and t.id = e.target_id and t.deleted = 0 and t.status in (0,1)
+        order by e.create_time desc, e.id desc
+    </select>
+    <select id="unread" resultType="long">
+        select count(*) from b_inbox_event where recipient_id = #{user} and active = 1 and is_read = 0
+    </select>
+    <update id="read">
+        update b_inbox_event set is_read = 1 where <include refid="owned"/> and is_read = 0
+    </update>
+    <insert id="recordComment">
+        insert into b_inbox_event (recipient_id, actor_id, channel, event_type, target_type, target_id, source_id)
+        select distinct r.recipient, c.user_id, 'interaction',
+               if(r.recipient = p.user_id, 'reply','comment'), 'article', a.id, c.id
+        from b_comment c join b_article a on a.id = c.article_id and a.deleted = 0 and a.status = 2 and coalesce(a.read_auth,1) = 1
+        left join b_comment p on p.id = c.parent_comment_id and p.article_id = a.id and p.deleted = 0 and p.status = 1
+             and coalesce(nullif(p.source,''),'article') = 'article'
+        join lateral (select a.user_id as recipient union select p.user_id) r on true
+        where c.id = #{id} and c.deleted = 0 and c.status = 1
+          and coalesce(nullif(c.source,''),'article') = 'article' and r.recipient != c.user_id
+        on duplicate key update id = b_inbox_event.id
+    </insert>
+    <select id="likeRecipient" resultType="long">
+        <choose>
+            <when test="type == 'article'">select user_id from b_article where id = #{target} and deleted = 0 and status = 2 and coalesce(read_auth,1) = 1</when>
+            <when test="type == 'say'">select user_id from b_say where id = #{target} and deleted = 0 and status in (0,1)</when>
+            <otherwise>select user_id from b_treehole where id = #{target} and deleted = 0 and status in (0,1)</otherwise>
+        </choose>
+    </select>
+    <insert id="activate">
+        insert into b_inbox_event (recipient_id, actor_id, channel, event_type, target_type, target_id, source_id)
+        values (#{user}, #{actor}, #{channel}, #{channel}, #{type}, #{target}, #{target})
+        on duplicate key update is_read = if(active = 0,0,is_read), create_time = if(active = 0,now(3),create_time), active = 1
+    </insert>
+    <update id="deactivate">
+        update b_inbox_event set active = 0 where actor_id = #{actor} and channel = #{channel}
+          and target_type = #{type} and target_id = #{target} and active = 1
+    </update>
+    <select id="recipients" resultType="long">
+        select distinct recipient_id from b_inbox_event where channel = #{channel} and target_type = #{type} and source_id = #{source}
+    </select>
+</mapper>

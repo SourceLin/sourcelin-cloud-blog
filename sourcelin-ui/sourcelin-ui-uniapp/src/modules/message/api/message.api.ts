@@ -7,6 +7,10 @@ const PUBLIC_SYSTEM_MESSAGE_OPTIONS = {
   skipErrorToast: true
 } as const;
 
+function channelUrl(channel: MessageChannel = 'system'): string {
+  return channel === 'system' ? '/front/messages' : `/front/messages/inbox/${channel}`;
+}
+
 export interface MessagePageQuery {
   page?: number;
   pageSize?: number;
@@ -20,18 +24,18 @@ export function fetchMessagePage(query: MessagePageQuery = {}): Promise<PageResu
     params.channel = channel;
   }
   return http.get<PageResult<MessageItem>>(
-    '/front/messages',
+    channelUrl(channel),
     params,
     channel === 'system' ? PUBLIC_SYSTEM_MESSAGE_OPTIONS : undefined
   );
 }
 
-export function fetchMessageDetail(id: number): Promise<MessageItem> {
-  return http.get<MessageItem>(`/front/messages/${id}`);
+export function fetchMessageDetail(id: number, channel: MessageChannel = 'system'): Promise<MessageItem> {
+  return http.get<MessageItem>(`${channelUrl(channel)}/${id}`);
 }
 
-export function markMessageRead(id: number): Promise<boolean> {
-  return http.post<boolean>(`/front/messages/${id}/read`);
+export function markMessageRead(id: number, channel: MessageChannel = 'system'): Promise<boolean> {
+  return http.post<boolean>(`${channelUrl(channel)}/${id}/read`);
 }
 
 export function markAllMessagesRead(channel?: MessageChannel): Promise<boolean> {
@@ -39,7 +43,7 @@ export function markAllMessagesRead(channel?: MessageChannel): Promise<boolean> 
   if (channel) {
     params.channel = channel;
   }
-  return http.post<boolean>('/front/messages/read-all', params);
+  return http.post<boolean>(`${channelUrl(channel)}/read-all`, params);
 }
 
 export function fetchUnreadMessageCount(): Promise<MessageUnreadStat> {

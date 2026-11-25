@@ -1,8 +1,8 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
+  getMessageDetail,
   getMessages,
-  getUnreadCount,
   readAllMessages,
   readMessage
 } from '@/modules/notice/api/notice.api'
@@ -16,21 +16,6 @@ import type { NoticeViewItem } from '@/modules/notice/composables/useNoticeCente
 import { useMessageInboxBadgeStore } from '@/stores/message-inbox-badge.store'
 import { useUserStore } from '@/stores/user'
 import { useSMessage } from '@/shared/composables/useSMessage'
-
-interface SystemNoticeItem {
-  id?: number
-  title?: string
-  content?: string
-  publishTime?: string
-  isRead?: number
-}
-
-function asNotice(value: unknown): SystemNoticeItem {
-  if (typeof value === 'object' && value !== null) {
-    return value as SystemNoticeItem
-  }
-  return {}
-}
 
 function formatTime(time: string) {
   if (!time) {
@@ -73,13 +58,17 @@ export function useMessageCenter() {
 
   const splitIpAddress = (address: string) => address
 
-  const loadSystemNotices = async () => {
+  let listRequest = 0
+  const loadNotices = async () => {
+    const id = ++listRequest
+    const token = userStore.token
     noticesLoading.value = true
     try {
-      const rows = await getMessages({ channel: 'system', page: 1, pageSize: 100 })
-      noticeList.value = rows.map((item) => {
-        const notice = asNotice(item as SystemNoticeItem)
+      const rows = await getMessages({ channel: activeChannel.value, page: 1, pageSize: 100 })
+      if (id !== listRequest || userStore.token !== token) return
+      noticeList.value = rows.map((notice) => {
         return {
+          sourceAvailable: notice.sourceAvailable,
           id: Number(notice.id ?? 0),
           title: String(notice.title ?? '系统公告'),
           content: String(notice.content ?? ''),
@@ -88,14 +77,11 @@ export function useMessageCenter() {
         }
       })
       refreshKey.value = Date.now()
-      if (userStore.isLoggedIn) {
-        const unread = await getUnreadCount()
-        messageInboxBadgeStore.setTotalCount(Number(unread.total ?? 0))
-      }
+
     } catch (error) {
       console.error('加载公告失败:', error)
     } finally {
-      noticesLoading.value = false
+      if (id === listRequest) noticesLoading.value = false
     }
   }
 
@@ -113,22 +99,40 @@ export function useMessageCenter() {
   }
 
   const clearMessageItem = async (id: number | null, index: number | null) => {
+    const token = userStore.token
     if (index === null) {
       if (userStore.isLoggedIn) {
-        await readAllMessages()
+        await readAllMessages(activeChannel.value)
       }
+      if (userStore.token !== token) return
       noticeList.value = noticeList.value.map((item) => ({ ...item, isRead: 1 }))
     } else {
       if (userStore.isLoggedIn && id != null) {
-        await readMessage(id)
+        await readMessage(id, activeChannel.value)
       }
-      noticeList.value.splice(index, 1)
+      if (userStore.token !== token) return
+      noticeList.value = noticeList.value.map(item => item.id === id ? { ...item, isRead: 1 } : item)
     }
     if (userStore.isLoggedIn) {
-      const unread = await getUnreadCount()
-      messageInboxBadgeStore.setTotalCount(Number(unread.total ?? 0))
+      await messageInboxBadgeStore.refresh()
     }
-    toast.success('已从当前列表移除')
+    toast.success('已标为已读')
+  }
+
+  async function openMessage(id: number) {
+    const channel = activeChannel.value
+    const token = userStore.token
+    const message = await getMessageDetail(id, channel)
+    if (token !== userStore.token || channel !== activeChannel.value) return
+    await readMessage(id, channel)
+    if (token !== userStore.token || channel !== activeChannel.value) return
+    noticeList.value = noticeList.value.map(item => item.id === id ? { ...item, isRead: 1 } : item)
+    await messageInboxBadgeStore.refresh()
+    if (token !== userStore.token || channel !== activeChannel.value) return
+    if (!message.sourceAvailable) { toast.info('来源已不可用'); return }
+    if (message.targetType === 'article') {
+      await router.push({ path: `/article/${message.targetId}`, query: message.commentId ? { message: id } : {} })
+    }
   }
 
   function setChannel(id: MessageChannel) {
@@ -139,8 +143,11 @@ export function useMessageCenter() {
   }
 
   watch(
-    () => route.query.channel,
-    async (q) => {
+    [() => route.query.channel, () => userStore.token, () => messageInboxBadgeStore.inboxRevision],
+    async ([q, token], previous) => {
+      listRequest++
+      noticesLoading.value = false
+      if (token !== previous?.[1] || q !== previous?.[0]) noticeList.value = []
       if (!isMessageChannel(q)) {
         await router.replace({
           path: route.path,
@@ -148,8 +155,8 @@ export function useMessageCenter() {
         })
         return
       }
-      if (parseChannelFromQuery(q) === 'system') {
-        await loadSystemNotices()
+      if (q === 'system' || userStore.isLoggedIn) {
+        await loadNotices()
       }
     },
     { immediate: true }
@@ -165,6 +172,7 @@ export function useMessageCenter() {
     refreshKey,
     goBack,
     splitIpAddress,
+    openMessage,
     clearMessageItem,
     setChannel
   }

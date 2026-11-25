@@ -18,6 +18,11 @@ public class AiTaskServiceImpl implements AiTaskService {
     private AiTaskEventMapper aiTaskEventMapper;
 
     @Override
+    public int claimPending(String taskId) {
+        return aiTaskMapper.claimPending(taskId);
+    }
+
+    @Override
     public int insert(AiTask task) {
         return aiTaskMapper.insert(task);
     }

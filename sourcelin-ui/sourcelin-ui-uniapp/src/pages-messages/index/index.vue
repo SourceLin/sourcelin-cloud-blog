@@ -55,8 +55,8 @@
     <!-- 无数据空态 -->
     <s-empty
       v-else-if="isEmpty"
-      title="暂无公告"
-      text="当前没有新的系统公告或站务通知。"
+      :title="currentChannelConfig.emptyTitle"
+      :text="currentChannelConfig.emptyDescription"
     />
 
     <!-- 加载中（首次） -->
@@ -99,7 +99,9 @@
 </template>
 
 <script setup lang="ts">
-import { onLoad, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app';
+import { ref, watch } from 'vue';
+import { useAppStore } from '@/stores/app';
+import { onHide, onLoad, onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { showSuccessToast } from '@/utils/feedback';
@@ -109,6 +111,8 @@ import type { MessageItem } from '@/modules/message/types/message';
 import { useMiniAccess } from '@/shared/composables/useMiniAccess';
 
 const userStore = useUserStore();
+const appStore = useAppStore();
+const visible = ref(false);
 const themeStore = useThemeStore();
 const { guard } = useMiniAccess();
 
@@ -132,17 +136,21 @@ onLoad(() => {
   if (!guard('messageCenterEnabled')) {
     return;
   }
-  if (userStore.isLoggedIn) {
-    void refresh();
-  }
+
 });
 
 onShow(() => {
+  visible.value = true;
   themeStore.syncNativeArea();
   if (!userStore.isLoggedIn) {
     return;
   }
   void refresh();
+});
+
+onHide(() => { visible.value = false; });
+watch(() => [appStore.inboxRevision, userStore.token], () => {
+  if (visible.value && userStore.isLoggedIn) void refresh();
 });
 
 onPullDownRefresh(() => {
@@ -184,7 +192,7 @@ function goLogin(): void {
 }
 
 function openDetail(item: MessageItem): void {
-  uni.navigateTo({ url: `/pages-messages/detail/detail?id=${item.id}` });
+  uni.navigateTo({ url: `/pages-messages/detail/detail?id=${item.id}&channel=${activeChannel.value}` });
 }
 </script>
 

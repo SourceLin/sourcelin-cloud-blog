@@ -1,5 +1,7 @@
 # 消息中心改造完整可执行方案
 
+> 2026-11-24 实施状态：Web 和 Uniapp 已接入系统公告、评论回复、点赞和关注。收藏保持私密。下文保留初期设计，已实现的接口和部署配置见[消息架构](../../../docs/architecture/ai-message-architecture.md)。
+
 > 文档版本：v1.0 | 2026-04-08
 > 适用项目：`sourcelin-ui-platform`（Vue 3 + Naive UI）、`sourcelin-blog`（Spring Boot 微服务）
 

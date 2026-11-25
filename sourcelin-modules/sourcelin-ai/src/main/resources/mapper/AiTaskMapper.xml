@@ -34,6 +34,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         from ai_task
     </sql>
 
+    <update id="claimPending">
+        update ai_task set status = 'running', progress = 20, started_time = now(), update_time = now()
+        where task_id = #{taskId} and status = 'pending'
+    </update>
+
     <select id="selectByTaskId" parameterType="String" resultMap="AiTaskResult">
         <include refid="selectAiTaskVo"/>
         where task_id = #{taskId}

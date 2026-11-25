@@ -16,7 +16,7 @@ export interface AiInvokeResult {
 export interface AiTaskStatus {
   taskId: string
   requestId?: string
-  status: 'pending' | 'running' | 'succeeded' | 'failed'
+  status: 'pending' | 'running' | 'succeeded' | 'failed' | 'unconfirmed'
   progress?: number
   resultSnapshot?: string
   errorMessage?: string
@@ -44,12 +44,14 @@ export async function getAiStatus(): Promise<boolean> {
 export function invokeAiAbility(
   abilityCode: string,
   input: Record<string, unknown>,
-  bizId?: string | number
+  bizId?: string | number,
+  signal?: AbortSignal
 ): Promise<AiInvokeResult> {
   return requestData<AiInvokeResult>({
     url: `/front/ai/abilities/${abilityCode}/invoke`,
     method: 'post',
     params: bizId ? { bizId } : undefined,
+    signal,
     data: input
   })
 }

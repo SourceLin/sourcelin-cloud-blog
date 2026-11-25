@@ -12,6 +12,7 @@ import com.sourcelin.ai.domain.AiTask;
 import com.sourcelin.ai.domain.AiTaskEvent;
 import com.sourcelin.ai.monitor.AiMetricsCollector;
 import com.sourcelin.ai.provider.AiProviderClient;
+import com.sourcelin.ai.provider.ProviderConfigurationException;
 import com.sourcelin.ai.util.SensitiveDataMasker;
 import com.sourcelin.ai.feign.RemoteBlogAiCallbackService;
 import com.sourcelin.common.core.constant.SecurityConstants;
@@ -220,12 +221,42 @@ public class AiAdapterService {
         return "任务已重新执行，taskId: " + taskId;
     }
 
+    /** 只恢复尚未领取的任务。running 可能已向供应商发出请求，需核对后处理。 */
+    @org.springframework.context.event.EventListener(org.springframework.boot.context.event.ApplicationReadyEvent.class)
+    public void resumePendingTasks() {
+        AiTask query = new AiTask();
+        query.setStatus("pending");
+        var pending = aiTaskService.selectList(query);
+        if (pending.isEmpty()) return;
+        taskExecutor.execute(() -> {
+            for (AiTask task : pending) {
+                runPendingTask(task);
+            }
+        });
+    }
+
+    private void runPendingTask(AiTask task) {
+        if (aiTaskService.claimPending(task.getTaskId()) == 0) return;
+        AiTaskCreateRequest request = new AiTaskCreateRequest();
+        request.setAbilityCode(task.getAbilityCode());
+        request.setBizId(task.getBizId());
+        request.setUserId(task.getUserId());
+        request.setTenantId(task.getTenantId());
+        try {
+            request.setInput(new HashMap<>(JSON.parseObject(task.getInputSnapshot())));
+        } catch (RuntimeException error) {
+            failTask(task, "无法读取任务输入快照");
+            return;
+        }
+        executeClaimedTask(task, task.getTaskId(), request);
+    }
+
     private boolean submitTask(AiTask task, AiTaskCreateRequest request) {
         try {
             taskExecutor.execute(() -> executeAiTaskAsync(task, task.getTaskId(), request));
             return true;
         } catch (RejectedExecutionException e) {
-            failTask(task, "AI 任务队列暂不可用，请稍后重试");
+            if (aiTaskService.claimPending(task.getTaskId()) > 0) failTask(task, "AI 任务队列暂不可用，请稍后重试");
             return false;
         }
     }
@@ -271,6 +302,12 @@ public class AiAdapterService {
      * 异步执行AI任务
      */
     public void executeAiTaskAsync(AiTask task, String taskId, AiTaskCreateRequest request) {
+        if (aiTaskService.claimPending(taskId) == 0) return;
+        executeClaimedTask(task, taskId, request);
+    }
+
+    private void executeClaimedTask(AiTask task, String taskId, AiTaskCreateRequest request) {
+        boolean dispatched = false;
         try {
             task.setStatus("running");
             task.setProgress(20);
@@ -286,8 +323,10 @@ public class AiAdapterService {
             aiTaskService.updateByTaskId(task);
 
             if (!"1".equals(config.getEnabled())) throw new IllegalStateException("AI 能力未启用");
+            dispatched = true;
             String responseText = providerClient.invoke(config, request.getInput(), request.getUserId());
-
+            task.setResultSnapshot(responseText);
+            archiveBlogAiRecord(request, responseText);
             task.setStatus("succeeded");
             task.setProgress(100);
             task.setResultSnapshot(responseText);
@@ -296,9 +335,15 @@ public class AiAdapterService {
 
             recordTaskEvent(taskId, "SUCCEEDED", "Task completed successfully", responseText);
 
-            archiveBlogAiRecord(request, responseText);
         } catch (Exception e) {
             log.error("Async task execution failed: " + taskId, e);
+            if (dispatched && !(e instanceof ProviderConfigurationException)) {
+                task.setStatus("unconfirmed");
+                task.setErrorMessage("上游请求已发出，请核对生成结果与归档记录");
+                aiTaskService.updateByTaskId(task);
+                recordTaskEvent(taskId, "UNCONFIRMED", task.getErrorMessage(), null);
+                return;
+            }
             task.setResultSnapshot(null);
             failTask(task, e.getMessage() == null ? "AI 任务执行失败" : e.getMessage());
         }
@@ -322,11 +367,10 @@ public class AiAdapterService {
                     new AiRecordCreateRequest(request.getAbilityCode(), request.getBizId(), aiResult, request.getUserId()),
                     SecurityConstants.INNER);
             if (recordResult == null || recordResult.getCode() != R.SUCCESS) {
-                log.warn("Failed to archive blog AI record for async task, ability={}, bizId={}",
-                        request.getAbilityCode(), request.getBizId());
+                throw new IllegalStateException("封面结果归档未确认");
             }
         } catch (Exception e) {
-            log.error("Failed to archive blog AI record for async task", e);
+            throw new IllegalStateException("封面结果归档未确认", e);
         }
     }
 

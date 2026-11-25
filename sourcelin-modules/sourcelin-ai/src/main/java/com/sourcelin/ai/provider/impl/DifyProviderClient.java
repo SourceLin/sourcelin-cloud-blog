@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.sourcelin.ai.domain.AiAbilityConfig;
 import com.sourcelin.ai.domain.ProviderTypeEnum;
 import com.sourcelin.ai.provider.AiProviderClient;
+import com.sourcelin.ai.provider.ProviderConfigurationException;
 import com.sourcelin.ai.provider.common.DifySseEventHandler;
 import okhttp3.*;
 import okhttp3.sse.EventSource;
@@ -45,12 +46,12 @@ public class DifyProviderClient implements AiProviderClient {
     public String invoke(AiAbilityConfig config, Map<String, Object> inputs, String userId) throws Exception {
         String endpointUrl = config.getEndpointUrl();
         if (endpointUrl == null || endpointUrl.trim().isEmpty()) {
-            throw new IllegalArgumentException("Dify Endpoint URL is not configured for ability: " + config.getAbilityCode());
+            throw new ProviderConfigurationException("Dify Endpoint URL is not configured for ability: " + config.getAbilityCode());
         }
 
         String apiKey = config.getApiKey();
         if (apiKey == null || apiKey.trim().isEmpty()) {
-            throw new IllegalArgumentException("Dify API Key is not configured for ability: " + config.getAbilityCode());
+            throw new ProviderConfigurationException("Dify API Key is not configured for ability: " + config.getAbilityCode());
         }
 
         if ("chat".equals(config.getChatMode())) {
@@ -164,12 +165,12 @@ public class DifyProviderClient implements AiProviderClient {
 
         String endpointUrl = config.getEndpointUrl();
         if (endpointUrl == null || endpointUrl.trim().isEmpty()) {
-            throw new IllegalArgumentException("Dify Endpoint URL is not configured for ability: " + config.getAbilityCode());
+            throw new ProviderConfigurationException("Dify Endpoint URL is not configured for ability: " + config.getAbilityCode());
         }
 
         String apiKey = config.getApiKey();
         if (apiKey == null || apiKey.trim().isEmpty()) {
-            throw new IllegalArgumentException("Dify API Key is not configured for ability: " + config.getAbilityCode());
+            throw new ProviderConfigurationException("Dify API Key is not configured for ability: " + config.getAbilityCode());
         }
 
         if ("chat".equals(config.getChatMode())) {

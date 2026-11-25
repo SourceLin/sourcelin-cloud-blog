@@ -11,7 +11,16 @@ export const useMessageInboxBadgeStore = defineStore('messageInboxBadge', () => 
   const totalCount = ref(0)
   const loading = ref(false)
 
+  const inboxRevision = ref(0)
+  let requestId = 0
+
+  function invalidateInbox() {
+    inboxRevision.value++
+    void refresh()
+  }
+
   async function refresh() {
+    const id = ++requestId
     const userStore = useUserStore()
     if (!userStore.isLoggedIn) {
       totalCount.value = 0
@@ -21,16 +30,18 @@ export const useMessageInboxBadgeStore = defineStore('messageInboxBadge', () => 
     loading.value = true
     try {
       const data = await getUnreadCount()
-      if (token === userStore.token) totalCount.value = Number(data.total ?? 0)
+      if (id === requestId && token === userStore.token) totalCount.value = Number(data.total ?? 0)
     } catch {
-      if (token === userStore.token) totalCount.value = 0
+      // 查询失败时保留上次成功取得的未读数。
     } finally {
-      loading.value = false
+      if (id === requestId) loading.value = false
     }
   }
 
   /** 与消息页本地列表同步，避免重复请求 */
   function setTotalCount(next: number) {
+    requestId++
+    loading.value = false
     const userStore = useUserStore()
     if (!userStore.isLoggedIn) {
       totalCount.value = 0
@@ -40,6 +51,8 @@ export const useMessageInboxBadgeStore = defineStore('messageInboxBadge', () => 
   }
 
   return {
+    inboxRevision,
+    invalidateInbox,
     totalCount,
     loading,
     refresh,

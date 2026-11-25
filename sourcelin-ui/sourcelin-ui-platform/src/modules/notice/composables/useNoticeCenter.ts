@@ -12,6 +12,7 @@ interface SystemNoticeItem {
 }
 
 export interface NoticeViewItem {
+  sourceAvailable?: boolean
   id: number
   title: string
   content: string

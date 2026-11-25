@@ -12,6 +12,7 @@ import com.sourcelin.blog.vo.CommentVO;
 import com.sourcelin.blog.vo.FrontMyCommentVO;
 import com.sourcelin.blog.vo.ModerationOutcome;
 import com.sourcelin.common.core.utils.DateUtils;
+import com.sourcelin.blog.service.InboxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,9 @@ import java.util.List;
 @Service
 public class CommentServiceImpl implements ICommentService 
 {
+    @Autowired
+    private InboxService inbox;
+
     @Autowired
     private CommentMapper commentMapper;
 
@@ -79,10 +83,13 @@ public class CommentServiceImpl implements ICommentService
      * @return 结果
      */
     @Override
+    @Transactional
     public int insertComment(Comment comment)
     {
         comment.setCreateTime(DateUtils.getNowDate());
-        return commentMapper.insertComment(comment);
+        int rows = commentMapper.insertComment(comment);
+        if (rows > 0) inbox.commentChanged(comment.getId());
+        return rows;
     }
 
     @Override
@@ -112,10 +119,13 @@ public class CommentServiceImpl implements ICommentService
      * @return 结果
      */
     @Override
+    @Transactional
     public int updateComment(Comment comment)
     {
         comment.setUpdateTime(DateUtils.getNowDate());
-        return commentMapper.updateComment(comment);
+        int rows = commentMapper.updateComment(comment);
+        if (rows > 0) inbox.commentChanged(comment.getId());
+        return rows;
     }
 
     /**
@@ -125,9 +135,14 @@ public class CommentServiceImpl implements ICommentService
      * @return 结果
      */
     @Override
+    @Transactional
     public int deleteCommentByIds(Long[] ids)
     {
-        return commentMapper.deleteCommentByIds(ids);
+        int rows = commentMapper.deleteCommentByIds(ids);
+        if (rows > 0) {
+            for (Long id : ids) inbox.commentChanged(id);
+        }
+        return rows;
     }
 
     /**
@@ -137,9 +152,12 @@ public class CommentServiceImpl implements ICommentService
      * @return 结果
      */
     @Override
+    @Transactional
     public int deleteCommentById(Long id)
     {
-        return commentMapper.deleteCommentById(id);
+        int rows = commentMapper.deleteCommentById(id);
+        if (rows > 0) inbox.commentChanged(id);
+        return rows;
     }
 
     @Override

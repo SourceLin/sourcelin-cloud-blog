@@ -11,6 +11,7 @@ import { formatGrowthRate } from "@/utils";
 import { isElementPlusIconName } from "@/utils/element-icons";
 import { resolveThemeColor, withAlpha } from "@/utils/theme";
 import { useSettingsStore } from "@/store/modules/settings";
+import { AuthStorage } from "@/utils/auth";
 import { subscribeUnreadChanges } from "@/utils/SseClientManager";
 
 export function useDashboard() {
@@ -247,9 +248,13 @@ export function useDashboard() {
     });
   }
 
+  let unreadRequest = 0;
   function fetchUnreadNoticeCount() {
+    const request = ++unreadRequest;
+    const token = AuthStorage.getAccessToken();
     void NoticeAPI.getMyNoticePage({ page: 1, pageSize: 1, isRead: 0 })
       .then((page) => {
+        if (request !== unreadRequest || token !== AuthStorage.getAccessToken()) return;
         unreadNoticeCount.value = page.total ?? 0;
       })
       .catch(() => undefined);

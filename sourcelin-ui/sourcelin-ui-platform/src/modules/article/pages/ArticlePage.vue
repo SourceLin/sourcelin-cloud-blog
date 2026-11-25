@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import SButton from '@/shared/components/ui/SButton.vue'
 import SIcon from '@/shared/components/ui/SIcon.vue'
 import { appIcons } from '@/shared/components/ui/icons'
+import { getMessageDetail, type SystemNoticeItem } from '@/modules/notice/api/notice.api'
 import ArticleHero from '@/modules/article/components/ArticleHero.vue'
 import ArticleBody from '@/modules/article/components/ArticleBody.vue'
 import ArticleActions from '@/modules/article/components/ArticleActions.vue'
@@ -16,6 +17,9 @@ import CommentComposer from '@/shared/components/comments/CommentComposer.vue'
 import CommentThread from '@/shared/components/comments/CommentThread.vue'
 import { clearAiAgentArticleContext, setAiAgentArticleContext } from '@/modules/ai-agent'
 
+import { useUserStore } from '@/stores/user'
+
+const userStore = useUserStore()
 const route = useRoute()
 const router = useRouter()
 const articleId = ref(0)
@@ -83,6 +87,25 @@ const {
   resetAndReload,
   onCommentInteractionBlocked
 } = commentsApi
+
+const linkedComment = ref<SystemNoticeItem | null>(null)
+watch([() => route.query.message, () => route.params.id, () => userStore.token], async ([message, id, token], _, onCleanup) => {
+  linkedComment.value = null
+  if (!token || !Number.isSafeInteger(Number(message)) || Number(message) <= 0) return
+  let active = true
+  onCleanup(() => { active = false })
+  try {
+    const notice = await getMessageDetail(Number(message), 'interaction')
+    if (active && notice.targetId === Number(id)) linkedComment.value = notice
+  } catch { /* 消息已撤回或当前账号无法访问。 */ }
+}, { immediate: true })
+
+watch([linkedComment, loading], async ([message, busy]) => {
+  if (!message || busy) return
+  commentsVisible.value = true
+  await nextTick()
+  scrollCommentsSectionIntoView()
+})
 
 const articleAuthorId = computed(() => articleUser.value?.id)
 const articleSourceContext = computed(() => resolveArticleSourceContext(route))
@@ -242,6 +265,10 @@ onBeforeUnmount(() => {
 
           <div ref="commentsSectionRef" class="comments-section-anchor">
             <SCard class="comments-section" variant="default">
+              <section v-if="linkedComment" aria-label="通知对应的评论">
+                <h3>{{ linkedComment.title }}</h3>
+                <p>{{ linkedComment.sourceAvailable ? linkedComment.content : '来源已不可用' }}</p>
+              </section>
               <div class="section-header">
                 <div class="section-title">
                   <SIcon class="section-icon" :icon="appIcons.comment" :size="18" />

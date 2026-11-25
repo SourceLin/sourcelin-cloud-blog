@@ -165,6 +165,7 @@
       </div>
 
       <div class="form-actions">
+        <SButton v-if="Object.values(aiLoading).some(Boolean)" @click="cancelGeneration">取消等待 AI 结果</SButton>
         <SButton @click="emit('cancel')">{{ cancelText }}</SButton>
         <SButton type="primary" :loading="loading" @click="handleSubmit">{{ submitText }}</SButton>
       </div>
@@ -232,6 +233,7 @@ const coverUploading = ref(false)
 const skipNextCustomRequest = ref(false)
 
 const props = defineProps<{
+  articleId?: number | null
   categories: Array<{ label: string; value: number }>
   tagOptions: Array<{ label: string; value: number }>
   loading: boolean
@@ -239,7 +241,7 @@ const props = defineProps<{
   cancelText?: string
   aiEnabled?: boolean
 }>()
-const { aiLoading, showAiDialog, aiResult, handleAiGenerate, cleanTypingTimer, applyAiResult, discardAiResult } = usePostEditorAi(form, props)
+const { cancelGeneration, aiLoading, showAiDialog, aiResult, handleAiGenerate, cleanTypingTimer, applyAiResult, discardAiResult } = usePostEditorAi(form, props)
 
 const coverDisplayUrl = computed(() => {
   return resolveCoverUrl({

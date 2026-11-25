@@ -6,6 +6,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.sourcelin.ai.domain.AiAbilityConfig;
 import com.sourcelin.ai.domain.ProviderTypeEnum;
 import com.sourcelin.ai.provider.AiProviderClient;
+import com.sourcelin.ai.provider.ProviderConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -90,7 +91,7 @@ public class DirectImageProviderClient implements AiProviderClient {
     private String buildRequestUrl(AiAbilityConfig config) {
         String baseUrl = config.getEndpointUrl();
         if (baseUrl == null || baseUrl.trim().isEmpty()) {
-            throw new IllegalArgumentException("Direct Image Endpoint URL is not configured for ability: " + config.getAbilityCode());
+            throw new ProviderConfigurationException("Direct Image Endpoint URL is not configured for ability: " + config.getAbilityCode());
         }
         String url = baseUrl.trim();
         if (url.contains("/images/generations")) {
@@ -108,7 +109,7 @@ public class DirectImageProviderClient implements AiProviderClient {
     private String requireApiKey(AiAbilityConfig config) {
         String apiKey = config.getApiKey();
         if (apiKey == null || apiKey.trim().isEmpty()) {
-            throw new IllegalArgumentException("Direct Image API Key is not configured for ability: " + config.getAbilityCode());
+            throw new ProviderConfigurationException("Direct Image API Key is not configured for ability: " + config.getAbilityCode());
         }
         return apiKey;
     }
@@ -116,7 +117,7 @@ public class DirectImageProviderClient implements AiProviderClient {
     private String requireModelName(AiAbilityConfig config) {
         String modelName = config.getProviderAppId();
         if (modelName == null || modelName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Direct Image Model is not configured for ability: " + config.getAbilityCode());
+            throw new ProviderConfigurationException("Direct Image Model is not configured for ability: " + config.getAbilityCode());
         }
         return modelName.trim();
     }
@@ -138,7 +139,7 @@ public class DirectImageProviderClient implements AiProviderClient {
     private String renderPrompt(AiAbilityConfig config, Map<String, Object> inputs) {
         String template = config.getPromptTemplate();
         if (template == null || template.trim().isEmpty()) {
-            throw new IllegalArgumentException("Prompt template is not configured for ability: " + config.getAbilityCode());
+            throw new ProviderConfigurationException("Prompt template is not configured for ability: " + config.getAbilityCode());
         }
         return replacePlaceholders(template, inputs);
     }

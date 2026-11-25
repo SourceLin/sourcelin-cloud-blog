@@ -40,11 +40,13 @@
         </view>
         <view class="message-detail__divider" />
         <rich-text
-          v-if="detail.content"
+          v-if="detail.content && channelConfig.id === 'system'"
           class="message-detail__content"
           :nodes="detail.content"
         />
-        <view v-else class="message-detail__empty-content">暂无消息内容</view>
+        <text v-else-if="detail.content">{{ detail.content }}</text>
+        <text v-if="detail.sourceAvailable === false">来源已不可用</text>
+        <button v-if="detail.sourceAvailable && detail.targetType === 'article'" @tap="openArticle">查看文章</button>
       </view>
 
       <!-- 底部导航 -->
@@ -58,11 +60,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { onLoad, onShow } from '@dcloudio/uni-app';
 import { fetchMessageDetail, markMessageRead } from '@/modules/message/api/message.api';
 import type { MessageItem } from '@/modules/message/types/message';
-import { getChannelConfig, type MessageChannel } from '../modules/message/config/channels';
+import { getChannelConfig, parseChannelFromQuery, type MessageChannel } from '../modules/message/config/channels';
 import { useUserStore } from '@/stores/user';
 import { useThemeStore } from '@/stores/theme';
 import { useMiniAccess } from '@/shared/composables/useMiniAccess';
@@ -94,24 +96,35 @@ onLoad((options) => {
     showInfoToast('消息参数无效');
     return;
   }
-  loadDetail(id);
+  loadDetail(id, parseChannelFromQuery(options?.channel));
 });
 
-async function loadDetail(id: number): Promise<void> {
+async function loadDetail(id: number, channel: MessageChannel): Promise<void> {
+  const token = userStore.token;
   loading.value = true;
   try {
-    const data = await fetchMessageDetail(id);
+    const data = await fetchMessageDetail(id, channel);
+    if (token !== userStore.token) return;
     detail.value = {
       ...data,
       isRead: Number(data.isRead) === 1 ? 1 : 0
     };
     if (!detail.value.isRead) {
-      await markMessageRead(id);
-      detail.value.isRead = 1;
+      await markMessageRead(id, channel);
+      if (token === userStore.token && detail.value?.id === id) detail.value.isRead = 1;
     }
   } finally {
     loading.value = false;
   }
+}
+
+watch(() => userStore.token, () => { detail.value = null; });
+
+function openArticle(): void {
+  const item = detail.value;
+  if (!item?.targetId) return;
+  const context = item.commentId ? `&message=${item.id}` : '';
+  uni.navigateTo({ url: `/pages-article/detail/detail?id=${item.targetId}${context}` });
 }
 
 function formatTime(value?: string): string {

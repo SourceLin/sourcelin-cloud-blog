@@ -1,5 +1,6 @@
 // 消息中心 composable：频道切换、分页加载、未读计数与全部已读
-import { ref, computed } from 'vue';
+import { useUserStore } from '@/stores/user';
+import { ref, computed, watch } from 'vue';
 import {
   fetchMessagePage,
   fetchUnreadMessageCount,
@@ -23,6 +24,19 @@ export function useMessageCenter() {
   const finished = ref(false);
   const page = ref(1);
   const unreadCount = ref(0);
+
+  const user = useUserStore();
+  let listRequest = 0;
+  let countRequest = 0;
+  watch(() => user.token, () => {
+    listRequest++;
+    countRequest++;
+    items.value = [];
+    unreadCount.value = 0;
+    loading.value = false;
+    page.value = 1;
+    finished.value = false;
+  }, { flush: 'sync' });
 
   const channels = MESSAGE_CHANNELS.filter((c) => c.available);
 
@@ -71,6 +85,7 @@ export function useMessageCenter() {
 
   /** 加载分页数据 */
   async function loadPage(reset: boolean): Promise<void> {
+    const request = ++listRequest;
     loading.value = true;
     try {
       const query: MessagePageQuery = {
@@ -79,31 +94,35 @@ export function useMessageCenter() {
         channel: activeChannel.value
       };
       const result = await fetchMessagePage(query);
+      if (request !== listRequest) return;
       const nextItems = (result.items || []).map(normalizeMessage);
       items.value = reset ? nextItems : [...items.value, ...nextItems];
       finished.value = page.value >= (result.totalPages || 1) || nextItems.length < PAGE_SIZE;
     } catch {
-      if (!reset) page.value -= 1;
+      if (request === listRequest && !reset) page.value -= 1;
     } finally {
-      loading.value = false;
+      if (request === listRequest) loading.value = false;
     }
   }
 
   /** 加载未读计数 */
   async function loadUnreadCount(): Promise<void> {
+    const request = ++countRequest;
     try {
       const stat = await fetchUnreadMessageCount();
-      unreadCount.value = stat.total || 0;
+      if (request === countRequest) unreadCount.value = stat.total || 0;
     } catch {
-      unreadCount.value = 0;
+      // 保留上次成功查询的未读数。
     }
   }
 
   /** 全部标为已读 */
   async function markAllRead(): Promise<void> {
+    const token = user.token;
     await markAllMessagesRead(activeChannel.value);
-    items.value = items.value.map((item) => ({ ...item, isRead: 1 }));
-    unreadCount.value = 0;
+    if (token !== user.token) return;
+    await refresh();
+
   }
 
   return {

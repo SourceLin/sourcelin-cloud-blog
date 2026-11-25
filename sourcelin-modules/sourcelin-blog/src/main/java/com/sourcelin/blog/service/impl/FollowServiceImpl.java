@@ -4,8 +4,10 @@ import com.sourcelin.blog.domain.Follow;
 import com.sourcelin.blog.mapper.FollowMapper;
 import com.sourcelin.blog.service.IFollowService;
 import com.sourcelin.common.core.utils.DateUtils;
+import com.sourcelin.blog.service.InboxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,6 +20,9 @@ import java.util.List;
 @Service
 public class FollowServiceImpl implements IFollowService 
 {
+    @Autowired
+    private InboxService inbox;
+
     @Autowired
     private FollowMapper followMapper;
 
@@ -94,6 +99,7 @@ public class FollowServiceImpl implements IFollowService
      * @return 结果
      */
     @Override
+    @Transactional
     public int insertFollow(Follow follow)
     {
         if (follow.getDeleted() == null)
@@ -101,7 +107,9 @@ public class FollowServiceImpl implements IFollowService
             follow.setDeleted(0);
         }
         follow.setCreateTime(DateUtils.getNowDate());
-        return followMapper.insertFollow(follow);
+        int rows = followMapper.insertFollow(follow);
+        if (rows > 0 && follow.getDeleted() == 0) inbox.followChanged(follow.getUserId(), follow.getFollowUserId(), true);
+        return rows;
     }
 
     /**
@@ -123,9 +131,12 @@ public class FollowServiceImpl implements IFollowService
      * @return 结果
      */
     @Override
+    @Transactional
     public int deleteFollowByIds(Long[] ids)
     {
-        return followMapper.deleteFollowByIds(ids);
+        int rows = 0;
+        for (Long id : ids) rows += deleteFollowById(id);
+        return rows;
     }
 
     /**
@@ -135,8 +146,15 @@ public class FollowServiceImpl implements IFollowService
      * @return 结果
      */
     @Override
+    @Transactional
     public int deleteFollowById(Long id)
     {
-        return followMapper.deleteFollowById(id);
+        Follow follow = selectFollowById(id);
+        if (follow == null) return 0;
+        int rows = followMapper.deleteFollowById(id);
+        if (rows > 0 && selectFollowByUserAndTarget(follow.getUserId(), follow.getFollowUserId()) == null) {
+            inbox.followChanged(follow.getUserId(), follow.getFollowUserId(), false);
+        }
+        return rows;
     }
 }

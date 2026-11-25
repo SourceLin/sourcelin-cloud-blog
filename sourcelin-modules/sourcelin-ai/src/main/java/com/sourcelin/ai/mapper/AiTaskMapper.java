@@ -8,6 +8,7 @@ import java.util.List;
 @Mapper
 public interface AiTaskMapper {
     int insert(AiTask task);
+    int claimPending(String taskId);
     int updateByTaskId(AiTask task);
     int resetFailedTask(@Param("taskId") String taskId, @Param("retryCount") int retryCount);
     AiTask selectByTaskId(@Param("taskId") String taskId);

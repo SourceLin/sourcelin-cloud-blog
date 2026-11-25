@@ -39,7 +39,7 @@
                 </div>
                 <div class="notice-guide-panel__meta">
                   <SSurfaceChip class="notice-guide-chip">系统公告已接入</SSurfaceChip>
-                  <SSurfaceChip class="notice-guide-chip">频道持续扩展</SSurfaceChip>
+                  <SSurfaceChip class="notice-guide-chip">互动消息已接入</SSurfaceChip>
                 </div>
               </div>
             </SSurfacePanel>
@@ -69,7 +69,7 @@
             </div>
 
             <SButton
-              v-if="activeChannel === 'system' && noticeList.length"
+              v-if="noticeList.length"
               class="clear-btn"
               variant="glass"
               @click="clearMessageItem(null, null)"
@@ -77,25 +77,21 @@
               <template #icon>
                 <SIcon :icon="appIcons.trash" :size="16" />
               </template>
-              清空当前列表
+              全部标为已读
             </SButton>
           </SSurfacePanel>
 
           <NoticeList
-            v-if="activeChannel === 'system'"
+            :channel="currentChannel"
             :items="noticeList"
             :loading="noticesLoading"
             :refresh-key="refreshKey"
             :center-tab-type="0"
             :split-ip-address="splitIpAddress"
             @clear-item="clearMessageItem"
+            @open-message="openMessage"
           />
-          <ChannelComingSoon
-            v-else
-            :title="currentChannel.comingTitle"
-            :description="currentChannel.comingDescription"
-            :icon="appIcons[currentChannel.icon]"
-          />
+
         </SSurfacePanel>
       </div>
     </PageShell>
@@ -105,7 +101,6 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import { computed } from 'vue'
-import ChannelComingSoon from '@/modules/notice/components/ChannelComingSoon.vue'
 import HeroStatCard from '@/shared/components/business/HeroStatCard.vue'
 import MessageChannelMenu from '@/modules/notice/components/MessageChannelMenu.vue'
 import NoticeList from '@/modules/notice/components/NoticeList.vue'
@@ -125,14 +120,15 @@ const {
   refreshKey,
   goBack,
   splitIpAddress,
+  openMessage,
   clearMessageItem,
   setChannel
 } = useMessageCenter()
 
-const heroSubtitle = '按频道查看系统公告与后续开放的互动、赞藏、关注等提醒。'
+const heroSubtitle = '查看系统公告、评论回复、点赞与关注提醒。'
 
 const guidePanelLede =
-  '系统公告已对接站点通知；评论、点赞、关注等频道将在后端接口就绪后逐步开放。'
+  '切换频道查看对应消息，可单条或按频道标为已读。'
 
 interface HeroTile {
   label: string
@@ -143,27 +139,12 @@ interface HeroTile {
 }
 
 const heroStatTiles = computed<HeroTile[]>(() => {
-  const listCount =
-    activeChannel.value === 'system' ? String(noticeList.value.length) : '—'
-  const status =
-    activeChannel.value === 'system'
-      ? noticesLoading.value
-        ? '同步中'
-        : noticeList.value.length > 0
-          ? '已加载'
-          : '暂无数据'
-      : '即将开放'
-
+  const listCount = String(noticeList.value.length)
+  const status = noticesLoading.value ? '同步中' : noticeList.value.length ? '已加载' : '暂无数据'
   return [
     {
-      label: activeChannel.value === 'system' ? '列表条数' : '本频道',
-      value: listCount,
-      icon: appIcons.notice,
-      hue: 245,
-      ariaLabel:
-        activeChannel.value === 'system'
-          ? `当前列表共 ${noticeList.value.length} 条公告`
-          : '该频道尚未接入数据'
+      label: '列表条数', value: listCount, icon: appIcons.notice, hue: 245,
+      ariaLabel: `当前列表共 ${listCount} 条消息`
     },
     {
       label: '频道数量',

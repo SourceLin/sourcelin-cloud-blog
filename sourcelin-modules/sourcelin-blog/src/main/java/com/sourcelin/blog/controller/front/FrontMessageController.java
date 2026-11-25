@@ -1,6 +1,8 @@
 package com.sourcelin.blog.controller.front;
 
 import com.sourcelin.blog.domain.Announcement;
+import com.sourcelin.blog.service.InboxService;
+import com.sourcelin.blog.vo.InboxMessageVO;
 import com.sourcelin.blog.service.IAnnouncementService;
 import com.sourcelin.blog.vo.AnnouncementUnreadVO;
 import com.sourcelin.common.core.enums.ResultCode;
@@ -23,6 +25,33 @@ public class FrontMessageController extends BaseController
 {
     @Autowired
     private IAnnouncementService announcementService;
+
+    @Autowired
+    private InboxService inbox;
+
+    @GetMapping("/inbox/{channel}")
+    public PageResult<InboxMessageVO> inboxList(@PathVariable String channel) {
+        Long user = requireLoginUserId();
+        startPage();
+        return toPageResult(inbox.messages(user, channel, null));
+    }
+
+    @GetMapping("/inbox/{channel}/{id}")
+    public InboxMessageVO inboxDetail(@PathVariable String channel, @PathVariable Long id) {
+        return inbox.detail(requireLoginUserId(), channel, id);
+    }
+
+    @PostMapping("/inbox/{channel}/{id}/read")
+    public Boolean inboxRead(@PathVariable String channel, @PathVariable Long id) {
+        inbox.markRead(requireLoginUserId(), channel, id);
+        return true;
+    }
+
+    @PostMapping("/inbox/{channel}/read-all")
+    public Boolean inboxReadAll(@PathVariable String channel) {
+        inbox.markRead(requireLoginUserId(), channel, null);
+        return true;
+    }
 
     @Autowired
     private BlogLoginAccessor blogLoginAccessor;
@@ -81,7 +110,7 @@ public class FrontMessageController extends BaseController
     public AnnouncementUnreadVO unreadCount()
     {
         Long userId = blogLoginAccessor.getCurrentUserId();
-        long total = userId == null ? 0L : announcementService.countUnread(userId);
+        long total = userId == null ? 0L : announcementService.countUnread(userId) + inbox.unread(userId);
         return new AnnouncementUnreadVO(total);
     }
 

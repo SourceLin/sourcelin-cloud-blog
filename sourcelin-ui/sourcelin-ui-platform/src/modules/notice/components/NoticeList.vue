@@ -11,20 +11,24 @@
         </div>
 
         <div class="user-details">
-          <span class="user-nickname">系统公告</span>
+          <span class="user-nickname">{{ channel?.name ?? '系统公告' }}</span>
           <div class="user-meta">
             <span class="meta-item">{{ item.createTimeStr }}</span>
           </div>
         </div>
 
-        <button class="delete-btn" type="button" aria-label="移除" @click="emit('clearItem', item.id, index)">
-          <SIcon :icon="appIcons.trash" :size="16" />
+        <button class="delete-btn" type="button" :disabled="!!item.isRead" aria-label="标为已读" @click="emit('clearItem', item.id, index)">
+          <SIcon :icon="appIcons.notice" :size="16" />
         </button>
       </div>
 
       <div class="notice-content-box">
         <h4 class="notice-title">{{ item.title }}</h4>
-        <div class="notice-text-content" v-html="item.content" />
+        <div v-if="!channel || channel.id === 'system'" class="notice-text-content" v-html="item.content" />
+        <template v-else>
+          <p>{{ item.sourceAvailable ? item.content : '来源已不可用' }}</p>
+          <SButton v-if="channel.id === 'interaction'" @click="emit('openMessage', item.id)">查看评论</SButton>
+        </template>
       </div>
     </article>
   </div>
@@ -33,19 +37,22 @@
     <EmptyState
       variant="section"
       icon="notice"
-      title="暂无系统公告"
-      message="这里暂时没有新公告，晚点再来看看。"
+      :title="`暂无${channel?.name ?? '系统公告'}`"
+      message="该频道还没有消息。"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { NoticeViewItem } from '@/modules/notice/composables/useNoticeCenter'
+import SButton from '@/shared/components/ui/SButton.vue'
+import type { ChannelConfig } from '@/modules/notice/config/channels'
 import EmptyState from '@/shared/components/feedback/EmptyState.vue'
 import SIcon from '@/shared/components/ui/SIcon.vue'
 import { appIcons } from '@/shared/components/ui/icons'
 
 defineProps<{
+  channel?: ChannelConfig
   items: NoticeViewItem[]
   loading: boolean
   refreshKey: number
@@ -54,6 +61,7 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
+  openMessage: [id: number]
   clearItem: [id: number, index: number]
 }>()
 </script>

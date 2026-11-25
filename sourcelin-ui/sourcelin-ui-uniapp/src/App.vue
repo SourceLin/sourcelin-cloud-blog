@@ -50,18 +50,24 @@ onHide(() => {
   sseClientManager.disconnect();
 });
 
+let unreadRequest = 0;
 async function refreshUnread() {
+  const request = ++unreadRequest;
   const token = userStore.token;
   try {
     const data = await fetchUnreadMessageCount();
-    if (appVisible.value && token === userStore.token) appStore.setUnreadCount(data.total ?? 0);
+    if (request === unreadRequest && appVisible.value && token === userStore.token) appStore.setUnreadCount(data.total ?? 0);
   } catch { /* 保留现有未读数，后续页面查询恢复。 */ }
+}
+function invalidateInbox() {
+  appStore.invalidateInbox();
+  void refreshUnread();
 }
 function handleSseMessage(payload: { content: string }) {
   try {
     const event: unknown = JSON.parse(payload.content);
     if (event && typeof event === 'object' && 'type' in event && event.type === 'unread_changed') {
-      void refreshUnread();
+      invalidateInbox();
     }
   } catch { /* 忽略非业务事件。 */ }
 }
@@ -70,11 +76,11 @@ watch(() => [appVisible.value, userStore.token] as const, ([visible, token], pre
   if (!visible || !token || !userStore.isLoggedIn) return;
   let current = true;
   sseClientManager.on('message', handleSseMessage);
-  sseClientManager.on('reconnected', refreshUnread);
+  sseClientManager.on('reconnected', invalidateInbox);
   onCleanup(() => {
     current = false;
     sseClientManager.off('message', handleSseMessage);
-    sseClientManager.off('reconnected', refreshUnread);
+    sseClientManager.off('reconnected', invalidateInbox);
     sseClientManager.disconnect();
   });
   void refreshUnread();

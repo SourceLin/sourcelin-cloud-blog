@@ -44,6 +44,56 @@ class AiAdapterServiceRetryTest {
     private AiAdapterService aiAdapterService;
 
     @Test
+    void missingCoverKeyIsRetryable() throws Exception {
+        AiAbilityConfig config = new AiAbilityConfig();
+        config.setEndpointUrl("https://example.invalid");
+        AiTask task = executeCover(config, new com.sourcelin.ai.provider.impl.DirectImageProviderClient());
+
+        assertEquals("failed", task.getStatus());
+        assertTrue(task.getErrorMessage().contains("API Key"));
+        assertNotNull(task.getFinishedTime());
+    }
+
+    @Test
+    void interruptedCoverRequestIsUnconfirmed() throws Exception {
+        AiAbilityConfig config = new AiAbilityConfig();
+        when(providerClient.invoke(eq(config), anyMap(), eq("blog:1")))
+                .thenThrow(new org.springframework.web.client.ResourceAccessException("Read timed out"));
+
+        assertEquals("unconfirmed", executeCover(config, providerClient).getStatus());
+    }
+
+    private AiTask executeCover(AiAbilityConfig config, AiProviderClient client) {
+        config.setProviderType("direct_image");
+        config.setAbilityCode("article_cover_generate");
+        config.setEnabled("1");
+        AiTask task = new AiTask();
+        task.setTaskId("cover");
+        AiTaskCreateRequest request = new AiTaskCreateRequest();
+        request.setAbilityCode(config.getAbilityCode());
+        request.setUserId("blog:1");
+        request.setInput(Map.of());
+        when(aiAbilityRouter.getAbilityConfig(config.getAbilityCode())).thenReturn(config);
+        when(aiAbilityRouter.route("direct_image")).thenReturn(client);
+        when(aiTaskService.claimPending("cover")).thenReturn(1);
+        aiAdapterService.executeAiTaskAsync(task, "cover", request);
+        return task;
+    }
+
+    @Test
+    void startupRecoversOnlyUnclaimedTasks() {
+        AiTask task = new AiTask();
+        task.setTaskId("already-claimed");
+        task.setStatus("pending");
+        when(aiTaskService.selectList(any(AiTask.class))).thenReturn(java.util.List.of(task));
+        org.springframework.test.util.ReflectionTestUtils.setField(aiAdapterService, "taskExecutor",
+                (Executor) Runnable::run);
+        aiAdapterService.resumePendingTasks();
+        verify(aiTaskService).claimPending("already-claimed");
+        org.mockito.Mockito.verifyNoInteractions(providerClient, aiAbilityRouter);
+    }
+
+    @Test
     void retryTaskShouldImmediatelyDispatchFailedTaskAgain() throws Exception {
         AiTask task = new AiTask();
         task.setTaskId("task_1");
@@ -64,6 +114,7 @@ class AiAdapterServiceRetryTest {
 
         when(aiTaskService.selectByTaskId("task_1")).thenReturn(task);
         when(aiTaskService.resetFailedTask("task_1", 1)).thenReturn(1);
+        when(aiTaskService.claimPending("task_1")).thenReturn(1);
         when(aiAbilityRouter.getAbilityConfig("article_summary")).thenReturn(config);
         when(aiAbilityRouter.route("direct_llm")).thenReturn(providerClient);
         when(providerClient.invoke(eq(config), anyMap(), eq("user_1"))).thenReturn("retry result");
@@ -95,6 +146,7 @@ class AiAdapterServiceRetryTest {
 
     @Test
     void queueRejectionPersistsFailedTaskForRetry() {
+        when(aiTaskService.claimPending(org.mockito.ArgumentMatchers.anyString())).thenReturn(1);
         Executor rejected = work -> { throw new RejectedExecutionException("queue full"); };
         org.springframework.test.util.ReflectionTestUtils.setField(aiAdapterService, "taskExecutor", rejected);
         AiTaskCreateRequest request = new AiTaskCreateRequest();
