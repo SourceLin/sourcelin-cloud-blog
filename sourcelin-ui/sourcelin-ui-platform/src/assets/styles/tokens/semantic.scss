@@ -33,6 +33,9 @@
 
   --modal-overlay-scrim: color-mix(in srgb, var(--background-color-deep) 48%, transparent);
   --modal-overlay-backdrop-filter: blur(14px) saturate(135%);
+
+  --focus-ring-color: var(--primary-color);
+  --focus-ring-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-ring-color) 24%, transparent);
 }
 
 html[data-theme='dark'] {
@@ -62,4 +65,7 @@ html[data-theme='dark'] {
 
   --modal-overlay-scrim: color-mix(in srgb, var(--background-color-deep) 68%, transparent);
   --modal-overlay-backdrop-filter: blur(16px) saturate(140%);
+
+  --focus-ring-color: var(--primary-hover);
+  --focus-ring-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-ring-color) 32%, transparent);
 }

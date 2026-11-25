@@ -289,22 +289,30 @@ export function applyTheme(colors: Record<string, string>) {
  */
 export function generateThemeColors(primaryColor: string, mode: "LIGHT" | "DARK" | string) {
   const baseColor = resolveThemeColor(primaryColor);
-  const baseChannels = parseColorChannels(baseColor) || [64, 158, 255]; // #409EFF
-  const normalizedMode = String(mode).trim().toLowerCase();
+  const baseChannels = parseColorChannels(baseColor) || [75, 85, 250]; // #4B55FA
+  const isDark = String(mode).trim().toLowerCase() === "dark";
 
   const white = [255, 255, 255];
   const black = [0, 0, 0];
+  // 暗色卡片表面基准色（与 variables.scss 中 html.dark --el-bg-color 对齐）
+  const darkSurface = [17, 24, 39]; // #111827
+
+  // 暗色模式下适度提亮主色，避免高饱和蓝紫在深底上发闷或对比度不足
+  const effectivePrimary = isDark ? mixChannels(baseChannels, white, 0.14) : baseChannels;
+  const tintTarget = isDark ? darkSurface : white;
 
   const colors: Record<string, string> = {
-    primary: channelsToHex(baseChannels),
+    primary: channelsToHex(effectivePrimary),
   };
 
   for (let i = 1; i <= 9; i += 1) {
-    colors[`primary-light-${i}`] = channelsToHex(mixChannels(baseChannels, white, i / 10));
+    colors[`primary-light-${i}`] = channelsToHex(mixChannels(effectivePrimary, tintTarget, i / 10));
   }
 
-  const darkAmount = normalizedMode === "dark" ? 0.3 : 0.2;
-  colors["primary-dark-2"] = channelsToHex(mixChannels(baseChannels, black, darkAmount));
+  // Element Plus 暗色规范：dark-2 在暗色模式下略微提亮，亮色模式下加深
+  colors["primary-dark-2"] = isDark
+    ? channelsToHex(mixChannels(effectivePrimary, white, 0.2))
+    : channelsToHex(mixChannels(effectivePrimary, black, 0.2));
 
   return colors;
 }

@@ -1,12 +1,36 @@
 // Element Plus 变量覆盖（必须在最前面）
 @use "./element-plus-vars";
 
-$border: 1px solid var(--el-border-color-light);
+$border: 1px solid var(--el-border-color-lighter);
+
+/* el-card 统一现代卡片质感 */
+.el-card {
+  --el-card-border-color: var(--el-border-color-lighter);
+  --el-card-border-radius: 12px;
+
+  background-color: var(--el-bg-color);
+  box-shadow: var(--surface-shadow-sm);
+}
+
+/* el-table 表头微灰底 + 清晰层次 */
+.el-table {
+  --el-table-header-bg-color: var(--el-fill-color-light);
+  --el-table-header-text-color: var(--el-text-color-regular);
+  --el-table-border-color: var(--el-border-color-lighter);
+
+  th.el-table__cell {
+    font-weight: 600;
+  }
+}
 
 /* el-dialog */
 .el-dialog {
+  --el-dialog-border-radius: 14px;
+
+  border: $border;
+
   .el-dialog__header {
-    padding: 15px 20px;
+    padding: 16px 20px;
     margin: 0;
     border-bottom: $border;
   }
@@ -16,7 +40,7 @@ $border: 1px solid var(--el-border-color-light);
   }
 
   .el-dialog__footer {
-    padding: 15px;
+    padding: 14px 20px;
     border-top: $border;
   }
 }

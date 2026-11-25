@@ -15,8 +15,8 @@
 
   position: relative;
   padding: 24px;
-  background-color: var(--el-bg-color);
-  animation: fadeIn 0.4s ease-out;
+  background-color: transparent;
+  animation: fadeIn 0.35s ease-out;
 
   .dash-hero-banner,
   .dash-kpi-grid,
@@ -101,15 +101,18 @@
     gap: 14px;
     align-items: center;
     padding: 22px 18px;
-    background: var(--el-bg-color-overlay);
+    background: var(--el-bg-color);
     border: 1px solid var(--el-border-color-lighter);
     border-radius: 14px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.01);
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: var(--surface-shadow-sm);
+    transition:
+      transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1),
+      box-shadow 0.25s ease,
+      border-color 0.25s ease;
 
     &:hover {
       border-color: var(--blog-primary-border-strong);
-      box-shadow: 0 12px 30px color-mix(in srgb, var(--el-color-primary) 8%, transparent);
+      box-shadow: 0 12px 30px color-mix(in srgb, var(--el-color-primary) 10%, transparent);
       transform: translateY(-3px);
     }
   }

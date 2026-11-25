@@ -108,7 +108,7 @@ const themeOverrides = computed(() => {
       hoverColor: readThemeColor('--primary-opacity', 'rgba(79, 70, 229, 0.12)'),
       textColorBase: readThemeColor('--text-color', '#1E293B'),
       textColor1: readThemeColor('--text-color-dark', '#0F172A'),
-      textColor2: readThemeColor('--text-color-muted', '#64748B'),
+      textColor2: readThemeColor('--text-color-muted', '#475569'),
       textColor3: readThemeColor('--input-placeholder', '#94A3B8'),
       borderColor: readThemeColor('--border-color', 'rgba(148, 163, 184, 0.18)'),
       dividerColor: readThemeColor('--border-light', 'rgba(148, 163, 184, 0.1)')
@@ -169,12 +169,15 @@ onMounted(async () => {
       <SNotification>
         <NDialogProvider>
           <div id="app">
+            <a v-if="!useStandaloneShell" href="#main-content" class="skip-link">跳至正文</a>
             <AppHeader v-if="!useStandaloneShell" />
-            <router-view v-slot="{ Component }">
-              <transition name="fade" mode="out-in">
-                <component :is="Component" />
-              </transition>
-            </router-view>
+            <div id="main-content" class="app-main-landmark" tabindex="-1">
+              <router-view v-slot="{ Component }">
+                <transition name="fade" mode="out-in">
+                  <component :is="Component" />
+                </transition>
+              </router-view>
+            </div>
             <AppFooter v-if="!useStandaloneShell" />
             <FloatingToolbar v-if="!useStandaloneShell" />
             <AiAgentAvatar

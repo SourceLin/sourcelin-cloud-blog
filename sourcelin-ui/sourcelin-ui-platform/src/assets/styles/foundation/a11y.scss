@@ -13,3 +13,70 @@
   white-space: nowrap;
   border-width: 0;
 }
+
+/**
+ * 键盘跳过导航链接：默认视觉隐藏，聚焦时浮现于视口左上角。
+ */
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 10000;
+  padding: 10px 18px;
+  border-radius: var(--border-radius-lg, 12px);
+  background: var(--primary-color);
+  color: var(--text-color-light);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-200%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+
+  &:hover {
+    color: var(--text-color-light);
+    background: var(--primary-hover);
+  }
+
+  &:focus,
+  &:focus-visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+    outline: 2px solid var(--text-color-light);
+    outline-offset: 2px;
+    box-shadow: var(--shadow-medium), var(--focus-ring-shadow);
+  }
+}
+
+/**
+ * 统一键盘焦点环：使用 :where() 保持零特异度，不覆盖组件自带焦点样式。
+ */
+:where(a, button, input, textarea, select, summary, [role='button'], [tabindex]:not([tabindex='-1'])):focus-visible {
+  outline: 2px solid var(--focus-ring-color, var(--primary-color));
+  outline-offset: 2px;
+}
+
+:where([tabindex='-1']):focus {
+  outline: none;
+}
+
+/**
+ * 遵循系统减少动效偏好（prefers-reduced-motion）。
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .skip-link,
+  .fade-enter-active,
+  .fade-leave-active,
+  .startup-loading-fade-enter-active,
+  .startup-loading-fade-leave-active {
+    transition-duration: 0.01ms;
+  }
+}

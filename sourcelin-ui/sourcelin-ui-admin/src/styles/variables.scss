@@ -22,36 +22,40 @@ $tags-view-height: 34px;
 // ============================================
 
 :root {
-  // Design Tokens - 基础品牌色与语义色
+  // Design Tokens - 基础品牌色与语义色（统一对齐 Slate + Indigo 冷调体系）
   --primary-color: #4b55fa;
   --primary-hover: #3b45ea;
   --primary-active: #2b35da;
   --primary-light: rgba(75, 85, 250, 0.1);
-  --title-color: #2d3b8d;
-  --text-primary: #333333;
-  --text-secondary: #666666;
-  --text-placeholder: #999999;
-  --bg-page: #f1f4fd;
+  --title-color: #0f172a;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-placeholder: #94a3b8;
+  --bg-page: #f4f6fa;
   --bg-white: #ffffff;
-  --border-color: #e4eafd;
-  --success-color: #37b874;
-  --warning-color: #faad14;
-  --error-color: #fa4c6e;
-  --info-color: #1890ff;
-  --sidebar-classic-bg: #1a1f2e;
-  --sidebar-classic-text: #c3ccdd;
+  --border-color: #e5eaf2;
+  --success-color: #16a34a;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --info-color: #3b82f6;
+  --sidebar-classic-bg: #0f172a;
+  --sidebar-classic-text: #cbd5e1;
   --sidebar-classic-active-text: #ffffff;
-  --sidebar-classic-parent-active-text: #9fb3ff;
+  --sidebar-classic-parent-active-text: #a5b4fc;
+
+  // 表面层级与柔和阴影
+  --surface-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 1px rgba(15, 23, 42, 0.02);
+  --surface-shadow-md: 0 6px 20px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.03);
 
   // 菜单
-  --menu-background: var(--el-bg-color-overlay);
+  --menu-background: var(--el-bg-color);
   --menu-text: var(--el-text-color-regular);
-  --menu-active-text: var(--el-menu-active-color);
-  --menu-hover: color-mix(in srgb, var(--el-color-primary) 10%, var(--el-fill-color-light));
-  --menu-active-parent-bg: var(--el-color-primary-light-9);
+  --menu-active-text: var(--el-color-primary);
+  --menu-hover: color-mix(in srgb, var(--el-color-primary) 8%, var(--el-fill-color-light));
+  --menu-active-parent-bg: color-mix(in srgb, var(--el-color-primary) 10%, transparent);
   --menu-active-parent-text: var(--el-color-primary);
   --menu-active-parent-bg-emphasis: color-mix(in srgb, var(--el-color-primary) 14%, transparent);
-  --menu-top-active-bg: color-mix(in srgb, var(--el-text-color-primary) 10%, transparent);
+  --menu-top-active-bg: color-mix(in srgb, var(--el-color-primary) 10%, transparent);
 
   // 侧边栏 Logo
   --sidebar-logo-background: var(--menu-background);
@@ -94,35 +98,66 @@ html.sidebar-color-classic {
   --toolbar-hover-bg: color-mix(in srgb, var(--el-color-white) 10%, transparent);
 }
 
-// 暗黑主题
+// 暗黑主题（冷靛夜色 Slate Navy 3 级表面纵深：Canvas #0b1120 -> Surface #111827 -> Elevated #1a2336）
 html.dark {
-  --menu-background: var(--el-bg-color-page);
-  --menu-text: var(--el-color-white);
-  --menu-active-text: var(--el-menu-active-color);
-  --menu-hover: color-mix(in srgb, var(--el-color-primary) 12%, transparent);
-  --menu-active-parent-bg: color-mix(in srgb, var(--el-color-primary-light-3) 14%, transparent);
-  --menu-active-parent-text: var(--el-color-primary-light-3);
-  --menu-active-parent-bg-emphasis: color-mix(
-    in srgb,
-    var(--el-color-primary-light-3) 18%,
-    transparent
-  );
-  --menu-top-active-bg: color-mix(in srgb, var(--el-color-white) 12%, transparent);
-  --sidebar-logo-background: color-mix(
-    in srgb,
-    var(--menu-background) 88%,
-    var(--el-bg-color-page)
-  );
-  --sidebar-logo-text-color: var(--el-color-white);
-  --toolbar-hover-bg: color-mix(in srgb, var(--el-color-white) 10%, transparent);
+  --el-bg-color-page: #0b1120;
+  --el-bg-color: #111827;
+  --el-bg-color-overlay: #182234;
+  --el-fill-color-blank: #111827;
+  --el-fill-color-extra-light: #131c2e;
+  --el-fill-color-lighter: #162033;
+  --el-fill-color-light: #1a263b;
+  --el-fill-color: #1f2d45;
+  --el-fill-color-dark: #263652;
+  --el-fill-color-darker: #2f4263;
+  --el-text-color-primary: #f1f5f9;
+  --el-text-color-regular: #cbd5e1;
+  --el-text-color-secondary: #94a3b8;
+  --el-text-color-placeholder: #64748b;
+  --el-text-color-disabled: #475569;
+  --el-border-color-extra-light: rgba(148, 163, 184, 0.08);
+  --el-border-color-lighter: rgba(148, 163, 184, 0.13);
+  --el-border-color-light: rgba(148, 163, 184, 0.17);
+  --el-border-color: rgba(148, 163, 184, 0.22);
+  --el-border-color-dark: rgba(148, 163, 184, 0.3);
+  --el-border-color-darker: rgba(148, 163, 184, 0.38);
+  --el-mask-color: rgba(8, 13, 25, 0.72);
+  --el-box-shadow-light: 0 8px 24px rgba(0, 0, 0, 0.38);
 
-  // 暗色 + 经典蓝：Logo 背景与侧边栏背景一致
+  --title-color: #f1f5f9;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-placeholder: #64748b;
+  --bg-page: #0b1120;
+  --bg-white: #111827;
+  --border-color: rgba(148, 163, 184, 0.16);
+  --surface-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.28);
+  --surface-shadow-md: 0 10px 28px rgba(0, 0, 0, 0.42);
+
+  --menu-background: #0f172a;
+  --menu-text: #cbd5e1;
+  --menu-active-text: #f8fafc;
+  --menu-hover: color-mix(in srgb, var(--el-color-primary) 16%, transparent);
+  --menu-active-parent-bg: color-mix(in srgb, var(--el-color-primary) 18%, transparent);
+  --menu-active-parent-text: #a5b4fc;
+  --menu-active-parent-bg-emphasis: color-mix(in srgb, var(--el-color-primary) 24%, transparent);
+  --menu-top-active-bg: color-mix(in srgb, var(--el-color-primary) 20%, transparent);
+  --sidebar-logo-background: #0d1424;
+  --sidebar-logo-text-color: #f1f5f9;
+  --toolbar-hover-bg: rgba(148, 163, 184, 0.12);
+
+  // 暗色 + 经典蓝：Logo 背景与侧边栏保持协调
   &.sidebar-color-classic {
-    --sidebar-logo-background: var(--menu-background);
+    --sidebar-logo-background: #0d1424;
   }
 
-  // Element Plus 表格选中行背景色
+  // Element Plus 表格表面与选中行
   .el-table {
-    --el-table-current-row-bg-color: var(--el-fill-color-light);
+    --el-table-bg-color: var(--el-bg-color);
+    --el-table-tr-bg-color: var(--el-bg-color);
+    --el-table-header-bg-color: var(--el-fill-color-lighter);
+    --el-table-row-hover-bg-color: var(--el-fill-color-light);
+    --el-table-current-row-bg-color: color-mix(in srgb, var(--el-color-primary) 16%, transparent);
+    --el-table-border-color: var(--el-border-color-lighter);
   }
 }

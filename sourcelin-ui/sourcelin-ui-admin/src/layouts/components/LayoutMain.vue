@@ -95,29 +95,46 @@ const transitionName = computed(() => {
   /* fade-slide */
   .fade-slide-leave-active,
   .fade-slide-enter-active {
-    transition: all 0.3s;
+    transition:
+      opacity 0.24s ease,
+      transform 0.24s ease;
   }
   .fade-slide-enter-from {
     opacity: 0;
-    transform: translateX(-30px);
+    transform: translateX(-16px);
   }
   .fade-slide-leave-to {
     opacity: 0;
-    transform: translateX(30px);
+    transform: translateX(16px);
   }
 
   /* fade-scale */
   .fade-scale-leave-active,
   .fade-scale-enter-active {
-    transition: all 0.28s;
+    transition:
+      opacity 0.24s ease,
+      transform 0.24s ease;
   }
   .fade-scale-enter-from {
     opacity: 0;
-    transform: scale(1.2);
+    transform: scale(1.04);
   }
   .fade-scale-leave-to {
     opacity: 0;
-    transform: scale(0.8);
+    transform: scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-main {
+    .fade-enter-active,
+    .fade-leave-active,
+    .fade-slide-enter-active,
+    .fade-slide-leave-active,
+    .fade-scale-enter-active,
+    .fade-scale-leave-active {
+      transition-duration: 0.01ms;
+    }
   }
 }
 </style>

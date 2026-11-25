@@ -100,18 +100,19 @@ html.sidebar-color-classic .layout-mix .layout__sidebar--left .el-menu {
 
 /* 全局筛选区域 */
 .filter-section {
-  padding: 8px 12px 0;
-  margin-bottom: 8px;
-  background-color: var(--el-bg-color-overlay);
-  border: 1px solid var(--el-border-color-light);
-  border-radius: 4px;
+  padding: 14px 16px 4px;
+  margin-bottom: 12px;
+  background-color: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 12px;
+  box-shadow: var(--surface-shadow-sm);
 
   .search-buttons {
     margin-right: 0;
   }
 
   .el-form-item {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
 }
 

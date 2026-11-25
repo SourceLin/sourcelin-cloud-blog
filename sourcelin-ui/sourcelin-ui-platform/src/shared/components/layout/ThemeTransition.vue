@@ -2,6 +2,7 @@
   <Teleport to="body">
     <div
       class="theme-transition"
+      aria-hidden="true"
       :class="[
         targetTheme,
         direction,
@@ -84,6 +85,16 @@ function animate(from: number, to: number, duration: number) {
   animFrameId = requestAnimationFrame(tick)
 }
 
+const TRANSITION_DURATION_MS = 1100
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+}
+
 watch(
   () => themeStore.isDark,
   (isDark) => {
@@ -100,12 +111,19 @@ watch(
     }
     
     cancelAnimFrame()
+
+    if (prefersReducedMotion()) {
+      isAnimating.value = false
+      rotation.value = isDark ? 180 : 0
+      return
+    }
+
     isAnimating.value = true
     
     if (isDark) {
-      animate(0, 180, 3000)
+      animate(0, 180, TRANSITION_DURATION_MS)
     } else {
-      animate(180, 0, 3000)
+      animate(180, 0, TRANSITION_DURATION_MS)
     }
   },
   { immediate: true }
@@ -113,6 +131,7 @@ watch(
 
 onBeforeUnmount(() => {
   cancelAnimFrame()
+  document.body.classList.remove('theme-transitioning')
 })
 </script>
 
@@ -131,7 +150,7 @@ onBeforeUnmount(() => {
   pointer-events: none;
   z-index: 9999;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.22s ease;
 
   &.active {
     opacity: 1;
@@ -142,7 +161,7 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 1.2s ease;
+  transition: opacity 0.45s ease;
 
   &.active {
     opacity: 1;
@@ -153,7 +172,7 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 2s ease;
+  transition: opacity 0.65s ease;
 
   &.active {
     opacity: 1;
@@ -192,11 +211,20 @@ onBeforeUnmount(() => {
   top: calc(100% + var(--pivot-offset));
   border-radius: 50%;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.25s ease;
   pointer-events: none;
 
   &.visible {
     opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-transition,
+  .sky-bg,
+  .sky-overlay,
+  .celestial-body {
+    transition: none;
   }
 }
 

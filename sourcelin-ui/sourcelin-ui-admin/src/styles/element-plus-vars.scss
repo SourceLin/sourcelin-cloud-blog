@@ -6,7 +6,7 @@
   $colors: (
     "primary": (
       // 默认主题色 - 修改此值时需同步修改 src/settings.ts 中的 themeColor
-      "base": #2f6bde,
+      "base": #4b55fa,
     ),
     "success": (
       "base": #23c343,
@@ -24,34 +24,39 @@
 
   $bg-color: (
     "": #ffffff,
-    "page": #f2f5f9,
+    "page": #f4f6fa,
     "overlay": #ffffff,
   ),
 
   $text-color: (
-    "primary": #1f2937,
-    "regular": #374151,
-    "secondary": #6b7280,
-    "placeholder": #9ca3af,
-    "disabled": #b8c0cc,
+    "primary": #0f172a,
+    "regular": #334155,
+    "secondary": #64748b,
+    "placeholder": #94a3b8,
+    "disabled": #cbd5e1,
   ),
 
   $border-color: (
-    "": #d7dee8,
-    "light": #e5eaf1,
-    "lighter": #edf2f7,
-    "extra-light": #f4f7fb,
-    "dark": #c7d0dc,
-    "darker": #b7c2cf,
+    "": #dbe2ee,
+    "light": #e5eaf2,
+    "lighter": #eef2f7,
+    "extra-light": #f5f7fb,
+    "dark": #cbd5e1,
+    "darker": #b8c4d4,
   ),
 
   $fill-color: (
-    "": #f4f7fb,
-    "light": #f7f9fc,
-    "lighter": #fafbfd,
+    "": #f1f5f9,
+    "light": #f8fafc,
+    "lighter": #fafcff,
     "extra-light": #fcfdff,
-    "dark": #edf2f7,
-    "darker": #e4ebf3,
+    "dark": #e2e8f0,
+    "darker": #cbd5e1,
     "blank": #ffffff,
+  ),
+
+  $border-radius: (
+    "base": 8px,
+    "small": 6px,
   )
 );

@@ -13,8 +13,10 @@
           :key="tag.fullPath"
           h-26px
           cursor-pointer
+          class="tags-view-pill"
+          :class="{ 'is-active': tagsViewStore.isActive(tag) }"
           :closable="!tag.affix"
-          :effect="tagsViewStore.isActive(tag) ? 'dark' : 'light'"
+          effect="light"
           :type="tagsViewStore.isActive(tag) ? 'primary' : 'info'"
           @click.middle="handleMiddleClick(tag)"
           @contextmenu.prevent="(event: MouseEvent) => openContextMenu(tag, event)"
@@ -374,23 +376,44 @@ useContextMenuManager();
   width: 100%;
   height: $tags-view-height;
   padding: 0 15px;
-  border-top: 1px solid var(--el-border-color-light);
+  background-color: var(--el-bg-color);
+  border-bottom: 1px solid var(--el-border-color-lighter);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 
   .scroll-container {
     white-space: nowrap;
+  }
+
+  :deep(.tags-view-pill) {
+    font-weight: 500;
+    border-radius: 7px;
+    transition:
+      background-color 0.18s ease,
+      border-color 0.18s ease,
+      color 0.18s ease;
+
+    &.is-active {
+      font-weight: 600;
+      color: var(--el-color-primary);
+      background-color: color-mix(in srgb, var(--el-color-primary) 12%, transparent);
+      border-color: color-mix(in srgb, var(--el-color-primary) 30%, transparent);
+    }
   }
 }
 .contextmenu {
   position: absolute;
   z-index: 3000;
-  padding: 5px 0;
+  padding: 6px 0;
   margin: 0;
   font-size: 12px;
   font-weight: 400;
   color: var(--el-text-color-primary);
   list-style-type: none;
-  background: var(--el-bg-color);
-  border-radius: 4px;
+  background: var(--el-bg-color-overlay);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 10px;
   box-shadow: var(--el-box-shadow-light);
 
   li {
