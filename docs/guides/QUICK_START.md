@@ -21,7 +21,8 @@
 | Maven | 3.9 | 3.9.x |
 | MySQL | 8.4 | 8.4 LTS |
 | Redis | 6.0（支持 `SET ... KEEPTTL`） | 7.2.x |
-| Node.js | 22.22.2 | 22 LTS |
+| Node.js | 22.22.2（含后台样式检查） | 22.22.2 或更新的 22.x 版本 |
+| pnpm | 10.x | 10.33.0 |
 | Nacos | 3.1.1 | 3.1.1 |
 
 ## 三、本地最小启动
@@ -106,7 +107,7 @@ java -jar sourcelin-visual/sourcelin-visual-monitor/target/sourcelin-visual-moni
 
 ```bash
 cd sourcelin-ui/sourcelin-ui-admin
-pnpm install
+pnpm install --frozen-lockfile
 pnpm run dev
 ```
 
@@ -117,6 +118,18 @@ cd sourcelin-ui/sourcelin-ui-platform
 pnpm install --frozen-lockfile
 pnpm run dev
 ```
+
+H5 与微信小程序
+
+```bash
+cd sourcelin-ui/sourcelin-ui-uniapp
+pnpm install --frozen-lockfile
+pnpm run dev:h5
+# 微信小程序
+pnpm run dev:mp-weixin
+```
+
+AppID 配置见 [Uniapp README](../../sourcelin-ui/sourcelin-ui-uniapp/README.md)。
 
 ## 四、推荐验证顺序
 
@@ -163,10 +176,10 @@ pnpm run dev
 - 依赖是否完整安装
 - 控制台是否有接口地址、跨域或资源路径报错
 
-后台部署到 `/admin/` 时，构建必须带：
+后台的构建命令已配置 `/admin/` 基础路径。
 
 ```bash
-pnpm run build -- --base=/admin/
+pnpm run build
 ```
 
 ### 5. 只想快速看功能，不想一次启动全部服务

@@ -267,9 +267,9 @@ Design Tokens
 
 ### 守卫策略
 
-- `npm run style:guard`
+- `pnpm run style:guard`
   - 负责 Naive 边界、glass mixin、硬编码颜色等显性违规
-- `npm run layering:guard`
+- `pnpm run layering:guard`
   - 负责 `FeatureCard` 新增使用
   - 负责业务/页面层新增 `glass-card`、`sourcelin-panel*`、`sourcelin-chip-surface*` 直达用法
   - 负责业务/页面层新增 `@/assets/styles/foundation/responsive` 直达导入
@@ -305,13 +305,13 @@ Design Tokens
 ### 最低验证
 
 ```bash
-npm run typecheck
-npm run build
-npm run style:guard
-npm run layering:guard
-npm run test:style-guard
-npm run test:layering-guard
-npm run test:architecture
+pnpm run typecheck
+pnpm run build
+pnpm run style:guard
+pnpm run layering:guard
+pnpm run test:style-guard
+pnpm run test:layering-guard
+pnpm run test:architecture
 ```
 
 ## 9. 文档同步范围

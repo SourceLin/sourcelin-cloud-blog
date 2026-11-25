@@ -32,7 +32,7 @@ description: 用于新增或修改 Sourcelin 博客前台 Vue3 页面、组件�
 4. API 先定义类型，再接入 `src/shared/api/http.ts` 或模块 `*.api.ts`。
 5. 页面只保留装配逻辑；请求、分页、筛选、提交和复杂状态下沉到 composable。
 6. 业务组件使用 `S*` UI 抽象或业务成品组件，不直连 Naive UI。
-7. 修改后运行 `npm run typecheck`；涉及样式运行 `npm run style:guard`；涉及架构边界运行 `npm run test:architecture`。
+7. 修改后运行 `pnpm run typecheck`；涉及样式运行 `pnpm run style:guard`；涉及架构边界运行 `pnpm run test:architecture`。
 
 ## 依赖 rules
 
@@ -51,4 +51,4 @@ description: 用于新增或修改 Sourcelin 博客前台 Vue3 页面、组件�
 
 ## 升级验证
 
-在 `sourcelin-ui/sourcelin-ui-platform` 从锁文件执行 `pnpm install --frozen-lockfile`，按模块入口执行类型、样式与架构检查，再执行 `npm run build`。生产静态目录为模块内的 `sourcelin-ui-platform/`。
+在 `sourcelin-ui/sourcelin-ui-platform` 从锁文件执行 `pnpm install --frozen-lockfile`，按模块入口执行类型、样式与架构检查，再执行 `pnpm run build`。生产静态目录为模块内的 `sourcelin-ui-platform/`。

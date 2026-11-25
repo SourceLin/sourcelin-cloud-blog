@@ -5,6 +5,8 @@
 > 适用范围：Sourcelin Blog Uniapp 微信小程序与 H5 移动端
 > 依据文档：`docs/product/UNIAPP_MINI_PROGRAM_PRODUCT_DESIGN.md` v1.1、`rules/api-contract.md`、`rules/frontend-platform.md`、`AGENTS.md` 第 4/8 节
 
+> 2026-11-26 工具链更新后，当前的安装、Lint 和构建命令见 [Uniapp README](../../sourcelin-ui/sourcelin-ui-uniapp/README.md)。下面的验证记录与待办保留 2026-05-28 的状态。
+
 ## 一、文档定位
 
 本文档是产品方案 PRD 的工程化补充，仅承接 PRD 第 2/3/4 章，不重复阐述产品立意、视觉规范与交互细节。读者应已通读 PRD，本文聚焦四件事：

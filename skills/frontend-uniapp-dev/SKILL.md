@@ -36,7 +36,7 @@ description: 用于新增或修改 Sourcelin Uniapp 移动端页面、组件、A
 6. 新增页面同步维护 src/pages.json；新增 Tab 同步维护图标、文本和页面路径。
 7. 小程序端优先验证，避免使用浏览器专有 API；平台差异使用 Uniapp 条件编译。
 8. 样式使用 src/styles/** token 和自定义 s-* 组件体系，避免照搬 Web 前台布局。
-9. 修改后执行 npm run lint 和 npm run type-check；涉及页面、路由、Tab、manifest、静态资源或小程序兼容时执行 npm run build:mp-weixin；涉及 H5 时追加 npm run build:h5。
+9. 修改后执行 pnpm run lint 和 pnpm run type-check；涉及页面、路由、Tab、manifest、静态资源或小程序兼容时执行 pnpm run build:mp-weixin；涉及 H5 时追加 pnpm run build:h5。
 10. 涉及功能可见性时使用 useMiniAccess().can() 判断能力开关，能力定义来自 src/shared/api/capability.api.ts 的 MobileCapabilities 接口，由 capabilityStore 在应用启动时从 /front/mobile/capabilities 拉取。
 11. 涉及底部导航时注意区分原生 TabBar（首页、发现、我的，共 3 个）和液态 TabBar（4 个，含圈子）。圈子页通过 navigateTo 跳转而非 switchTab，液态 TabBar 配置在 src/shared/utils/liquid-tabbar.ts。
 
@@ -60,4 +60,4 @@ description: 用于新增或修改 Sourcelin Uniapp 移动端页面、组件、A
 
 ## 升级验证
 
-在小程序工程内执行 `pnpm install --frozen-lockfile`，同步更新 DCloud 编译器与 Vite 插件，按插件 peerDependencies 选 Vite。以生成的 app.json 核实主包和分包；记录真机登录、覆盖安装和 SSE 恢复结果。
+在小程序工程内执行 `pnpm install --frozen-lockfile`，当前 Vite 固定为 5.2.8。升级 DCloud 时同步核对编译器和插件的 `peerDependencies`。以生成的 app.json 核实主包和分包；记录真机登录、覆盖安装和 SSE 恢复结果。

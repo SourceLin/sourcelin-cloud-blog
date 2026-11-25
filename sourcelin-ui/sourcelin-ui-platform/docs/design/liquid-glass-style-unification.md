@@ -395,9 +395,9 @@ html[data-theme='dark'] {
 
 工程验收：
 
-- `npm run style:guard`
-- `npm run layering:guard`
-- `npm run typecheck`
+- `pnpm run style:guard`
+- `pnpm run layering:guard`
+- `pnpm run typecheck`
 - 搜索业务层新增代码，不应出现新的完整 `glass-frost` 手写配方。
 - 搜索新增代码，不应出现新的硬编码 `backdrop-filter: blur(20px)`、`blur(32px)` 这类非 token 写法。
 - 搜索新增代码，`variant="counter"` 的 `SSurfaceChip` 必须显式声明 `size`。

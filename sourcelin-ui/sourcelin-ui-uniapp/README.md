@@ -1,6 +1,6 @@
 # Sourcelin Blog Uniapp 客户端
 
-> Vue3 + TypeScript + Vite + Pinia + Uniapp
+> Uniapp 3 + Vue 3.5.46 + TypeScript 6.0.3 + Vite 5.2.8 + Pinia 4.1.0 + Vue I18n 11.4.23。Vite 版本与 DCloud 编译器配套。
 > 编译目标：微信小程序（基础库 3.0+）、H5 移动端、APP-PLUS（可选）
 > 上层蓝图：[`docs/product/UNIAPP_MINI_PROGRAM_PRODUCT_DESIGN.md`](../../docs/product/UNIAPP_MINI_PROGRAM_PRODUCT_DESIGN.md)、[`docs/product/UNIAPP_MINI_PROGRAM_DEV_BREAKDOWN.md`](../../docs/product/UNIAPP_MINI_PROGRAM_DEV_BREAKDOWN.md)
 
@@ -55,7 +55,7 @@ sourcelin-ui-uniapp/
 ```powershell
 cd sourcelin-ui\sourcelin-ui-uniapp
 pnpm install --frozen-lockfile
-pnpm run dev:mp-weixin   # 编译微信小程序，生成 unpackage/dist/dev/mp-weixin
+pnpm run dev:mp-weixin   # 编译微信小程序，生成 dist/dev/mp-weixin
 pnpm run dev:h5          # 浏览器调试
 ```
 
@@ -120,8 +120,8 @@ pnpm run dev:h5          # 浏览器调试
 ## 四、验证命令
 
 ```powershell
-npm run type-check       # vue-tsc --noEmit
-npm run lint             # ESLint
+pnpm run type-check       # vue-tsc --noEmit
+pnpm run lint             # ESLint
 pnpm run build:mp-weixin  # 微信小程序生产构建
 pnpm run build:h5         # H5 生产构建
 ```

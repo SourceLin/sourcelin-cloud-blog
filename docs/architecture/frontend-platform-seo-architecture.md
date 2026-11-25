@@ -1,7 +1,7 @@
 # 博客前台 SEO 技术改造方案
 
 > 适用项目：`sourcelin-ui/sourcelin-ui-platform`
-> 技术栈：Vue 3 + TypeScript + Vite 8 + Pinia + Vue Router 4
+> 技术栈：Vue 3.5 + TypeScript 6 + Vite 8 + Pinia 4 + Vue Router 5
 > 文档状态：**评估通过 / 待实施**
 
 ---
@@ -102,7 +102,7 @@
 
 **Sitemap 生成思路：**
 
-- 静态路由：Vite 构建插件读取 `appRoutes`，过滤 `hidden: false` 路由生成静态条目。
+- 静态路由：Vite 构建插件按 `vite.config.ts` 内的静态路由清单生成条目。
 - 动态路由：构建时请求后端 `/blog/front/articles`（按 `page` 和 `pageSize` 分页，读取 ID 和更新时间），生成 `/article/:id` 条目。
 - 输出：构建产物根目录 `sitemap.xml`。
 - 更新：CI/CD 流水线每次构建自动重新生成。
@@ -152,7 +152,7 @@ SEO 改造只触及 `<head>` 元数据层和页面容器语义结构层，**严�
 - [ ] 在 `App.vue` 设置全局默认 TDK，数据来源为 `useSiteStore().siteInfo`
 - [ ] 创建 `src/shared/composables/useSeoHead.ts`，封装通用 `useHead()` 调用逻辑
 - [ ] 创建 `public/robots.txt`
-- [ ] 验证：`npm run typecheck`
+- [ ] 验证：`pnpm run typecheck`
 
 ### Phase 2：详情页动态 SEO
 
@@ -162,18 +162,18 @@ SEO 改造只触及 `<head>` 元数据层和页面容器语义结构层，**严�
 - [ ] 映射 OG 字段：`title / summary / cover / createTime`
 - [ ] 补充 `og:url`、`og:type: 'article'`、`twitter:card`
 - [ ] 补充 `<link rel="canonical">` 防止重复内容
-- [ ] 验证：社交分享预览工具（Open Graph Debugger）+ `npm run typecheck`
+- [ ] 验证：社交分享预览工具（Open Graph Debugger）+ `pnpm run typecheck`
 
 ### Phase 3：Sitemap 自动生成与爬虫策略
 
 > 目标：建立爬虫索引引导体系
 
-- [ ] 实现 Vite 自定义插件，构建时读取 `appRoutes` 生成静态路由 Sitemap 条目
-- [ ] 构建插件调用文章列表 API，追加动态文章 URL 条目（含 `lastmod`、`changefreq`、`priority`）
-- [ ] 将 `sitemap.xml` 写入 `dist/` 根目录
-- [ ] 在 `robots.txt` 中声明 `Sitemap:` 地址
+- [x] 使用 Vite 构建插件按静态路由清单生成 Sitemap 条目
+- [x] 配置 `VITE_API_ORIGIN` 后，构建插件分页请求文章列表并追加动态文章条目
+- [x] 将 `sitemap.xml` 写入博客前台构建输出目录 `sourcelin-ui-platform/`
+- [x] 在 `public/robots.txt` 中声明 `Sitemap:` 地址
 - [ ] 提供 Nginx 爬虫 UA 识别配置片段，维护在 `docs/configs/nginx-prerender.conf`
-- [ ] 验证：`npm run build` 后检查 `sitemap.xml` 正确生成
+- [x] 在隔离网关配置 `VITE_API_ORIGIN` 后运行 `pnpm run build`，生成 10 条链接，其中包含 1 篇测试文章
 
 ### Phase 4：语义化 HTML 补全
 
@@ -183,7 +183,7 @@ SEO 改造只触及 `<head>` 元数据层和页面容器语义结构层，**严�
 - [ ] 文章详情页：`<article>` 包裹内容主体，`<h1>` 承载文章标题
 - [ ] 归档、分类、标签页：`<section>` 容器 + `<h1>`
 - [ ] 全站语义化改造不触碰任何 `S*` 组件内部
-- [ ] 验证：`npm run typecheck` + `npm run style:guard` + `npm run test:architecture` 三项全绿
+- [ ] 验证：`pnpm run typecheck` + `pnpm run style:guard` + `pnpm run test:architecture` 三项全绿
 
 ---
 
@@ -202,13 +202,13 @@ SEO 改造只触及 `<head>` 元数据层和页面容器语义结构层，**严�
 
 ```bash
 # Phase 1 / Phase 2 / Phase 4
-npm run typecheck
-npm run style:guard
-npm run test:architecture
+pnpm run typecheck
+pnpm run style:guard
+pnpm run test:architecture
 
 # Phase 3
-npm run build
-# 验证 dist/sitemap.xml 存在且包含文章 URL 条目
+pnpm run build
+# 验证 sourcelin-ui-platform/sitemap.xml 存在且包含文章 URL 条目
 ```
 
 ---

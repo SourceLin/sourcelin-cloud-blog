@@ -88,9 +88,9 @@
 ## 最低验证
 
 ```bash
-npm run typecheck
-npm run build
-npm run style:guard
-npm run test:style-guard
-npm run test:architecture
+pnpm run typecheck
+pnpm run build
+pnpm run style:guard
+pnpm run test:style-guard
+pnpm run test:architecture
 ```

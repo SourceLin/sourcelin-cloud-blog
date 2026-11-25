@@ -7,7 +7,7 @@
 
 - **项目名称**：`sourcelin-ui-platform`
 - **项目类型**：Sourcelin Blog 博客前台
-- **技术栈**：Vue 3 + TypeScript + Vite + Pinia + Naive UI
+- **技术栈**：Vue 3.5 + TypeScript 6 + Vite 8 + Pinia 4 + Vue Router 5 + Naive UI 2
 - **开发端口**：`80`
 - **前端 API 基础路径**：开发环境 `VITE_APP_BASE_API=/blog-api`
 - **开发代理目标**：默认 `VITE_APP_API_URL=http://localhost:8080`，需要联调线上时显式改为目标域名

@@ -1,8 +1,8 @@
-﻿# 博客前台架构说明
+# 博客前台架构说明
 
 ## 当前状态
 
-博客前台位于 `sourcelin-ui/sourcelin-ui-platform`，采用 Vue 3 + TypeScript + Naive UI 封装层。当前模块化主线已经收敛到 `src/modules/**`，共享 API、UI 抽象、反馈组件和布局组件位于 `src/shared/**`。
+博客前台位于 `sourcelin-ui/sourcelin-ui-platform`，使用 Vue 3.5、TypeScript 6、Vite 8、Pinia 4、Vue Router 5 和 Naive UI 2 封装层。当前模块化主线已经收敛到 `src/modules/**`，共享 API、UI 抽象、反馈组件和布局组件位于 `src/shared/**`。
 
 已完成的第三阶段与后续页面容器化拆分：
 
@@ -39,8 +39,9 @@ src/shared/
 ## 验证命令
 
 ```bash
-npm run typecheck
-npm run style:guard
-npm run test:architecture
-node ../../scripts/architecture-guard/frontend-platform-guard.mjs
+pnpm run typecheck
+pnpm run style:guard
+pnpm run test:architecture
+pnpm run lint
+pnpm run build
 ```

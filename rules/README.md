@@ -28,7 +28,7 @@
 - Uniapp 移动端开发：读取 `api-contract.md`、`frontend-uniapp.md`、`coding-conventions.md`、`testing-and-validation.md`，并联查 `sourcelin-ui/sourcelin-ui-uniapp/AGENTS.md`。
 - 管理后台开发：读取 `api-contract.md`、`frontend-admin.md`、`coding-conventions.md`、`testing-and-validation.md`。
 - API 契约治理：读取 `api-contract.md` 和 `testing-and-validation.md`。
-- 架构重构：读取全部规则，按影响范围执行 Maven、npm 或 pnpm 验证。
+- 架构重构：读取全部规则，按影响范围执行 Maven 或 pnpm 验证。
 
 ## 开源分支边界
 

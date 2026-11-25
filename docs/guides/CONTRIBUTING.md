@@ -139,9 +139,9 @@ mvn test -pl sourcelin-modules/sourcelin-blog -am
 
 ```bash
 cd sourcelin-ui/sourcelin-ui-platform
-npm run typecheck
-npm run style:guard
-npm run test:architecture
+pnpm run typecheck
+pnpm run style:guard
+pnpm run test:architecture
 ```
 
 ### 管理后台改动

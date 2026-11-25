@@ -303,9 +303,9 @@ sourcelin-cloud-blog/
 
 | 端 | 目录 | 技术栈 |
 |---|---|---|
-| 博客前台 | `sourcelin-ui/sourcelin-ui-platform` | Vue 3.5 + TypeScript 5.9 + Vite 8 + Pinia 3 + Vue Router 4 + Naive UI 2 + `S*` UI 抽象层 |
-| 管理后台 | `sourcelin-ui/sourcelin-ui-admin` | Vue 3.5 + TypeScript 5.9 + Vite 8 + Pinia 3 + Element Plus 2 + vxe-table + wangEditor |
-| 移动端小程序 | `sourcelin-ui/sourcelin-ui-uniapp` | Uniapp 3 + Vue 3.5 + TypeScript 5.6 + Vite 5 + Pinia 2 + 自定义 `s-*` 组件体系 |
+| 博客前台 | `sourcelin-ui/sourcelin-ui-platform` | Vue 3.5.46 + TypeScript 6.0.3 + Vite 8.3.8 + Pinia 4.1.0 + Vue Router 5.5.1 + Naive UI 2.45.3 + `S*` UI 抽象层 |
+| 管理后台 | `sourcelin-ui/sourcelin-ui-admin` | Vue 3.5.46 + TypeScript 6.0.3 + Vite 8.3.8 + Pinia 4.1.0 + Vue Router 5.5.1 + Element Plus 2.14.8 + Vxe Table 4.24.4 + Vxe UI 4.21.7 + WangEditor Next 6.7.0 |
+| 移动端小程序 | `sourcelin-ui/sourcelin-ui-uniapp` | Uniapp 3 + Vue 3.5.46 + TypeScript 6.0.3 + Vite 5.2.8 + Pinia 4.1.0 + Vue I18n 11.4.23 + 自定义 `s-*` 组件体系 |
 
 ### 工程治理
 
@@ -385,7 +385,8 @@ sourcelin-cloud-blog/
 | Maven | 3.9 | 3.9.x |
 | MySQL | 8.4 | 8.4 LTS |
 | Redis | 6.0（支持 `SET ... KEEPTTL`） | 7.2.x |
-| Node.js | 22.22.2 | 22 LTS |
+| Node.js | 22.22.2（含后台样式检查） | 22.22.2 或更新的 22.x 版本 |
+| pnpm | 10.x | 10.33.0 |
 | Nacos | 3.1.1 | 3.1.1 |
 | Docker | 20+ | 24.x |
 
@@ -436,6 +437,8 @@ java -jar sourcelin-visual/sourcelin-monitor/target/sourcelin-visual-monitor.jar
 
 #### 6. 启动前端
 
+在各模块目录使用对应的 `pnpm-lock.yaml` 安装依赖。
+
 博客前台：
 
 ```bash
@@ -448,7 +451,7 @@ pnpm run dev
 
 ```bash
 cd sourcelin-ui/sourcelin-ui-admin
-pnpm install
+pnpm install --frozen-lockfile
 pnpm run dev
 ```
 
@@ -490,7 +493,7 @@ docker compose -f docker-compose.example.yml up -d
 
 - 先确认 MySQL、Redis、Nacos 已可用，再启动微服务；否则大部分启动失败都只是基础依赖未就绪。
 - `docs/sql/sourcelin-config.sql` 不是业务表，它用于初始化 Nacos 配置，缺它时服务可能能启动但配置不完整。
-- 管理后台部署到 `/admin/` 时，前端构建需要带 `--base=/admin/`。
+- 管理后台的 `pnpm run build` 已配置 `/admin/` 基础路径。
 - 如果只是本地调试博客能力，优先启动 `gateway`、`auth`、`system`、`blog` 四个核心服务即可。
 - Docker 部署前先阅读 [`docs/guides/QUICK_START.md`](./docs/guides/QUICK_START.md) 和 [`docs/deployment/NGINX_CONFIG.md`](./docs/deployment/NGINX_CONFIG.md), 确认目录、端口和网关入口是否符合你的环境。
 

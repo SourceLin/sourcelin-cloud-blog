@@ -221,6 +221,8 @@ mvn <goal>
 
 ## 8. 博客前台执行流程
 
+三端按各自的 `pnpm-lock.yaml` 安装，使用 `pnpm install --frozen-lockfile`。版本与环境要求见 [README.md](README.md#前端)。
+
 
 1. 读取 `rules/frontend-platform.md` 和 `skills/frontend-platform-dev/SKILL.md`。
 
@@ -234,7 +236,7 @@ mvn <goal>
 
 6. 业务组件不得直连 Naive UI，必须使用 `S*` UI 抽象或业务成品组件。
 
-7. 按改动范围执行 `npm run typecheck`、`npm run style:guard`、`npm run test:architecture`。
+7. 按改动范围执行 `pnpm run typecheck`、`pnpm run style:guard`、`pnpm run test:architecture`。
 
 
 
@@ -249,7 +251,7 @@ mvn <goal>
 7. `onPageScroll` 必须使用 `useBackToTop`（`src/shared/composables/useBackToTop`）的 `handlePageScroll`，禁止逐像素写响应式状态。
 8. 新增页面必须同步 `src/pages.json`；新增 Tab 必须同步 `src/static/tabbar/**` 图标。
 9. 小程序分包 root 必须是真实目录，不满足条件时保持普通页面注册。
-10. 按改动范围执行 `npm run lint`、`npm run type-check`、`npm run build:mp-weixin`，并验证主包体积。
+10. 按改动范围执行 `pnpm run lint`、`pnpm run type-check`、`pnpm run build:mp-weixin`，并验证主包体积。
 
 
 ## 10. 管理后台执行流程
@@ -286,7 +288,7 @@ mvn <goal>
 
 5. 同步更新 `docs/architecture/**`、`rules/**`、`skills/**`、`AGENTS.md`；数据库初始化变化同步 `docs/sql/**`。
 
-6. 使用当前仓库存在的 Maven、npm、pnpm 命令完成验证，不依赖未提交的本地脚本。
+6. 使用当前仓库存在的 Maven、pnpm 命令完成验证，不依赖未提交的本地脚本。
 
 ## 12. 审查流程
 
@@ -332,11 +334,11 @@ mvn compile -pl sourcelin-modules/sourcelin-blog -am
 
 cd sourcelin-ui\sourcelin-ui-platform
 
-npm run typecheck
+pnpm run typecheck
 
-npm run style:guard
+pnpm run style:guard
 
-npm run test:architecture
+pnpm run test:architecture
 
 ```
 
@@ -349,11 +351,11 @@ Uniapp 移动端：
 
 cd sourcelin-ui\sourcelin-ui-uniapp
 
-npm run lint
+pnpm run lint
 
-npm run type-check
+pnpm run type-check
 
-npm run build:mp-weixin
+pnpm run build:mp-weixin
 
 ```
 

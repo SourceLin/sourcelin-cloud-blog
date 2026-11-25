@@ -199,7 +199,9 @@ Read more: [docs/openai-application.md](./docs/openai-application.md) | [docs/ai
 | ORM | MyBatis, MyBatis-Plus, PageHelper |
 | Database | MySQL 8.4 LTS |
 | Cache | Redis |
-| Frontend | Vue 3, TypeScript, Naive UI (blog frontend), Element Plus (admin panel) |
+| Blog frontend | Vue 3.5, TypeScript 6, Vite 8, Pinia 4, Vue Router 5, Naive UI 2 |
+| Admin panel | Vue 3.5, TypeScript 6, Vite 8, Pinia 4, Vue Router 5, Element Plus 2, Vxe Table 4, WangEditor Next 6 |
+| Mobile | Uniapp 3, Vue 3.5, TypeScript 6, Vite 5.2.8, Pinia 4, Vue I18n 11 for H5 and WeChat Mini Program |
 | Build | Maven, pnpm, Vite |
 | Deployment | Docker, Docker Compose, Nginx |
 
@@ -234,7 +236,7 @@ Read more: [docs/openai-application.md](./docs/openai-application.md) | [docs/ai
 - MySQL 8.4 LTS
 - Redis 6.0+ with `SET ... KEEPTTL` support (7.2.x recommended)
 - Nacos 3.1.1
-- Node.js 22.22.2+ and pnpm
+- Node.js 22.22.2 or newer within the 22.x line for the complete frontend toolchain, and pnpm 10.x
 
 ### Local Development
 
@@ -270,9 +272,21 @@ pnpm run dev
 
 ```bash
 cd sourcelin-ui/sourcelin-ui-admin
-pnpm install
+pnpm install --frozen-lockfile
 pnpm run dev
 ```
+
+6. **Start the mobile app**
+
+```bash
+cd sourcelin-ui/sourcelin-ui-uniapp
+pnpm install --frozen-lockfile
+pnpm run dev:h5
+# WeChat Mini Program
+pnpm run dev:mp-weixin
+```
+
+See the [Uniapp README](sourcelin-ui/sourcelin-ui-uniapp/README.md) for AppID configuration and build outputs.
 
 ### Docker Deployment
 

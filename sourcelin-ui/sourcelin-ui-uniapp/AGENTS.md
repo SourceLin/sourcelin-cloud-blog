@@ -11,8 +11,8 @@
 技术栈：
 
 ```text
-Uniapp + Vue3 + TypeScript + Vite
-Pinia 状态管理
+Uniapp 3 + Vue 3.5 + TypeScript 6 + Vite 5.2.8
+Pinia 4 状态管理，Vue I18n 11
 自定义 s-* 组件体系
 Sourcelin Liquid Glass Mobile 设计语言
 ```
@@ -109,15 +109,15 @@ src/static/**             # tabbar、图片等静态资源
 
 ```powershell
 cd sourcelin-ui\sourcelin-ui-uniapp
-npm run lint
-npm run type-check
-npm run build:mp-weixin
+pnpm run lint
+pnpm run type-check
+pnpm run build:mp-weixin
 ```
 
 涉及 H5 构建或跨端兼容时追加：
 
 ```powershell
-npm run build:h5
+pnpm run build:h5
 ```
 
 构建完成后，微信开发者工具导入：

@@ -12,7 +12,7 @@
 - MUST：通用组件使用 `src/components/s-*/s-*.vue`，并通过 `pages.json` 的 easycom `s-*` 规则自动注册。
 - MUST NOT：页面文件直接堆叠大段请求编排、复杂状态机或跨页面复用逻辑。
 - MUST NOT：新增 Web 前台目录结构到 Uniapp，例如 `src/modules/**/pages` 或 Naive UI 组件抽象。
-- CHECK：审查新增文件路径，并执行 `npm run lint` 与 `npm run type-check`。
+- CHECK：审查新增文件路径，并执行 `pnpm run lint` 与 `pnpm run type-check`。
 
 ## 2. API 与登录契约
 
@@ -25,7 +25,7 @@
 - MUST：文件资源使用统一文件前缀或后端返回的可访问 URL，不在页面拼接 `127.0.0.1` 或内网地址。
 - MUST NOT：Uniapp 调用 `/prod-api/**`、`/system/**`、`/blog/admin/**`、`/monitor/**` 等后台管理域接口。
 - MUST NOT：页面判断 `code === 200`，或读取 `msg/rows/records/list/pageNum/limit`。
-- CHECK：涉及 API 改动时执行 `npm run type-check`，并审查 API 类型、请求路径、分页字段和 `loginType`。
+- CHECK：涉及 API 改动时执行 `pnpm run type-check`，并审查 API 类型、请求路径、分页字段和 `loginType`。
 
 ## 3. 页面、路由与小程序配置
 
@@ -40,7 +40,7 @@
 - MUST NOT：使用 Vue Router、浏览器 History API 或动态路由能力实现小程序页面跳转。
 - MUST NOT：在小程序端直接访问 `window`、`document`、`localStorage`、`sessionStorage`。
 - MUST NOT：在 `pages.json` 顶层 `pages` 中注册非 Tab 页面，避免主包膨胀超 2MB。
-- CHECK：路由、Tab、分包或 manifest 改动后执行 `npm run build:mp-weixin`，并检查输出 `dist/build/mp-weixin/app.json` 和主包体积。
+- CHECK：路由、Tab、分包或 manifest 改动后执行 `pnpm run build:mp-weixin`，并检查输出 `dist/build/mp-weixin/app.json` 和主包体积。
 
 ## 4. UI 与液态玻璃移动端规范
 
@@ -52,7 +52,7 @@
 - MUST：表单、抽屉、评论、登录引导等核心操作需要明确加载态、空态、错误态和禁用态。
 - MUST NOT：照搬 Web 端大屏布局、密集导航、悬浮 hover 交互或桌面端信息架构。
 - MUST NOT：引入重型 UI 框架替代现有自定义组件体系。
-- CHECK：样式或组件改动后执行 `npm run lint`，核心页面改动后执行 `npm run build:mp-weixin`。
+- CHECK：样式或组件改动后执行 `pnpm run lint`，核心页面改动后执行 `pnpm run build:mp-weixin`。
 
 ## 5. 性能、缓存与跨端兼容
 
@@ -68,4 +68,4 @@
 - MUST：模板中禁止对同一 item 重复调用解析函数（如 resolveImages/resolveAvatar），应预计算为 computed Map 后查表取值。
 - MUST：累积集合（brokenUrl/brokenId 等）使用 `shallowRef` + `Set.add()` + `triggerRef()`，禁止 `new Set([...old, val])` 全量重建。
 - MUST NOT：为了移动端首版引入 WebSocket、复杂推荐算法或大体积富文本组件，除非任务明确要求并评估包体积。
-- CHECK：发布前执行 `npm run lint`、`npm run type-check`、`npm run build:mp-weixin`；涉及 H5 输出时追加 `npm run build:h5`。
+- CHECK：发布前执行 `pnpm run lint`、`pnpm run type-check`、`pnpm run build:mp-weixin`；涉及 H5 输出时追加 `pnpm run build:h5`。

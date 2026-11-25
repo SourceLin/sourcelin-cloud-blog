@@ -1,10 +1,17 @@
-﻿# 更新日志
+# 更新日志
 
 本文档记录了 Sourcelin Blog 的所有重要变更。所有重大变更都会在此文件中列出。
 
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
 > 说明：`v1.0.0` 章节主要反映首个开源版本时的历史发布信息，不完全等同于当前代码现状。当前实现以 [README.md](../../README.md)、[PROJECT_SUMMARY.md](../product/PROJECT_SUMMARY.md) 和 [rules/](../../rules/) 为准。
+
+## 2026-11-26 三端前端工具链升级
+
+- 三端更新至 Vue 3.5.46、TypeScript 6.0.3 和 Pinia 4.1.0，使用 pnpm 10.x 和各自的锁文件。
+- 博客前台与管理后台使用 Vue Router 5.5.1 和 Vite 8.3.8。博客前台升级 Naive UI 和 Quill，拆分分类和热门页面，并按文章分页接口生成站点地图。
+- 管理后台升级 Element Plus、Vxe Table、Vxe UI 和 WangEditor Next，统一亮暗主题下的导航悬停、选中和焦点样式。
+- Uniapp 更新 Vue I18n，沿用 DCloud 编译器对应的 Vite 5.2.8，复用微信登录逻辑并拆分社区页面。
 
 ## 2026-11-23 主线架构升级
 

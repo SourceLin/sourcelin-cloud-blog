@@ -1,8 +1,10 @@
-﻿# 管理后台架构说明
+# 管理后台架构说明
 
 ## 当前状态
 
-管理后台位于 `sourcelin-ui/sourcelin-ui-admin`，采用 Vue 3 + Vite + TypeScript + Element Plus。业务页面主线保留现有 `src/views/**` 和 `src/api/**` 目录，不引入新框架。
+管理后台位于 `sourcelin-ui/sourcelin-ui-admin`，采用 Vue 3.5 + TypeScript 6 + Vite 8 + Pinia 4 + Vue Router 5 + Element Plus 2，表格使用 Vxe Table 4 与 Vxe UI 4，富文本使用 WangEditor Next 6。业务页面主线保留现有 `src/views/**` 和 `src/api/**` 目录，不引入新框架。
+
+导航菜单在 `LayoutSidebar` 与混合布局接入共享主题样式，覆盖浅蓝、极简白和暗色，以及悬停、选中、键盘焦点和弹出子菜单。
 
 已完成的第四阶段拆分：
 
@@ -35,5 +37,5 @@ src/views/blog/shared # 博客管理模块共享壳和类型
 ```bash
 pnpm run type-check
 pnpm run lint
-node ../../scripts/architecture-guard/frontend-admin-guard.mjs
+pnpm run build
 ```

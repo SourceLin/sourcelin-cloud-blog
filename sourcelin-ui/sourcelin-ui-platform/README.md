@@ -4,14 +4,10 @@ Sourcelin Blog 前台项目，基于 Vue 3、TypeScript、Vite、Pinia 和 Naive
 
 ## 技术栈
 
-- Vue 3
-- TypeScript
-- Vite
-- Pinia
-- Vue Router 4
-- Naive UI
-- Axios
-- ECharts
+- Vue 3.5.46、TypeScript 6.0.3、Vite 8.3.8
+- Pinia 4.1.0、Vue Router 5.5.1
+- Naive UI 2.45.3、Quill 2、ECharts 6.1
+- Axios、pnpm 10.x、ESLint 10
 
 ## 常用命令
 
@@ -21,6 +17,7 @@ pnpm run dev
 pnpm run build
 pnpm run preview
 pnpm run typecheck
+pnpm run lint
 pnpm run style:guard
 pnpm run test:style-guard
 pnpm run test:architecture

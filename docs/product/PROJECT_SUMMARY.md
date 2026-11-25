@@ -34,9 +34,9 @@
 
 | 端 | 技术栈 |
 |----|--------|
-| 博客前台 | Vue 3.5 + TypeScript 5.9 + Naive UI + Vite 8 |
-| 管理后台 | Vue 3.5 + TypeScript 5.9 + Element Plus + Vite 8 |
-| H5 / 微信小程序 | Uniapp 3 + Vue 3.5 + TypeScript 5.6 + Vite 5 |
+| 博客前台 | Vue 3.5.46 + TypeScript 6.0.3 + Vite 8.3.8 + Pinia 4.1.0 + Vue Router 5.5.1 + Naive UI 2.45.3 |
+| 管理后台 | Vue 3.5.46 + TypeScript 6.0.3 + Vite 8.3.8 + Pinia 4.1.0 + Vue Router 5.5.1 + Element Plus 2.14.8 + Vxe Table 4.24.4 + Vxe UI 4.21.7 + WangEditor Next 6.7.0 |
+| H5 / 微信小程序 | Uniapp 3 + Vue 3.5.46 + TypeScript 6.0.3 + Vite 5.2.8 + Pinia 4.1.0 + Vue I18n 11.4.23 |
 
 ## 系统架构
 

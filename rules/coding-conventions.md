@@ -27,7 +27,7 @@
 - MUST：不确定外部数据结构使用 `unknown` 或 `Record<string, unknown>`。
 - MUST NOT：新增 `any`。
 - MUST NOT：通过类型断言掩盖协议不一致。
-- CHECK：博客前台执行 `npm run typecheck`，管理后台执行 `pnpm run type-check`。
+- CHECK：博客前台执行 `pnpm run typecheck`，管理后台执行 `pnpm run type-check`。
 
 ## 4. 安全配置
 
