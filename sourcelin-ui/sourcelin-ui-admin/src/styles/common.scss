@@ -9,57 +9,38 @@
   background-color: var(--el-color-primary);
 }
 
-/* 弹出菜单统一使用主题变量（简化 hover 色） */
-.el-menu--popup {
+/* 左侧、横向和弹出菜单共用主题色与交互状态。 */
+.admin-navigation-menu,
+.admin-navigation-popper .el-menu {
   --el-menu-bg-color: var(--menu-background);
   --el-menu-text-color: var(--menu-text);
+  --el-menu-hover-text-color: var(--menu-text);
   --el-menu-active-color: var(--menu-active-text);
   --el-menu-hover-bg-color: var(--menu-hover);
-
-  background-color: var(--menu-background);
-
-  .el-menu-item,
-  .el-sub-menu__title {
-    color: var(--menu-text) !important;
-  }
-
-  .el-menu-item:hover,
-  .el-sub-menu__title:hover {
-    color: var(--menu-active-text) !important;
-    background-color: var(--menu-hover) !important;
-  }
-
-  .el-menu-item.is-active {
-    color: var(--menu-active-text) !important;
-    background-color: var(--menu-hover) !important;
-  }
 }
 
-/* ============================================
-   混合布局左侧菜单 hover 样式
-   ============================================ */
-.layout-mix .layout__sidebar--left .el-menu {
-  .el-menu-item {
+:is(.admin-navigation-menu.el-menu, .admin-navigation-popper .el-menu) {
+  .el-menu-item:not(.is-disabled):hover,
+  .el-sub-menu:not(.is-disabled) > .el-sub-menu__title:hover {
+    background-color: var(--menu-hover);
+  }
+
+  .el-menu-item.is-active,
+  .el-sub-menu:is(.is-active, .has-active-child) > .el-sub-menu__title {
+    color: var(--menu-active-text);
+    background-color: var(--menu-active-bg);
+
     &:hover {
-      background-color: var(--el-fill-color-light) !important;
+      background-color: var(--menu-active-hover);
     }
   }
 
-  .el-sub-menu__title {
-    &:hover {
-      background-color: var(--el-fill-color-light) !important;
-    }
-  }
-}
-
-/* 深色或深蓝侧边栏的 hover 样式 */
-html.dark .layout-mix .layout__sidebar--left .el-menu,
-html.sidebar-color-classic .layout-mix .layout__sidebar--left .el-menu {
-  .el-menu-item,
-  .el-sub-menu__title {
-    &:hover {
-      background-color: var(--menu-hover) !important;
-    }
+  .el-menu-item:not(.is-disabled):focus-visible,
+  a:focus-visible > .el-menu-item,
+  .el-sub-menu:focus-visible > .el-sub-menu__title,
+  .el-sub-menu__title:focus-visible {
+    outline: 2px solid var(--menu-focus);
+    outline-offset: -2px;
   }
 }
 

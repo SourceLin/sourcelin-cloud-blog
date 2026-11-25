@@ -112,15 +112,8 @@ const isLogoCollapsed = computed(() => width.value < 768);
             line-height: $navbar-height;
           }
 
-          &.has-active-child {
-            .el-sub-menu__title {
-              color: var(--el-color-primary) !important;
-              border-bottom: 2px solid var(--el-color-primary) !important;
-
-              .menu-icon {
-                color: var(--el-color-primary) !important;
-              }
-            }
+          &.has-active-child > .el-sub-menu__title {
+            border-bottom: 2px solid var(--menu-active-text);
           }
         }
 

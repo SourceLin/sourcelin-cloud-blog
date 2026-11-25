@@ -54,9 +54,9 @@ sourcelin-ui-uniapp/
 
 ```powershell
 cd sourcelin-ui\sourcelin-ui-uniapp
-npm install
-npm run dev:mp-weixin   # 编译微信小程序，生成 unpackage/dist/dev/mp-weixin
-npm run dev:h5          # 浏览器调试
+pnpm install --frozen-lockfile
+pnpm run dev:mp-weixin   # 编译微信小程序，生成 unpackage/dist/dev/mp-weixin
+pnpm run dev:h5          # 浏览器调试
 ```
 
 启动前置：
@@ -83,7 +83,7 @@ npm run dev:h5          # 浏览器调试
 微信小程序 AppID 公开边界：
 
 - `src/manifest.json` 的 `mp-weixin.appid` 必须保持为 `__WECHAT_MINI_APP_ID__` 占位值。
-- `npm run dev:mp-weixin` 和 `npm run build:mp-weixin` 会在命令执行期间读取 `.env.local` 并临时注入真实 AppID，结束后自动恢复占位源码。
+- `pnpm run dev:mp-weixin` 和 `pnpm run build:mp-weixin` 会在命令执行期间读取 `.env.local` 并临时注入真实 AppID，结束后自动恢复占位源码。
 - 如果未配置 `VITE_WECHAT_MINI_APP_ID`，命令仍可构建，但产物不能用于真实微信登录预览。
 
 ## 三、核心约束
@@ -115,15 +115,15 @@ npm run dev:h5          # 浏览器调试
 
 - 新增页面时：Tab 页入主包 `pages`，业务页入对应 `subPackages`。
 - 主包体积限制 2MB，子包各限制 2MB。
-- 构建后验证：`npm run build:mp-weixin`，检查 `dist/build/mp-weixin/` 主包大小。
+- 构建后验证：`pnpm run build:mp-weixin`，检查 `dist/build/mp-weixin/` 主包大小。
 
 ## 四、验证命令
 
 ```powershell
 npm run type-check       # vue-tsc --noEmit
 npm run lint             # ESLint
-npm run build:mp-weixin  # 微信小程序生产构建
-npm run build:h5         # H5 生产构建
+pnpm run build:mp-weixin  # 微信小程序生产构建
+pnpm run build:h5         # H5 生产构建
 ```
 
 ## 五、当前闭环范围

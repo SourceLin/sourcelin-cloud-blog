@@ -31,7 +31,6 @@ const second = ref('00')
 let timer: ReturnType<typeof setInterval> | null = null
 
 const currentYear = new Date().getFullYear()
-const launchDateText = '2026.02.01'
 
 const copyrightYearText = computed(() => {
   const startYear = 2026

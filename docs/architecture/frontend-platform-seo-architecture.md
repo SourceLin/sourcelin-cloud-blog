@@ -103,7 +103,7 @@
 **Sitemap 生成思路：**
 
 - 静态路由：Vite 构建插件读取 `appRoutes`，过滤 `hidden: false` 路由生成静态条目。
-- 动态路由：构建时请求后端 `/blog/front/article/list`（全量，仅取 ID 和更新时间），生成 `/article/:id` 条目。
+- 动态路由：构建时请求后端 `/blog/front/articles`（按 `page` 和 `pageSize` 分页，读取 ID 和更新时间），生成 `/article/:id` 条目。
 - 输出：构建产物根目录 `sitemap.xml`。
 - 更新：CI/CD 流水线每次构建自动重新生成。
 

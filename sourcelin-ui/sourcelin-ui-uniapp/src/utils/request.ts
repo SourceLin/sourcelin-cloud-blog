@@ -309,7 +309,7 @@ export function upload<T = unknown>(config: UploadConfig): Promise<T> {
       header,
       timeout: config.timeout || 30000,
       success: (res) => {
-        let body: ApiResponse<T> | string | null = null;
+        let body: ApiResponse<T> | string | null;
         try {
           body = res.data ? (JSON.parse(res.data) as ApiResponse<T>) : null;
         } catch {

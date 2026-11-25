@@ -70,11 +70,14 @@
         type="warning"
         :closable="false"
       />
-      <el-table :data="resultData" style="width: 100%; max-height: 400px">
+      <el-table
+        :data="resultData.map((message) => ({ message }))"
+        style="width: 100%; max-height: 400px"
+      >
         <el-table-column prop="index" align="center" width="100" type="index" label="序号" />
         <el-table-column prop="message" label="错误信息" width="400">
           <template #default="scope">
-            {{ scope.row }}
+            {{ scope.row.message }}
           </template>
         </el-table-column>
       </el-table>

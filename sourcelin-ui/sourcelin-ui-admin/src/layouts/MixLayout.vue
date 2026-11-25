@@ -10,11 +10,11 @@
         <!-- 顶部菜单 -->
         <div class="layout__header-menu">
           <el-menu
+            class="admin-navigation-menu"
+            popper-class="admin-navigation-popper"
+            :popper-effect="menuTheme"
             mode="horizontal"
             :default-active="activeTopMenuPath"
-            :background-color="useMenuColors ? variables['menu-background'] : undefined"
-            :text-color="useMenuColors ? variables['menu-text'] : undefined"
-            :active-text-color="useMenuColors ? variables['menu-active-text'] : undefined"
             @select="handleTopMenuSelect"
           >
             <el-menu-item v-for="item in topMenuItems" :key="item.path" :index="item.path">
@@ -40,13 +40,13 @@
       <div class="layout__sidebar--left" :class="{ 'layout__sidebar--collapsed': !isSidebarOpen }">
         <el-scrollbar>
           <el-menu
+            class="admin-navigation-menu"
+            popper-class="admin-navigation-popper"
+            :popper-effect="menuTheme"
             :default-active="activeSideMenuPath"
             :collapse="!isSidebarOpen"
             :collapse-transition="false"
             :unique-opened="false"
-            :background-color="variables['menu-background']"
-            :text-color="variables['menu-text']"
-            :active-text-color="variables['menu-active-text']"
           >
             <LayoutSidebarItem
               v-for="item in sideMenuRoutes"
@@ -77,7 +77,7 @@ import { useLayout } from "./useLayout";
 import { useAppStore, usePermissionStore, useSettingsStore } from "@/store";
 import { isExternal } from "@/utils/index";
 import { translateRouteTitle } from "@/lang/utils";
-import { SidebarColor, ThemeMode } from "@/enums/settings";
+import { ThemeMode } from "@/enums/settings";
 import { ElIcon } from "element-plus";
 import { isElementPlusIconName } from "@/utils/element-icons";
 import BaseLayout from "./BaseLayout.vue";
@@ -87,7 +87,6 @@ import LayoutTagsView from "./components/LayoutTagsView.vue";
 import LayoutMain from "./components/LayoutMain.vue";
 import LayoutSidebarItem from "./components/LayoutSidebarItem.vue";
 import Hamburger from "@/components/Hamburger/index.vue";
-import variables from "@/styles/variables.module.scss";
 
 // 菜单图标渲染组件
 const MenuIcon = defineComponent({
@@ -125,11 +124,8 @@ const { showTagsView, showLogo, isSidebarOpen, toggleSidebar, sideMenuRoutes, ac
 
 const isLogoCollapsed = computed(() => width.value < 768);
 
-// 是否使用深色菜单配色（暗色主题或经典蓝侧边栏）
-const useMenuColors = computed(
-  () =>
-    settingsStore.resolvedTheme === ThemeMode.DARK ||
-    settingsStore.sidebarColorScheme === SidebarColor.CLASSIC_BLUE
+const menuTheme = computed(() =>
+  settingsStore.resolvedTheme === ThemeMode.DARK ? "dark" : "light"
 );
 
 // 顶部菜单项（处理单子菜单显示优化）
@@ -276,8 +272,7 @@ watch(
           border-bottom: none;
 
           &.is-active {
-            background-color: var(--menu-top-active-bg);
-            border-bottom: 2px solid var(--el-color-primary);
+            border-bottom: 2px solid var(--menu-active-text);
           }
         }
       }

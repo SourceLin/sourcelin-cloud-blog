@@ -98,10 +98,14 @@ import { onShow } from '@dcloudio/uni-app';
 import {
   bindMiniProgramAccount,
   fetchCaptcha,
-  loginByMiniProgramCode,
   loginByPassword,
   prepareMiniProgramBind
 } from '@/shared/api/auth.api';
+import {
+  getWechatCode,
+  isWechatMiniProgram,
+  requestWechatMiniLogin
+} from '@/shared/composables/useWechatMiniAuth';
 import type { CaptchaInfo, LoginToken } from '@/modules/auth/types/auth';
 import { fetchCurrentUserInfo } from '@/modules/user/api/user.api';
 import { mapFrontUserInfo } from '@/shared/utils/user-mapper';
@@ -239,39 +243,11 @@ async function loginWithWechat(): Promise<void> {
 
   wechatSubmitting.value = true;
   try {
-    const code = await getWechatCode();
-    const result = await loginByMiniProgramCode(code);
-    if (result.token) {
-      await finalizeLogin(result.token, result.newUser ? '已通过微信登录' : '微信登录成功');
-      return;
-    }
-    throw new Error('微信登录结果缺少 token');
+    const result = await requestWechatMiniLogin();
+    await finalizeLogin(result.token, result.newUser ? '已通过微信登录' : '微信登录成功');
   } finally {
     wechatSubmitting.value = false;
   }
-}
-
-function isWechatMiniProgram(): boolean {
-  let supported = false;
-  // #ifdef MP-WEIXIN
-  supported = true;
-  // #endif
-  return supported;
-}
-
-function getWechatCode(): Promise<string> {
-  return new Promise((resolve, reject) => {
-    uni.login({
-      success: (res) => {
-        if (res.code) {
-          resolve(res.code);
-          return;
-        }
-        reject(new Error('微信登录 code 获取失败'));
-      },
-      fail: (error) => reject(error)
-    });
-  });
 }
 
 async function finalizeLogin(token: LoginToken, successTitle: string): Promise<void> {

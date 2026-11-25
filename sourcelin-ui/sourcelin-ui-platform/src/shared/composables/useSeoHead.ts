@@ -1,9 +1,9 @@
 import { useHead, useSeoMeta } from '@unhead/vue'
-import { computed, isRef, type ComputedRef, type MaybeRef } from 'vue'
+import { computed, isRef, type MaybeRef } from 'vue'
 import { useSiteStore } from '@/stores/site.store'
 
 type OgType = 'website' | 'article' | 'book' | 'profile'
-  | 'music.song' | 'music.album' | 'music.playlist' | 'music.radio_status'
+  | 'music.song' | 'music.album' | 'music.playlist' | 'music.radio_station'
   | 'video.movie' | 'video.episode' | 'video.tv_show' | 'video.other'
 
 export interface SeoHeadOptions {
@@ -61,7 +61,7 @@ export function useSeoHead(options: SeoHeadOptions) {
     const val = options.ogType ? resolveRef(options.ogType) : 'website'
     const validTypes: OgType[] = [
       'website', 'article', 'book', 'profile',
-      'music.song', 'music.album', 'music.playlist', 'music.radio_status',
+      'music.song', 'music.album', 'music.playlist', 'music.radio_station',
       'video.movie', 'video.episode', 'video.tv_show', 'video.other'
     ]
     return (validTypes.includes(val as OgType) ? val : 'website') as OgType

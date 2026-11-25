@@ -57,4 +57,4 @@
 
 ## 升级验收
 
-根目录执行 `mvn -version`、`mvn clean verify`、`mvn dependency:tree`，核对实际测试数。Web 与小程序使用 `npm ci`，后台使用 `pnpm install --frozen-lockfile`。在各端执行前述检查后，Web 与后台执行各自的 build。后台 lint 会自动写文件，应在验证副本运行。小程序检查主包字节数，并在真机验证登录、覆盖安装及流式重连。
+根目录执行 `mvn -version`、`mvn clean verify`、`mvn dependency:tree`，核对实际测试数。三端使用 `pnpm install --frozen-lockfile`。在各端执行前述检查后，Web 与后台执行各自的 build。后台 lint 会自动写文件，应在验证副本运行。小程序检查主包字节数，并在真机验证登录、覆盖安装及流式重连。

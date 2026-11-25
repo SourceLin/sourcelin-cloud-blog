@@ -2,11 +2,10 @@
 <template>
   <el-menu
     ref="menuRef"
+    class="admin-navigation-menu"
+    popper-class="admin-navigation-popper"
     :default-active="activeMenuPath"
     :collapse="!appStore.sidebar.opened"
-    :background-color="menuThemeProps.backgroundColor"
-    :text-color="menuThemeProps.textColor"
-    :active-text-color="menuThemeProps.activeTextColor"
     :popper-effect="theme"
     :unique-opened="false"
     :collapse-transition="false"
@@ -29,11 +28,10 @@ import { useRoute } from "vue-router";
 import path from "path-browserify";
 import type { MenuInstance } from "element-plus";
 import type { RouteRecordRaw } from "vue-router";
-import { SidebarColor, ThemeMode } from "@/enums/settings";
+import { ThemeMode } from "@/enums/settings";
 import { useSettingsStore, useAppStore } from "@/store";
 import { isExternal } from "@/utils/index";
 import LayoutSidebarItem from "./LayoutSidebarItem.vue";
-import variables from "@/styles/variables.module.scss";
 
 const props = defineProps({
   data: {
@@ -62,22 +60,6 @@ const expandedMenuIndexes = ref<string[]>([]);
 
 // 获取主题（用于菜单弹层明暗风格）
 const theme = computed(() => (settingsStore.resolvedTheme === ThemeMode.DARK ? "dark" : "light"));
-
-// 获取浅色主题下的侧边栏配色方案
-const sidebarColorScheme = computed(() => settingsStore.sidebarColorScheme);
-
-// 菜单主题属性
-const menuThemeProps = computed(() => {
-  const isDarkOrClassicBlue =
-    settingsStore.resolvedTheme === ThemeMode.DARK ||
-    sidebarColorScheme.value === SidebarColor.CLASSIC_BLUE;
-
-  return {
-    backgroundColor: isDarkOrClassicBlue ? variables["menu-background"] : undefined,
-    textColor: isDarkOrClassicBlue ? variables["menu-text"] : undefined,
-    activeTextColor: isDarkOrClassicBlue ? variables["menu-active-text"] : undefined,
-  };
-});
 
 // 计算当前激活的菜单项
 const activeMenuPath = computed((): string => {

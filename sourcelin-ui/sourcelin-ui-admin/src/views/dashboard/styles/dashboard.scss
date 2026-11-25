@@ -295,12 +295,12 @@ html.dark .dashboard-shell {
   }
 }
 
-:deep(.dashboard-panel .el-card__header) {
+.dashboard-panel .el-card__header {
   padding: 22px 22px 0;
   border-bottom: none;
 }
 
-:deep(.dashboard-panel .el-card__body) {
+.dashboard-panel .el-card__body {
   padding: 12px 22px 22px;
 }
 

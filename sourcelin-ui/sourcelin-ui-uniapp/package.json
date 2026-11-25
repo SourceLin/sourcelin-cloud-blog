@@ -11,7 +11,7 @@
     "build:h5": "uni build",
     "build:app": "uni build -p app",
     "type-check": "vue-tsc --noEmit -p tsconfig.json",
-    "lint": "eslint . --ext .ts,.vue --max-warnings 0"
+    "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-5030420261029002",
@@ -22,28 +22,29 @@
     "@dcloudio/uni-mp-weixin": "3.0.0-5030420261029002",
     "@dcloudio/uni-ui": "^1.5.12",
     "jsencrypt": "^3.5.4",
-    "pinia": "^2.2.6",
-    "vue": "^3.5.13",
-    "vue-i18n": "^9.14.2"
+    "pinia": "^4.1.0",
+    "vue": "^3.5.46",
+    "vue-i18n": "^11.4.23"
   },
   "devDependencies": {
-    "@dcloudio/types": "^3.4.14",
+    "@dcloudio/types": "3.4.31",
     "@dcloudio/uni-automator": "3.0.0-5030420261029002",
     "@dcloudio/uni-cli-shared": "3.0.0-5030420261029002",
     "@dcloudio/uni-stacktracey": "3.0.0-5030420261029002",
     "@dcloudio/vite-plugin-uni": "3.0.0-5030420261029002",
-    "@eslint/js": "^9.39.4",
-    "@types/node": "^22.10.5",
-    "@vue/runtime-core": "^3.5.13",
-    "@vue/tsconfig": "^0.7.0",
-    "eslint": "^9.18.0",
-    "eslint-plugin-vue": "^10.9.1",
-    "sass": "^1.83.4",
-    "typescript": "~5.6.3",
-    "typescript-eslint": "^8.47.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.10",
+    "@vue/runtime-core": "^3.5.46",
+    "@vue/tsconfig": "^0.9.1",
+    "eslint": "^10.15.0",
+    "eslint-plugin-vue": "^10.12.1",
+    "globals": "^17.14.0",
+    "sass": "^1.108.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.74.0",
     "vite": "5.2.8",
-    "vue-eslint-parser": "^10.3.0",
-    "vue-tsc": "^2.1.10"
+    "vue-eslint-parser": "^10.4.2",
+    "vue-tsc": "3.2.9"
   },
   "engines": {
     "node": ">=18"

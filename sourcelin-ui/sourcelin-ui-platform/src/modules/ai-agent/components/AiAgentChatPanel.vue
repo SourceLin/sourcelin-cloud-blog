@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, nextTick, onMounted, onBeforeUnmount, computed } from 'vue' // Added computed
+import { ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import SIcon from '@/shared/components/ui/SIcon.vue'
 import { appIcons } from '@/shared/components/ui/icons'
 import AiAgentMessageItem from '@/modules/ai-agent/components/AiAgentMessageItem.vue'

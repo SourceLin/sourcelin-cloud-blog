@@ -1,7 +1,6 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getCaptcha, login as loginApi, sendEmailCode, emailLogin } from '@/modules/auth/api/auth.api'
-import type { LoginTokenPayload } from '@/modules/auth/api/auth.api'
+import { getCaptcha, sendEmailCode, emailLogin } from '@/modules/auth/api/auth.api'
 import { useUserStore } from '@/stores/user'
 import { sDiscreteMessage } from '@/shared/composables/useSMessage'
 import { resolveRequestErrorMessage } from '@/shared/api/error-message'

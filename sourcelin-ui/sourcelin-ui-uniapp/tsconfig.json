@@ -15,9 +15,8 @@
     "experimentalDecorators": true,
     "lib": ["ES2018", "DOM", "DOM.Iterable"],
     "types": ["@dcloudio/types", "@types/node"],
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": [

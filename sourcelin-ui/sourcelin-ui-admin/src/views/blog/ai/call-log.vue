@@ -50,7 +50,9 @@
       <el-table-column prop="createTime" label="调用时间" width="170" />
       <el-table-column label="操作" width="100" align="center" fixed="right">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="showDetail(row)">详情</el-button>
+          <el-button link type="primary" size="small" @click="showDetail(row as AiCallLog)">
+            详情
+          </el-button>
         </template>
       </el-table-column>
     </el-table>

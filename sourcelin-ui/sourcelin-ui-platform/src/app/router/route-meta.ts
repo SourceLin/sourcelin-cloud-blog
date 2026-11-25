@@ -1,4 +1,4 @@
-﻿import type { RouteRecordRaw } from 'vue-router'
+﻿import type { RouteLocationRaw, RouteRecordRaw } from 'vue-router'
 
 export type RouteNavKind = 'header' | 'header-child' | 'mobile' | 'footer'
 
@@ -131,15 +131,19 @@ export function collectFooterNavigation(routes: AppRouteRecordRaw[]): Navigation
   }))
 }
 
-export function setupRouterNavigation<T extends { push: Function; replace: Function }>(router: T) {
+type RouterNavigationMethod = (to: RouteLocationRaw) => Promise<unknown>
+
+export function setupRouterNavigation<
+  T extends { push: RouterNavigationMethod; replace: RouterNavigationMethod }
+>(router: T) {
   const originalPush = router.push
   const originalReplace = router.replace
 
-  router.push = function(to: unknown) {
+  router.push = function(to: RouteLocationRaw) {
     return originalPush.call(router, to).catch(() => {})
   }
 
-  router.replace = function(to: unknown) {
+  router.replace = function(to: RouteLocationRaw) {
     return originalReplace.call(router, to).catch(() => {})
   }
 }

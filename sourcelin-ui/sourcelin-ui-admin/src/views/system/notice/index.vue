@@ -356,10 +356,7 @@ function getPublishStatusLabel(value?: number): string {
 
 function getPublishStatusTagType(value?: number): "success" | "warning" | "danger" | "info" {
   return (publishStatusOptions.find((item) => item.value === Number(value))?.tagType ?? "info") as
-    | "success"
-    | "warning"
-    | "danger"
-    | "info";
+    "success" | "warning" | "danger" | "info";
 }
 
 function getTargetTypeLabel(value?: number): string {
@@ -368,10 +365,7 @@ function getTargetTypeLabel(value?: number): string {
 
 function getTargetTypeTagType(value?: number): "success" | "warning" | "danger" | "info" {
   return (targetTypeOptions.find((item) => item.value === Number(value))?.tagType ?? "info") as
-    | "success"
-    | "warning"
-    | "danger"
-    | "info";
+    "success" | "warning" | "danger" | "info";
 }
 
 /**

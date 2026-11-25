@@ -77,7 +77,7 @@
               link
               size="small"
               :icon="Delete"
-              @click="handleForceLogout(row)"
+              @click="handleForceLogout(row as OnlineUserItem)"
             >
               强退
             </el-button>

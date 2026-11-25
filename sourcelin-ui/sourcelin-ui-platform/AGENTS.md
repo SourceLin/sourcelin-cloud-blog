@@ -16,34 +16,34 @@
 
 ```bash
 # 安装依赖
-npm install
+pnpm install --frozen-lockfile
 
 # 启动开发环境
-npm run dev
+pnpm run dev
 
 # 生产构建
-npm run build
+pnpm run build
 
 # 预览生产构建
-npm run preview
+pnpm run preview
 
 # 类型检查
-npm run typecheck
+pnpm run typecheck
 
 # 样式边界检查
-npm run style:guard
+pnpm run style:guard
 
 # 分层边界检查
-npm run layering:guard
+pnpm run layering:guard
 
 # 样式守卫测试
-npm run test:style-guard
+pnpm run test:style-guard
 
 # 分层守卫测试
-npm run test:layering-guard
+pnpm run test:layering-guard
 
 # 架构边界测试
-npm run test:architecture
+pnpm run test:architecture
 ```
 
 ## 项目结构

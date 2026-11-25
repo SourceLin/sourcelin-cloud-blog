@@ -1,5 +1,3 @@
-import { computed } from 'vue'
-
 export const FILE_API_BASE = import.meta.env.VITE_FILE_BASE_API || '/file'
 
 /** 仅 fileId 时走二进制下载，/file/{id} 为元数据 JSON，不能作为 img src */

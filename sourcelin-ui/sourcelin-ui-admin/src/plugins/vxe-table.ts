@@ -3,7 +3,7 @@
  * @see https://vxetable.cn/v4.6/#/table/start/install
  */
 
-import VXETable from "vxe-table";
+import { VXETable } from "vxe-table";
 
 export function configureVxeTable() {
   VXETable.setConfig({

@@ -41,20 +41,8 @@ import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import StatsPanelCard from '@/shared/components/business/StatsPanelCard.vue'
 import SkeletonStatGrid from '@/shared/components/feedback/skeletons/SkeletonStatGrid.vue'
-import SIcon from '@/shared/components/ui/SIcon.vue'
 import { getStats } from '@/modules/home/api/stats.api'
 import { appIcons } from '@/shared/components/ui/icons'
-
-interface StatsResponse {
-  articleCount?: number
-  articleTrend?: number
-  commentCount?: number
-  commentTrend?: number
-  viewCount?: number
-  viewTrend?: number
-  userCount?: number
-  userTrend?: number
-}
 
 interface Stat {
   icon: Component

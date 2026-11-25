@@ -54,13 +54,15 @@
       <el-table-column prop="finishedTime" label="完成时间" width="170" />
       <el-table-column label="操作" width="180" align="center" fixed="right">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="showEvents(row)">事件</el-button>
+          <el-button link type="primary" size="small" @click="showEvents(row as AiTask)">
+            事件
+          </el-button>
           <el-button
             v-if="row.status === 'failed'"
             link
             type="warning"
             size="small"
-            @click="handleRetry(row)"
+            @click="handleRetry(row as AiTask)"
           >
             重试
           </el-button>

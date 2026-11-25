@@ -16,14 +16,14 @@ Sourcelin Blog 前台项目，基于 Vue 3、TypeScript、Vite、Pinia 和 Naive
 ## 常用命令
 
 ```bash
-npm install
-npm run dev
-npm run build
-npm run preview
-npm run typecheck
-npm run style:guard
-npm run test:style-guard
-npm run test:architecture
+pnpm install --frozen-lockfile
+pnpm run dev
+pnpm run build
+pnpm run preview
+pnpm run typecheck
+pnpm run style:guard
+pnpm run test:style-guard
+pnpm run test:architecture
 ```
 
 ## 当前目录结构
@@ -139,11 +139,11 @@ Design Tokens
 涉及架构、边界、样式守卫或共享约定调整后，至少执行：
 
 ```bash
-npm run typecheck
-npm run build
-npm run style:guard
-npm run test:style-guard
-npm run test:architecture
+pnpm run typecheck
+pnpm run build
+pnpm run style:guard
+pnpm run test:style-guard
+pnpm run test:architecture
 ```
 
 ## 资料入口

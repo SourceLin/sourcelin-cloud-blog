@@ -4,6 +4,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { resolve } from 'path'
 import { mkdirSync, writeFileSync } from 'fs'
+import type { ApiResponse, PageResult } from './src/shared/types/api'
 
 function manualChunks(id: string) {
   const normalizedId = id.replace(/\\/g, '/')
@@ -37,11 +38,11 @@ function manualChunks(id: string) {
   ) {
     return 'naive-ecosystem'
   }
-  if (
-    normalizedId.includes('/node_modules/@vueup/vue-quill/') ||
-    normalizedId.includes('/node_modules/highlight.js/')
-  ) {
-    return 'editor-highlight'
+  if (normalizedId.includes('/node_modules/@vueup/vue-quill/') || normalizedId.includes('/node_modules/quill/')) {
+    return 'quill'
+  }
+  if (normalizedId.includes('/node_modules/highlight.js/')) {
+    return 'highlight'
   }
   if (
     normalizedId.includes('/node_modules/echarts/') ||
@@ -55,14 +56,14 @@ function manualChunks(id: string) {
 /**
  * Sitemap 构建插件。
  * 构建完成后在产物目录生成 sitemap.xml。
- * 静态路由条目直接读取路由配置，动态文章条目按需从后端 API 拉取。
+ * 静态路由使用下方清单，动态文章从后端分页接口获取。
  *
  * 使用方式：
  *   - VITE_SITE_ORIGIN: 站点根 URL，例如 https://your-domain.com
  *   - VITE_API_ORIGIN: 后端 API 根地址，例如 http://localhost:8080
  *     若未配置则跳过动态文章条目，仅生成静态路由
  */
-function sitemapPlugin(): Plugin {
+function sitemapPlugin(siteOrigin: string, apiOrigin: string): Plugin {
   // 静态路由列表（path、changefreq、priority）
   const staticRoutes = [
     { path: '/', changefreq: 'daily', priority: '1.0' },
@@ -96,8 +97,6 @@ function sitemapPlugin(): Plugin {
     name: 'vite-plugin-sitemap-gen',
     apply: 'build',
     async closeBundle() {
-      const siteOrigin = process.env['VITE_SITE_ORIGIN'] || ''
-      const apiOrigin = process.env['VITE_API_ORIGIN'] || ''
       const outDir = 'sourcelin-ui-platform'
 
       if (!siteOrigin) {
@@ -113,35 +112,31 @@ function sitemapPlugin(): Plugin {
         })
       )
 
-      // 动态文章条目：构建时请求后端全量文章列表
       if (apiOrigin) {
+        const articleEntries: typeof urlEntries = []
         try {
-          const articleListUrl = `${apiOrigin}/blog/front/article/list?pageSize=9999&pageNum=1`
-          const { default: https } = await import('node:https')
-          const { default: http } = await import('node:http')
-          const fetcher = articleListUrl.startsWith('https') ? https : http
-
-          const rawBody = await new Promise<string>((ok, fail) => {
-            fetcher.get(articleListUrl, (res) => {
-              let data = ''
-              res.on('data', (chunk: string) => { data += chunk })
-              res.on('end', () => ok(data))
-              res.on('error', fail)
-            }).on('error', fail)
-          })
-
-          const parsed = JSON.parse(rawBody) as { code: number; data?: { items?: Array<{ id: number; updateTime?: string }> } }
-          if (parsed.code === 0 && Array.isArray(parsed.data?.items)) {
-            for (const item of parsed.data.items) {
-              urlEntries.push({
+          let totalPages = 1
+          for (let page = 1; page <= totalPages; page++) {
+            const url = new URL('/blog/front/articles', apiOrigin)
+            url.search = new URLSearchParams({ page: String(page), pageSize: '100' }).toString()
+            const response = await fetch(url, { signal: AbortSignal.timeout(10000) })
+            if (!response.ok) throw new Error(`文章列表请求失败 (${response.status})`)
+            const result = await response.json() as ApiResponse<PageResult<{ id: number; updateTime?: string }>>
+            if (result.code !== 0 || !Array.isArray(result.data?.items)) {
+              throw new Error('文章列表响应不符合分页契约')
+            }
+            if (page === 1) totalPages = result.data.totalPages
+            for (const item of result.data.items) {
+              articleEntries.push({
                 loc: `${siteOrigin}/article/${item.id}`,
-                lastmod: item.updateTime ? item.updateTime.split(' ')[0] : undefined,
+                lastmod: item.updateTime?.slice(0, 10),
                 changefreq: 'weekly',
                 priority: '0.9'
               })
             }
-            console.info(`[sitemap] 动态文章条目: ${parsed.data.items.length} 条`)
           }
+          urlEntries.push(...articleEntries)
+          console.info(`[sitemap] 动态文章条目: ${articleEntries.length} 条`)
         } catch (err) {
           console.warn('[sitemap] 拉取文章列表失败，仅生成静态路由条目。', err)
         }
@@ -172,11 +167,11 @@ export default defineConfig(({ mode }) => {
         dirs: ['src/shared/components', 'src/modules'],
         dts: 'src/components.d.ts'
       }),
-      sitemapPlugin()
+      sitemapPlugin(env.VITE_SITE_ORIGIN || '', env.VITE_API_ORIGIN || '')
     ],
     resolve: {
       alias: {
-        '@': resolve(__dirname, 'src')
+        '@': resolve(import.meta.dirname, 'src')
       },
       // 优先解析 TS，避免同名 .js/.ts 并存时命中历史 JS 文件
       extensions: ['.mjs', '.ts', '.js', '.mts', '.jsx', '.tsx', '.json']

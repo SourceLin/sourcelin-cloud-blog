@@ -51,4 +51,4 @@ description: 用于新增或修改 Sourcelin 博客前台 Vue3 页面、组件�
 
 ## 升级验证
 
-在 `sourcelin-ui/sourcelin-ui-platform` 从锁文件执行 `npm ci`，按模块入口执行类型、样式与架构检查，再执行 `npm run build`。生产静态目录为模块内的 `sourcelin-ui-platform/`。
+在 `sourcelin-ui/sourcelin-ui-platform` 从锁文件执行 `pnpm install --frozen-lockfile`，按模块入口执行类型、样式与架构检查，再执行 `npm run build`。生产静态目录为模块内的 `sourcelin-ui-platform/`。

@@ -18,7 +18,7 @@
 import { computed, useAttrs } from 'vue'
 import { NBadge } from 'naive-ui'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     /** 徽标数值；与 `dot` 二选一展示 */
     value?: string | number

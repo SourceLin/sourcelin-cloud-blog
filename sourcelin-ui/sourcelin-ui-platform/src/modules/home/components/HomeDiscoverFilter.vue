@@ -44,7 +44,7 @@ import type { HomeCategory } from '@/modules/home/model/home-discover'
 import SHorizontalOverflowRail from '@/shared/components/ui/SHorizontalOverflowRail.vue'
 import SSurfaceChip from '@/shared/components/ui/SSurfaceChip.vue'
 
-const props = defineProps<{
+defineProps<{
   categories: HomeCategory[]
   selectedCategoryId: number | null
 }>()

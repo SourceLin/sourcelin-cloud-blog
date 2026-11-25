@@ -39,20 +39,20 @@
             <view class="community__identity" @tap="openUserHome(item)">
               <view class="community__avatar">
                 <image
-                  v-if="resolveAvatar(item)"
+                  v-if="getCardView(item).avatar"
                   class="community__avatar-img"
-                  :src="resolveAvatar(item)"
+                  :src="getCardView(item).avatar"
                   mode="aspectFill"
-                  @error="onImageError(resolveAvatar(item))"
+                  @error="onImageError(getCardView(item).avatar)"
                 />
-                <text v-else>{{ resolveAuthor(item).slice(0, 1) }}</text>
+                <text v-else>{{ getCardView(item).author.slice(0, 1) }}</text>
               </view>
               <view>
                 <view class="community__author-row">
-                  <text class="community__author">{{ resolveAuthor(item) }}</text>
+                  <text class="community__author">{{ getCardView(item).author }}</text>
                   <text v-if="activeTab === 'treeholes'" class="community__inline-badge">主帖</text>
                 </view>
-                <view class="community__time">{{ formatDate(item.createTime) }}</view>
+                <view class="community__time">{{ getCardView(item).timeText }}</view>
               </view>
             </view>
             <view v-if="showCommunityActions" class="community__more" @tap="openItemAction(item)">···</view>
@@ -62,23 +62,26 @@
           </view>
 
           <view
-            v-if="activeTab === 'says' && resolveImages(item).length > 0"
+            v-if="activeTab === 'says' && getCardView(item).images.length > 0"
             class="community__media"
             :class="{
-              'community__media--single': resolveImages(item).length === 1,
-              'community__media--multi': resolveImages(item).length > 1
+              'community__media--single': getCardView(item).images.length === 1,
+              'community__media--multi': getCardView(item).images.length > 1
             }"
           >
             <view
-              v-for="(image, index) in resolveGalleryImages(item)"
+              v-for="(image, index) in getCardView(item).galleryImages"
               :key="`${item.id}-image-${index}`"
               class="community__media-item"
-              :class="{ 'community__media-item--featured': index === 0 && resolveImages(item).length >= 3 }"
-              @tap="previewImages(resolveImages(item), index)"
+              :class="{ 'community__media-item--featured': index === 0 && getCardView(item).images.length >= 3 }"
+              @tap="previewImages(getCardView(item).images, index)"
             >
               <image class="community__media-img" :src="image" mode="aspectFill" lazy-load @error="onImageError(image)" />
-              <view v-if="index === resolveGalleryImages(item).length - 1 && resolveExtraImageCount(item) > 0" class="community__media-more">
-                +{{ resolveExtraImageCount(item) }}
+              <view
+                v-if="index === getCardView(item).galleryImages.length - 1 && getCardView(item).extraImageCount > 0"
+                class="community__media-more"
+              >
+                +{{ getCardView(item).extraImageCount }}
               </view>
             </view>
           </view>
@@ -107,7 +110,13 @@
           </view>
         </view>
 
-        <s-loading v-if="loading && currentItems.length > 0" :visible="true" :fullpage="false" compact text="正在加载更多..." />
+        <s-loading
+          v-if="loading && currentItems.length > 0"
+          :visible="true"
+          :fullpage="false"
+          compact
+          text="正在加载更多..."
+        />
         <view v-else-if="finished && currentItems.length > 0" class="community__footer">已经到底了</view>
       </view>
     </view>
@@ -135,736 +144,79 @@
       </view>
     </view>
 
-    <view v-if="commentSheetVisible" class="community__sheet-mask" @tap="closeCommentSheet">
-      <view class="community__sheet" :class="{ 'community__sheet--keyboard': keyboardVisible }" :style="commentSheetStyle" @tap.stop>
-        <view class="community__sheet-head">
-          <view>
-            <view class="community__sheet-title">评论互动</view>
-            <view class="community__sheet-subtitle">{{ activeCommentLabel }}</view>
-          </view>
-          <view class="community__sheet-close" @tap="closeCommentSheet">关闭</view>
-        </view>
-
-        <s-loading
-          v-if="commentLoading && commentList.length === 0"
-          :visible="true"
-          :fullpage="false"
-          compact
-          text="正在加载评论..."
-        />
-        <view v-else-if="commentList.length === 0" class="community__sheet-empty">
-          暂无评论，来写第一条
-        </view>
-        <scroll-view v-else class="community__sheet-list" scroll-y>
-          <view v-for="item in commentTree" :key="item.id" class="community__sheet-comment" @tap="handleCommentTap(item)">
-            <view class="community__sheet-comment-head">
-              <text class="community__comment-nickname">{{ item.userNickname || item.nickname || '读者' }}</text>
-              <view class="community__comment-meta">
-                <text class="community__comment-time">{{ formatDate(item.createTime) }}</text>
-                <text v-if="canUseComments" class="community__comment-reply-btn" @tap.stop="handleCommentTap(item)">回复</text>
-                <text 
-                  v-if="userStore.isLoggedIn && currentUserId && currentUserId === item.userId" 
-                  class="community__comment-delete-btn" 
-                  @tap.stop="handleDeleteComment(item.id)"
-                >
-                  删除
-                </text>
-              </view>
-            </view>
-            <view class="community__sheet-comment-content">{{ item.content }}</view>
-
-            <!-- 二级回复区域 -->
-            <view v-if="item.replies.length > 0" class="community__reply-box" @tap.stop>
-              <view 
-                v-for="reply in (item.collapsed ? item.replies.slice(0, 2) : item.replies)" 
-                :key="reply.id" 
-                class="community__reply-item" 
-                @tap="handleCommentTap(reply)"
-              >
-                <view class="community__reply-head">
-                  <view class="community__reply-users">
-                    <text class="community__reply-author">{{ reply.userNickname || reply.nickname || '读者' }}</text>
-                    <text class="community__reply-arrow">▶</text>
-                    <text class="community__reply-target">{{ reply.parentNickname || '读者' }}</text>
-                  </view>
-                  <view class="community__reply-meta">
-                    <text class="community__reply-time">{{ formatDate(reply.createTime) }}</text>
-                    <text v-if="canUseComments" class="community__reply-btn" @tap.stop="handleCommentTap(reply)">回复</text>
-                    <text 
-                      v-if="userStore.isLoggedIn && currentUserId && currentUserId === reply.userId" 
-                      class="community__reply-delete-btn" 
-                      @tap.stop="handleDeleteComment(reply.id)"
-                    >
-                      删除
-                    </text>
-                  </view>
-                </view>
-                <view class="community__reply-content">{{ reply.content }}</view>
-              </view>
-
-              <!-- 折叠与展开控制条 -->
-              <view v-if="item.collapsed && item.replies.length > 2" class="community__reply-toggle" @tap.stop="item.collapsed = false">
-                <text class="community__reply-toggle-text">—— 展开 {{ item.replies.length }} 条回复 ∨</text>
-              </view>
-              <view v-else-if="!item.collapsed && item.replies.length > 2" class="community__reply-toggle" @tap.stop="item.collapsed = true">
-                <text class="community__reply-toggle-text">—— 收起回复 ∧</text>
-              </view>
-            </view>
-          </view>
-          <s-loading
-            v-if="commentLoading"
-            :visible="true"
-            :fullpage="false"
-            compact
-            text="正在加载评论..."
-          />
-        </scroll-view>
-
-        <!-- 回复提示横条 -->
-        <view v-if="replyTarget" class="community__reply-indicator">
-          <text class="community__reply-indicator-text">正在回复 @{{ replyTarget.userNickname || replyTarget.nickname || '读者' }}</text>
-          <view class="community__reply-indicator-close" @tap="cancelReply">✕</view>
-        </view>
-
-        <template v-if="canUseComments">
-          <textarea
-            v-model="commentContent"
-            class="community__textarea"
-            :placeholder="commentPlaceholder"
-            placeholder-class="textarea-placeholder"
-            maxlength="300"
-            auto-height
-            fixed
-            :adjust-position="false"
-            :cursor-spacing="keyboardCursorSpacing"
-          />
-          <view class="community__sheet-actions">
-            <button class="community__sheet-button community__sheet-button--ghost sl-button sl-button--secondary" @tap="closeCommentSheet">取消</button>
-            <button
-              class="community__sheet-button community__sheet-button--primary sl-button sl-button--primary"
-              :disabled="commentSubmitting"
-              @tap="submitComment"
-            >
-              <s-inline-loading v-if="commentSubmitting" text="发布中" light />
-              <text v-else>发布</text>
-            </button>
-          </view>
-        </template>
-        <view v-else class="community__sheet-actions" style="margin-top: 20rpx;">
-          <button class="community__sheet-button community__sheet-button--ghost sl-button sl-button--secondary" style="width: 100%" @tap="closeCommentSheet">返回</button>
-        </view>
-      </view>
-    </view>
+    <s-comment-sheet
+      v-model="commentContent"
+      :visible="commentSheetVisible"
+      :subtitle="activeCommentLabel"
+      :loading="commentLoading"
+      :submitting="commentSubmitting"
+      :comments="commentList"
+      :reply-target="replyTarget"
+      :can-comment="canUseComments"
+      :is-logged-in="userStore.isLoggedIn"
+      :current-user-id="currentUserId"
+      :keyboard-visible="keyboardVisible"
+      :cursor-spacing="keyboardCursorSpacing"
+      :sheet-style="commentSheetStyle"
+      :theme-class="themeStore.themeClass"
+      @close="closeCommentSheet"
+      @submit="submitComment"
+      @delete="handleDeleteComment"
+      @reply="handleReplyComment"
+      @cancel-reply="cancelReply"
+    />
   </view>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { onHide, onLoad, onPageScroll, onPullDownRefresh, onReachBottom, onShareAppMessage, onShow, onUnload } from '@dcloudio/uni-app';
-import { fetchSayPage, fetchTreeholePage, deleteSay, deleteTreehole } from '@/modules/community/api/community.api';
-import type { SayItem, TreeholeItem } from '@/modules/community/types/community';
-import { createComment, fetchComments, deleteComment } from '@/modules/comment/api/comment.api';
-import type { CommentItem, CommentSource, CommentCreatePayload } from '@/modules/comment/types/comment';
-import { collectTarget, likeTarget, uncollectTarget, unlikeTarget } from '@/modules/interaction/api/interaction.api';
-import { createContentReport } from '@/modules/report/api/report.api';
-import { useKeyboardInset } from '@/shared/composables/useBackToTop';
-import { useMiniAccess } from '@/shared/composables/useMiniAccess';
-import { reportAnalyticsEvent } from '@/shared/utils/analytics';
-import { applyH5Seo, buildSeoTitle, extractSeoSummary } from '@/shared/utils/seo';
-import type { InteractionTargetType } from '@/modules/interaction/types/interaction';
-import { env } from '@/config/env';
-import { consumeCommunityRefresh } from '@/modules/community/utils/publish';
-import { liquidTabItems, switchLiquidTab } from '@/shared/utils/liquid-tabbar';
-import { useThemeStore } from '@/stores/theme';
-import { AUTH_LOGIN_SUCCESS_EVENT, type LoginSuccessEventDetail } from '@/utils/auth';
-import { showInfoToast, showSuccessToast } from '@/utils/feedback';
-import { normalizeAssetUrl } from '@/utils/url';
+import { useCommunityPage } from '@/modules/community/composables/useCommunityPage';
 
-const { userStore, can, guard, resolveLiquidTabs } = useMiniAccess();
-const themeStore = useThemeStore();
-
-type TabKey = 'says' | 'treeholes';
-type CommunityItem = SayItem | TreeholeItem;
-
-interface Tab {
-  key: TabKey;
-  text: string;
-}
-
-const tabs: Tab[] = [
-  { key: 'says', text: '说说' },
-  { key: 'treeholes', text: '树洞' }
-];
-
-const activeTab = ref<TabKey>('says');
-const says = ref<SayItem[]>([]);
-const treeholes = ref<TreeholeItem[]>([]);
-const pageMap = ref<Record<TabKey, number>>({ says: 1, treeholes: 1 });
-const totalPageMap = ref<Record<TabKey, number>>({ says: 1, treeholes: 1 });
-const loading = ref(false);
-const commentSheetVisible = ref(false);
-const commentLoading = ref(false);
-const commentSubmitting = ref(false);
-const commentContent = ref('');
-const commentList = ref<CommentItem[]>([]);
-const replyTarget = ref<CommentItem | null>(null);
-
-interface CommentNode extends CommentItem {
-  replies: CommentItem[];
-  collapsed: boolean;
-  visibleCount: number;
-}
-
-const commentTree = computed<CommentNode[]>(() => {
-  const rootComments: CommentNode[] = [];
-  const childComments: CommentItem[] = [];
-
-  // 1. 分流一级和子回复
-  commentList.value.forEach((item) => {
-    if (!item.parentCommentId) {
-      rootComments.push({
-        ...item,
-        replies: [],
-        collapsed: true,
-        visibleCount: 2
-      });
-    } else {
-      childComments.push(item);
-    }
-  });
-
-  // 2. 归并子回复到对应的 floorCommentId 楼层根评论下
-  childComments.forEach((child) => {
-    const root = rootComments.find((r) => r.id === child.floorCommentId);
-    if (root) {
-      root.replies.push(child);
-    } else {
-      // 容错：如果找不到根，作为一级评论呈现
-      rootComments.push({
-        ...child,
-        replies: [],
-        collapsed: true,
-        visibleCount: 2
-      });
-    }
-  });
-
-  // 3. 正序排序每栋楼子回复
-  rootComments.forEach((root) => {
-    root.replies.sort((a, b) => {
-      const aTime = a.createTime ? new Date(a.createTime).getTime() : 0;
-      const bTime = b.createTime ? new Date(b.createTime).getTime() : 0;
-      return aTime - bTime;
-    });
-  });
-
-  return rootComments;
-});
-
-const commentPlaceholder = computed(() => {
-  if (replyTarget.value) {
-    const targetNickname = replyTarget.value.userNickname || replyTarget.value.nickname || '读者';
-    return `回复 @${targetNickname}:`;
-  }
-  return '写下你的看法...';
-});
-const visibleLiquidTabItems = computed(() => resolveLiquidTabs(liquidTabItems));
-const canUseComments = computed(() => can('commentEnabled'));
-const canUseUserHome = computed(() => can('userHomeEnabled'));
-const canUseCommunityTab = computed(() => can('communityEnabled'));
-const canPublishCommunity = computed(() =>
-  activeTab.value === 'says' ? can('sayPublishEnabled') : can('treeholeEnabled')
-);
-const showCommunityActions = computed(() => canUseComments.value);
-
-function handleCommentTap(item: CommentItem): void {
-  if (!canUseComments.value) return;
-  replyTarget.value = item;
-}
-
-function cancelReply(): void {
-  replyTarget.value = null;
-}
-
-const activeCommentId = ref<number | null>(null);
-const activeCommentSource = ref<CommentSource>('say');
-const brokenUrls = ref<Set<string>>(new Set());
-const activeCommentLabel = ref('');
-const backToTopVisible = ref(false);
-const activeTabPath = 'pages/community/community';
 const {
-  cursorSpacing: keyboardCursorSpacing,
+  userStore,
+  themeStore,
+  tabs,
+  activeTab,
+  activeTabPath,
+  visibleLiquidTabItems,
+  switchLiquidTab,
+  loading,
+  finished,
+  isEmpty,
+  emptyText,
+  currentItems,
+  canUseComments,
+  canPublishCommunity,
+  showCommunityActions,
+  currentUserId,
+  backToTopVisible,
+  commentSheetVisible,
+  commentLoading,
+  commentSubmitting,
+  commentContent,
+  commentList,
+  replyTarget,
+  activeCommentLabel,
+  keyboardCursorSpacing,
   keyboardVisible,
-  sheetStyle: commentSheetStyle,
-  startKeyboardWatch,
-  stopKeyboardWatch
-} = useKeyboardInset();
-
-const currentUserId = computed(() => {
-  const id = userStore.userInfo?.id;
-  return id != null ? Number(id) : undefined;
-});
-
-const currentItems = computed<CommunityItem[]>(() =>
-  activeTab.value === 'says' ? says.value : treeholes.value
-);
-const targetType = computed<InteractionTargetType>(() =>
-  activeTab.value === 'says' ? 'say' : 'treehole'
-);
-const finished = computed(() => pageMap.value[activeTab.value] >= totalPageMap.value[activeTab.value]);
-const isEmpty = computed(() => !loading.value && currentItems.value.length === 0);
-const emptyText = computed(() => activeTab.value === 'says' ? '暂无说说' : '暂无树洞');
-
-watch([activeTab, currentItems], () => {
-  const isTreehole = activeTab.value === 'treeholes';
-  const firstItem = currentItems.value[0];
-  applyH5Seo({
-    title: buildSeoTitle(isTreehole ? '树洞广场' : '轻圈子'),
-    description: extractSeoSummary(
-      firstItem?.content ? `浏览${isTreehole ? '匿名树洞' : '说说互动'}：${firstItem.content}` : '',
-      isTreehole ? '浏览匿名树洞、轻讨论与互动内容。' : '浏览说说动态、轻互动与作者圈子内容。'
-    ),
-    keywords: [isTreehole ? '树洞' : '圈子', '说说', '互动', '评论', '轻圈子']
-  });
-}, { immediate: true });
-
-onLoad((options) => {
-  if (!guard('communityEnabled')) {
-    return;
-  }
-  if (options?.tab === 'treeholes') {
-    activeTab.value = 'treeholes';
-  }
-  refresh();
-});
-
-function formatDate(value?: string): string {
-  return value ? value.slice(0, 10) : '刚刚';
-}
-
-function resolveAuthor(item: CommunityItem): string {
-  if (activeTab.value === 'treeholes') {
-    const treehole = item as TreeholeItem;
-    return treehole.userNickname || treehole.nickname || '匿名洞友';
-  }
-  const say = item as SayItem;
-  return say.userNickname || say.user?.nickname || 'Sourcelin';
-}
-
-function splitStoredUrls(value?: string): string[] {
-  return value
-    ? value.split(',').map((url) => normalizeAssetUrl(url.trim())).filter(Boolean)
-    : [];
-}
-
-function resolveImages(item: CommunityItem): string[] {
-  if (activeTab.value !== 'says') return [];
-  const say = item as SayItem;
-  const ids = say.imageFileIds
-    ? say.imageFileIds.split(',').map((id) => id.trim()).filter((id) => /^\d+$/.test(id))
-    : [];
-  const urls = ids.length > 0
-    ? ids.map((id) => `${env.baseURL}/file/download/${id}`)
-    : splitStoredUrls(say.images);
-  return urls.filter((url) => !brokenUrls.value.has(url));
-}
-
-function onImageError(url: string): void {
-  if (!brokenUrls.value.has(url)) {
-    brokenUrls.value = new Set([...brokenUrls.value, url]);
-  }
-}
-
-function resolveGalleryImages(item: CommunityItem): string[] {
-  return resolveImages(item).slice(0, 5);
-}
-
-function resolveExtraImageCount(item: CommunityItem): number {
-  return Math.max(0, resolveImages(item).length - 5);
-}
-
-function resolveAvatar(item: CommunityItem): string {
-  let url: string;
-  if (activeTab.value === 'treeholes') {
-    url = normalizeAssetUrl((item as TreeholeItem).avatar);
-  } else {
-    const say = item as SayItem;
-    url = normalizeAssetUrl(say.user?.avatar);
-  }
-  return url && !brokenUrls.value.has(url) ? url : '';
-}
-
-function previewImages(images: string[], index: number): void {
-  if (images.length === 0) return;
-  uni.previewImage({
-    urls: images,
-    current: images[index] || images[0]
-  });
-}
-
-function goPublish(): void {
-  if (!canPublishCommunity.value) return;
-  const url = activeTab.value === 'says' ? '/pages-publish/say/say' : '/pages-publish/treehole/treehole';
-  uni.navigateTo({ url });
-}
-
-function openUserHome(item: CommunityItem): void {
-  if (!canUseUserHome.value) return;
-  if (activeTab.value !== 'says') return;
-  const say = item as SayItem;
-  const userId = say.user?.id || say.userId;
-  if (!userId) return;
-  uni.navigateTo({ url: `/pages-user/home/home?id=${userId}` });
-}
-
-function isLiked(item: CommunityItem): boolean {
-  return !!item.likedByMe;
-}
-
-function isCollected(item: CommunityItem): boolean {
-  if (activeTab.value === 'says') return !!(item as SayItem).isCollected;
-  return !!(item as TreeholeItem).collectedByMe;
-}
-
-function setCollected(item: CommunityItem, value: boolean): void {
-  if (activeTab.value === 'says') {
-    (item as SayItem).isCollected = value;
-  } else {
-    (item as TreeholeItem).collectedByMe = value;
-  }
-}
-
-function requireLogin(type: string, payload: unknown): boolean {
-  if (userStore.isLoggedIn) return true;
-  userStore.pushPendingAction({ type, payload });
-  uni.navigateTo({ url: '/pages-user/login/login' });
-  return false;
-}
-
-async function fetchPage(targetPage = 1): Promise<void> {
-  if (loading.value) return;
-  loading.value = true;
-  try {
-    const result = activeTab.value === 'says'
-      ? await fetchSayPage(targetPage, 10)
-      : await fetchTreeholePage(targetPage, 10);
-    if (activeTab.value === 'says') {
-      says.value = targetPage === 1 ? result.items as SayItem[] : says.value.concat(result.items as SayItem[]);
-    } else {
-      treeholes.value = targetPage === 1
-        ? result.items as TreeholeItem[]
-        : treeholes.value.concat(result.items as TreeholeItem[]);
-    }
-    pageMap.value[activeTab.value] = result.page || targetPage;
-    totalPageMap.value[activeTab.value] = result.totalPages || 1;
-  } finally {
-    loading.value = false;
-  }
-}
-
-function refresh(): Promise<void> {
-  pageMap.value[activeTab.value] = 1;
-  totalPageMap.value[activeTab.value] = 1;
-  return fetchPage(1);
-}
-
-function loadMore(): void {
-  if (loading.value || finished.value) return;
-  fetchPage(pageMap.value[activeTab.value] + 1);
-}
-
-function switchTab(key: TabKey): void {
-  if (!canUseCommunityTab.value) return;
-  if (activeTab.value === key) return;
-  activeTab.value = key;
-  if (currentItems.value.length === 0) refresh();
-}
-
-async function openCommentSheet(item: CommunityItem): Promise<void> {
-  if (!canUseComments.value) return;
-  activeCommentId.value = item.id;
-  activeCommentSource.value = activeTab.value === 'says' ? 'say' : 'treehole';
-  activeCommentLabel.value = activeTab.value === 'says' ? '说说评论区' : '树洞评论区';
-  commentContent.value = '';
-  replyTarget.value = null;
-  commentSheetVisible.value = true;
-  commentLoading.value = true;
-  try {
-    const result = await fetchComments(item.id, activeCommentSource.value, 1, 100);
-    commentList.value = result.items || [];
-  } finally {
-    commentLoading.value = false;
-  }
-}
-
-function hasActiveCommentReplay(detail?: LoginSuccessEventDetail): boolean {
-  if (!detail?.actions?.length || !activeCommentId.value) return false;
-  return detail.actions.some((action) => {
-    if (action.type !== 'comment:create') return false;
-    const payload = action.payload as { targetId?: number; source?: string } | undefined;
-    return payload?.targetId === activeCommentId.value && payload?.source === activeCommentSource.value;
-  });
-}
-
-async function handleLoginSuccess(detail?: LoginSuccessEventDetail): Promise<void> {
-  if (hasActiveCommentReplay(detail)) {
-    commentContent.value = '';
-  }
-  await refresh();
-  if (commentSheetVisible.value && activeCommentId.value) {
-    commentLoading.value = true;
-    try {
-      const result = await fetchComments(activeCommentId.value, activeCommentSource.value, 1, 100);
-      commentList.value = result.items || [];
-    } finally {
-      commentLoading.value = false;
-    }
-  }
-}
-
-function closeCommentSheet(): void {
-  commentSheetVisible.value = false;
-  replyTarget.value = null;
-  uni.hideKeyboard();
-}
-
-async function toggleLike(item: CommunityItem): Promise<void> {
-  if (!showCommunityActions.value) return;
-  if (!requireLogin('interaction:like', { targetType: targetType.value, targetId: item.id })) return;
-  const next = !isLiked(item);
-  item.likedByMe = next;
-  item.likeCount = Math.max(0, (item.likeCount || 0) + (next ? 1 : -1));
-  try {
-    if (next) await likeTarget(targetType.value, item.id);
-    else await unlikeTarget(targetType.value, item.id);
-  } catch {
-    item.likedByMe = !next;
-    item.likeCount = Math.max(0, (item.likeCount || 0) + (next ? -1 : 1));
-  }
-}
-
-async function toggleCollect(item: CommunityItem): Promise<void> {
-  if (!showCommunityActions.value) return;
-  if (!requireLogin('interaction:collect', { targetType: targetType.value, targetId: item.id })) return;
-  const next = !isCollected(item);
-  setCollected(item, next);
-  item.collectCount = Math.max(0, (item.collectCount || 0) + (next ? 1 : -1));
-  try {
-    if (next) await collectTarget(targetType.value, item.id);
-    else await uncollectTarget(targetType.value, item.id);
-  } catch {
-    setCollected(item, !next);
-    item.collectCount = Math.max(0, (item.collectCount || 0) + (next ? -1 : 1));
-  }
-}
-
-async function submitComment(): Promise<void> {
-  if (!canUseComments.value) return;
-  const content = commentContent.value.trim();
-  if (!activeCommentId.value || !content) {
-    showInfoToast('请输入评论内容');
-    return;
-  }
-  if (!requireLogin('comment:create', {
-    targetId: activeCommentId.value,
-    source: activeCommentSource.value,
-    content
-  })) {
-    return;
-  }
-  commentSubmitting.value = true;
-  try {
-    const payload: CommentCreatePayload = {
-      articleId: activeCommentId.value,
-      source: activeCommentSource.value,
-      content
-    };
-    if (replyTarget.value) {
-      payload.parentCommentId = replyTarget.value.id;
-      payload.parentUserId = replyTarget.value.userId;
-      payload.floorCommentId = replyTarget.value.floorCommentId || replyTarget.value.id;
-    }
-    await createComment(payload);
-    commentContent.value = '';
-    replyTarget.value = null;
-    updateCommentCount(activeCommentId.value, 1);
-    showSuccessToast('发布成功');
-    closeCommentSheet();
-  } finally {
-    commentSubmitting.value = false;
-  }
-}
-
-async function handleDeleteComment(id: number): Promise<void> {
-  if (!canUseComments.value) return;
-  const confirmed = await new Promise<boolean>((resolve) => {
-    uni.showModal({
-      title: '提示',
-      content: '确认删除该评论吗？',
-      success: (res) => resolve(!!res.confirm),
-      fail: () => resolve(false)
-    });
-  });
-  if (!confirmed) return;
-  try {
-    await deleteComment(id);
-    showSuccessToast('评论已删除');
-    if (activeCommentId.value) {
-      updateCommentCount(activeCommentId.value, -1);
-      const result = await fetchComments(activeCommentId.value, activeCommentSource.value, 1, 100);
-      commentList.value = result.items || [];
-    }
-  } catch {
-    // 接口层已报错提示
-  }
-}
-
-function canDelete(item: CommunityItem): boolean {
-  if (!userStore.isLoggedIn) return false;
-  const ownerId = activeTab.value === 'says'
-    ? ((item as SayItem).user?.id || (item as SayItem).userId)
-    : (item as TreeholeItem).userId;
-  return ownerId != null && currentUserId.value != null && Number(ownerId) === currentUserId.value;
-}
-
-async function openItemAction(item: CommunityItem): Promise<void> {
-  if (!showCommunityActions.value) return;
-  if (canDelete(item)) {
-    await handleDelete(item);
-    return;
-  }
-  await reportItemAction(item);
-}
-
-async function handleDelete(item: CommunityItem): Promise<void> {
-  const confirmed = await new Promise<boolean>((resolve) => {
-    uni.showModal({
-      title: '确认删除',
-      content: '删除后无法恢复，确定删除吗？',
-      confirmText: '删除',
-      confirmColor: '#DC2626',
-      success: (res) => resolve(!!res.confirm),
-      fail: () => resolve(false)
-    });
-  });
-  if (!confirmed) return;
-  try {
-    if (activeTab.value === 'says') {
-      await deleteSay(item.id);
-      says.value = says.value.filter((s) => s.id !== item.id);
-    } else {
-      await deleteTreehole(item.id);
-      treeholes.value = treeholes.value.filter((t) => t.id !== item.id);
-    }
-    showSuccessToast('已删除');
-  } catch {
-    showInfoToast('删除失败，请稍后重试');
-  }
-}
-
-async function reportItemAction(item: CommunityItem): Promise<void> {
-  const reasons = ['广告营销', '不当内容', '侵权抄袭', '其他'];
-  const selected = await new Promise<number>((resolve) => {
-    uni.showActionSheet({
-      itemList: reasons,
-      success: (res) => resolve(res.tapIndex),
-      fail: () => resolve(-1)
-    });
-  });
-  if (selected < 0) return;
-  const currentTargetType = activeTab.value === 'says' ? 'say' : 'treehole';
-  await createContentReport({
-    targetType: currentTargetType,
-    targetId: item.id,
-    reason: reasons[selected],
-    pagePath: '/pages/community/community'
-  });
-  void reportAnalyticsEvent({
-    eventType: 'community_report_submit',
-    pagePath: '/pages/community/community',
-    targetType: currentTargetType,
-    targetId: item.id,
-    metadata: { reason: reasons[selected] }
-  });
-  showInfoToast('举报已提交，我们会尽快核查');
-}
-
-function updateCommentCount(targetId: number, delta: number): void {
-  const target = currentItems.value.find((item) => item.id === targetId);
-  if (!target) return;
-  target.commentCount = Math.max(0, (target.commentCount || 0) + delta);
-}
-
-onPullDownRefresh(() => {
-  refresh().finally(() => uni.stopPullDownRefresh());
-});
-
-onReachBottom(() => {
-  loadMore();
-});
-
-onPageScroll((event) => {
-  backToTopVisible.value = event.scrollTop > 360;
-});
-
-onShow(() => {
-  if (!guard('communityEnabled')) {
-    return;
-  }
-  themeStore.syncNativeArea();
-  const refreshTab = consumeCommunityRefresh();
-  if (!refreshTab) return;
-  if (refreshTab === activeTab.value) {
-    void refresh();
-    return;
-  }
-  if (refreshTab === 'says') {
-    says.value = [];
-    pageMap.value.says = 1;
-    totalPageMap.value.says = 1;
-    return;
-  }
-  treeholes.value = [];
-  pageMap.value.treeholes = 1;
-  totalPageMap.value.treeholes = 1;
-});
-
-onHide(() => {
-  stopKeyboardWatch();
-});
-
-onUnload(() => {
-  stopKeyboardWatch();
-});
-
-watch(commentSheetVisible, (visible) => {
-  if (visible) {
-    startKeyboardWatch();
-    return;
-  }
-  stopKeyboardWatch();
-});
-
-onShareAppMessage(() => {
-  const isTreehole = activeTab.value === 'treeholes';
-  void reportAnalyticsEvent({
-    eventType: 'community_share',
-    pagePath: '/pages/community/community',
-    targetType: isTreehole ? 'treehole' : 'say',
-    metadata: {
-      activeTab: activeTab.value,
-      itemCount: currentItems.value.length
-    }
-  });
-  return {
-    title: isTreehole ? '来树洞看看匿名故事 - 圆圈博客' : '来圈子看看最新说说 - 圆圈博客',
-    path: `/pages/community/community?tab=${activeTab.value}`
-  };
-});
-
-uni.$off(AUTH_LOGIN_SUCCESS_EVENT, handleLoginSuccess);
-uni.$on(AUTH_LOGIN_SUCCESS_EVENT, handleLoginSuccess);
-
+  commentSheetStyle,
+  getCardView,
+  onImageError,
+  previewImages,
+  goPublish,
+  openUserHome,
+  isLiked,
+  isCollected,
+  switchTab,
+  openCommentSheet,
+  closeCommentSheet,
+  handleReplyComment,
+  cancelReply,
+  submitComment,
+  handleDeleteComment,
+  toggleLike,
+  toggleCollect,
+  openItemAction
+} = useCommunityPage();
 </script>
 
 <style lang="scss" scoped>
@@ -896,8 +248,7 @@ uni.$on(AUTH_LOGIN_SUCCESS_EVENT, handleLoginSuccess);
     }
 
     .community__tabs {
-      background:
-        linear-gradient(145deg, rgba(24, 27, 38, 0.92), rgba(18, 20, 28, 0.88));
+      background: linear-gradient(145deg, rgba(24, 27, 38, 0.92), rgba(18, 20, 28, 0.88));
       border-color: var(--sl-border-light);
       box-shadow:
         inset 0 1rpx 0 rgba(255, 255, 255, 0.06),
@@ -941,52 +292,8 @@ uni.$on(AUTH_LOGIN_SUCCESS_EVENT, handleLoginSuccess);
       color: var(--sl-text-main);
       text-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.5);
     }
-
-    .community__sheet {
-      background:
-        linear-gradient(180deg, var(--sl-surface-bg), var(--sl-page-bg));
-      border-top: 1rpx solid var(--sl-border-light);
-      box-shadow:
-        inset 0 2rpx 0 rgba(255, 255, 255, 0.08),
-        0 -18rpx 48rpx rgba(0, 0, 0, 0.34);
-    }
-
-    .community__sheet-subtitle,
-    .community__sheet-close,
-    .community__sheet-comment-head,
-    .community__sheet-empty,
-    .community__sheet-loading {
-      color: var(--sl-text-sub);
-    }
-
-    .community__sheet-comment::after {
-      background-color: var(--sl-border-light);
-    }
-
-    .community__textarea {
-      color: var(--sl-text-main);
-      background: var(--sl-input-bg);
-      border-color: var(--sl-control-border);
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .community__textarea:focus {
-      border-color: var(--sl-border-focused);
-      box-shadow: 0 0 12rpx rgba(112, 152, 218, 0.25);
-    }
-
-    .community__textarea-placeholder {
-      color: var(--sl-text-muted);
-    }
-
-    .community__sheet-button--ghost {
-      color: var(--sl-text-sub);
-      background: var(--sl-control-bg);
-      border-color: var(--sl-border-light);
-    }
   }
 
-  /* ─── 固定 Tab 栏 ─── */
   &__tabbar {
     position: sticky;
     top: 0;
@@ -1141,7 +448,6 @@ uni.$on(AUTH_LOGIN_SUCCESS_EVENT, handleLoginSuccess);
     z-index: 1;
     align-items: flex-start;
     justify-content: space-between;
-    padding-right: 0;
   }
 
   &__identity {
@@ -1366,308 +672,6 @@ uni.$on(AUTH_LOGIN_SUCCESS_EVENT, handleLoginSuccess);
     color: $color-text-tertiary;
     font-size: 24rpx;
     padding: $space-md 0;
-  }
-
-  &__sheet-mask {
-    position: fixed;
-    inset: 0;
-    z-index: 120;
-    display: flex;
-    align-items: flex-end;
-    background: rgba(17, 24, 39, 0.54);
-  }
-
-  &__sheet {
-    position: relative;
-    width: 100%;
-    max-height: 78vh;
-    padding: $space-lg $space-md $space-lg;
-    border-radius: 36rpx 36rpx 0 0;
-    background:
-      linear-gradient(180deg, var(--sl-control-bg-strong), var(--sl-page-bg));
-    display: flex;
-    flex-direction: column;
-  }
-
-  &__sheet--keyboard {
-    padding-bottom: $space-lg;
-  }
-
-  &__sheet-head,
-  &__sheet-comment-head,
-  &__sheet-actions {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: $space-sm;
-  }
-
-  &__sheet-title {
-    color: var(--community-text-main);
-    font-size: 32rpx;
-    font-weight: 700;
-  }
-
-  &__sheet-subtitle,
-  &__sheet-close,
-  &__sheet-comment-head,
-  &__sheet-empty,
-  &__sheet-loading {
-    color: rgba(75, 85, 99, 0.68);
-    font-size: 22rpx;
-  }
-
-  &__sheet-list {
-    height: 42vh;
-    margin-top: $space-md;
-    padding-right: 8rpx;
-  }
-
-  &__sheet-comment {
-    padding: $space-sm 0;
-    @include hairline-bottom;
-
-    &:last-child::after {
-      display: none;
-    }
-  }
-
-  &__sheet-comment-content {
-    margin-top: 8rpx;
-    color: var(--community-text-main);
-    font-size: 26rpx;
-    line-height: 1.7;
-  }
-
-  &__comment-nickname {
-    color: var(--sl-text-main, #111827);
-    font-weight: 700;
-    font-size: 26rpx;
-  }
-  &__comment-meta {
-    display: flex;
-    align-items: center;
-    gap: $space-sm;
-  }
-  &__comment-time {
-    color: var(--sl-text-sub, rgba(75, 85, 99, 0.68));
-    font-size: 22rpx;
-  }
-  &__comment-reply-btn {
-    color: var(--community-primary, #3b59ff);
-    font-size: 22rpx;
-    font-weight: 600;
-    cursor: pointer;
-    &:active {
-      opacity: 0.7;
-    }
-  }
-
-  &__comment-delete-btn {
-    color: $color-danger;
-    font-size: 22rpx;
-    font-weight: 600;
-    cursor: pointer;
-    &:active {
-      opacity: 0.7;
-    }
-  }
-
-  &__reply-box {
-    margin-top: $space-sm;
-    margin-left: 20rpx;
-    padding: 16rpx 20rpx;
-    border-radius: $radius-md;
-    background: rgba(0, 0, 0, 0.024);
-    border: 1rpx solid rgba(17, 24, 39, 0.03);
-    
-    .sl-theme--dark & {
-      background: rgba(255, 255, 255, 0.025);
-      border-color: rgba(255, 255, 255, 0.04);
-    }
-  }
-
-  &__reply-item {
-    padding: 10rpx 0;
-    border-bottom: 1rpx dashed rgba(17, 24, 39, 0.04);
-    &:last-of-type {
-      border-bottom: none;
-    }
-    .sl-theme--dark & {
-      border-bottom-color: rgba(255, 255, 255, 0.04);
-    }
-  }
-
-  &__reply-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: $space-xs;
-  }
-
-  &__reply-users {
-    display: flex;
-    align-items: center;
-    gap: 8rpx;
-    font-size: 24rpx;
-  }
-
-  &__reply-author {
-    color: var(--sl-text-main, #111827);
-    font-weight: 700;
-  }
-
-  &__reply-arrow {
-    font-size: 18rpx;
-    color: var(--sl-text-sub, rgba(75, 85, 99, 0.5));
-    margin: 0 4rpx;
-  }
-
-  &__reply-target {
-    color: var(--community-primary, #3b59ff);
-    font-weight: 600;
-  }
-
-  &__reply-meta {
-    display: flex;
-    align-items: center;
-    gap: 12rpx;
-  }
-
-  &__reply-time {
-    color: var(--sl-text-sub, rgba(75, 85, 99, 0.5));
-    font-size: 20rpx;
-  }
-
-  &__reply-btn {
-    color: var(--community-primary, #3b59ff);
-    font-size: 20rpx;
-    font-weight: 600;
-    cursor: pointer;
-    &:active {
-      opacity: 0.7;
-    }
-  }
-
-  &__reply-delete-btn {
-    color: $color-danger;
-    font-size: 20rpx;
-    font-weight: 600;
-    cursor: pointer;
-    &:active {
-      opacity: 0.7;
-    }
-  }
-
-  &__reply-content {
-    margin-top: 6rpx;
-    color: var(--sl-text-main, #111827);
-    font-size: 24rpx;
-    line-height: 1.6;
-  }
-
-  &__reply-toggle {
-    display: flex;
-    align-items: center;
-    padding-top: 10rpx;
-    cursor: pointer;
-  }
-
-  &__reply-toggle-text {
-    font-size: 22rpx;
-    color: var(--community-primary, #3b59ff);
-    font-weight: 700;
-    opacity: 0.95;
-    &:active {
-      opacity: 0.7;
-    }
-  }
-
-  &__reply-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 16rpx;
-    padding: 12rpx 20rpx;
-    border-radius: $radius-sm;
-    background: rgba(59, 89, 255, 0.08);
-    border: 1rpx solid rgba(59, 89, 255, 0.15);
-    
-    .sl-theme--dark & {
-      background: rgba(105, 129, 255, 0.12);
-      border-color: rgba(105, 129, 255, 0.2);
-    }
-  }
-
-  &__reply-indicator-text {
-    font-size: 24rpx;
-    color: var(--community-primary, #3b59ff);
-    font-weight: 600;
-  }
-
-  &__reply-indicator-close {
-    font-size: 26rpx;
-    color: var(--community-primary, #3b59ff);
-    padding: 0 8rpx;
-    cursor: pointer;
-    &:active {
-      transform: scale(0.9);
-    }
-  }
-
-  &__sheet-empty,
-  &__sheet-loading {
-    padding: $space-lg 0;
-    text-align: center;
-  }
-
-  &__textarea {
-    width: 100%;
-    min-height: 148rpx;
-    margin-top: $space-md;
-    padding: $space-md;
-    box-sizing: border-box;
-    border-radius: $radius-lg;
-    background: rgba(31, 41, 55, 0.04);
-    border: 1rpx solid rgba(17, 24, 39, 0.08);
-    font-size: 28rpx;
-    color: var(--sl-text-main) !important;
-  }
-
-  &__textarea-placeholder {
-    color: var(--sl-text-muted) !important;
-  }
-
-  &__sheet-actions {
-    margin-top: $space-md;
-  }
-
-  &__sheet-button {
-    flex: 1;
-    min-height: 84rpx;
-    line-height: 84rpx;
-    border-radius: 999rpx;
-    font-size: 28rpx;
-  }
-
-  &__sheet-button::after {
-    border: none;
-  }
-
-  &__sheet-button:active {
-    transform: scale(0.98);
-  }
-
-  &__sheet-button--ghost {
-    color: var(--community-text-sub);
-    background: var(--sl-control-bg);
-    border: 1rpx solid rgba(229, 231, 235, 0.9);
-  }
-
-  &__sheet-button--primary {
-    background: linear-gradient(135deg, var(--community-primary), var(--community-primary-soft));
-    color: #fff;
-    box-shadow: 0 14rpx 32rpx rgba(59, 89, 255, 0.2);
   }
 }
 </style>

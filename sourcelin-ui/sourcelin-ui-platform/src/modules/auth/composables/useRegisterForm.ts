@@ -1,7 +1,6 @@
 import { onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getCaptcha, register as registerApi, sendEmailCode } from '@/modules/auth/api/auth.api'
-import type { LoginTokenPayload } from '@/modules/auth/api/auth.api'
 import { useUserStore } from '@/stores/user'
 import { sDiscreteMessage } from '@/shared/composables/useSMessage'
 import { resolveRequestErrorMessage } from '@/shared/api/error-message'

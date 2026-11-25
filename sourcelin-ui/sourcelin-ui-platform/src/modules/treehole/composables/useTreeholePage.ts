@@ -70,6 +70,7 @@ export function useTreeholePage() {
 
   const activeCommentTargetId = computed(() => activeTreeholeId.value || 0)
   const commentAnonymousLabel = computed(() => (isLoggedIn.value ? '洞友' : '匿名洞友'))
+  const barrageNicknameFallback = () => commentAnonymousLabel.value
   const commentApi = useContentComments({
     targetId: activeCommentTargetId,
     source: 'treehole',
@@ -94,16 +95,6 @@ export function useTreeholePage() {
     collectedByMe: Boolean(item.collectedByMe),
     nickname: item.userNickname || item.nickname || item.userName || item.user?.nickname,
     avatar: item.avatar || item.userAvatar || item.user?.avatar || defaultAvatar
-  })
-
-  const barrageNicknameFallback = () => (isLoggedIn.value ? '洞友' : '匿名洞友')
-
-  const createBarrageItem = (item: TreeholeCardItem): TreeholeBarrageItem => ({
-    id: item.id,
-    msg: item.content,
-    avatar: item.avatar || defaultAvatar,
-    nickname: item.nickname || barrageNicknameFallback(),
-    time: Math.floor(Math.random() * 5 + 5)
   })
 
   const loadBarrages = async () => {

@@ -4,7 +4,7 @@
  * 结构：
  * 1. SCSS 变量 - 布局尺寸（供 JS 导出和组件使用）
  * 2. CSS 变量 - 侧边栏/菜单主题色
- * 3. 主题模式 - 深蓝侧边栏、暗黑模式
+ * 3. 主题模式 - 经典蓝侧边栏、暗黑模式
  * 4. 无障碍模式
  */
 
@@ -38,10 +38,7 @@ $tags-view-height: 34px;
   --warning-color: #f59e0b;
   --error-color: #ef4444;
   --info-color: #3b82f6;
-  --sidebar-classic-bg: #0f172a;
-  --sidebar-classic-text: #cbd5e1;
-  --sidebar-classic-active-text: #ffffff;
-  --sidebar-classic-parent-active-text: #a5b4fc;
+  --sidebar-classic-bg: #eef2ff;
 
   // 表面层级与柔和阴影
   --surface-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 1px rgba(15, 23, 42, 0.02);
@@ -51,11 +48,10 @@ $tags-view-height: 34px;
   --menu-background: var(--el-bg-color);
   --menu-text: var(--el-text-color-regular);
   --menu-active-text: var(--el-color-primary);
-  --menu-hover: color-mix(in srgb, var(--el-color-primary) 8%, var(--el-fill-color-light));
-  --menu-active-parent-bg: color-mix(in srgb, var(--el-color-primary) 10%, transparent);
-  --menu-active-parent-text: var(--el-color-primary);
-  --menu-active-parent-bg-emphasis: color-mix(in srgb, var(--el-color-primary) 14%, transparent);
-  --menu-top-active-bg: color-mix(in srgb, var(--el-color-primary) 10%, transparent);
+  --menu-hover: color-mix(in srgb, var(--el-color-primary) 8%, var(--menu-background));
+  --menu-active-bg: color-mix(in srgb, var(--el-color-primary) 13%, var(--menu-background));
+  --menu-active-hover: color-mix(in srgb, var(--el-color-primary) 20%, var(--menu-background));
+  --menu-focus: var(--el-color-primary);
 
   // 侧边栏 Logo
   --sidebar-logo-background: var(--menu-background);
@@ -75,27 +71,9 @@ $sidebar-logo-text-color: var(--sidebar-logo-text-color);
 // 3. 主题模式
 // ============================================
 
-// 浅色主题 - 深蓝色侧边栏
+// 亮色主题下的经典蓝配色使用浅靛蓝背景。
 html.sidebar-color-classic {
   --menu-background: var(--sidebar-classic-bg);
-  --menu-text: var(--sidebar-classic-text);
-  --menu-active-text: var(--sidebar-classic-active-text);
-  --menu-hover: color-mix(in srgb, var(--el-color-white) 10%, transparent);
-  --menu-active-parent-bg: color-mix(
-    in srgb,
-    var(--sidebar-classic-parent-active-text) 14%,
-    transparent
-  );
-  --menu-active-parent-text: var(--sidebar-classic-parent-active-text);
-  --menu-active-parent-bg-emphasis: color-mix(
-    in srgb,
-    var(--sidebar-classic-parent-active-text) 20%,
-    transparent
-  );
-  --menu-top-active-bg: color-mix(in srgb, var(--el-color-white) 12%, transparent);
-  --sidebar-logo-background: color-mix(in srgb, var(--sidebar-classic-bg) 88%, black);
-  --sidebar-logo-text-color: var(--sidebar-classic-active-text);
-  --toolbar-hover-bg: color-mix(in srgb, var(--el-color-white) 10%, transparent);
 }
 
 // 暗黑主题（冷靛夜色 Slate Navy 3 级表面纵深：Canvas #0b1120 -> Surface #111827 -> Elevated #1a2336）
@@ -137,11 +115,10 @@ html.dark {
   --menu-background: #0f172a;
   --menu-text: #cbd5e1;
   --menu-active-text: #f8fafc;
-  --menu-hover: color-mix(in srgb, var(--el-color-primary) 16%, transparent);
-  --menu-active-parent-bg: color-mix(in srgb, var(--el-color-primary) 18%, transparent);
-  --menu-active-parent-text: #a5b4fc;
-  --menu-active-parent-bg-emphasis: color-mix(in srgb, var(--el-color-primary) 24%, transparent);
-  --menu-top-active-bg: color-mix(in srgb, var(--el-color-primary) 20%, transparent);
+  --menu-hover: color-mix(in srgb, var(--el-color-primary) 16%, var(--menu-background));
+  --menu-active-bg: color-mix(in srgb, var(--el-color-primary) 23%, var(--menu-background));
+  --menu-active-hover: color-mix(in srgb, var(--el-color-primary) 31%, var(--menu-background));
+  --menu-focus: #a5b4fc;
   --sidebar-logo-background: #0d1424;
   --sidebar-logo-text-color: #f1f5f9;
   --toolbar-hover-bg: rgba(148, 163, 184, 0.12);

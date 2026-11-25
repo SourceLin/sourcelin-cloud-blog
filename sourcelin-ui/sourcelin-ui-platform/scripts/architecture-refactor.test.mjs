@@ -517,6 +517,14 @@ async function testPlatformContentPaginationContracts() {
     path.resolve('src/modules/article/pages/CategoryPage.vue'),
     'utf8'
   )
+  const categoryArticleList = await fs.readFile(
+    path.resolve('src/modules/article/components/CategoryArticleList.vue'),
+    'utf8'
+  )
+  const categoryPageQuery = await fs.readFile(
+    path.resolve('src/modules/article/composables/useCategoryPageQuery.ts'),
+    'utf8'
+  )
   const tagPage = await fs.readFile(
     path.resolve('src/modules/article/pages/TagPage.vue'),
     'utf8'
@@ -563,12 +571,12 @@ async function testPlatformContentPaginationContracts() {
   )
 
   assert.equal(
-    categoryPage.includes('<SPagination'),
+    categoryPage.includes('<SPagination') || categoryArticleList.includes('<SPagination'),
     true,
     'CategoryPage detail mode should expose explicit article pagination instead of truncating to 12 items'
   )
   assert.equal(
-    categoryPage.includes('page: articlePage.value'),
+    categoryPage.includes('page: articlePage.value') || categoryPageQuery.includes('page: articlePage.value'),
     true,
     'CategoryPage should request category articles with the current page state'
   )

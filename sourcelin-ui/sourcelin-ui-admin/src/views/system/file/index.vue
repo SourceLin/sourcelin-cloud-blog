@@ -167,7 +167,7 @@
               size="small"
               link
               :icon="Download"
-              @click="handleDownload(scope.row)"
+              @click="handleDownload(scope.row as FileInfoDetail)"
             >
               下载
             </el-button>
@@ -177,7 +177,7 @@
               size="small"
               link
               :icon="View"
-              @click="handlePreviewImage(scope.row)"
+              @click="handlePreviewImage(scope.row as FileInfoDetail)"
             >
               预览
             </el-button>

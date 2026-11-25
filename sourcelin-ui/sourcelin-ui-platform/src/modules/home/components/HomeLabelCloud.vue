@@ -39,8 +39,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import SGradientText from '@/shared/components/ui/SGradientText.vue'
-import SIcon from '@/shared/components/ui/SIcon.vue'
-import { appIcons } from '@/shared/components/ui/icons'
 
 interface Tag {
   id: number

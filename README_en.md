@@ -234,7 +234,7 @@ Read more: [docs/openai-application.md](./docs/openai-application.md) | [docs/ai
 - MySQL 8.4 LTS
 - Redis 6.0+ with `SET ... KEEPTTL` support (7.2.x recommended)
 - Nacos 3.1.1
-- Node.js 22.12+ and pnpm
+- Node.js 22.22.2+ and pnpm
 
 ### Local Development
 
@@ -262,8 +262,8 @@ Import `docs/sql/sourcelin-config.sql` into MySQL before starting Nacos. Use `BL
 
 ```bash
 cd sourcelin-ui/sourcelin-ui-platform
-npm install
-npm run dev
+pnpm install --frozen-lockfile
+pnpm run dev
 ```
 
 5. **Start admin panel**

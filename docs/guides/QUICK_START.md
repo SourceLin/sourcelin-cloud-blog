@@ -21,7 +21,7 @@
 | Maven | 3.9 | 3.9.x |
 | MySQL | 8.4 | 8.4 LTS |
 | Redis | 6.0（支持 `SET ... KEEPTTL`） | 7.2.x |
-| Node.js | 22.12 | 22 LTS |
+| Node.js | 22.22.2 | 22 LTS |
 | Nacos | 3.1.1 | 3.1.1 |
 
 ## 三、本地最小启动
@@ -114,8 +114,8 @@ pnpm run dev
 
 ```bash
 cd sourcelin-ui/sourcelin-ui-platform
-npm install
-npm run dev
+pnpm install --frozen-lockfile
+pnpm run dev
 ```
 
 ## 四、推荐验证顺序

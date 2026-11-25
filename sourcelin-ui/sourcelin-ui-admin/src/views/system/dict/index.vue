@@ -69,7 +69,12 @@
         <el-table-column label="备注" prop="remark" min-width="180" />
         <el-table-column fixed="right" label="操作" align="center" width="240">
           <template #default="{ row }">
-            <el-button type="primary" link size="small" @click.stop="openDictData(row)">
+            <el-button
+              type="primary"
+              link
+              size="small"
+              @click.stop="openDictData(row as DictTypeItem)"
+            >
               <template #icon>
                 <Collection />
               </template>

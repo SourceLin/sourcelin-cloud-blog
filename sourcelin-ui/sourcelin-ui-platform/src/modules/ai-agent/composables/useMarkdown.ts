@@ -1,5 +1,68 @@
-import hljs from 'highlight.js'
+import hljs from 'highlight.js/lib/core'
+import bash from 'highlight.js/lib/languages/bash'
+import c from 'highlight.js/lib/languages/c'
+import cpp from 'highlight.js/lib/languages/cpp'
+import css from 'highlight.js/lib/languages/css'
+import dockerfile from 'highlight.js/lib/languages/dockerfile'
+import go from 'highlight.js/lib/languages/go'
+import java from 'highlight.js/lib/languages/java'
+import javascript from 'highlight.js/lib/languages/javascript'
+import json from 'highlight.js/lib/languages/json'
+import kotlin from 'highlight.js/lib/languages/kotlin'
+import markdown from 'highlight.js/lib/languages/markdown'
+import php from 'highlight.js/lib/languages/php'
+import python from 'highlight.js/lib/languages/python'
+import rust from 'highlight.js/lib/languages/rust'
+import scss from 'highlight.js/lib/languages/scss'
+import shell from 'highlight.js/lib/languages/shell'
+import sql from 'highlight.js/lib/languages/sql'
+import typescript from 'highlight.js/lib/languages/typescript'
+import xml from 'highlight.js/lib/languages/xml'
+import yaml from 'highlight.js/lib/languages/yaml'
 import 'highlight.js/styles/github-dark.css'
+
+const REGISTERED_LANGUAGES = [
+  ['bash', bash],
+  ['sh', bash],
+  ['zsh', bash],
+  ['shell', shell],
+  ['c', c],
+  ['cpp', cpp],
+  ['css', css],
+  ['scss', scss],
+  ['dockerfile', dockerfile],
+  ['docker', dockerfile],
+  ['go', go],
+  ['golang', go],
+  ['java', java],
+  ['javascript', javascript],
+  ['js', javascript],
+  ['jsx', javascript],
+  ['typescript', typescript],
+  ['ts', typescript],
+  ['tsx', typescript],
+  ['json', json],
+  ['kotlin', kotlin],
+  ['markdown', markdown],
+  ['md', markdown],
+  ['php', php],
+  ['python', python],
+  ['py', python],
+  ['rust', rust],
+  ['rs', rust],
+  ['sql', sql],
+  ['xml', xml],
+  ['html', xml],
+  ['vue', xml],
+  ['yaml', yaml],
+  ['yml', yaml]
+] as const
+
+for (const [name, definition] of REGISTERED_LANGUAGES) {
+  if (!hljs.getLanguage(name)) {
+    hljs.registerLanguage(name, definition)
+  }
+}
 
 export function useMarkdown() {
   function parseMarkdown(text: string): string {

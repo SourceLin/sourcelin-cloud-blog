@@ -85,10 +85,6 @@ import * as ElementPlusIconsVue from "@element-plus/icons-vue";
 import { isElementPlusIconName } from "@/utils/element-icons";
 
 const props = defineProps({
-  modelValue: {
-    type: String,
-    default: "",
-  },
   width: {
     type: String,
     default: "500px",
@@ -99,8 +95,6 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:modelValue"]);
-
 const iconSelectRef = ref();
 const popoverContentRef = ref();
 const popoverVisible = ref(false);
@@ -108,9 +102,7 @@ const activeTab = ref("svg");
 
 const svgIcons = ref<string[]>([]);
 const elementIcons = ref<string[]>(Object.keys(ElementPlusIconsVue));
-const selectedIcon = defineModel("modelValue", {
-  type: String,
-  required: true,
+const selectedIcon = defineModel<string>("modelValue", {
   default: "",
 });
 
@@ -150,7 +142,7 @@ function filterIcons() {
 }
 
 function selectIcon(icon: string) {
-  emit("update:modelValue", icon);
+  selectedIcon.value = icon;
   popoverVisible.value = false;
 }
 

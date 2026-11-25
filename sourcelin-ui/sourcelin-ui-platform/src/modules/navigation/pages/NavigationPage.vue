@@ -193,14 +193,13 @@ import HeroStatCard from '@/shared/components/business/HeroStatCard.vue'
 import EmptyState from '@/shared/components/feedback/EmptyState.vue'
 import SkeletonNavCardGrid from '@/shared/components/feedback/skeletons/SkeletonNavCardGrid.vue'
 import PageShell from '@/shared/components/layout/PageShell.vue'
-import SIcon from '@/shared/components/ui/SIcon.vue'
 import SInput from '@/shared/components/ui/SInput.vue'
 import SSkeleton from '@/shared/components/ui/SSkeleton.vue'
 import SSurfaceChip from '@/shared/components/ui/SSurfaceChip.vue'
 import SSurfacePanel from '@/shared/components/ui/SSurfacePanel.vue'
 import { appIcons } from '@/shared/components/ui/icons'
 
-interface RecentNavItem extends Pick<NavItem, 'id' | 'name' | 'url' | 'category'> {}
+type RecentNavItem = Pick<NavItem, 'id' | 'name' | 'url' | 'category'>
 
 const loading = ref(false)
 const navigationData = ref<Record<string, NavItem[]>>({})

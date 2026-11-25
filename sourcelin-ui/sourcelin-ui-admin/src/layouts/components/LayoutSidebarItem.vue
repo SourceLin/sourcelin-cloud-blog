@@ -258,53 +258,5 @@ function resolvePath(routePath: string) {
   }
 }
 
-html.dark {
-  .el-menu-item:hover {
-    background-color: $menu-hover;
-  }
-}
-
-html.sidebar-color-classic {
-  .el-menu-item:hover {
-    background-color: $menu-hover;
-  }
-}
-
-// 父菜单激活状态样式 - 当子菜单激活时，父菜单显示激活状态
-.el-sub-menu {
-  // 当父菜单包含激活子菜单时的样式
-  &.has-active-child > .el-sub-menu__title {
-    color: var(--menu-active-parent-text) !important;
-    background-color: var(--menu-active-parent-bg) !important;
-
-    .menu-icon {
-      color: var(--menu-active-parent-text) !important;
-    }
-  }
-
-  // 深色主题下的父菜单激活状态"
-  html.dark & {
-    &.has-active-child > .el-sub-menu__title {
-      color: var(--menu-active-parent-text) !important;
-      background-color: var(--menu-active-parent-bg-emphasis) !important;
-
-      .menu-icon {
-        color: var(--menu-active-parent-text) !important;
-      }
-    }
-  }
-
-  // 深蓝色侧边栏配色下的父菜单激活状态"
-  html.sidebar-color-classic & {
-    &.has-active-child > .el-sub-menu__title {
-      color: var(--menu-active-parent-text) !important;
-      background-color: var(--menu-active-parent-bg-emphasis) !important;
-
-      .menu-icon {
-        color: var(--menu-active-parent-text) !important;
-      }
-    }
-  }
-}
 /* stylelint-enable no-descending-specificity */
 </style>

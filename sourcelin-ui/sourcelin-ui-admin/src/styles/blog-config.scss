@@ -16,7 +16,7 @@
       box-shadow: var(--el-box-shadow);
     }
 
-    :deep(.el-card__body) {
+    .el-card__body {
       padding: 0;
     }
   }
@@ -188,7 +188,7 @@
         margin-bottom: 0;
       }
 
-      :deep(.el-form-item__label) {
+      .el-form-item__label {
         padding-right: 12px;
         font-size: 13.5px;
         font-weight: 600;
@@ -211,21 +211,21 @@
     }
 
     // 统一大单栏宽度控制
-    :deep(.el-input:not(.el-input--textarea)),
-    :deep(.el-select),
-    :deep(.el-input-number) {
+    .el-input:not(.el-input--textarea),
+    .el-select,
+    .el-input-number {
       width: 100%;
       max-width: 520px;
     }
 
-    :deep(.el-textarea) {
+    .el-textarea {
       width: 100%;
       max-width: 520px;
     }
 
     // 大宽版下取消文本域的限制以自适应栅格分栏
     .is-full & {
-      :deep(.el-textarea) {
+      .el-textarea {
         max-width: none;
       }
     }
@@ -250,16 +250,16 @@
     }
 
     // 输入框聚焦发光微动效
-    :deep(.el-input__wrapper),
-    :deep(.el-textarea__inner) {
+    .el-input__wrapper,
+    .el-textarea__inner {
       background-color: color-mix(in srgb, var(--el-bg-color) 40%, var(--el-bg-color-overlay));
       transition:
         box-shadow 0.25s cubic-bezier(0.25, 0.8, 0.25, 1),
         border-color 0.25s ease;
     }
 
-    :deep(.el-input__wrapper.is-focus),
-    :deep(.el-textarea__inner:focus) {
+    .el-input__wrapper.is-focus,
+    .el-textarea__inner:focus {
       outline: none;
       background-color: var(--el-bg-color-overlay) !important;
       border-color: var(--el-color-primary) !important;

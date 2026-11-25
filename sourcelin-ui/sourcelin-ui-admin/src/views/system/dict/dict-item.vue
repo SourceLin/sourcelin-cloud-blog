@@ -82,7 +82,7 @@
               link
               size="small"
               :icon="Edit"
-              @click.stop="openDialog(row)"
+              @click.stop="openDialog(row as DictItem)"
             >
               编辑
             </el-button>

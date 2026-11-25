@@ -68,7 +68,7 @@
             <el-table-column label="操作时间" prop="createTime" width="180" />
             <el-table-column label="操作" width="80" align="center" fixed="right">
               <template #default="{ row }">
-                <el-button type="primary" link size="small" @click="handleDetail(row)">
+                <el-button type="primary" link size="small" @click="handleDetail(row as LogItem)">
                   详情
                 </el-button>
               </template>

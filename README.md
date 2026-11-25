@@ -385,7 +385,7 @@ sourcelin-cloud-blog/
 | Maven | 3.9 | 3.9.x |
 | MySQL | 8.4 | 8.4 LTS |
 | Redis | 6.0（支持 `SET ... KEEPTTL`） | 7.2.x |
-| Node.js | 22.12 | 22 LTS |
+| Node.js | 22.22.2 | 22 LTS |
 | Nacos | 3.1.1 | 3.1.1 |
 | Docker | 20+ | 24.x |
 
@@ -440,8 +440,8 @@ java -jar sourcelin-visual/sourcelin-monitor/target/sourcelin-visual-monitor.jar
 
 ```bash
 cd sourcelin-ui/sourcelin-ui-platform
-npm install
-npm run dev
+pnpm install --frozen-lockfile
+pnpm run dev
 ```
 
 管理后台：
@@ -456,10 +456,10 @@ pnpm run dev
 
 ```bash
 cd sourcelin-ui/sourcelin-ui-uniapp
-npm install
-npm run dev:mp-weixin
+pnpm install --frozen-lockfile
+pnpm run dev:mp-weixin
 # 或启动 H5 调试
-npm run dev:h5
+pnpm run dev:h5
 ```
 
 ### Docker 部署

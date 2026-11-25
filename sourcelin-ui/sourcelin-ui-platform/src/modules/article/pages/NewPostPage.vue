@@ -9,7 +9,6 @@ import { getAiStatus } from '@/modules/article/api/ai.api'
 import PostEditorForm from '@/modules/article/components/PostEditorForm.vue'
 import HeroStatCard from '@/shared/components/business/HeroStatCard.vue'
 import PageShell from '@/shared/components/layout/PageShell.vue'
-import SIcon from '@/shared/components/ui/SIcon.vue'
 import SSkeleton from '@/shared/components/ui/SSkeleton.vue'
 import { useSMessage } from '@/shared/composables/useSMessage'
 import { appIcons } from '@/shared/components/ui/icons'
@@ -20,21 +19,12 @@ interface SelectOption {
   value: number
 }
 
-interface ArticleTag {
-  id?: number
-}
-
 interface HeroStatTile {
   label: string
   value: string
   icon: Component
   hue: number
   ariaLabel: string
-}
-
-function toNumber(value: unknown, fallback = 0): number {
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : fallback
 }
 
 function getPlainContentLength(content: string): number {

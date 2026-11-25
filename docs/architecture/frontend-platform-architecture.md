@@ -4,10 +4,11 @@
 
 博客前台位于 `sourcelin-ui/sourcelin-ui-platform`，采用 Vue 3 + TypeScript + Naive UI 封装层。当前模块化主线已经收敛到 `src/modules/**`，共享 API、UI 抽象、反馈组件和布局组件位于 `src/shared/**`。
 
-已完成的第三阶段拆分：
+已完成的第三阶段与后续页面容器化拆分：
 
 - `modules/say`：`SayFeedCard.vue` 已拆为作者信息、媒体、互动栏、评论预览和状态聚合。
-- `modules/article`：`TagPage.vue` 已拆为容器、Hero、筛选、列表和 `useTagPageQuery.ts`。
+- `modules/article`：`TagPage.vue` 与 `CategoryPage.vue` 均已拆为容器、Hero、筛选网格、文章列表和 `useTagPageQuery.ts` / `useCategoryPageQuery.ts`。
+- `modules/hot`：`HotPage.vue` 已拆出精选榜单组件 `HotFeaturedSection.vue` 与独立样式 `styles/hot-page.scss`。
 - `modules/about`：`AboutPage.vue` 已拆为展示区块和 `useAboutPage.ts`。
 - `modules/navigation`：`LinksPage.vue` 已拆为 Hero、列表、申请表和 `useLinksPage.ts`。
 

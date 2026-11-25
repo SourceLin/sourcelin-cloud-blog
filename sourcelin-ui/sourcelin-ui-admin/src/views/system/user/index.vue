@@ -118,7 +118,7 @@
                   :icon="RefreshLeft"
                   size="small"
                   link
-                  @click="handleResetPassword(scope.row)"
+                  @click="handleResetPassword(scope.row as UserItem)"
                 >
                   重置密码
                 </el-button>

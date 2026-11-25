@@ -5,7 +5,7 @@ import SPopoverMenu from '@/shared/components/ui/SPopoverMenu.vue'
 import SPopconfirm from '@/shared/components/ui/SPopconfirm.vue'
 import { appIcons } from '@/shared/components/ui/icons'
 
-const props = defineProps<{
+defineProps<{
   liked: boolean
   collected: boolean
   likeCount: number

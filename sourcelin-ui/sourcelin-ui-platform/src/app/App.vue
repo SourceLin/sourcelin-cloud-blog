@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
+import { computed, defineAsyncComponent, ref, onMounted } from 'vue'
 import { darkTheme, NConfigProvider, NDialogProvider } from 'naive-ui'
 import { useRoute } from 'vue-router'
 import { useHead } from '@unhead/vue'
@@ -18,7 +18,12 @@ import MobileNavDrawer from '@/shared/components/layout/MobileNavDrawer.vue'
 import ThemeTransition from '@/shared/components/layout/ThemeTransition.vue'
 import SMessage from '@/shared/components/ui/SMessage.vue'
 import SNotification from '@/shared/components/ui/SNotification.vue'
-import { AiAgentAvatar, AiAgentChatPanel, useAiAgentChat } from '@/modules/ai-agent'
+import AiAgentAvatar from '@/modules/ai-agent/components/AiAgentAvatar.vue'
+import { useAiAgentChat } from '@/modules/ai-agent/composables/useAiAgentChat'
+
+const AiAgentChatPanel = defineAsyncComponent(
+  () => import('@/modules/ai-agent/components/AiAgentChatPanel.vue')
+)
 
 const themeStore = useThemeStore()
 const uiStore = useUiStore()

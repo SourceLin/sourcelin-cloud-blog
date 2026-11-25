@@ -137,21 +137,6 @@ const mobileNavigation = computed<MobileNavItem[]>(() => {
 const webInfo = () => siteStore.siteInfo
 const siteName = () => webInfo().siteName || webInfo().webName || '圆圈博客'
 const siteLogo = () => webInfo().logo || localLogo
-const authorAvatar = () => webInfo().avatar || siteLogo()
-const authorName = () => webInfo().author || siteName()
-const authorDesc = () => {
-  const title = webInfo().webTitle
-
-  if (Array.isArray(title) && title.length > 0) {
-    return title[0]
-  }
-
-  if (typeof title === 'string' && title) {
-    return title
-  }
-
-  return webInfo().webName || '欢迎来到博客'
-}
 
 const drawer = computed({
   get: () => uiStore.drawerVisible,

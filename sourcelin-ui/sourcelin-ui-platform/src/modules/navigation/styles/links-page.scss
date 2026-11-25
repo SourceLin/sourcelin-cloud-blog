@@ -30,7 +30,7 @@
     var(--surface-page-ambient);
 }
 
-.links-page :deep(.page-shell) {
+.links-page .page-shell {
   position: relative;
   z-index: 1;
 }

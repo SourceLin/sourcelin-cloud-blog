@@ -60,4 +60,4 @@ description: 用于新增或修改 Sourcelin Uniapp 移动端页面、组件、A
 
 ## 升级验证
 
-在小程序工程内执行 `npm ci`，同步更新 DCloud 编译器与 Vite 插件，按插件 peerDependencies 选 Vite。以生成的 app.json 核实主包和分包；记录真机登录、覆盖安装和 SSE 恢复结果。
+在小程序工程内执行 `pnpm install --frozen-lockfile`，同步更新 DCloud 编译器与 Vite 插件，按插件 peerDependencies 选 Vite。以生成的 app.json 核实主包和分包；记录真机登录、覆盖安装和 SSE 恢复结果。

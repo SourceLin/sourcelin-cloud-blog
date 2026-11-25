@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
 const displayValue = computed(() => String(props.value ?? '').trim())
 
 const valueKind = computed<'number' | 'cjk' | 'text'>(() => {
-  if (/^[\d./:%+\-]+$/.test(displayValue.value)) {
+  if (/^[\d./:%+-]+$/.test(displayValue.value)) {
     return 'number'
   }
   if (/[\u4e00-\u9fa5]/.test(displayValue.value)) {

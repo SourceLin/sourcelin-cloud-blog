@@ -23,7 +23,7 @@
 import type { HotCategory } from '@/modules/hot/composables/useHotPage'
 import SHorizontalOverflowRail from '@/shared/components/ui/SHorizontalOverflowRail.vue'
 
-const props = defineProps<{
+defineProps<{
   categories: HotCategory[]
   activeCategory: string | number
 }>()

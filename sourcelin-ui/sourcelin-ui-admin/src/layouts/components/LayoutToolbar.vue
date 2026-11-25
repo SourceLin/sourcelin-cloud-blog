@@ -58,7 +58,7 @@
 import { useRoute, useRouter } from "vue-router";
 import ThemeSwitch from "@/components/ThemeSwitch/index.vue";
 import { useThemeToggle } from "@/composables";
-import { DeviceEnum, SidebarColor, ThemeMode, LayoutMode } from "@/enums/settings";
+import { DeviceEnum, ThemeMode } from "@/enums/settings";
 import { useAppStore, useSettingsStore, useUserStore } from "@/store";
 
 // 导入子组件
@@ -84,31 +84,11 @@ function handleProfileClick() {
   router.push({ name: "Profile" });
 }
 
-// 根据主题和侧边栏配色方案选择样式类
-const navbarActionsClass = computed(() => {
-  const { resolvedTheme, sidebarColorScheme, layout } = settingStore;
-
-  // 暗黑主题下，所有布局都使用白色文字
-  if (resolvedTheme === ThemeMode.DARK) {
-    return "navbar-actions--white-text";
-  }
-
-  // 明亮主题下
-  if (resolvedTheme === ThemeMode.LIGHT) {
-    // 顶部布局和混合布局的顶部区域：
-    // - 如果侧边栏是经典蓝色，使用白色文字
-    // - 如果侧边栏是极简白色，使用深色文字
-    if (layout === LayoutMode.TOP || layout === LayoutMode.MIX) {
-      if (sidebarColorScheme === SidebarColor.CLASSIC_BLUE) {
-        return "navbar-actions--white-text";
-      } else {
-        return "navbar-actions--dark-text";
-      }
-    }
-  }
-
-  return "navbar-actions--dark-text";
-});
+const navbarActionsClass = computed(() =>
+  settingStore.resolvedTheme === ThemeMode.DARK
+    ? "navbar-actions--white-text"
+    : "navbar-actions--dark-text"
+);
 
 /**
  * 退出登录
@@ -215,7 +195,7 @@ function handleSettingsClick() {
   }
 }
 
-// 白色文字样式（用于深色背景：暗黑主题、顶部布局、混合布局等）
+// 暗色主题的工具栏文字
 .navbar-actions--white-text {
   .navbar-actions__item {
     :deep([class^="i-svg:"]) {
@@ -244,7 +224,7 @@ function handleSettingsClick() {
   }
 }
 
-// 深色文字样式（用于浅色背景：明亮主题下的左侧布局等）
+// 亮色主题的工具栏文字
 .navbar-actions--dark-text {
   .navbar-actions__item {
     :deep([class^="i-svg:"]) {

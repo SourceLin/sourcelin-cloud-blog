@@ -49,22 +49,6 @@ const emptyState = computed(() => {
 
   return null
 })
-const resultMeta = computed(() => {
-  if (loading.value) {
-    return '正在整理匹配内容'
-  }
-
-  if (hasResults.value) {
-    return `共找到 ${total.value} 篇相关文章`
-  }
-
-  if (hasKeyword.value) {
-    return '没有找到完全匹配的结果'
-  }
-
-  return '输入关键词后，快速跳转到文章与主题'
-})
-
 const searchScrollLock = typeof document !== 'undefined' ? createStartupScrollLock(document) : null
 
 watch(
